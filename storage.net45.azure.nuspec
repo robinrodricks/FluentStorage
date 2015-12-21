@@ -2,25 +2,26 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata>
       <id>Aloneguid.Support.WindowsAzure</id>
-      <version>1.1.1</version>
+      <version>1.0.0</version>
       <authors>Ivan Gavryliuk</authors>
       <owners>Ivan Gavryliuk</owners>
       <projectUrl>https://github.com/aloneguid/support</projectUrl>
       <requireLicenseAcceptance>false</requireLicenseAcceptance>
       <description>
-         An addition implementation of support interfaces in Windows Azure. This includes Tables, Messages and Queues.
+         .NET storage implementation for Windows Azure.
       </description>
       <summary>
-         The library tagets .NET 4.5 framework only.
+         To follow.
       </summary>
       <copyright>Copyright (c) 2015 by Ivan Gavryliuk</copyright>
       <tags>Common</tags>
       <dependencies>
+         <dependency id="Storage.Net" version="1.0"/>
          <dependency id="Aloneguid.Support" version="1.6" />
-         <dependency id="WindowsAzure.Storage" version="5.0"/>
+         <dependency id="WindowsAzure.Storage" version="6.2"/>
       </dependencies>
    </metadata>
    <files>
-      <file src="src\Aloneguid.Support.Net45.Azure\bin\Release\Aloneguid.Support.Net45.Azure.*" target="lib\net45"/>
+      <file src="out\lib\azure\Storage.Net.Net45.Azure.*" target="lib\net45"/>
    </files>
 </package>
