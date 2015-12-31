@@ -123,7 +123,7 @@ namespace Storage.Net.Tests.Integration
          Assert.AreEqual("2", theOne.RowKey);
       }
 
-      [Test, ExpectedException(typeof(StorageException))]
+      [Test]
       public void Concurrency_DeleteWithWrongEtag_Fails()
       {
          if(!_tables.HasOptimisticConcurrency) Assert.Ignore();
@@ -136,10 +136,13 @@ namespace Storage.Net.Tests.Integration
 
          //change it's ETag and try to delete which must fail!
          row.Id.ConcurrencyKey = Guid.NewGuid().ToString();
-         _tables.Delete(_tableName, row.Id);
+         Assert.Throws<StorageException>(() =>
+         {
+            _tables.Delete(_tableName, row.Id);
+         });
       }
 
-      [Test, ExpectedException(typeof(StorageException))]
+      [Test]
       public void Concurrency_RowOldCopy_MustNotUpdate()
       {
          if(!_tables.HasOptimisticConcurrency) Assert.Ignore();

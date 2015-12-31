@@ -58,11 +58,11 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Aloneguid.Support.Portable, Version=1.0.0.0, Culture=neutral, PublicKeyToken=8dea52f811e261ef, processorArchitecture=MSIL">
-      <HintPath>..\packages\Aloneguid.Support.2.0\lib\portable-net45+sl5+wp8+win8\Aloneguid.Support.Portable.dll</HintPath>
+      <HintPath>..\packages\Aloneguid.Support.2.0.1\lib\portable-net45+sl5+wp8+win8\Aloneguid.Support.Portable.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.1\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Collections.Concurrent">
@@ -74,6 +74,7 @@
     <None Include="..\storage.snk">
       <Link>storage.snk</Link>
     </None>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
