@@ -1,23 +1,23 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata>
-      <id>Aloneguid.Support.WindowsAzure</id>
+      <id>Storage.Net.WindowsAzure</id>
       <version>1.0.0</version>
       <authors>Ivan Gavryliuk</authors>
       <owners>Ivan Gavryliuk</owners>
-      <projectUrl>https://github.com/aloneguid/support</projectUrl>
+      <projectUrl>https://github.com/aloneguid/storage</projectUrl>
       <requireLicenseAcceptance>false</requireLicenseAcceptance>
       <description>
          .NET storage implementation for Windows Azure.
       </description>
       <summary>
-         To follow.
+         To follow
       </summary>
       <copyright>Copyright (c) 2015 by Ivan Gavryliuk</copyright>
       <tags>Common</tags>
       <dependencies>
          <dependency id="Storage.Net" version="1.0"/>
-         <dependency id="Aloneguid.Support" version="1.6" />
+         <dependency id="Aloneguid.Support" version="2.0" />
          <dependency id="WindowsAzure.Storage" version="6.2"/>
       </dependencies>
    </metadata>
