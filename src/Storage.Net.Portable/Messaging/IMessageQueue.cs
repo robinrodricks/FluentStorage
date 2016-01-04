@@ -5,14 +5,8 @@ namespace Storage.Net.Messaging
    /// <summary>
    /// Generic queue interface
    /// </summary>
-   public interface IMessageQueue
+   public interface IMessageQueue : IMessagePublisher
    {
-      /// <summary>
-      /// Puts new message to the back of the qeuue
-      /// </summary>
-      /// <param name="content"></param>
-      void PutMessage(string content);
-
       /// <summary>
       /// Gets a message from the queue and marks it as invisible so that further requeusts to this message won't return it
       /// </summary>

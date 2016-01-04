@@ -36,8 +36,8 @@
     <AssemblyOriginatorKeyFile>..\storage.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Config.Net, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Config.Net.1.1.0\lib\net45\Config.Net.dll</HintPath>
+    <Reference Include="Config.Net, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d836a57afd299520, processorArchitecture=MSIL">
+      <HintPath>..\packages\Config.Net.1.1.2\lib\net45\Config.Net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.core, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">

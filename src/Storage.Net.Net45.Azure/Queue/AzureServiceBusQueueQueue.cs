@@ -29,7 +29,7 @@ namespace Storage.Net.Azure.Queue
          throw new NotImplementedException();
       }
 
-      public void PutMessage(string content)
+      public void PutMessage(QueueMessage message)
       {
          throw new NotImplementedException();
       }

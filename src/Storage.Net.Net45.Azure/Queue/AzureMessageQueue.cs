@@ -22,11 +22,11 @@ namespace Storage.Net.Azure.Queue
          _queue.CreateIfNotExists();
       }
 
-      public void PutMessage(string content)
+      public void PutMessage(QueueMessage message)
       {
-         var message = new CloudQueueMessage(content);
+         var ccm = new CloudQueueMessage(message.Content);
 
-         _queue.AddMessage(message);
+         _queue.AddMessage(ccm);
       }
 
       public QueueMessage GetMessage(TimeSpan? visibilityTimeout)

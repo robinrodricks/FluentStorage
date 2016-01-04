@@ -55,11 +55,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Aloneguid.Support.Net45, Version=1.0.0.0, Culture=neutral, PublicKeyToken=8dea52f811e261ef, processorArchitecture=MSIL">
-      <HintPath>..\packages\Aloneguid.Support.2.0.1\lib\net45\Aloneguid.Support.Net45.dll</HintPath>
+      <HintPath>..\packages\Aloneguid.Support.2.0.2\lib\net45\Aloneguid.Support.Net45.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Config.Net, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Config.Net.1.1.0\lib\net45\Config.Net.dll</HintPath>
+    <Reference Include="Config.Net, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d836a57afd299520, processorArchitecture=MSIL">
+      <HintPath>..\packages\Config.Net.1.1.2\lib\net45\Config.Net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="LogMagic, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -87,6 +87,7 @@
     <Compile Include="AbstractTestFixture.cs" />
     <Compile Include="BlobStorageTest.cs" />
     <Compile Include="ConsoleRunner.cs" />
+    <Compile Include="Messaging\GenericMessageQueueTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TableStorageTest.cs" />
     <Compile Include="TestSettings.cs" />

@@ -41,7 +41,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Aloneguid.Support.Net45, Version=1.0.0.0, Culture=neutral, PublicKeyToken=8dea52f811e261ef, processorArchitecture=MSIL">
-      <HintPath>..\packages\Aloneguid.Support.2.0.1\lib\net45\Aloneguid.Support.Net45.dll</HintPath>
+      <HintPath>..\packages\Aloneguid.Support.2.0.2\lib\net45\Aloneguid.Support.Net45.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -70,8 +70,14 @@
     <Compile Include="..\Storage.Net.Portable\FileFormats\CsvWriter.cs">
       <Link>FileFormats\CsvWriter.cs</Link>
     </Compile>
+    <Compile Include="..\Storage.Net.Portable\Messaging\IMessagePublisher.cs">
+      <Link>Messaging\IMessagePublisher.cs</Link>
+    </Compile>
     <Compile Include="..\Storage.Net.Portable\Messaging\IMessageQueue.cs">
       <Link>Messaging\IMessageQueue.cs</Link>
+    </Compile>
+    <Compile Include="..\Storage.Net.Portable\Messaging\IMessageReceiver.cs">
+      <Link>Messaging\IMessageReceiver.cs</Link>
     </Compile>
     <Compile Include="..\Storage.Net.Portable\Messaging\QueueMessage.cs">
       <Link>Messaging\QueueMessage.cs</Link>
