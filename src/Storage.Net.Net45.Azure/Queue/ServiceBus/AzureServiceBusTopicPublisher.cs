@@ -8,7 +8,7 @@ namespace Storage.Net.Azure.Queue.ServiceBus
    /// <summary>
    /// Represents queues as Azure Service Bus Topics
    /// </summary>
-   public class AzureServiceBusTopicPublisher : IMessagePublisher
+   class AzureServiceBusTopicPublisher : IMessagePublisher
    {
       private NamespaceManager _nsMgr;
       readonly private string _connectionString;
@@ -53,7 +53,11 @@ namespace Storage.Net.Azure.Queue.ServiceBus
       /// <param name="message"></param>
       public void PutMessage(QueueMessage message)
       {
-         _client.Send(ServiceBusConverter.ToBrokeredMessage(message));
+         _client.Send(Converter.ToBrokeredMessage(message));
+      }
+
+      public void Dispose()
+      {
       }
    }
 }

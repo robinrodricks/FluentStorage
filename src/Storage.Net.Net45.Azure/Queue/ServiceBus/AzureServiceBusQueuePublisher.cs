@@ -1,4 +1,5 @@
-﻿using Microsoft.ServiceBus;
+﻿using System;
+using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Storage.Net.Messaging;
 
@@ -45,8 +46,12 @@ namespace Storage.Net.Azure.Queue.ServiceBus
       /// <param name="message"></param>
       public void PutMessage(QueueMessage message)
       {
-         BrokeredMessage bm = ServiceBusConverter.ToBrokeredMessage(message);
+         BrokeredMessage bm = Converter.ToBrokeredMessage(message);
          _client.Send(bm);
+      }
+
+      public void Dispose()
+      {
       }
    }
 }

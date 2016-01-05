@@ -6,7 +6,7 @@ using QueueMessage = Storage.Net.Messaging.QueueMessage;
 
 namespace Storage.Net.Azure.Queue.ServiceBus
 {
-   static class ServiceBusConverter
+   static class Converter
    {
       public static BrokeredMessage ToBrokeredMessage(QueueMessage message)
       {
@@ -32,7 +32,6 @@ namespace Storage.Net.Azure.Queue.ServiceBus
          var result = new QueueMessage(message.MessageId, body);
          if(message.Properties != null && message.Properties.Count > 0)
          {
-            result.Properties = new Dictionary<string, string>();
             foreach(KeyValuePair<string, object> pair in message.Properties)
             {
                result.Properties[pair.Key] = pair.Value == null ? pair.Value.ToString() : null;

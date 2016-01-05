@@ -1,47 +1,62 @@
 ﻿using System;
 using Storage.Net.Messaging;
+using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
-using Microsoft.WindowsAzure.Storage.Queue;
 
 namespace Storage.Net.Azure.Queue.Storage
 {
    /// <summary>
-   /// Azure Storage queue
+   /// Queue receiver based on Azure Storage Queues
    /// </summary>
-   public class AzureStorageMessageQueue : IMessageQueue
+   public class AzureStorageQueueReceiver : IMessageReceiver
    {
       private readonly CloudQueue _queue;
 
       /// <summary>
-      /// Creates an instance of Azure Storage Queue by account details and the queue name
+      /// Creates an instance of Azure Storage Queue receiver 
       /// </summary>
-      /// <param name="accountName">Storage account name</param>
-      /// <param name="storageKey">Storage key (primary or secondary)</param>
-      /// <param name="queueName">Name of the queue. If queue doesn't exist it will be created</param>
-      public AzureStorageMessageQueue(string accountName, string storageKey, string queueName)
+      /// <param name="accountName">Azure Storage account name</param>
+      /// <param name="storageKey">Azure Storage key</param>
+      /// <param name="queueName">Queue name</param>
+      /// <param name="pingInverval">
+      /// Ping interval. Due to the fact that Storage Queues have to be periodically
+      /// pinged for new messages you have to choose this interval wisely. Each call is billed separately.
+      /// </param>
+      public AzureStorageQueueReceiver(string accountName, string storageKey, string queueName,
+         TimeSpan pingInverval)
       {
-         if(accountName == null) throw new ArgumentNullException(nameof(accountName));
-         if(storageKey == null) throw new ArgumentNullException(nameof(storageKey));
-         if(queueName == null) throw new ArgumentNullException(nameof(queueName));
-
          var account = new CloudStorageAccount(new StorageCredentials(accountName, storageKey), true);
          var client = account.CreateCloudQueueClient();
          _queue = client.GetQueueReference(queueName);
          _queue.CreateIfNotExists();
       }
 
-      public void PutMessage(QueueMessage message)
-      {
-         var ccm = new CloudQueueMessage(message.Content);
+      /// <summary>
+      /// Fired when a new message is received.
+      /// </summary>
+      public event EventHandler<QueueMessage> OnNewMessage;
 
-         _queue.AddMessage(ccm);
+      /// <summary>
+      /// Deletes the message from the queue
+      /// </summary>
+      /// <param name="message"></param>
+      public void ConfirmMessage(QueueMessage message)
+      {
+         throw new NotImplementedException();
       }
 
+      /// <summary>
+      /// Stops the pinging thread
+      /// </summary>
+      public void Dispose()
+      {
+      }
+      /*
       public QueueMessage GetMessage(TimeSpan? visibilityTimeout)
       {
          CloudQueueMessage message = _queue.GetMessage(visibilityTimeout);
-         if (message == null) return null;
+         if(message == null) return null;
 
          return new QueueMessage(CreateId(message), message.AsString);
       }
@@ -49,7 +64,7 @@ namespace Storage.Net.Azure.Queue.Storage
       public QueueMessage PeekMesssage()
       {
          CloudQueueMessage message = _queue.PeekMessage();
-         if (message == null) return null;
+         if(message == null) return null;
 
          return new QueueMessage(CreateId(message), message.AsString);
       }
@@ -58,7 +73,7 @@ namespace Storage.Net.Azure.Queue.Storage
       {
          string id2, pop;
          SplitId(id, out id2, out pop);
-         if (pop == null) throw new ArgumentException(@"cannot delete message by short id, use GetMessage to get the message with full id first", id);
+         if(pop == null) throw new ArgumentException(@"cannot delete message by short id, use GetMessage to get the message with full id first", id);
 
          _queue.DeleteMessage(id2, pop);
       }
@@ -70,7 +85,7 @@ namespace Storage.Net.Azure.Queue.Storage
 
       private string CreateId(CloudQueueMessage message)
       {
-         if (string.IsNullOrEmpty(message.PopReceipt)) return message.Id;
+         if(string.IsNullOrEmpty(message.PopReceipt)) return message.Id;
 
          return message.Id + ":" + message.PopReceipt;
       }
@@ -80,6 +95,7 @@ namespace Storage.Net.Azure.Queue.Storage
          string[] parts = compositeId.Split(new[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries);
          id = parts[0];
          popReceipt = parts.Length > 1 ? parts[1] : null;
-      }
+      }*/
+
    }
 }

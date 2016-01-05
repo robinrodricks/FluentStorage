@@ -9,7 +9,7 @@ namespace Storage.Net.Messaging
    /// <summary>
    /// Responsible for publishing messages
    /// </summary>
-   public interface IMessagePublisher
+   public interface IMessagePublisher : IDisposable
    {
       /// <summary>
       /// Puts new message to the back of the qeuue

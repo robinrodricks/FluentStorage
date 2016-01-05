@@ -95,10 +95,13 @@
     <Compile Include="Blob\AzureStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queue\ServiceBus\AzureServiceBusQueueReceiver.cs" />
-    <Compile Include="Queue\ServiceBus\ServiceBusConverter.cs" />
-    <Compile Include="Queue\Storage\AzureStorageMessageQueue.cs" />
+    <Compile Include="Queue\ServiceBus\Converter.cs" />
+    <Compile Include="Queue\Storage\AzureStorageQueuePublisher.cs" />
     <Compile Include="Queue\ServiceBus\AzureServiceBusQueuePublisher.cs" />
     <Compile Include="Queue\ServiceBus\AzureServiceBusTopicPublisher.cs" />
+    <Compile Include="Queue\Storage\AzureStorageQueueReceiver.cs" />
+    <Compile Include="Queue\Storage\Converter.cs" />
+    <Compile Include="Queue\Storage\JsonProps.cs" />
     <Compile Include="Table\AzureTableStorage.cs" />
   </ItemGroup>
   <ItemGroup>

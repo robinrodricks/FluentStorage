@@ -8,6 +8,8 @@ namespace Storage.Net.Messaging
    /// </summary>
    public class QueueMessage
    {
+      private Dictionary<string, string> _properties;
+
       /// <summary>
       /// Creates an instance of <see cref="QueueMessage"/>
       /// </summary>
@@ -41,6 +43,13 @@ namespace Storage.Net.Messaging
       /// <summary>
       /// Extra properties for this message
       /// </summary>
-      public Dictionary<string, string> Properties { get; set; }
+      public Dictionary<string, string> Properties
+      {
+         get
+         {
+            if(_properties == null) _properties = new Dictionary<string, string>();
+            return _properties;
+         }
+      }
    }
 }

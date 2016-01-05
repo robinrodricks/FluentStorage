@@ -42,7 +42,7 @@ namespace Storage.Net.Azure.Queue.ServiceBus
 
       private void OnBrokeredMessage(BrokeredMessage message)
       {
-         QueueMessage result = ServiceBusConverter.ToQueueMessage(message);
+         QueueMessage result = Converter.ToQueueMessage(message);
 
          message.Complete();
 

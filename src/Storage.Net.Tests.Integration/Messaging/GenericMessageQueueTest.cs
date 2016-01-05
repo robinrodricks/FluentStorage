@@ -9,7 +9,7 @@ using System.Threading;
 namespace Storage.Net.Tests.Integration.Messaging
 {
    [TestFixture("azure-storage-queue")]
-   [TestFixture("azure-servicebus-topic")]
+   //[TestFixture("azure-servicebus-topic")]
    [TestFixture("azure-servicebus-queue")]
    public class GenericMessageQueueTest : AbstractTestFixture
    {
@@ -28,21 +28,31 @@ namespace Storage.Net.Tests.Integration.Messaging
          switch(_name)
          {
             case "azure-storage-queue":
-               _publisher = new AzureStorageMessageQueue(
+               _publisher = new AzureStorageQueuePublisher(
                   Cfg.Read(TestSettings.AzureStorageName),
                   Cfg.Read(TestSettings.AzureStorageKey),
                   "testqueue");
-               _receiver = null;
+               _receiver = new AzureStorageQueueReceiver(
+                  Cfg.Read(TestSettings.AzureStorageName),
+                  Cfg.Read(TestSettings.AzureStorageKey),
+                  "testqueue", TimeSpan.FromSeconds(1));
                break;
-            case "azure-servicebus-topic":
+            /*case "azure-servicebus-topic":
                _publisher = new AzureServiceBusTopicPublisher(Cfg.Read(TestSettings.ServiceBusConnectionString), "testtopic");
                _receiver = null;
-               break;
+               break;*/
             case "azure-servicebus-queue":
                _publisher = new AzureServiceBusQueuePublisher(Cfg.Read(TestSettings.ServiceBusConnectionString), "testqueue");
                _receiver = new AzureServiceBusQueueReceiver(Cfg.Read(TestSettings.ServiceBusConnectionString), "testqueue", true);
                break;
          }
+      }
+
+      [TearDown]
+      public void TearDown()
+      {
+         _publisher.Dispose();
+         _receiver.Dispose();
       }
 
       [Test]
@@ -54,5 +64,13 @@ namespace Storage.Net.Tests.Integration.Messaging
          //_queue.PeekMesssage
       }
 
+      [Test]
+      public void SendMessage_ExtraProperties_DoesntCrash()
+      {
+         var msg = new QueueMessage("prop content at " + DateTime.UtcNow);
+         msg.Properties["one"] = "one value";
+         msg.Properties["two"] = "two value";
+         _publisher.PutMessage(msg);
+      }
    }
 }
