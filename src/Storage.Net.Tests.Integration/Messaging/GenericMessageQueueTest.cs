@@ -1,21 +1,20 @@
 ﻿using Config.Net;
 using NUnit.Framework;
-using Storage.Net.Azure.Queue;
+using Storage.Net.Azure.Queue.ServiceBus;
+using Storage.Net.Azure.Queue.Storage;
 using Storage.Net.Messaging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
    [TestFixture("azure-storage-queue")]
-   [TestFixture("azure-servicebus-topics")]
+   [TestFixture("azure-servicebus-topic")]
+   [TestFixture("azure-servicebus-queue")]
    public class GenericMessageQueueTest : AbstractTestFixture
    {
       private string _name;
-      private IMessageQueue _queue;
+      private IMessagePublisher _publisher;
+      private IMessageReceiver _receiver;
 
       public GenericMessageQueueTest(string name)
       {
@@ -28,13 +27,16 @@ namespace Storage.Net.Tests.Integration.Messaging
          switch(_name)
          {
             case "azure-storage-queue":
-               _queue = new AzureMessageQueue(
+               _publisher = new AzureStorageMessageQueue(
                   Cfg.Read(TestSettings.AzureStorageName),
                   Cfg.Read(TestSettings.AzureStorageKey),
                   "testqueue");
                break;
-            case "azure-servicebus-topics":
-               _queue = new AzureServiceBusTopicQueue(Cfg.Read(TestSettings.ServiceBusConnectionString), "testtopic");
+            case "azure-servicebus-topic":
+               _publisher = new AzureServiceBusTopicPublisher(Cfg.Read(TestSettings.ServiceBusConnectionString), "testtopic");
+               break;
+            case "azure-servicebus-queue":
+               _publisher = new AzureServiceBusQueuePublisher(Cfg.Read(TestSettings.ServiceBusConnectionString), "testqueue");
                break;
          }
       }
@@ -42,7 +44,7 @@ namespace Storage.Net.Tests.Integration.Messaging
       [Test]
       public void SendMessage_OneMessage_DoesntCrash()
       {
-         _queue.PutMessage(new QueueMessage("test content at " + DateTime.UtcNow));
+         _publisher.PutMessage(new QueueMessage("test content at " + DateTime.UtcNow));
 
          //_queue.PeekMesssage
       }

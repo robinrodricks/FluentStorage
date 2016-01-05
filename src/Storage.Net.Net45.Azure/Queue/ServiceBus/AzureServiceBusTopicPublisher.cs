@@ -3,12 +3,12 @@ using Storage.Net.Messaging;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Storage.Net.Azure.Queue
+namespace Storage.Net.Azure.Queue.ServiceBus
 {
    /// <summary>
    /// Represents queues as Azure Service Bus Topics
    /// </summary>
-   public class AzureServiceBusTopicQueue : IMessageQueue
+   public class AzureServiceBusTopicPublisher : IMessagePublisher
    {
       private NamespaceManager _nsMgr;
       readonly private string _connectionString;
@@ -20,7 +20,7 @@ namespace Storage.Net.Azure.Queue
       /// </summary>
       /// <param name="connectionString">Service Bus connection string</param>
       /// <param name="topicName">Name of the Service Bus topic</param>
-      public AzureServiceBusTopicQueue(string connectionString, string topicName)
+      public AzureServiceBusTopicPublisher(string connectionString, string topicName)
       {
          _connectionString = connectionString;
          _nsMgr = NamespaceManager.CreateFromConnectionString(connectionString);
@@ -47,51 +47,13 @@ namespace Storage.Net.Azure.Queue
          //
       }
 
-      public void Clear()
-      {
-         throw new NotImplementedException();
-      }
-
-      public void DeleteMessage(string id)
-      {
-         throw new NotImplementedException();
-      }
-
-      public QueueMessage GetMessage(TimeSpan? visibilityTimeout = default(TimeSpan?))
-      {
-         throw new NotSupportedException();
-      }
-
-      public QueueMessage PeekMesssage()
-      {
-         throw new NotSupportedException();
-      }
-
       /// <summary>
       /// Sends a <see cref="BrokeredMessage"/> with passed content
       /// </summary>
       /// <param name="message"></param>
       public void PutMessage(QueueMessage message)
       {
-         _client.Send(ToBrokeredMessage(message));
-      }
-
-      private static BrokeredMessage ToBrokeredMessage(QueueMessage message)
-      {
-         var result = new BrokeredMessage(message.Content.ToMemoryStream());
-         if(message.Properties != null && message.Properties.Count > 0)
-         {
-            foreach(var prop in message.Properties)
-            {
-               result.Properties.Add(prop.Key, prop.Value);
-            }
-         }
-         return result;
-      }
-
-      private QueueMessage ToQueueMessage(BrokeredMessage message)
-      {
-         return null;
+         _client.Send(ServiceBusConverter.ToBrokeredMessage(message));
       }
    }
 }

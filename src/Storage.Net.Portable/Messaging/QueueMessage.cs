@@ -15,8 +15,6 @@ namespace Storage.Net.Messaging
       /// <param name="content">Message content</param>
       public QueueMessage(string id, string content)
       {
-         if(id == null) throw new ArgumentNullException("id");
-
          Id = id;
          Content = content;
       }

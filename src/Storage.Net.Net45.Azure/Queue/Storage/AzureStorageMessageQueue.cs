@@ -4,17 +4,26 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Queue;
 
-namespace Storage.Net.Azure.Queue
+namespace Storage.Net.Azure.Queue.Storage
 {
-   public class AzureMessageQueue : IMessageQueue
+   /// <summary>
+   /// Azure Storage queue
+   /// </summary>
+   public class AzureStorageMessageQueue : IMessageQueue
    {
       private readonly CloudQueue _queue;
 
-      public AzureMessageQueue(string accountName, string storageKey, string queueName)
+      /// <summary>
+      /// Creates an instance of Azure Storage Queue by account details and the queue name
+      /// </summary>
+      /// <param name="accountName">Storage account name</param>
+      /// <param name="storageKey">Storage key (primary or secondary)</param>
+      /// <param name="queueName">Name of the queue. If queue doesn't exist it will be created</param>
+      public AzureStorageMessageQueue(string accountName, string storageKey, string queueName)
       {
-         if (accountName == null) throw new ArgumentNullException(nameof(accountName));
-         if (storageKey == null) throw new ArgumentNullException(nameof(storageKey));
-         if (queueName == null) throw new ArgumentNullException(nameof(queueName));
+         if(accountName == null) throw new ArgumentNullException(nameof(accountName));
+         if(storageKey == null) throw new ArgumentNullException(nameof(storageKey));
+         if(queueName == null) throw new ArgumentNullException(nameof(queueName));
 
          var account = new CloudStorageAccount(new StorageCredentials(accountName, storageKey), true);
          var client = account.CreateCloudQueueClient();

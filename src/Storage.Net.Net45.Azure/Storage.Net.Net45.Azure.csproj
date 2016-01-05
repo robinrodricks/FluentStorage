@@ -94,9 +94,10 @@
     <Compile Include="Blob\AzureBlobStorage.cs" />
     <Compile Include="Blob\AzureStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Queue\AzureMessageQueue.cs" />
-    <Compile Include="Queue\AzureServiceBusQueueQueue.cs" />
-    <Compile Include="Queue\AzureServiceBusTopicQueue.cs" />
+    <Compile Include="Queue\ServiceBus\ServiceBusConverter.cs" />
+    <Compile Include="Queue\Storage\AzureStorageMessageQueue.cs" />
+    <Compile Include="Queue\ServiceBus\AzureServiceBusQueuePublisher.cs" />
+    <Compile Include="Queue\ServiceBus\AzureServiceBusTopicPublisher.cs" />
     <Compile Include="Table\AzureTableStorage.cs" />
   </ItemGroup>
   <ItemGroup>
