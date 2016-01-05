@@ -4,6 +4,7 @@ using Storage.Net.Azure.Queue.ServiceBus;
 using Storage.Net.Azure.Queue.Storage;
 using Storage.Net.Messaging;
 using System;
+using System.Threading;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
@@ -14,7 +15,7 @@ namespace Storage.Net.Tests.Integration.Messaging
    {
       private string _name;
       private IMessagePublisher _publisher;
-      //private IMessageReceiver _receiver;
+      private IMessageReceiver _receiver;
 
       public GenericMessageQueueTest(string name)
       {
@@ -31,12 +32,15 @@ namespace Storage.Net.Tests.Integration.Messaging
                   Cfg.Read(TestSettings.AzureStorageName),
                   Cfg.Read(TestSettings.AzureStorageKey),
                   "testqueue");
+               _receiver = null;
                break;
             case "azure-servicebus-topic":
                _publisher = new AzureServiceBusTopicPublisher(Cfg.Read(TestSettings.ServiceBusConnectionString), "testtopic");
+               _receiver = null;
                break;
             case "azure-servicebus-queue":
                _publisher = new AzureServiceBusQueuePublisher(Cfg.Read(TestSettings.ServiceBusConnectionString), "testqueue");
+               _receiver = new AzureServiceBusQueueReceiver(Cfg.Read(TestSettings.ServiceBusConnectionString), "testqueue", true);
                break;
          }
       }
@@ -46,6 +50,7 @@ namespace Storage.Net.Tests.Integration.Messaging
       {
          _publisher.PutMessage(new QueueMessage("test content at " + DateTime.UtcNow));
 
+         if(_receiver != null) Thread.Sleep(TimeSpan.FromMinutes(1));
          //_queue.PeekMesssage
       }
 

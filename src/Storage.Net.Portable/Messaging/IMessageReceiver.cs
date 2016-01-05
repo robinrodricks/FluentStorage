@@ -5,7 +5,7 @@ namespace Storage.Net.Messaging
    /// <summary>
    /// Responsible for receiving messages
    /// </summary>
-   public interface IMessageReceiver
+   public interface IMessageReceiver : IDisposable
    {
       /// <summary>
       /// Fired on new message received
