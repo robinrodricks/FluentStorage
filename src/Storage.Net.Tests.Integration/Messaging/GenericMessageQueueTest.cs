@@ -14,7 +14,7 @@ namespace Storage.Net.Tests.Integration.Messaging
    {
       private string _name;
       private IMessagePublisher _publisher;
-      private IMessageReceiver _receiver;
+      //private IMessageReceiver _receiver;
 
       public GenericMessageQueueTest(string name)
       {

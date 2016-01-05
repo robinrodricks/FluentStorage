@@ -58,52 +58,82 @@ namespace Storage.Net.Table
 
       #region [IDictionary]
 
+      /// <summary>
+      /// Get enumerator for cells inside the row
+      /// </summary>
       public IEnumerator<KeyValuePair<string, TableCell>> GetEnumerator()
       {
          return _keyToValue.GetEnumerator();
       }
 
+      /// <summary>
+      /// Get enumerator for cells inside the row
+      /// </summary>
       IEnumerator IEnumerable.GetEnumerator()
       {
          return GetEnumerator();
       }
 
+      /// <summary>
+      /// IDictionary.Add
+      /// </summary>
       public void Add(KeyValuePair<string, TableCell> item)
       {
          Add(item.Key, item.Value);
       }
 
+      /// <summary>
+      /// Clears cells
+      /// </summary>
       public void Clear()
       {
          _keyToValue.Clear();
       }
 
+      /// <summary>
+      /// IDictionary.Contains
+      /// </summary>
       public bool Contains(KeyValuePair<string, TableCell> item)
       {
          return _keyToValue.ContainsKey(item.Key);
       }
 
+      /// <summary>
+      /// IDictionary.CopyTo
+      /// </summary>
       public void CopyTo(KeyValuePair<string, TableCell>[] array, int arrayIndex)
       {
          throw new NotSupportedException();
       }
 
+      /// <summary>
+      /// IDictionary.Remove
+      /// </summary>
       public bool Remove(KeyValuePair<string, TableCell> item)
       {
          TableCell value;
          return _keyToValue.TryRemove(item.Key, out value);
       }
 
+      /// <summary>
+      /// IDictionary.Count
+      /// </summary>
       public int Count
       {
          get { return _keyToValue.Count; }
       }
 
+      /// <summary>
+      /// IDictionary.IsReadOnly
+      /// </summary>
       public bool IsReadOnly
       {
          get { return false; }
       }
 
+      /// <summary>
+      /// IDictionary.Add
+      /// </summary>
       public void Add(string key, TableCell value)
       {
          if(value == null)
@@ -116,22 +146,34 @@ namespace Storage.Net.Table
          }
       }
 
+      /// <summary>
+      /// IDictionary.ContainsKey
+      /// </summary>
       public bool ContainsKey(string key)
       {
          return _keyToValue.ContainsKey(key);
       }
 
+      /// <summary>
+      /// IDictionary.Remove
+      /// </summary>
       public bool Remove(string key)
       {
          TableCell value;
          return _keyToValue.TryRemove(key, out value);
       }
 
+      /// <summary>
+      /// IDictionary.TryGetValue
+      /// </summary>
       public bool TryGetValue(string key, out TableCell value)
       {
          return _keyToValue.TryGetValue(key, out value);
       }
 
+      /// <summary>
+      /// IDictionary.this
+      /// </summary>
       public TableCell this[string key]
       {
          get
@@ -143,11 +185,17 @@ namespace Storage.Net.Table
          set { Add(key, value); }
       }
 
+      /// <summary>
+      /// IDictionary.Keys
+      /// </summary>
       public ICollection<string> Keys
       {
          get { return _keyToValue.Keys; }
       }
 
+      /// <summary>
+      /// IDictionary.Values
+      /// </summary>
       public ICollection<TableCell> Values
       {
          get { return _keyToValue.Values; }
@@ -155,6 +203,12 @@ namespace Storage.Net.Table
 
       #endregion
 
+      /// <summary>
+      /// Clones the row
+      /// </summary>
+      /// <param name="rowKey">When specified, the clone receives this value for the Row Key</param>
+      /// <param name="partitionKey">When speified, the clone receives this value for the Partition Key</param>
+      /// <returns></returns>
       public TableRow Clone(string rowKey = null, string partitionKey = null)
       {
          var clone = new TableRow(partitionKey ?? PartitionKey, rowKey ?? RowKey);
@@ -165,6 +219,10 @@ namespace Storage.Net.Table
          return clone;
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <returns></returns>
       public override string ToString()
       {
          return $"{PartitionKey} : {RowKey}";
@@ -172,6 +230,9 @@ namespace Storage.Net.Table
 
       #region [ Value Helpers ]
 
+      /// <summary>
+      /// Gets value as enum
+      /// </summary>
       public TEnum GetEnum<TEnum>(string key) where TEnum : struct
       {
          if(key == null) return default(TEnum);
