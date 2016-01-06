@@ -3,6 +3,7 @@ using Storage.Net.Messaging;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
+using System.Threading;
 
 namespace Storage.Net.Azure.Queue.Storage
 {
@@ -12,6 +13,8 @@ namespace Storage.Net.Azure.Queue.Storage
    public class AzureStorageQueueReceiver : IMessageReceiver
    {
       private readonly CloudQueue _queue;
+      private readonly Timer _pingTimer;
+      private readonly TimeSpan _messageVisibilityTimeout;
 
       /// <summary>
       /// Creates an instance of Azure Storage Queue receiver 
@@ -23,13 +26,34 @@ namespace Storage.Net.Azure.Queue.Storage
       /// Ping interval. Due to the fact that Storage Queues have to be periodically
       /// pinged for new messages you have to choose this interval wisely. Each call is billed separately.
       /// </param>
+      /// <param name="messageVisibilityTimeout">
+      /// Timeout value passed in GetMessage call in the Storage Queue. The value indicates how long the message
+      /// will be hidden before it reappears in the queue. Therefore you must call <see cref="ConfirmMessage(QueueMessage)"/>
+      /// to complete and delete it.
+      /// </param>
       public AzureStorageQueueReceiver(string accountName, string storageKey, string queueName,
-         TimeSpan pingInverval)
+         TimeSpan pingInverval, TimeSpan messageVisibilityTimeout)
       {
          var account = new CloudStorageAccount(new StorageCredentials(accountName, storageKey), true);
          var client = account.CreateCloudQueueClient();
          _queue = client.GetQueueReference(queueName);
          _queue.CreateIfNotExists();
+         _messageVisibilityTimeout = messageVisibilityTimeout;
+         _pingTimer = new Timer(PingNewMessageCallback, null, TimeSpan.FromSeconds(5), pingInverval);
+      }
+
+      private void PingNewMessageCallback(object state)
+      {
+         if(OnNewMessage == null) return;
+
+         CloudQueueMessage message = _queue.GetMessage(_messageVisibilityTimeout);
+         if(message == null) return;
+
+         QueueMessage modelMessage = Converter.ToQueueMessage(message);
+         if(OnNewMessage != null)   //check again just in case of race conditions
+         {
+            OnNewMessage(this, modelMessage);
+         }
       }
 
       /// <summary>
@@ -43,7 +67,10 @@ namespace Storage.Net.Azure.Queue.Storage
       /// <param name="message"></param>
       public void ConfirmMessage(QueueMessage message)
       {
-         throw new NotImplementedException();
+         string id, popReceipt;
+         Converter.SplitId(message.Id, out id, out popReceipt);
+         if(popReceipt == null) throw new ArgumentException("cannot delete message by short id", id);
+         _queue.DeleteMessage(id, popReceipt);
       }
 
       /// <summary>
@@ -51,51 +78,7 @@ namespace Storage.Net.Azure.Queue.Storage
       /// </summary>
       public void Dispose()
       {
+         _pingTimer.Dispose();
       }
-      /*
-      public QueueMessage GetMessage(TimeSpan? visibilityTimeout)
-      {
-         CloudQueueMessage message = _queue.GetMessage(visibilityTimeout);
-         if(message == null) return null;
-
-         return new QueueMessage(CreateId(message), message.AsString);
-      }
-
-      public QueueMessage PeekMesssage()
-      {
-         CloudQueueMessage message = _queue.PeekMessage();
-         if(message == null) return null;
-
-         return new QueueMessage(CreateId(message), message.AsString);
-      }
-
-      public void DeleteMessage(string id)
-      {
-         string id2, pop;
-         SplitId(id, out id2, out pop);
-         if(pop == null) throw new ArgumentException(@"cannot delete message by short id, use GetMessage to get the message with full id first", id);
-
-         _queue.DeleteMessage(id2, pop);
-      }
-
-      public void Clear()
-      {
-         _queue.Clear();
-      }
-
-      private string CreateId(CloudQueueMessage message)
-      {
-         if(string.IsNullOrEmpty(message.PopReceipt)) return message.Id;
-
-         return message.Id + ":" + message.PopReceipt;
-      }
-
-      private void SplitId(string compositeId, out string id, out string popReceipt)
-      {
-         string[] parts = compositeId.Split(new[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries);
-         id = parts[0];
-         popReceipt = parts.Length > 1 ? parts[1] : null;
-      }*/
-
    }
 }

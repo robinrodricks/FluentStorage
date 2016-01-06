@@ -1,4 +1,5 @@
-﻿using Config.Net;
+﻿using Aloneguid.Support;
+using Config.Net;
 using NUnit.Framework;
 using Storage.Net.Azure.Queue.ServiceBus;
 using Storage.Net.Azure.Queue.Storage;
@@ -10,12 +11,13 @@ namespace Storage.Net.Tests.Integration.Messaging
 {
    [TestFixture("azure-storage-queue")]
    //[TestFixture("azure-servicebus-topic")]
-   [TestFixture("azure-servicebus-queue")]
+   //[TestFixture("azure-servicebus-queue")]
    public class GenericMessageQueueTest : AbstractTestFixture
    {
       private string _name;
       private IMessagePublisher _publisher;
       private IMessageReceiver _receiver;
+      private QueueMessage _lastMessage;
 
       public GenericMessageQueueTest(string name)
       {
@@ -35,7 +37,7 @@ namespace Storage.Net.Tests.Integration.Messaging
                _receiver = new AzureStorageQueueReceiver(
                   Cfg.Read(TestSettings.AzureStorageName),
                   Cfg.Read(TestSettings.AzureStorageKey),
-                  "testqueue", TimeSpan.FromSeconds(1));
+                  "testqueue", TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(1));
                break;
             /*case "azure-servicebus-topic":
                _publisher = new AzureServiceBusTopicPublisher(Cfg.Read(TestSettings.ServiceBusConnectionString), "testtopic");
@@ -46,13 +48,24 @@ namespace Storage.Net.Tests.Integration.Messaging
                _receiver = new AzureServiceBusQueueReceiver(Cfg.Read(TestSettings.ServiceBusConnectionString), "testqueue", true);
                break;
          }
+
+         _receiver.OnNewMessage += OnMessage;
       }
 
       [TearDown]
       public void TearDown()
       {
+         _receiver.OnNewMessage -= OnMessage;
+
          _publisher.Dispose();
          _receiver.Dispose();
+      }
+
+      private void OnMessage(object sender, QueueMessage message)
+      {
+         _lastMessage = message;
+
+         _receiver.ConfirmMessage(message);
       }
 
       [Test]
@@ -72,5 +85,34 @@ namespace Storage.Net.Tests.Integration.Messaging
          msg.Properties["two"] = "two value";
          _publisher.PutMessage(msg);
       }
+
+      [Test]
+      public void SendMessage_SimpleOne_Received()
+      {
+         string content = Generator.RandomString;
+
+         _publisher.PutMessage(new QueueMessage(content));
+
+         Thread.Sleep(TimeSpan.FromSeconds(10));
+
+         Assert.AreEqual(content, _lastMessage.Content);
+      }
+
+      [Test]
+      public void SendMessage_WithProperties_Received()
+      {
+         string content = Generator.RandomString;
+
+         var msg = new QueueMessage(content);
+         msg.Properties["one"] = "v1";
+
+         _publisher.PutMessage(msg);
+
+         Thread.Sleep(TimeSpan.FromSeconds(10));
+
+         Assert.AreEqual(content, _lastMessage.Content);
+         Assert.AreEqual("v1", _lastMessage.Properties["one"]);
+      }
+
    }
 }
