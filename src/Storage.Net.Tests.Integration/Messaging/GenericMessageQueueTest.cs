@@ -9,9 +9,9 @@ using System.Threading;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
-   [TestFixture("azure-storage-queue")]
+   //[TestFixture("azure-storage-queue")]
    //[TestFixture("azure-servicebus-topic")]
-   //[TestFixture("azure-servicebus-queue")]
+   [TestFixture("azure-servicebus-queue")]
    public class GenericMessageQueueTest : AbstractTestFixture
    {
       private string _name;

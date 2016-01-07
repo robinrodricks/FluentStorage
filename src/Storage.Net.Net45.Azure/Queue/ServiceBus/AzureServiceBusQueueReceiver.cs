@@ -1,7 +1,7 @@
-﻿using Microsoft.ServiceBus;
-using Microsoft.ServiceBus.Messaging;
+﻿using Microsoft.ServiceBus.Messaging;
 using Storage.Net.Messaging;
 using System;
+using System.Collections.Concurrent;
 
 namespace Storage.Net.Azure.Queue.ServiceBus
 {
@@ -14,6 +14,7 @@ namespace Storage.Net.Azure.Queue.ServiceBus
 
       private readonly QueueClient _client;
       private readonly bool _peekLock;
+      private readonly ConcurrentDictionary<string, BrokeredMessage> _messageIdToBrokeredMessage = new ConcurrentDictionary<string, BrokeredMessage>();
 
       /// <summary>
       /// Creates 
@@ -44,7 +45,11 @@ namespace Storage.Net.Azure.Queue.ServiceBus
       {
          QueueMessage result = Converter.ToQueueMessage(message);
 
-         message.Complete();
+         if(_peekLock)
+         {
+            //only cache messages in PeekLock mode
+            _messageIdToBrokeredMessage[result.Id] = message;
+         }
 
          if(OnNewMessage != null) OnNewMessage(this, result);
       }
@@ -60,7 +65,13 @@ namespace Storage.Net.Azure.Queue.ServiceBus
       /// <param name="message"></param>
       public void ConfirmMessage(QueueMessage message)
       {
-         throw new NotImplementedException();
+         if(!_peekLock) return;
+
+         BrokeredMessage bm;
+         //delete the message and get the deleted element, very nice method!
+         if(!_messageIdToBrokeredMessage.TryRemove(message.Id, out bm)) return;
+
+         bm.Complete();
       }
 
       public void Dispose()
