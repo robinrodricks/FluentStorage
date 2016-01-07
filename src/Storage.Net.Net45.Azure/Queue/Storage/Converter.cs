@@ -10,7 +10,6 @@ namespace Storage.Net.Azure.Queue.Storage
 {
    static class Converter
    {
-      private const string PropBeginWord = "PROPBEGIN";
       private const string PropEndWord = "PROPEND";
 
       public static CloudQueueMessage ToCloudQueueMessage(QueueMessage message)
@@ -21,12 +20,11 @@ namespace Storage.Net.Azure.Queue.Storage
          }
 
          var sb = new StringBuilder();
-         sb.Append(PropBeginWord);
          var clazz = new JsonProps
          {
             Properties = message.Properties.Select(p => new JsonProp { Name = p.Key, Value = p.Value }).ToArray()
          };
-         sb.Append(clazz.ToJsonString());
+         sb.Append(clazz.ToCompressedJsonString());
          sb.Append(PropEndWord);
          sb.Append(message.Content);
 
@@ -38,12 +36,12 @@ namespace Storage.Net.Azure.Queue.Storage
          if(message == null) return null;
 
          string content = message.AsString;
-         if(content.StartsWith(PropBeginWord))
+         if(content.Contains(PropEndWord))
          {
             int idx = content.IndexOf(PropEndWord);
             if(idx != -1)
             {
-               string json = content.Substring(PropBeginWord.Length, idx - PropBeginWord.Length);
+               string json = content.Substring(0, idx);
                content = content.Substring(idx + PropEndWord.Length);
                JsonProps props = json.AsJsonObject<JsonProps>();
                var result = new QueueMessage(CreateId(message), content);

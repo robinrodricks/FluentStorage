@@ -108,7 +108,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          _publisher.PutMessage(msg);
 
-         Thread.Sleep(TimeSpan.FromSeconds(10));
+         Thread.Sleep(TimeSpan.FromSeconds(30));
 
          Assert.AreEqual(content, _lastMessage.Content);
          Assert.AreEqual("v1", _lastMessage.Properties["one"]);
