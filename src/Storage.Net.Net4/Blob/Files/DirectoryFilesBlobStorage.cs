@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace Storage.Net.Blob.Files
 {
+   /// <summary>
+   /// Blob storage implementation which uses local file system directory
+   /// </summary>
    public class DirectoryFilesBlobStorage : IBlobStorage
    {
       private readonly DirectoryInfo _directory;

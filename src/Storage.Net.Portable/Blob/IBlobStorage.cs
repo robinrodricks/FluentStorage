@@ -3,6 +3,9 @@ using System.IO;
 
 namespace Storage.Net.Blob
 {
+   /// <summary>
+   /// Generic interface for blob storage implementations
+   /// </summary>
    public interface IBlobStorage
    {
       /// <summary>
@@ -12,6 +15,9 @@ namespace Storage.Net.Blob
       /// <returns>List of blob IDs</returns>
       IEnumerable<string> List(string prefix);
 
+      /// <summary>
+      /// Deletes a blob by id
+      /// </summary>
       void Delete(string id);
 
       /// <summary>
