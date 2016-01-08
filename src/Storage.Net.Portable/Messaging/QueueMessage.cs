@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Storage.Net.Messaging
 {
    /// <summary>
-   /// Message to be used with <see cref="IMessageQueue"/>
+   /// Message to be used in all the queueing code
    /// </summary>
    public class QueueMessage
    {
