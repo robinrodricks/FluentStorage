@@ -28,36 +28,21 @@ namespace Storage.Net.Azure.Queue.ServiceBus
             peekLock ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete);
 
          _peekLock = peekLock;
-
-         SubscribeQueue();
-      }
-
-      private void SubscribeQueue()
-      {
-         var options = new OnMessageOptions();
-         options.AutoComplete = false;
-         options.AutoRenewTimeout = AutoRenewTimeout;
-
-         _client.OnMessage(OnBrokeredMessage, options);
-      }
-
-      private void OnBrokeredMessage(BrokeredMessage message)
-      {
-         QueueMessage result = Converter.ToQueueMessage(message);
-
-         if(_peekLock)
-         {
-            //only cache messages in PeekLock mode
-            _messageIdToBrokeredMessage[result.Id] = message;
-         }
-
-         if(OnNewMessage != null) OnNewMessage(this, result);
       }
 
       /// <summary>
-      /// Fired when a new message appears in the queue
+      /// Tries to receive the message from queue client by calling .Receive explicitly.
       /// </summary>
-      public event EventHandler<QueueMessage> OnNewMessage;
+      /// <returns></returns>
+      public QueueMessage ReceiveMessage()
+      {
+         BrokeredMessage bm =_client.Receive();
+         if(bm == null) return null;
+
+         QueueMessage qm = Converter.ToQueueMessage(bm);
+         if(_peekLock) _messageIdToBrokeredMessage[qm.Id] = bm;
+         return qm;
+      }
 
       /// <summary>
       /// Call at the end when done with the message.
@@ -74,9 +59,11 @@ namespace Storage.Net.Azure.Queue.ServiceBus
          bm.Complete();
       }
 
+      /// <summary>
+      /// Doesn't do anything
+      /// </summary>
       public void Dispose()
       {
-         //_client.OnMessage -= OnBrokeredMessage;
       }
    }
 }

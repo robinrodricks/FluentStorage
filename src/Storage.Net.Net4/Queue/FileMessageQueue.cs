@@ -1,16 +1,12 @@
 ﻿using Storage.Net.Messaging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Storage.Net.Queue
 {
    /// <summary>
    /// Disk based queueing abstraction
    /// </summary>
-   public class FileMessageQueue : IMessagePublisher, IMessageReceiver
+   class FileMessageQueue : IMessagePublisher, IMessageReceiver
    {
       public FileMessageQueue()
       {
@@ -32,9 +28,12 @@ namespace Storage.Net.Queue
 
       #region [ Receiver ]
 
-      public event EventHandler<QueueMessage> OnNewMessage;
-
       public void ConfirmMessage(QueueMessage message)
+      {
+         throw new NotImplementedException();
+      }
+
+      public QueueMessage ReceiveMessage()
       {
          throw new NotImplementedException();
       }

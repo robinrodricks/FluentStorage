@@ -8,9 +8,10 @@ namespace Storage.Net.Messaging
    public interface IMessageReceiver : IDisposable
    {
       /// <summary>
-      /// Fired on new message received
+      /// Gets the next message from the queue if available.
       /// </summary>
-      event EventHandler<QueueMessage> OnNewMessage;
+      /// <returns>The message or null if there are no messages available in the queue.</returns>
+      QueueMessage ReceiveMessage();
 
       /// <summary>
       /// Confirmation call that the message was acknowledged and processed by the receiver.

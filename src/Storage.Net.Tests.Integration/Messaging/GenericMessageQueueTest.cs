@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
-   //[TestFixture("azure-storage-queue")]
+   [TestFixture("azure-storage-queue")]
    //[TestFixture("azure-servicebus-topic")]
    [TestFixture("azure-servicebus-queue")]
    public class GenericMessageQueueTest : AbstractTestFixture
@@ -17,7 +17,6 @@ namespace Storage.Net.Tests.Integration.Messaging
       private string _name;
       private IMessagePublisher _publisher;
       private IMessageReceiver _receiver;
-      private QueueMessage _lastMessage;
 
       public GenericMessageQueueTest(string name)
       {
@@ -49,23 +48,19 @@ namespace Storage.Net.Tests.Integration.Messaging
                break;
          }
 
-         _receiver.OnNewMessage += OnMessage;
+         //delete any messages already in queue
+         QueueMessage qm;
+         while((qm = _receiver.ReceiveMessage()) != null)
+         {
+            _receiver.ConfirmMessage(qm);
+         }
       }
 
       [TearDown]
       public void TearDown()
       {
-         _receiver.OnNewMessage -= OnMessage;
-
          _publisher.Dispose();
          _receiver.Dispose();
-      }
-
-      private void OnMessage(object sender, QueueMessage message)
-      {
-         _lastMessage = message;
-
-         _receiver.ConfirmMessage(message);
       }
 
       [Test]
@@ -93,9 +88,9 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          _publisher.PutMessage(new QueueMessage(content));
 
-         Thread.Sleep(TimeSpan.FromSeconds(10));
+         QueueMessage received = _receiver.ReceiveMessage();
 
-         Assert.AreEqual(content, _lastMessage.Content);
+         Assert.AreEqual(content, received.Content);
       }
 
       [Test]
@@ -108,10 +103,9 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          _publisher.PutMessage(msg);
 
-         Thread.Sleep(TimeSpan.FromSeconds(30));
-
-         Assert.AreEqual(content, _lastMessage.Content);
-         Assert.AreEqual("v1", _lastMessage.Properties["one"]);
+         QueueMessage received = _receiver.ReceiveMessage();
+         Assert.AreEqual(content, received.Content);
+         Assert.AreEqual("v1", received.Properties["one"]);
       }
 
    }

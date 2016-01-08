@@ -94,14 +94,15 @@
     <Compile Include="Blob\AzureBlobStorage.cs" />
     <Compile Include="Blob\AzureStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Queue\ServiceBus\AzureServiceBusQueueReceiver.cs" />
-    <Compile Include="Queue\ServiceBus\Converter.cs" />
-    <Compile Include="Queue\Storage\AzureStorageQueuePublisher.cs" />
-    <Compile Include="Queue\ServiceBus\AzureServiceBusQueuePublisher.cs" />
-    <Compile Include="Queue\ServiceBus\AzureServiceBusTopicPublisher.cs" />
-    <Compile Include="Queue\Storage\AzureStorageQueueReceiver.cs" />
-    <Compile Include="Queue\Storage\Converter.cs" />
-    <Compile Include="Queue\Storage\JsonProps.cs" />
+    <Compile Include="Messaging\ServiceBus\AzureServiceBusQueueReceiver.cs" />
+    <Compile Include="Messaging\ServiceBus\AzureServiceBusTopicReceiver.cs" />
+    <Compile Include="Messaging\ServiceBus\Converter.cs" />
+    <Compile Include="Messaging\Storage\AzureStorageQueuePublisher.cs" />
+    <Compile Include="Messaging\ServiceBus\AzureServiceBusQueuePublisher.cs" />
+    <Compile Include="Messaging\ServiceBus\AzureServiceBusTopicPublisher.cs" />
+    <Compile Include="Messaging\Storage\AzureStorageQueueReceiver.cs" />
+    <Compile Include="Messaging\Storage\Converter.cs" />
+    <Compile Include="Messaging\Storage\JsonProps.cs" />
     <Compile Include="Table\AzureTableStorage.cs" />
   </ItemGroup>
   <ItemGroup>

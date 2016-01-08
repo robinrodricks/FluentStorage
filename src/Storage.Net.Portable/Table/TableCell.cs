@@ -18,21 +18,38 @@ namespace Storage.Net.Table
          DataType = dataType;
       }
 
+      /// <summary>
+      /// Raw value without conversions
+      /// </summary>
       public string RawValue { get; private set; }
 
+      /// <summary>
+      /// Data type
+      /// </summary>
       public CellType DataType { get; private set; }
 
+      /// <summary>
+      /// Gets the raw value
+      /// </summary>
+      /// <param name="cell"></param>
       public static implicit operator string(TableCell cell)
       {
          return cell?.RawValue;
       }
 
+      /// <summary>
+      /// Constructs from string value
+      /// </summary>
       public static implicit operator TableCell(string s)
       {
          if(s == null) return null;
          return new TableCell(s, CellType.String);
       }
 
+      /// <summary>
+      /// Attempts to convert to long data type, and if unsuccessfull returns 0
+      /// </summary>
+      /// <param name="cell"></param>
       public static implicit operator long(TableCell cell)
       {
          if(cell == null) return default(long);
@@ -42,11 +59,19 @@ namespace Storage.Net.Table
          return result;
       }
 
+      /// <summary>
+      /// Constructs from long data type
+      /// </summary>
+      /// <param name="l"></param>
       public static implicit operator TableCell(long l)
       {
          return new TableCell(l.ToString(), CellType.Long);
       }
       
+      /// <summary>
+      /// Attempts to convert to int data type, and if not successful returns 0
+      /// </summary>
+      /// <param name="cell"></param>
       public static implicit operator int(TableCell cell)
       {
          if(cell == null) return default(int);
@@ -56,11 +81,19 @@ namespace Storage.Net.Table
          return result;
       }
 
+      /// <summary>
+      /// Creates an instance from int data type
+      /// </summary>
+      /// <param name="i"></param>
       public static implicit operator TableCell(int i)
       {
          return new TableCell(i.ToString(), CellType.Int);
       }
 
+      /// <summary>
+      /// Attempts to convert to DateTime, and if not successful fails miserably
+      /// </summary>
+      /// <param name="cell"></param>
       public static implicit operator DateTime(TableCell cell)
       {
          if(cell == null) return default(DateTime);
@@ -68,11 +101,19 @@ namespace Storage.Net.Table
          return new DateTime(long.Parse(cell.RawValue));
       }
 
+      /// <summary>
+      /// Creates a new instance from DateTime
+      /// </summary>
+      /// <param name="d"></param>
       public static implicit operator TableCell(DateTime d)
       {
          return new TableCell(d.Ticks.ToString(), CellType.DateTime);
       }
 
+      /// <summary>
+      /// Attempts to convert to boolean data type, returns false if unsuccessful
+      /// </summary>
+      /// <param name="cell"></param>
       public static implicit operator bool(TableCell cell)
       {
          if(cell == null) return default(bool);
@@ -80,16 +121,28 @@ namespace Storage.Net.Table
          return cell.RawValue == "1" || "true".Equals(cell.RawValue, StringComparison.OrdinalIgnoreCase);
       }
 
+      /// <summary>
+      /// Creates a new instance from boolean data type
+      /// </summary>
+      /// <param name="b"></param>
       public static implicit operator TableCell(bool b)
       {
          return new TableCell(b ? "1": "0", CellType.Boolean);
       }
 
+      /// <summary>
+      /// Creates a new instance from Enum data type
+      /// </summary>
+      /// <param name="value"></param>
       public static implicit operator TableCell(Enum value)
       {
          return new TableCell(value.ToString(), CellType.Enum);
       }
 
+      /// <summary>
+      /// Gets readable representation
+      /// </summary>
+      /// <returns></returns>
       public override string ToString()
       {
          return $"{RawValue} ({DataType})";

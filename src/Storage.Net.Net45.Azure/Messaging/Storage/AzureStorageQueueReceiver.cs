@@ -3,7 +3,6 @@ using Storage.Net.Messaging;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
-using System.Threading;
 
 namespace Storage.Net.Azure.Queue.Storage
 {
@@ -13,7 +12,6 @@ namespace Storage.Net.Azure.Queue.Storage
    public class AzureStorageQueueReceiver : IMessageReceiver
    {
       private readonly CloudQueue _queue;
-      private readonly Timer _pingTimer;
       private readonly TimeSpan _messageVisibilityTimeout;
 
       /// <summary>
@@ -39,27 +37,7 @@ namespace Storage.Net.Azure.Queue.Storage
          _queue = client.GetQueueReference(queueName);
          _queue.CreateIfNotExists();
          _messageVisibilityTimeout = messageVisibilityTimeout;
-         _pingTimer = new Timer(PingNewMessageCallback, null, TimeSpan.FromSeconds(5), pingInverval);
       }
-
-      private void PingNewMessageCallback(object state)
-      {
-         if(OnNewMessage == null) return;
-
-         CloudQueueMessage message = _queue.GetMessage(_messageVisibilityTimeout);
-         if(message == null) return;
-
-         QueueMessage modelMessage = Converter.ToQueueMessage(message);
-         if(OnNewMessage != null)   //check again just in case of race conditions
-         {
-            OnNewMessage(this, modelMessage);
-         }
-      }
-
-      /// <summary>
-      /// Fired when a new message is received.
-      /// </summary>
-      public event EventHandler<QueueMessage> OnNewMessage;
 
       /// <summary>
       /// Deletes the message from the queue
@@ -74,11 +52,22 @@ namespace Storage.Net.Azure.Queue.Storage
       }
 
       /// <summary>
-      /// Stops the pinging thread
+      /// Doesn't do anything
       /// </summary>
       public void Dispose()
       {
-         _pingTimer.Dispose();
+      }
+
+      /// <summary>
+      /// Calls .GetMessage on storage queue
+      /// </summary>
+      /// <returns></returns>
+      public QueueMessage ReceiveMessage()
+      {
+         CloudQueueMessage message = _queue.GetMessage(_messageVisibilityTimeout);
+         if(message == null) return null;
+
+         return Converter.ToQueueMessage(message);
       }
    }
 }
