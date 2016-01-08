@@ -73,9 +73,6 @@
     <Compile Include="..\Storage.Net.Portable\Messaging\IMessagePublisher.cs">
       <Link>Messaging\IMessagePublisher.cs</Link>
     </Compile>
-    <Compile Include="..\Storage.Net.Portable\Messaging\IMessageQueue.cs">
-      <Link>Messaging\IMessageQueue.cs</Link>
-    </Compile>
     <Compile Include="..\Storage.Net.Portable\Messaging\IMessageReceiver.cs">
       <Link>Messaging\IMessageReceiver.cs</Link>
     </Compile>

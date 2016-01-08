@@ -46,8 +46,8 @@
     <Compile Include="FileFormats\CsvReader.cs" />
     <Compile Include="FileFormats\CsvWriter.cs" />
     <Compile Include="Messaging\IMessagePublisher.cs" />
-    <Compile Include="Messaging\IMessageQueue.cs" />
     <Compile Include="Messaging\IMessageReceiver.cs" />
+    <Compile Include="Messaging\InMemoryMessagePublisherReceiver.cs" />
     <Compile Include="Messaging\QueueMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StorageException.cs" />

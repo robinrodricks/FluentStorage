@@ -9,6 +9,10 @@ namespace Storage.Net.Table
    {
       bool HasOptimisticConcurrency { get; }
 
+      /// <summary>
+      /// Returns the list of all table names in the table storage
+      /// </summary>
+      /// <returns></returns>
       IEnumerable<string> ListTableNames();
 
       /// <summary>
