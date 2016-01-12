@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Storage.Net.FileFormats
 {
+   /// <summary>
+   /// CSV format writer
+   /// </summary>
    public class CsvWriter
    {
       private readonly Stream _destination;
@@ -40,11 +43,17 @@ namespace Storage.Net.FileFormats
          _newLine = _encoding.GetBytes(CsvFormat.NewLine);
       }
 
+      /// <summary>
+      /// Writes the values as a CSV row
+      /// </summary>
       public void Write(params string[] values)
       {
          Write((IEnumerable<string>)values);
       }
 
+      /// <summary>
+      /// Writes the values as a CSV row
+      /// </summary>
       public void Write(IEnumerable<string> values)
       {
          if(values == null) return;
