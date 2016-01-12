@@ -4,9 +4,9 @@ Storage.Net abstracts storage implementation from the applicatiion developer. Th
 
 Storage.Net abstracts the following types of storage patterns:
 
-- Blobs
-- Simple tables
-- Queues
+- [Blobs](https://github.com/aloneguid/storage/wiki/Blobs)
+- [Simple tables](https://github.com/aloneguid/storage/wiki/Tables)
+- [Queues](https://github.com/aloneguid/storage/wiki/Queues)
 
 The biggest advantage of Storage.Net framework comparing to similar frameworks like [NServiceBus](http://particular.net/nservicebus) or [MassTransit](http://masstransit-project.com/) and others is that it's not just aimed to abstract different big vendor implementation, but to also define a common easy standard for those technologies.
 
