@@ -12,11 +12,17 @@ namespace Storage.Net.Blob.Files
    {
       private readonly DirectoryInfo _directory;
 
+      /// <summary>
+      /// Creates an instance in a specific disk directory
+      /// </summary>
       public DirectoryFilesBlobStorage(DirectoryInfo directory)
       {
          _directory = directory;
       }
 
+      /// <summary>
+      /// Returns the list of blob names in this storage, optionally filtered by prefix
+      /// </summary>
       public IEnumerable<string> List(string prefix)
       {
          if(!_directory.Exists) return null;
@@ -26,6 +32,10 @@ namespace Storage.Net.Blob.Files
             .Select(f => f.Name);
       }
 
+      /// <summary>
+      /// Deletes blob file
+      /// </summary>
+      /// <param name="id"></param>
       public void Delete(string id)
       {
          if(id == null) throw new ArgumentNullException(nameof(id));
@@ -34,6 +44,9 @@ namespace Storage.Net.Blob.Files
          if(File.Exists(path)) File.Delete(path);
       }
 
+      /// <summary>
+      /// Writes blob to file
+      /// </summary>
       public void UploadFromStream(string id, Stream sourceStream)
       {
          if(id == null) throw new ArgumentNullException(nameof(id));
@@ -45,6 +58,9 @@ namespace Storage.Net.Blob.Files
          }
       }
 
+      /// <summary>
+      /// Reads blob from file and writes to the target stream
+      /// </summary>
       public void DownloadToStream(string id, Stream targetStream)
       {
          if(id == null) throw new ArgumentNullException(nameof(id));
@@ -59,6 +75,9 @@ namespace Storage.Net.Blob.Files
          }
       }
 
+      /// <summary>
+      /// Opens the blob as a readable stream
+      /// </summary>
       public Stream OpenStreamToRead(string id)
       {
          if(id == null) throw new ArgumentNullException(nameof(id));
@@ -66,6 +85,9 @@ namespace Storage.Net.Blob.Files
          return OpenStream(id);
       }
 
+      /// <summary>
+      /// Checks if file exists
+      /// </summary>
       public bool Exists(string id)
       {
          if(id == null) throw new ArgumentNullException(nameof(id));

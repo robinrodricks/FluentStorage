@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CA174258-0F21-4682-9C69-CEBC440F0A80}"
 	ProjectSection(SolutionItems) = preProject
 		..\pack.cmd = ..\pack.cmd
+		..\README.md = ..\README.md
 		..\storage.net45.azure.nuspec = ..\storage.net45.azure.nuspec
 		..\storage.nuspec = ..\storage.nuspec
 	EndProjectSection
