@@ -15,6 +15,9 @@ using System.Collections.Generics;
 
 namespace Storage.Net.Azure.Table
 {
+   /// <summary>
+   /// Microsoft Azure Table storage
+   /// </summary>
    public class AzureTableStorage : ITableStorage
    {
       private const int MaxInsertLimit = 100;
@@ -32,6 +35,11 @@ namespace Storage.Net.Azure.Table
          public bool Exists { get; set; }
       }
 
+      /// <summary>
+      /// Creates an instance by account name and storage key
+      /// </summary>
+      /// <param name="accountName"></param>
+      /// <param name="storageKey"></param>
       public AzureTableStorage(string accountName, string storageKey)
       {
          if (accountName == null) throw new ArgumentNullException(nameof(accountName));
@@ -41,11 +49,18 @@ namespace Storage.Net.Azure.Table
          _client = account.CreateCloudTableClient();
       }
 
+      /// <summary>
+      /// Returns true as Azure supports optimistic concurrency
+      /// </summary>
       public bool HasOptimisticConcurrency
       {
          get { return true; }
       }
 
+      /// <summary>
+      /// Returns the list of table names in this storage
+      /// </summary>
+      /// <returns></returns>
       public IEnumerable<string> ListTableNames()
       {
          IEnumerable<CloudTable> tables = _client.ListTables();
@@ -53,6 +68,10 @@ namespace Storage.Net.Azure.Table
          return tables == null ? null : tables.Select(t => t.Name);
       }
 
+      /// <summary>
+      /// Deletes table completely
+      /// </summary>
+      /// <param name="tableName"></param>
       public void Delete(string tableName)
       {
          CloudTable table = GetTable(tableName, false);
@@ -67,16 +86,25 @@ namespace Storage.Net.Azure.Table
          }
       }
 
+      /// <summary>
+      /// Gets the list of rows in a specified partition
+      /// </summary>
       public IEnumerable<TableRow> Get(string tableName, string partitionKey)
       {
          return Get(tableName, partitionKey, null, -1);
       }
 
+      /// <summary>
+      /// Gets the list of rows in a table by partition and row key
+      /// </summary>
       public TableRow Get(string tableName, string partitionKey, string rowKey)
       {
          return Get(tableName, partitionKey, rowKey, -1).FirstOrDefault();
       }
 
+      /// <summary>
+      /// As per interface
+      /// </summary>
       public IEnumerable<TableRow> Get(string tableName, string partitionKey, string rowKey, int maxRecords)
       {
          if (tableName == null) throw new ArgumentNullException("tableName");
@@ -124,6 +152,9 @@ namespace Storage.Net.Azure.Table
          return entities.Select(ToTableRow);
       }
 
+      /// <summary>
+      /// As per interface
+      /// </summary>
       public void Insert(string tableName, IEnumerable<TableRow> rows)
       {
          BatchedOperation(tableName, true,
@@ -131,11 +162,17 @@ namespace Storage.Net.Azure.Table
             rows);
       }
 
+      /// <summary>
+      /// As per interface
+      /// </summary>
       public void Insert(string tableName, TableRow row)
       {
          Insert(tableName, new[] { row });
       }
 
+      /// <summary>
+      /// As per interface
+      /// </summary>
       public void Update(string tableName, IEnumerable<TableRow> rows)
       {
          BatchedOperation(tableName, false,
@@ -143,11 +180,17 @@ namespace Storage.Net.Azure.Table
             rows);
       }
 
+      /// <summary>
+      /// As per interface
+      /// </summary>
       public void Update(string tableName, TableRow row)
       {
          Update(tableName, new[] { row });
       }
 
+      /// <summary>
+      /// As per interface
+      /// </summary>
       public void Merge(string tableName, IEnumerable<TableRow> rows)
       {
          BatchedOperation(tableName, true,
@@ -155,11 +198,17 @@ namespace Storage.Net.Azure.Table
             rows);
       }
 
+      /// <summary>
+      /// As per interface
+      /// </summary>
       public void Merge(string tableName, TableRow row)
       {
          Merge(tableName, new[] { row });
       }
 
+      /// <summary>
+      /// As per interface
+      /// </summary>
       public void Delete(string tableName, IEnumerable<TableRowId> rowIds)
       {
          BatchedOperation(tableName, true,
@@ -167,6 +216,10 @@ namespace Storage.Net.Azure.Table
             rowIds);
       }
 
+
+      /// <summary>
+      /// As per interface
+      /// </summary>
       public void Delete(string tableName, TableRowId rowId)
       {
          Delete(tableName, new[] { rowId });

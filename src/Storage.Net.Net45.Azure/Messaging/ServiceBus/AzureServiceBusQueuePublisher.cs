@@ -50,6 +50,9 @@ namespace Storage.Net.Azure.Queue.ServiceBus
          _client.Send(bm);
       }
 
+      /// <summary>
+      /// Nothing to dispose
+      /// </summary>
       public void Dispose()
       {
       }
