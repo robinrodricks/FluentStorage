@@ -9,10 +9,16 @@ using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace Storage.Net.Azure.Blob
 {
+   /// <summary>
+   /// Azure Blob Storage
+   /// </summary>
    public class AzureBlobStorage : AzureStorage, IBlobStorage
    {
       private readonly CloudBlobContainer _blobContainer;
 
+      /// <summary>
+      /// Creates an instance from account name, private key and container name
+      /// </summary>
       public AzureBlobStorage(string accountName, string key, string containerName)
          : base(accountName, key)
       {
@@ -59,6 +65,9 @@ namespace Storage.Net.Azure.Blob
          }
       }
 
+      /// <summary>
+      /// Gets all the blob names, then filters by prefix optionally
+      /// </summary>
       public IEnumerable<string> List(string prefix)
       {
          return _blobContainer.ListBlobs()
@@ -67,6 +76,9 @@ namespace Storage.Net.Azure.Blob
             .Select(b => ToUserId(b.Name));
       }
 
+      /// <summary>
+      /// Deletes blob remotely
+      /// </summary>
       public void Delete(string id)
       {
          if (id == null) throw new ArgumentNullException(nameof(id));
@@ -76,6 +88,9 @@ namespace Storage.Net.Azure.Blob
          blob.DeleteIfExists();
       }
 
+      /// <summary>
+      /// Uploads from stream
+      /// </summary>
       public void UploadFromStream(string id, Stream sourceStream)
       {
          if (id == null) throw new ArgumentNullException(nameof(id));
@@ -86,6 +101,9 @@ namespace Storage.Net.Azure.Blob
          blob.UploadFromStream(sourceStream);
       }
 
+      /// <summary>
+      /// Downloads to stream
+      /// </summary>
       public void DownloadToStream(string id, Stream targetStream)
       {
          if (id == null) throw new ArgumentNullException(nameof(id));
@@ -96,6 +114,11 @@ namespace Storage.Net.Azure.Blob
          blob.DownloadToStream(targetStream);
       }
 
+      /// <summary>
+      /// Opens stream to read
+      /// </summary>
+      /// <param name="id"></param>
+      /// <returns></returns>
       public Stream OpenStreamToRead(string id)
       {
          if (id == null) throw new ArgumentNullException(nameof(id));
@@ -105,6 +128,9 @@ namespace Storage.Net.Azure.Blob
          return blob.OpenRead();
       }
 
+      /// <summary>
+      /// Checks if the blob exists by trying to fetch attributes from the blob reference and checkign if that fails
+      /// </summary>
       public bool Exists(string id)
       {
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(ToInternalId(id));

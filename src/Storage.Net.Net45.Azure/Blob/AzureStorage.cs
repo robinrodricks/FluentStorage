@@ -4,8 +4,14 @@ using Microsoft.WindowsAzure.Storage.Auth;
 
 namespace Storage.Net.Azure.Blob
 {
+   /// <summary>
+   /// General Azure methods
+   /// </summary>
    public class AzureStorage
    {
+      /// <summary>
+      /// Creates an instance
+      /// </summary>
       protected AzureStorage(string accountName, string key)
       {
          Account = new CloudStorageAccount(
@@ -14,8 +20,16 @@ namespace Storage.Net.Azure.Blob
 
       }
 
+      /// <summary>
+      /// Gets account
+      /// </summary>
       protected CloudStorageAccount Account { get; private set; }
 
+      /// <summary>
+      /// Checks if blob name is valid
+      /// </summary>
+      /// <param name="id"></param>
+      /// <returns></returns>
       public static bool IsValidBlobName(string id)
       {
          /*
