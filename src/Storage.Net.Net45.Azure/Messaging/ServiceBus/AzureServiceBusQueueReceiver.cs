@@ -3,7 +3,7 @@ using Storage.Net.Messaging;
 using System;
 using System.Collections.Concurrent;
 
-namespace Storage.Net.Azure.Queue.ServiceBus
+namespace Storage.Net.Azure.Messaging.ServiceBus
 {
    /// <summary>
    /// Implements message receiver on Azure Service Bus Queues

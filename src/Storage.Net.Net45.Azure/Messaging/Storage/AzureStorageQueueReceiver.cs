@@ -4,7 +4,7 @@ using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 
-namespace Storage.Net.Azure.Queue.Storage
+namespace Storage.Net.Azure.Messaging.Storage
 {
    /// <summary>
    /// Queue receiver based on Azure Storage Queues

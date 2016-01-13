@@ -3,12 +3,14 @@ using Storage.Net.Messaging;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Storage.Net.Azure.Queue.ServiceBus
+namespace Storage.Net.Azure.Messaging.ServiceBus
 {
    /// <summary>
-   /// Represents queues as Azure Service Bus Topics
+   /// Represents queues as Azure Service Bus Topics. Note that you must have at least one subscription
+   /// for messages not to be lost. Subscriptions represent <see cref="AzureServiceBusTopicReceiver"/>
+   /// in this library
    /// </summary>
-   class AzureServiceBusTopicPublisher : IMessagePublisher
+   public class AzureServiceBusTopicPublisher : IMessagePublisher
    {
       private NamespaceManager _nsMgr;
       readonly private string _connectionString;
@@ -26,25 +28,8 @@ namespace Storage.Net.Azure.Queue.ServiceBus
          _nsMgr = NamespaceManager.CreateFromConnectionString(connectionString);
          _topicName = topicName;
 
-         PrepareTopic();
-      }
-
-      private void PrepareTopic()
-      {
-         if(!_nsMgr.TopicExists(_topicName))
-         {
-            var td = new TopicDescription(_topicName);
-            //todo: more options on TD
-
-            _nsMgr.CreateTopic(td);
-         }
-
+         TopicHelper.PrepareTopic(_nsMgr, topicName);
          _client = TopicClient.CreateFromConnectionString(_connectionString, _topicName);
-      }
-
-      private void PrepareSubscription()
-      {
-         //
       }
 
       /// <summary>
@@ -56,6 +41,9 @@ namespace Storage.Net.Azure.Queue.ServiceBus
          _client.Send(Converter.ToBrokeredMessage(message));
       }
 
+      /// <summary>
+      /// Doesn't do anything
+      /// </summary>
       public void Dispose()
       {
       }

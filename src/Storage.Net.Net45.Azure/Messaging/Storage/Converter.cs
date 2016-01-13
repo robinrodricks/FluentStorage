@@ -1,12 +1,10 @@
 ﻿using Microsoft.WindowsAzure.Storage.Queue;
 using Storage.Net.Messaging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Storage.Net.Azure.Queue.Storage
+namespace Storage.Net.Azure.Messaging.Storage
 {
    static class Converter
    {

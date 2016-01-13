@@ -1,8 +1,8 @@
 ﻿using Aloneguid.Support;
 using Config.Net;
 using NUnit.Framework;
-using Storage.Net.Azure.Queue.ServiceBus;
-using Storage.Net.Azure.Queue.Storage;
+using Storage.Net.Azure.Messaging.ServiceBus;
+using Storage.Net.Azure.Messaging.Storage;
 using Storage.Net.Messaging;
 using System;
 using System.Threading;
@@ -10,7 +10,7 @@ using System.Threading;
 namespace Storage.Net.Tests.Integration.Messaging
 {
    [TestFixture("azure-storage-queue")]
-   //[TestFixture("azure-servicebus-topic")]
+   [TestFixture("azure-servicebus-topic")]
    [TestFixture("azure-servicebus-queue")]
    public class GenericMessageQueueTest : AbstractTestFixture
    {
@@ -38,13 +38,24 @@ namespace Storage.Net.Tests.Integration.Messaging
                   Cfg.Read(TestSettings.AzureStorageKey),
                   "testqueue", TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(1));
                break;
-            /*case "azure-servicebus-topic":
-               _publisher = new AzureServiceBusTopicPublisher(Cfg.Read(TestSettings.ServiceBusConnectionString), "testtopic");
-               _receiver = null;
-               break;*/
+            case "azure-servicebus-topic":
+               _publisher = new AzureServiceBusTopicPublisher(
+                  Cfg.Read(TestSettings.ServiceBusConnectionString),
+                  "testtopic");
+               _receiver = new AzureServiceBusTopicReceiver(
+                  Cfg.Read(TestSettings.ServiceBusConnectionString),
+                  "testtopic",
+                  "AllMessages",
+                  true);
+               break;
             case "azure-servicebus-queue":
-               _publisher = new AzureServiceBusQueuePublisher(Cfg.Read(TestSettings.ServiceBusConnectionString), "testqueue");
-               _receiver = new AzureServiceBusQueueReceiver(Cfg.Read(TestSettings.ServiceBusConnectionString), "testqueue", true);
+               _publisher = new AzureServiceBusQueuePublisher(
+                  Cfg.Read(TestSettings.ServiceBusConnectionString),
+                  "testqueue");
+               _receiver = new AzureServiceBusQueueReceiver(
+                  Cfg.Read(TestSettings.ServiceBusConnectionString),
+                  "testqueue",
+                  true);
                break;
          }
 
@@ -67,9 +78,6 @@ namespace Storage.Net.Tests.Integration.Messaging
       public void SendMessage_OneMessage_DoesntCrash()
       {
          _publisher.PutMessage(new QueueMessage("test content at " + DateTime.UtcNow));
-
-         if(_receiver != null) Thread.Sleep(TimeSpan.FromMinutes(1));
-         //_queue.PeekMesssage
       }
 
       [Test]

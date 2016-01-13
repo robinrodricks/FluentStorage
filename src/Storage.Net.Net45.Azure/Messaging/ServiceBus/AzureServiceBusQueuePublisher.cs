@@ -3,7 +3,7 @@ using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Storage.Net.Messaging;
 
-namespace Storage.Net.Azure.Queue.ServiceBus
+namespace Storage.Net.Azure.Messaging.ServiceBus
 {
    /// <summary>
    /// Implements Azure Service Bus Queue
