@@ -36,7 +36,7 @@ namespace Storage.Net.Tests.Integration.Messaging
                _receiver = new AzureStorageQueueReceiver(
                   Cfg.Read(TestSettings.AzureStorageName),
                   Cfg.Read(TestSettings.AzureStorageKey),
-                  "testqueue", TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(1));
+                  "testqueue", TimeSpan.FromMinutes(1));
                break;
             case "azure-servicebus-topic":
                _publisher = new AzureServiceBusTopicPublisher(
