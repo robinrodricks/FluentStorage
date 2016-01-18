@@ -3,6 +3,8 @@ using Storage.Net.Messaging;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Storage.Net.Azure.Messaging.Storage
 {
@@ -56,13 +58,22 @@ namespace Storage.Net.Azure.Messaging.Storage
       /// <summary>
       /// Calls .GetMessage on storage queue
       /// </summary>
-      /// <returns></returns>
       public QueueMessage ReceiveMessage()
       {
          CloudQueueMessage message = _queue.GetMessage(_messageVisibilityTimeout);
          if(message == null) return null;
 
          return Converter.ToQueueMessage(message);
+      }
+
+      /// <summary>
+      /// Calls .GetMessages on storage queue
+      /// </summary>
+      public IEnumerable<QueueMessage> ReceiveMessages(int count)
+      {
+         IEnumerable<CloudQueueMessage> batch = _queue.GetMessages(count, _messageVisibilityTimeout);
+         if(batch == null) return null;
+         return batch.Select(Converter.ToQueueMessage).ToList();
       }
    }
 }

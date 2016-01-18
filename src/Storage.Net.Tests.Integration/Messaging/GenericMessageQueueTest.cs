@@ -6,6 +6,8 @@ using Storage.Net.Azure.Messaging.Storage;
 using Storage.Net.Messaging;
 using System;
 using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
@@ -78,6 +80,18 @@ namespace Storage.Net.Tests.Integration.Messaging
       public void SendMessage_OneMessage_DoesntCrash()
       {
          _publisher.PutMessage(new QueueMessage("test content at " + DateTime.UtcNow));
+      }
+
+      [Test]
+      public void SendMessage_SendAFew_ReceivesAsBatch()
+      {
+         for(int i = 0; i < 2; i++)
+         {
+            _publisher.PutMessage(new QueueMessage("test content at " + DateTime.UtcNow));
+         }
+
+         List<QueueMessage> batch = _receiver.ReceiveMessages(3).ToList();
+         Assert.AreEqual(2, batch.Count);
       }
 
       [Test]

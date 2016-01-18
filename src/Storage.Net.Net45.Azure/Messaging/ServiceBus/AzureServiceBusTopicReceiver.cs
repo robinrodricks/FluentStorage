@@ -3,6 +3,8 @@ using Microsoft.ServiceBus.Messaging;
 using Storage.Net.Messaging;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Storage.Net.Azure.Messaging.ServiceBus
 {
@@ -62,12 +64,25 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
       /// <summary>
       /// As per interface
       /// </summary>
-      /// <returns></returns>
       public QueueMessage ReceiveMessage()
       {
          BrokeredMessage bm = _client.Receive();
          if(bm == null) return null;
+         return ProcessAndConvert(bm);
+      }
 
+      /// <summary>
+      /// As per interface
+      /// </summary>
+      public IEnumerable<QueueMessage> ReceiveMessages(int count)
+      {
+         IEnumerable<BrokeredMessage> batch = _client.ReceiveBatch(count);
+         if(batch == null) return null;
+         return batch.Select(ProcessAndConvert).ToList();
+      }
+
+      private QueueMessage ProcessAndConvert(BrokeredMessage bm)
+      {
          QueueMessage qm = Converter.ToQueueMessage(bm);
          if(_peekLock) _messageIdToBrokeredMessage[qm.Id] = bm;
          return qm;

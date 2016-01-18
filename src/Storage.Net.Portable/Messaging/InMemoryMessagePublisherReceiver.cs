@@ -1,6 +1,7 @@
 ﻿using Aloneguid.Support;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace Storage.Net.Messaging
 {
@@ -46,6 +47,11 @@ namespace Storage.Net.Messaging
       /// </summary>
       /// <param name="message"></param>
       public void ConfirmMessage(QueueMessage message)
+      {
+         throw new NotImplementedException();
+      }
+
+      public IEnumerable<QueueMessage> ReceiveMessages(int count)
       {
          throw new NotImplementedException();
       }

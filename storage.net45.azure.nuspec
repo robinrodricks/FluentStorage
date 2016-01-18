@@ -2,21 +2,21 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata>
       <id>Storage.Net.WindowsAzure</id>
-      <version>2.0.1</version>
+      <version>2.1.0</version>
       <authors>Ivan Gavryliuk</authors>
       <owners>Ivan Gavryliuk</owners>
       <projectUrl>https://github.com/aloneguid/storage</projectUrl>
       <requireLicenseAcceptance>false</requireLicenseAcceptance>
       <description>
-         .NET storage implementation for Windows Azure.
+         .NET storage implementation for Microsoft Azure.
       </description>
       <summary>
-         To follow
+         Storage.Net impelementation for Microsoft Azure platform.
       </summary>
       <copyright>Copyright (c) 2015 by Ivan Gavryliuk</copyright>
       <tags>Common</tags>
       <dependencies>
-         <dependency id="Storage.Net" version="2.0"/>
+         <dependency id="Storage.Net" version="2.1"/>
          <dependency id="Aloneguid.Support" version="2.0" />
          <dependency id="WindowsAzure.Storage" version="6.2"/>
       </dependencies>

@@ -1,5 +1,6 @@
 ﻿using Storage.Net.Messaging;
 using System;
+using System.Collections.Generic;
 
 namespace Storage.Net.Queue
 {
@@ -34,6 +35,11 @@ namespace Storage.Net.Queue
       }
 
       public QueueMessage ReceiveMessage()
+      {
+         throw new NotImplementedException();
+      }
+
+      public IEnumerable<QueueMessage> ReceiveMessages(int count)
       {
          throw new NotImplementedException();
       }
