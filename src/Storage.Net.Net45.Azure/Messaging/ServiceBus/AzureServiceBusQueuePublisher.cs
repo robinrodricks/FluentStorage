@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Storage.Net.Messaging;
@@ -43,11 +44,21 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
       /// <summary>
       /// Puts message to the queue with default options
       /// </summary>
-      /// <param name="message"></param>
       public void PutMessage(QueueMessage message)
       {
+         if(message == null) return;
          BrokeredMessage bm = Converter.ToBrokeredMessage(message);
          _client.Send(bm);
+      }
+
+      /// <summary>
+      /// Puts message to the queue with default options
+      /// </summary>
+      public void PutMessages(IEnumerable<QueueMessage> messages)
+      {
+         if(messages == null) return;
+         IEnumerable<BrokeredMessage> bms = messages.Select(Converter.ToBrokeredMessage);
+         _client.SendBatch(bms);
       }
 
       /// <summary>

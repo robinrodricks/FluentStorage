@@ -55,5 +55,10 @@ namespace Storage.Net.Messaging
       {
          throw new NotImplementedException();
       }
+
+      public void PutMessages(IEnumerable<QueueMessage> messages)
+      {
+         throw new NotImplementedException();
+      }
    }
 }

@@ -2,6 +2,8 @@
 using Storage.Net.Messaging;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Storage.Net.Azure.Messaging.ServiceBus
 {
@@ -35,10 +37,19 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
       /// <summary>
       /// Sends a <see cref="BrokeredMessage"/> with passed content
       /// </summary>
-      /// <param name="message"></param>
       public void PutMessage(QueueMessage message)
       {
          _client.Send(Converter.ToBrokeredMessage(message));
+      }
+
+      /// <summary>
+      /// Sends a <see cref="BrokeredMessage"/> with passed content
+      /// </summary>
+      public void PutMessages(IEnumerable<QueueMessage> messages)
+      {
+         if(messages == null) return;
+         IEnumerable<BrokeredMessage> bms = messages.Select(Converter.ToBrokeredMessage);
+         _client.SendBatch(bms);
       }
 
       /// <summary>

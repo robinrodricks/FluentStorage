@@ -3,6 +3,7 @@ using Storage.Net.Messaging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Queue;
+using System.Collections.Generic;
 
 namespace Storage.Net.Azure.Messaging.Storage
 {
@@ -34,12 +35,24 @@ namespace Storage.Net.Azure.Messaging.Storage
       /// <summary>
       /// Pushes a new message to storage queue
       /// </summary>
-      /// <param name="message"></param>
       public void PutMessage(QueueMessage message)
       {
          if(message == null) return;
          CloudQueueMessage nativeMessage = Converter.ToCloudQueueMessage(message);
          _queue.AddMessage(nativeMessage);
+      }
+
+      /// <summary>
+      /// Pushes new messages to storage queue. Due to the fact storage queues don't support batched pushes
+      /// this method makes a call per message.
+      /// </summary>
+      public void PutMessages(IEnumerable<QueueMessage> messages)
+      {
+         if(messages == null) return;
+         foreach(QueueMessage message in messages)
+         {
+            PutMessage(message);
+         }
       }
 
       /// <summary>
