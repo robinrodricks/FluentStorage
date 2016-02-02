@@ -5,7 +5,6 @@ using Storage.Net.Azure.Messaging.ServiceBus;
 using Storage.Net.Azure.Messaging.Storage;
 using Storage.Net.Messaging;
 using System;
-using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,6 +13,7 @@ namespace Storage.Net.Tests.Integration.Messaging
    [TestFixture("azure-storage-queue")]
    [TestFixture("azure-servicebus-topic")]
    [TestFixture("azure-servicebus-queue")]
+   [TestFixture("inmemory")]
    public class GenericMessageQueueTest : AbstractTestFixture
    {
       private string _name;
@@ -58,6 +58,9 @@ namespace Storage.Net.Tests.Integration.Messaging
                   Cfg.Read(TestSettings.ServiceBusConnectionString),
                   "testqueue",
                   true);
+               break;
+            case "inmemory":
+               _publisher = new InMemoryMessagePublisherReceiver();
                break;
          }
 

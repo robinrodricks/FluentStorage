@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Net.Tests.Integrati
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Net.Net45.Aws", "Storage.Net.Net45.Aws\Storage.Net.Net45.Aws.csproj", "{7E924E0B-DD63-4DC5-8B17-32B2591A928D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Net.Net45.OneDrive", "Storage.Net.Net45.OneDrive\Storage.Net.Net45.OneDrive.csproj", "{D7D4F783-ADBA-499D-A7C5-A68795D9B768}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +56,10 @@ Global
 		{7E924E0B-DD63-4DC5-8B17-32B2591A928D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E924E0B-DD63-4DC5-8B17-32B2591A928D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E924E0B-DD63-4DC5-8B17-32B2591A928D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7D4F783-ADBA-499D-A7C5-A68795D9B768}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7D4F783-ADBA-499D-A7C5-A68795D9B768}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7D4F783-ADBA-499D-A7C5-A68795D9B768}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7D4F783-ADBA-499D-A7C5-A68795D9B768}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

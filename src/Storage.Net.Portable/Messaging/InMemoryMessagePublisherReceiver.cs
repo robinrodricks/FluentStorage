@@ -11,7 +11,7 @@ namespace Storage.Net.Messaging
    /// Message IDs are generated based on random instance bound prefix and long integer taken from the current time
    /// tick count
    /// </summary>
-   class InMemoryMessagePublisherReceiver : IMessagePublisher, IMessageReceiver
+   public class InMemoryMessagePublisherReceiver : IMessagePublisher, IMessageReceiver
    {
       private readonly ConcurrentQueue<QueueMessage> _queue = new ConcurrentQueue<QueueMessage>();
       private readonly string _instancePrefix = Generator.RandomString;
@@ -20,10 +20,22 @@ namespace Storage.Net.Messaging
       /// <summary>
       /// Puts the message in the inmemory queue
       /// </summary>
-      /// <param name="message"></param>
       public void PutMessage(QueueMessage message)
       {
-         throw new NotImplementedException();
+         if(message == null) return;
+         _queue.Enqueue(message);
+      }
+
+      /// <summary>
+      /// Puts the messages in the inmemory queue
+      /// </summary>
+      public void PutMessages(IEnumerable<QueueMessage> messages)
+      {
+         if(messages == null) return;
+         foreach(QueueMessage message in messages)
+         {
+            _queue.Enqueue(message);
+         }
       }
 
       /// <summary>
@@ -39,26 +51,30 @@ namespace Storage.Net.Messaging
       /// <returns></returns>
       public QueueMessage ReceiveMessage()
       {
-         throw new NotImplementedException();
+         QueueMessage result;
+         _queue.TryDequeue(out result);
+         return result;
       }
 
       /// <summary>
-      /// Deletes message from inmemory queue
+      /// Doesn't do anything as <see cref="ReceiveMessage"/> always deletes the message from the queue
       /// </summary>
-      /// <param name="message"></param>
       public void ConfirmMessage(QueueMessage message)
       {
-         throw new NotImplementedException();
       }
 
       public IEnumerable<QueueMessage> ReceiveMessages(int count)
       {
-         throw new NotImplementedException();
-      }
-
-      public void PutMessages(IEnumerable<QueueMessage> messages)
-      {
-         throw new NotImplementedException();
+         var result = new List<QueueMessage>();
+         while(result.Count < count && _queue.Count > 0)
+         {
+            QueueMessage message;
+            if(_queue.TryDequeue(out message))
+            {
+               result.Add(message);
+            }
+         }
+         return result;
       }
    }
 }

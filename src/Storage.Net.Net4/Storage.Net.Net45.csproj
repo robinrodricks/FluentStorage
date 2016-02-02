@@ -76,6 +76,12 @@
     <Compile Include="..\Storage.Net.Portable\Messaging\IMessageReceiver.cs">
       <Link>Messaging\IMessageReceiver.cs</Link>
     </Compile>
+    <Compile Include="..\Storage.Net.Portable\Messaging\InMemoryMessagePublisherReceiver.cs">
+      <Link>Messaging\InMemoryMessagePublisherReceiver.cs</Link>
+    </Compile>
+    <Compile Include="..\Storage.Net.Portable\Messaging\MessageCaps.cs">
+      <Link>Messaging\MessageCaps.cs</Link>
+    </Compile>
     <Compile Include="..\Storage.Net.Portable\Messaging\QueueMessage.cs">
       <Link>Messaging\QueueMessage.cs</Link>
     </Compile>
