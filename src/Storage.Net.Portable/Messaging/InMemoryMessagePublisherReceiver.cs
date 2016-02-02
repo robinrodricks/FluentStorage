@@ -15,7 +15,7 @@ namespace Storage.Net.Messaging
    {
       private readonly ConcurrentQueue<QueueMessage> _queue = new ConcurrentQueue<QueueMessage>();
       private readonly string _instancePrefix = Generator.RandomString;
-      private readonly long _messageId = DateTime.UtcNow.Ticks;
+      private long _messageId = DateTime.UtcNow.Ticks;
 
       /// <summary>
       /// Puts the message in the inmemory queue
@@ -34,8 +34,24 @@ namespace Storage.Net.Messaging
          if(messages == null) return;
          foreach(QueueMessage message in messages)
          {
-            _queue.Enqueue(message);
+            var stampedMessage = RecreateWithId(message);
+            _queue.Enqueue(stampedMessage);
          }
+      }
+
+      private QueueMessage RecreateWithId(QueueMessage message)
+      {
+         string id = $"{_instancePrefix}-{++_messageId}";
+
+         var result = new QueueMessage(id, message.Content);
+         if(message.Properties.Count > 0)
+         {
+            foreach(var pair in message.Properties)
+            {
+               result.Properties.Add(pair.Key, pair.Value);
+            }
+         }
+         return result;
       }
 
       /// <summary>
@@ -63,6 +79,10 @@ namespace Storage.Net.Messaging
       {
       }
 
+      /// <summary>
+      /// Receives up to <paramref name="count"/> messages when available.
+      /// </summary>
+      /// <returns>Messages or null if there is nothing to fetch.</returns>
       public IEnumerable<QueueMessage> ReceiveMessages(int count)
       {
          var result = new List<QueueMessage>();
