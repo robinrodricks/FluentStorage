@@ -1,15 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Config.Net;
 using NUnit.Framework;
 using Storage.Net.Blob;
 using Storage.Net.Blob.Files;
 using Storage.Net.Azure.Blob;
+using Storage.Net.OneDrive.Blob;
 
 namespace Storage.Net.Tests.Integration
 {
    [TestFixture("azure")]
    [TestFixture("disk-directory")]
+   //[TestFixture("onedrive-personal")]
+   //[TestFixture("onedrive-business")]
    public class BlobStorageTest : AbstractTestFixture
    {
       private readonly string _type;
@@ -34,6 +39,9 @@ namespace Storage.Net.Tests.Integration
             case "disk-directory":
                _storage = new DirectoryFilesBlobStorage(TestDir);
                break;
+            case "onedrive-personal":
+               //_storage = new OneDriveBlobStorage();
+               break;
          }
       }
 
@@ -47,6 +55,12 @@ namespace Storage.Net.Tests.Integration
          }
 
          return id;
+      }
+
+      [Test]
+      public void List_All_DoesntCrash()
+      {
+         List<string> allBlobNames = _storage.List(null).ToList();
       }
 
       [Test]

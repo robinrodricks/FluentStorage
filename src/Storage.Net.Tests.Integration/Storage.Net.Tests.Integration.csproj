@@ -104,6 +104,10 @@
       <Project>{42341769-8edd-4af8-8845-85e92f43ec29}</Project>
       <Name>Storage.Net.Net45.Azure</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Storage.Net.Net45.OneDrive\Storage.Net.Net45.OneDrive.csproj">
+      <Project>{d7d4f783-adba-499d-a7c5-a68795d9b768}</Project>
+      <Name>Storage.Net.Net45.OneDrive</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Storage.Net.Net4\Storage.Net.Net45.csproj">
       <Project>{ee6c2fe4-e7ab-4003-85be-217ddcb428d3}</Project>
       <Name>Storage.Net.Net45</Name>
