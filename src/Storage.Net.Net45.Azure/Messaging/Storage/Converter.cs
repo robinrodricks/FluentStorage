@@ -25,7 +25,6 @@ namespace Storage.Net.Azure.Messaging.Storage
          sb.Append(clazz.ToCompressedJsonString());
          sb.Append(PropEndWord);
          sb.Append(message.Content);
-
          return new CloudQueueMessage(sb.ToString());
       }
 
