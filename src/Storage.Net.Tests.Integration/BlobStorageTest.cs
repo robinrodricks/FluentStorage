@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Config.Net;
 using NUnit.Framework;
+using Storage.Net.Aws.Blob;
 using Storage.Net.Blob;
 using Storage.Net.Blob.Files;
 using Storage.Net.Azure.Blob;
@@ -13,6 +14,7 @@ namespace Storage.Net.Tests.Integration
 {
    [TestFixture("azure")]
    [TestFixture("disk-directory")]
+   [TestFixture("aws-s3")]
    //[TestFixture("onedrive-personal")]
    //[TestFixture("onedrive-business")]
    public class BlobStorageTest : AbstractTestFixture
@@ -39,8 +41,14 @@ namespace Storage.Net.Tests.Integration
             case "disk-directory":
                _storage = new DirectoryFilesBlobStorage(TestDir);
                break;
-            case "onedrive-personal":
-               //_storage = new OneDriveBlobStorage();
+            //case "onedrive-personal":
+            //_storage = new OneDriveBlobStorage();
+            //break;
+            case "aws-s3":
+               _storage = new AwsS3BlobStorage(
+                  TestSettings.AwsAccessKeyId,
+                  TestSettings.AwsSecretAccessKey,
+                  TestSettings.AwsTestBucketName);
                break;
          }
       }

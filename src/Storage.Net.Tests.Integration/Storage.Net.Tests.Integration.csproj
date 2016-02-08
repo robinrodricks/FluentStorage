@@ -100,6 +100,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Storage.Net.Net45.Aws\Storage.Net.Net45.Aws.csproj">
+      <Project>{7E924E0B-DD63-4DC5-8B17-32B2591A928D}</Project>
+      <Name>Storage.Net.Net45.Aws</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Storage.Net.Net45.Azure\Storage.Net.Net45.Azure.csproj">
       <Project>{42341769-8edd-4af8-8845-85e92f43ec29}</Project>
       <Name>Storage.Net.Net45.Azure</Name>

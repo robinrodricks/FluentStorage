@@ -1,18 +1,51 @@
 ﻿using Storage.Net.Blob;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
+using System.Linq;
+using Amazon;
+using Amazon.S3;
+using Amazon.Runtime;
+using Amazon.S3.Model;
+using Amazon.S3.Transfer;
 
 namespace Storage.Net.Aws.Blob
 {
-   class AwsS3BlobStorage : IBlobStorage
+   public class AwsS3BlobStorage : IBlobStorage
    {
-      public AwsS3BlobStorage()
+      private readonly string _bucketName;
+      private readonly AmazonS3Client _client;
+      private readonly TransferUtility _fileTransferUtility;
+
+      //https://github.com/awslabs/aws-sdk-net-samples/blob/master/ConsoleSamples/AmazonS3Sample/AmazonS3Sample/S3Sample.cs
+
+      public AwsS3BlobStorage(string accessKeyId, string secretAccessKey, string bucketName)
       {
-         //IAmazonS3 client;
+         if(accessKeyId == null) throw new ArgumentNullException(nameof(accessKeyId));
+         if(secretAccessKey == null) throw new ArgumentNullException(nameof(secretAccessKey));
+         if(bucketName == null) throw new ArgumentNullException(nameof(bucketName));
+
+         _client = new AmazonS3Client(new BasicAWSCredentials(accessKeyId, secretAccessKey), RegionEndpoint.EUWest1);
+         _fileTransferUtility = new TransferUtility(_client);
+         _bucketName = bucketName;
+
+         Initialise();
+
+      }
+
+      private void Initialise()
+      {
+         try
+         {
+            _client.PutBucket(new PutBucketRequest { BucketName = _bucketName });
+         }
+         catch(AmazonS3Exception ex)
+         {
+            if(ex.ErrorCode == "BucketAlreadyOwnedByYou")
+            {
+               //ignore this error as bucket already exists
+            }
+         }
       }
 
       public void Delete(string id)
@@ -32,7 +65,9 @@ namespace Storage.Net.Aws.Blob
 
       public IEnumerable<string> List(string prefix)
       {
-         throw new NotImplementedException();
+         ListBucketsResponse response = _client.ListBuckets();
+
+         return response.Buckets.Select(b => b.BucketName);
       }
 
       public Stream OpenStreamToRead(string id)
@@ -42,7 +77,9 @@ namespace Storage.Net.Aws.Blob
 
       public void UploadFromStream(string id, Stream sourceStream)
       {
-         throw new NotImplementedException();
+         //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
+
+         _fileTransferUtility.Upload(sourceStream, _bucketName, id);
       }
    }
 }
