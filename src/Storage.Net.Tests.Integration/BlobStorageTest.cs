@@ -127,7 +127,7 @@ namespace Storage.Net.Tests.Integration
             }
             catch(Exception ex)
             {
-               Assert.Fail();
+               Assert.Fail("this exception is not expected: " + ex);
             }
          }
       }

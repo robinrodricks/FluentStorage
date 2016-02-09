@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Blob\AwsS3BlobStorage.cs" />
+    <Compile Include="Blob\AwsS3BlobStorageExternalStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

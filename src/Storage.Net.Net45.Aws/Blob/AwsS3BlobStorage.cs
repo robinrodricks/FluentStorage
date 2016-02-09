@@ -62,16 +62,15 @@ namespace Storage.Net.Aws.Blob
          throw new NotImplementedException();
       }
 
+      /// <summary>
+      /// Downloads object to the stream
+      /// </summary>
       public void DownloadToStream(string id, Stream targetStream)
       {
-         var request = new GetObjectRequest { BucketName = _bucketName, Key = id };
-
-         using(GetObjectResponse response = _client.GetObject(request))
+         using(GetObjectResponse response = GetObject(id))
          {
             response.ResponseStream.CopyTo(targetStream);
          }
-
-         //_fileTransferUtility.Download(new TransferUtilityDownloadRequest)
       }
 
       public bool Exists(string id)
@@ -94,9 +93,16 @@ namespace Storage.Net.Aws.Blob
          return response.Buckets.Where(b => b.BucketName.StartsWith(prefix)).Select(b => b.BucketName);
       }
 
+      /// <summary>
+      /// Opens AWS stream and returns it. Note that you absolutely have to dispose it yourself in order for this
+      /// adapter to close the network connection properly.
+      /// </summary>
+      /// <param name="id"></param>
+      /// <returns></returns>
       public Stream OpenStreamToRead(string id)
       {
-         throw new NotImplementedException();
+         GetObjectResponse response = GetObject(id);
+         return new AwsS3BlobStorageExternalStream(response);
       }
 
       /// <summary>
@@ -109,6 +115,32 @@ namespace Storage.Net.Aws.Blob
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
 
          _fileTransferUtility.Upload(sourceStream, _bucketName, id);
+      }
+
+      private GetObjectResponse GetObject(string key)
+      {
+         var request = new GetObjectRequest { BucketName = _bucketName, Key = key };
+
+         try
+         {
+            GetObjectResponse response = _client.GetObject(request);
+            return response;
+         }
+         catch(AmazonS3Exception ex)
+         {
+            TryHandleException(ex);
+            throw;
+         }
+      }
+
+      private static bool TryHandleException(AmazonS3Exception ex)
+      {
+         if(ex.ErrorCode == "NoSuchKey")
+         {
+            throw new StorageException(ErrorCode.NotFound, ex);
+         }
+
+         return false;
       }
    }
 }
