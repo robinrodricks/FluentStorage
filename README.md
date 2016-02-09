@@ -1,5 +1,7 @@
 # Storage
 
+![](https://aloneguid.visualstudio.com/DefaultCollection/_apis/public/build/definitions/323c5f4c-c814-452d-9eaf-1006c83fd44c/2/badge)
+
 Storage.Net abstracts storage implementation from the applicatiion developer. The library started as an internal experiment in one of the companies I worked for and quickly grown into a separate library as I saw more and more repeating patterns.
 
 Storage.Net abstracts the following types of storage patterns:
