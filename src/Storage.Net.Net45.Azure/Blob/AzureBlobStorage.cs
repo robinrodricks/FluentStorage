@@ -149,11 +149,11 @@ namespace Storage.Net.Azure.Blob
             blob.FetchAttributes();
             return true;
          }
-         catch (StorageException ex)
+         catch(AzureStorageException ex)
          {
             WebException wex = ex.InnerException as WebException;
             var hwr = wex?.Response as HttpWebResponse;
-            if (hwr != null && hwr.StatusCode == HttpStatusCode.NotFound)
+            if(hwr != null && hwr.StatusCode == HttpStatusCode.NotFound)
             {
                return false;
             }

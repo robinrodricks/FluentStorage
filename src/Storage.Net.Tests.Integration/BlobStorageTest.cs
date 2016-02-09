@@ -133,6 +133,26 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Test]
+      public void Exists_ByNull_ConsistentException()
+      {
+         Assert.Throws<ArgumentNullException>(() => _storage.Exists(null));
+      }
+
+      [Test]
+      public void Exists_NoObject_ReturnsFalse()
+      {
+         Assert.IsFalse(_storage.Exists(Generator.RandomString));
+      }
+
+      [Test]
+      public void Exists_HasObject_ReturnsTrue()
+      {
+         string id = GetRandomStreamId();
+
+         Assert.IsTrue(_storage.Exists(id));
+      }
+
+      [Test]
       public void Delete_CreateNewAndDelete_CannotFindAgain()
       {
          string id = GetRandomStreamId();

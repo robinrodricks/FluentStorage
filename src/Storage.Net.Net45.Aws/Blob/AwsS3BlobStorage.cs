@@ -78,9 +78,26 @@ namespace Storage.Net.Aws.Blob
          }
       }
 
+      /// <summary>
+      /// Checks if the object exists by trying to fetch the details
+      /// </summary>
       public bool Exists(string id)
       {
-         throw new NotImplementedException();
+         if(id == null) throw new ArgumentNullException(nameof(id));
+
+         try
+         {
+            using(GetObject(id))
+            {
+
+            }
+         }
+         catch(StorageException ex)
+         {
+            if(ex.ErrorCode == ErrorCode.NotFound) return false;
+         }
+
+         return true;
       }
 
       /// <summary>
