@@ -20,3 +20,4 @@ This framework is available through NuGet:
 
 - [Core Package](https://www.nuget.org/packages/Storage.Net)
 - [Windows Azure Package](https://www.nuget.org/packages/Storage.Net.WindowsAzure)
+- [Amazon Web Services Package](https://www.nuget.org/packages/Storage.Net.AmazonWebServices/)
