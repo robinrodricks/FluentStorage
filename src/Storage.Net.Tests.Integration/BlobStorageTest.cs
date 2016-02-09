@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Aloneguid.Support;
 using Config.Net;
 using NUnit.Framework;
@@ -75,12 +76,22 @@ namespace Storage.Net.Tests.Integration
       [Test]
       public void Upload_New_CanDownload()
       {
-         string id = GetRandomStreamId();
+         string content = Generator.GetRandomString(10000, false);
+         string contentRead;
+         string id = Guid.NewGuid().ToString();
 
-         using (Stream s = new MemoryStream())
+         using(var ms = content.ToMemoryStream())
+         {
+            _storage.UploadFromStream(id, ms);
+         }
+
+         using (var s = new MemoryStream())
          {
             _storage.DownloadToStream(id, s);
+            contentRead = Encoding.UTF8.GetString(s.ToArray());
          }
+
+         Assert.AreEqual(content, contentRead);
       }
 
       [Test]

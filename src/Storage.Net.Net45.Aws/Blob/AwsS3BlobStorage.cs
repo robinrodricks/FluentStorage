@@ -64,7 +64,14 @@ namespace Storage.Net.Aws.Blob
 
       public void DownloadToStream(string id, Stream targetStream)
       {
-         throw new NotImplementedException();
+         var request = new GetObjectRequest { BucketName = _bucketName, Key = id };
+
+         using(GetObjectResponse response = _client.GetObject(request))
+         {
+            response.ResponseStream.CopyTo(targetStream);
+         }
+
+         //_fileTransferUtility.Download(new TransferUtilityDownloadRequest)
       }
 
       public bool Exists(string id)
@@ -72,11 +79,19 @@ namespace Storage.Net.Aws.Blob
          throw new NotImplementedException();
       }
 
+      /// <summary>
+      /// Lists all buckets, optionaly filtering by prefix. Prefix filtering happens on client side.
+      /// </summary>
       public IEnumerable<string> List(string prefix)
       {
          ListBucketsResponse response = _client.ListBuckets();
 
-         return response.Buckets.Select(b => b.BucketName);
+         if(string.IsNullOrEmpty(prefix))
+         {
+            return response.Buckets.Select(b => b.BucketName);
+         }
+
+         return response.Buckets.Where(b => b.BucketName.StartsWith(prefix)).Select(b => b.BucketName);
       }
 
       public Stream OpenStreamToRead(string id)
@@ -84,6 +99,11 @@ namespace Storage.Net.Aws.Blob
          throw new NotImplementedException();
       }
 
+      /// <summary>
+      /// Uploads the stream using transfer manager
+      /// </summary>
+      /// <param name="id">Unique resource ID</param>
+      /// <param name="sourceStream">Stream to upload</param>
       public void UploadFromStream(string id, Stream sourceStream)
       {
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
