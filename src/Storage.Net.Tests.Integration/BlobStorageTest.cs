@@ -132,5 +132,21 @@ namespace Storage.Net.Tests.Integration
          }
       }
 
+      [Test]
+      public void Delete_CreateNewAndDelete_CannotFindAgain()
+      {
+         string id = GetRandomStreamId();
+
+         _storage.Delete(id);
+
+         var ms = new MemoryStream();
+         Assert.Throws<StorageException>(() => _storage.DownloadToStream(id, ms));
+      }
+
+      [Test]
+      public void Delete_NullInKey_ConsistentException()
+      {
+         Assert.Throws<ArgumentNullException>(() => _storage.Delete(null));
+      }
    }
 }

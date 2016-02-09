@@ -57,9 +57,14 @@ namespace Storage.Net.Aws.Blob
          }
       }
 
+      /// <summary>
+      /// deletes object from current bucket
+      /// </summary>
       public void Delete(string id)
       {
-         throw new NotImplementedException();
+         if(id == null) throw new ArgumentNullException(nameof(id));
+
+         _client.DeleteObject(_bucketName, id);
       }
 
       /// <summary>
