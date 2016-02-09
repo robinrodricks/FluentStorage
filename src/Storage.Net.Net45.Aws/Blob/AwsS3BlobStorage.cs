@@ -11,6 +11,9 @@ using Amazon.S3.Transfer;
 
 namespace Storage.Net.Aws.Blob
 {
+   /// <summary>
+   /// Amazon S3 storage adapter for blobs
+   /// </summary>
    public class AwsS3BlobStorage : IBlobStorage
    {
       private readonly string _bucketName;
@@ -19,6 +22,12 @@ namespace Storage.Net.Aws.Blob
 
       //https://github.com/awslabs/aws-sdk-net-samples/blob/master/ConsoleSamples/AmazonS3Sample/AmazonS3Sample/S3Sample.cs
 
+      /// <summary>
+      /// Creates a new instance of <see cref="AwsS3BlobStorage"/>
+      /// </summary>
+      /// <param name="accessKeyId"></param>
+      /// <param name="secretAccessKey"></param>
+      /// <param name="bucketName"></param>
       public AwsS3BlobStorage(string accessKeyId, string secretAccessKey, string bucketName)
       {
          if(accessKeyId == null) throw new ArgumentNullException(nameof(accessKeyId));

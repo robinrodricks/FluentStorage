@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Aloneguid.Support;
 using Config.Net;
 using NUnit.Framework;
 using Storage.Net.Aws.Blob;
@@ -93,6 +94,30 @@ namespace Storage.Net.Tests.Integration
             s.CopyTo(ms);
 
             Assert.Greater(ms.Length, 0);
+         }
+      }
+
+      [Test]
+      public void Download_DoesNotExist_ConsistentException()
+      {
+         string id = Generator.RandomString;
+
+         using(var ms = new MemoryStream())
+         {
+            try
+            {
+               _storage.DownloadToStream(id, ms);
+
+               Assert.Fail("the call must fail");
+            }
+            catch(StorageException ex)
+            {
+               Assert.AreEqual(ErrorCode.NotFound, ex.ErrorCode);
+            }
+            catch(Exception ex)
+            {
+               Assert.Fail();
+            }
          }
       }
 

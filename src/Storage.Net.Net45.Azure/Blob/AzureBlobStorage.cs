@@ -6,6 +6,7 @@ using System.Net;
 using System.Web;
 using Storage.Net.Blob;
 using Microsoft.WindowsAzure.Storage.Blob;
+using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
 
 namespace Storage.Net.Azure.Blob
 {
@@ -106,12 +107,20 @@ namespace Storage.Net.Azure.Blob
       /// </summary>
       public void DownloadToStream(string id, Stream targetStream)
       {
-         if (id == null) throw new ArgumentNullException(nameof(id));
-         if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
+         if(id == null) throw new ArgumentNullException(nameof(id));
+         if(targetStream == null) throw new ArgumentNullException(nameof(targetStream));
          id = ToInternalId(id);
 
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
-         blob.DownloadToStream(targetStream);
+
+         try
+         {
+            blob.DownloadToStream(targetStream);
+         }
+         catch(AzureStorageException ex)
+         {
+            if(!TryHandleStorageException(ex)) throw;
+         }
       }
 
       /// <summary>
@@ -162,6 +171,24 @@ namespace Storage.Net.Azure.Blob
       private static string ToUserId(string internalId)
       {
          return HttpUtility.UrlDecode(internalId);
+      }
+
+      private static bool TryHandleStorageException(AzureStorageException ex)
+      {
+         WebException wex = ex.InnerException as WebException;
+         if(wex != null)
+         {
+            var response = wex.Response as HttpWebResponse;
+            if(response != null)
+            {
+               if(response.StatusCode == HttpStatusCode.NotFound)
+               {
+                  throw new StorageException(ErrorCode.NotFound, ex);
+               }
+            }
+         }
+
+         return false;
       }
    }
 }

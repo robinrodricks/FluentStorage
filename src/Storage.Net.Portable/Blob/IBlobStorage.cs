@@ -32,7 +32,7 @@ namespace Storage.Net.Blob
       /// </summary>
       /// <param name="id">Blob ID</param>
       /// <param name="targetStream">Target stream to copy to</param>
-      /// <exception cref="FileNotFoundException">Thrown when blob does not exist</exception>
+      /// <exception cref="StorageException">Thrown when blob does not exist, error code set to <see cref="ErrorCode.NotFound"/></exception>
       void DownloadToStream(string id, Stream targetStream);
 
       /// <summary>

@@ -61,6 +61,9 @@
     <Compile Include="..\Storage.Net.Portable\Blob\IBlobStorage.cs">
       <Link>Blob\IBlobStorage.cs</Link>
     </Compile>
+    <Compile Include="..\Storage.Net.Portable\ErrorCode.cs">
+      <Link>ErrorCode.cs</Link>
+    </Compile>
     <Compile Include="..\Storage.Net.Portable\FileFormats\CsvFormat.cs">
       <Link>FileFormats\CsvFormat.cs</Link>
     </Compile>

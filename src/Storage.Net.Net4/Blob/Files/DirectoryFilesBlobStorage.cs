@@ -68,7 +68,10 @@ namespace Storage.Net.Blob.Files
 
          using(Stream source = OpenStream(id))
          {
-            if(source == null) return;
+            if(source == null)
+            {
+               throw new StorageException(ErrorCode.NotFound, null);
+            }
 
             source.CopyTo(targetStream);
             targetStream.Flush();

@@ -42,6 +42,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Blob\IBlobStorage.cs" />
+    <Compile Include="ErrorCode.cs" />
     <Compile Include="FileFormats\CsvFormat.cs" />
     <Compile Include="FileFormats\CsvReader.cs" />
     <Compile Include="FileFormats\CsvWriter.cs" />
@@ -67,11 +68,7 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Collections.Concurrent">
-      <HintPath>..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETPortable\v4.5\System.Collections.Concurrent.dll</HintPath>
-    </Reference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <None Include="..\storage.snk">
       <Link>storage.snk</Link>
