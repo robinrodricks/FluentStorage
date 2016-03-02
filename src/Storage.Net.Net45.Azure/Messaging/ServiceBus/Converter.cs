@@ -10,7 +10,7 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
    {
       public static BrokeredMessage ToBrokeredMessage(QueueMessage message)
       {
-         var result = new BrokeredMessage(message.Content.ToMemoryStream());
+         var result = new BrokeredMessage(message.Content == null ? null : new MemoryStream(message.Content));
          if(message.Properties != null && message.Properties.Count > 0)
          {
             foreach(var prop in message.Properties)
@@ -23,10 +23,14 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
 
       public static QueueMessage ToQueueMessage(BrokeredMessage message)
       {
-         string body;
-         using(var reader = new StreamReader(message.GetBody<Stream>()))
+         byte[] body;
+         using (Stream stream = message.GetBody<Stream>())
          {
-            body = reader.ReadToEnd();
+            using (var ms = new MemoryStream())
+            {
+               stream.CopyTo(ms);
+               body = ms.ToArray();
+            }
          }
 
          var result = new QueueMessage(message.MessageId, body);

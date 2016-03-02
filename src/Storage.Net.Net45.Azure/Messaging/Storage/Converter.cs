@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Storage.Net.Azure.Messaging.Storage
 {
-   static class Converter
+   internal static class Converter
    {
       private const string PropEndWord = "PROPEND";
 
