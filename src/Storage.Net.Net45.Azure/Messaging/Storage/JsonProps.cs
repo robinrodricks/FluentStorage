@@ -4,7 +4,7 @@ namespace Storage.Net.Azure.Messaging.Storage
 {
    class JsonProps
    {
-      [JsonProperty("properties")]
+      [JsonProperty("props")]
       public JsonProp[] Properties { get; set; }
    }
 

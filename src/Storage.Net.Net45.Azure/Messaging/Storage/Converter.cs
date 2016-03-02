@@ -1,6 +1,7 @@
 ﻿using Microsoft.WindowsAzure.Storage.Queue;
 using Storage.Net.Messaging;
 using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -9,48 +10,84 @@ namespace Storage.Net.Azure.Messaging.Storage
    internal static class Converter
    {
       private const string PropEndWord = "PROPEND";
+      private static readonly Guid CustomFlag = new Guid("820e7dc0-46a3-4177-a241-cdac97275ca9");
+      private static readonly byte[] CustomFlagBytes = CustomFlag.ToByteArray();
 
       public static CloudQueueMessage ToCloudQueueMessage(QueueMessage message)
       {
+         //when there are no properties pack the data as binary in raw form
          if(message.Properties == null || message.Properties.Count == 0)
          {
             return new CloudQueueMessage(message.Content);
          }
 
-         var sb = new StringBuilder();
+         //note that Azure Storage doesn't have properties on message, therefore I can do a simulation instead
+
          var clazz = new JsonProps
          {
             Properties = message.Properties.Select(p => new JsonProp { Name = p.Key, Value = p.Value }).ToArray()
          };
-         sb.Append(clazz.ToCompressedJsonString());
-         sb.Append(PropEndWord);
-         sb.Append(message.Content);
-         return new CloudQueueMessage(sb.ToString());
+         byte[] propBytes = Encoding.UTF8.GetBytes(clazz.ToCompressedJsonString());
+
+         using (var ms = new MemoryStream())
+         {
+            using (var writer = new BinaryWriter(ms, Encoding.UTF8))
+            {
+               writer.Write(CustomFlagBytes);
+               writer.Write(propBytes.Length);
+               writer.Write(propBytes);
+               writer.Write(message.Content);
+            }
+
+            return new CloudQueueMessage(ms.ToArray());
+         }
       }
 
       public static QueueMessage ToQueueMessage(CloudQueueMessage message)
       {
          if(message == null) return null;
 
-         string content = message.AsString;
-         if(content.Contains(PropEndWord))
-         {
-            int idx = content.IndexOf(PropEndWord);
-            if(idx != -1)
-            {
-               string json = content.Substring(0, idx);
-               content = content.Substring(idx + PropEndWord.Length);
-               JsonProps props = json.AsJsonObject<JsonProps>();
-               var result = new QueueMessage(CreateId(message), content);
-               foreach(JsonProp prop in props.Properties)
-               {
-                  result.Properties[prop.Name] = prop.Value;
-               }
-               return result;
-            }
-         }
+         byte[] mb = message.AsBytes;
+         if (!IsCustomMessage(mb)) return new QueueMessage(CreateId(message), mb);
 
-         return new QueueMessage(CreateId(message), message.AsString);
+         using (var ms = new MemoryStream(mb))
+         {
+            //skip forward custom message flag
+            ms.Seek(CustomFlagBytes.Length, SeekOrigin.Begin);
+
+            //read the custom properties length
+            int cpl;
+            using (var br = new BinaryReader(ms, Encoding.UTF8, true))
+            {
+               cpl = br.ReadInt32();
+            }
+
+            //read the actual properties
+            byte[] propBytes = new byte[cpl];
+            ms.Read(propBytes, 0, cpl);
+            string propString = Encoding.UTF8.GetString(propBytes);
+            JsonProps props = propString.AsJsonObject<JsonProps>();
+
+            //read message data
+            byte[] leftovers = ms.ToByteArray();
+
+            var result = new QueueMessage(CreateId(message), leftovers);
+            foreach(JsonProp prop in props.Properties)
+            {
+               result.Properties[prop.Name] = prop.Value;
+            }
+            return result;
+         }
+      }
+
+      private static bool IsCustomMessage(byte[] messageBytes)
+      {
+         if(messageBytes.Length < CustomFlagBytes.Length) return false;
+
+         byte[] firstBytes = new byte[CustomFlagBytes.Length];
+         Array.Copy(messageBytes, 0, firstBytes, 0, CustomFlagBytes.Length);
+
+         return firstBytes.SequenceEqual(CustomFlagBytes);
       }
 
       private static string CreateId(CloudQueueMessage message)

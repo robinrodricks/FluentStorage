@@ -20,6 +20,12 @@ namespace Storage.Net.Tests.Azure.Messaging.Storage
          qm.Properties["one"] = "two";
 
          CloudQueueMessage cm = Converter.ToCloudQueueMessage(qm);
+
+         QueueMessage qm2 = Converter.ToQueueMessage(cm);
+
+         Assert.AreEqual(qm.Properties.Count, qm2.Properties.Count);
+         Assert.AreEqual(qm.Properties["one"], qm2.Properties["one"]);
+         Assert.AreEqual(qm.StringContent, qm2.StringContent);
       }
    }
 }
