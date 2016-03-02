@@ -60,7 +60,9 @@ namespace Storage.Net.Tests.Integration.Messaging
                   true);
                break;
             case "inmemory":
-               _publisher = new InMemoryMessagePublisherReceiver();
+               var inmem = new InMemoryMessagePublisherReceiver();
+               _publisher = inmem;
+               _receiver = inmem;
                break;
          }
 
