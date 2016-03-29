@@ -17,6 +17,7 @@
       <tags>Common</tags>
       <dependencies>
          <dependency id="Aloneguid.Support" version="2.0" />
+         <dependency id="System.Data.SQLite.Core" version="1.0"/>
       </dependencies>
    </metadata>
    <files>
