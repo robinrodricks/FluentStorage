@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Storage.Net.Application;
 using Storage.Net.Messaging;
 
 namespace Storage.Net.Queue.Files
 {
-   public class DiskMessagePublisherReceiver : IMessagePublisher, IMessageReceiver
+   class DiskMessagePublisherReceiver : IMessagePublisher, IMessageReceiver
    {
-      private readonly DirectoryInfo _directory;
+      private readonly SqliteDriver _sql;
 
       public DiskMessagePublisherReceiver(DirectoryInfo directory)
       {
-         _directory = directory;
+         _sql = new SqliteDriver(directory);
+
+         //_sql.EnsureTable("message", "Id");
       }
 
       #region [ Publisher ]

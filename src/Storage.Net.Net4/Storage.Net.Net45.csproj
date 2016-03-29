@@ -112,6 +112,7 @@
     <Compile Include="..\Storage.Net.Portable\Table\TableRowId.cs">
       <Link>Table\TableRowId.cs</Link>
     </Compile>
+    <Compile Include="Application\SqliteDriver.cs" />
     <Compile Include="Blob\Files\DirectoryFilesBlobStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queue\Files\DiskMessagePublisherReceiver.cs" />

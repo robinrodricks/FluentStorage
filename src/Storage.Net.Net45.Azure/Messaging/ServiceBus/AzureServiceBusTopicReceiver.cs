@@ -21,7 +21,16 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
       /// <summary>
       /// Creates an instance by connection string and topic name
       /// </summary>
-      public AzureServiceBusTopicReceiver(string connectionString, string topicName, string subscriptionName, bool peekLock = true)
+      /// <param name="connectionString">Full connection string to the Service Bus service, it looks like Endpoint=sb://myservice.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=aLongKey</param>
+      /// <param name="topicName">Name of the topic to subscribe to. If the topic does not exist it is created on the go.</param>
+      /// <param name="subscriptionName">Name of the subscription inside the topic. It is created on the go when does not exist.</param>
+      /// <param name="subscriptionSqlFilter">
+      /// Optional. When specified creates the subscription with specific filter, otherwise subscribes
+      /// to all messages withing the topic. Please see https://msdn.microsoft.com/library/azure/microsoft.servicebus.messaging.sqlfilter.sqlexpression.aspx for
+      /// the filter syntax or refer to Service Fabric documentation on how to create SQL filters.
+      /// </param>
+      /// <param name="peekLock">Indicates the Service Bus mode (PeekLock or ReceiveAndDelete). PeekLock (true) is the most common scenario to use.</param>
+      public AzureServiceBusTopicReceiver(string connectionString, string topicName, string subscriptionName, string subscriptionSqlFilter, bool peekLock)
       {
          _nsMgr = NamespaceManager.CreateFromConnectionString(connectionString);
 
@@ -29,7 +38,14 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
 
          if(!_nsMgr.SubscriptionExists(topicName, subscriptionName))
          {
-            _nsMgr.CreateSubscription(topicName, subscriptionName);
+            if (string.IsNullOrEmpty(subscriptionSqlFilter))
+            {
+               _nsMgr.CreateSubscription(topicName, subscriptionName);
+            }
+            else
+            {
+               _nsMgr.CreateSubscription(topicName, subscriptionName, new SqlFilter(subscriptionSqlFilter));
+            }
          }
 
          _peekLock = peekLock;

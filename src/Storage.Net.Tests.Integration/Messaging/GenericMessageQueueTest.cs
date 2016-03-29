@@ -15,10 +15,10 @@ namespace Storage.Net.Tests.Integration.Messaging
    [TestFixture("azure-servicebus-topic")]
    [TestFixture("azure-servicebus-queue")]
    [TestFixture("inmemory")]
-   [TestFixture("disk")]
+   //[TestFixture("disk")]
    public class GenericMessageQueueTest : AbstractTestFixture
    {
-      private string _name;
+      private readonly string _name;
       private IMessagePublisher _publisher;
       private IMessageReceiver _receiver;
 
@@ -50,6 +50,7 @@ namespace Storage.Net.Tests.Integration.Messaging
                   Cfg.Read(TestSettings.ServiceBusConnectionString),
                   "testtopic",
                   "AllMessages",
+                  null,
                   true);
                break;
             case "azure-servicebus-queue":
@@ -66,11 +67,11 @@ namespace Storage.Net.Tests.Integration.Messaging
                _publisher = inmem;
                _receiver = inmem;
                break;
-            case "disk":
+            /*case "disk":
                var disk = new DiskMessagePublisherReceiver(TestDir);
                _publisher = disk;
                _receiver = disk;
-               break;
+               break;*/
          }
 
          //delete any messages already in queue

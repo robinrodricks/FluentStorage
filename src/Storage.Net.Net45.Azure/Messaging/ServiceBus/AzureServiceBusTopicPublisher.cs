@@ -15,8 +15,8 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
    public class AzureServiceBusTopicPublisher : IMessagePublisher
    {
       private NamespaceManager _nsMgr;
-      readonly private string _connectionString;
-      readonly private string _topicName;
+      private readonly string _connectionString;
+      private readonly string _topicName;
       private TopicClient _client;
 
       /// <summary>
