@@ -10,15 +10,12 @@ using Storage.Net.Aws.Blob;
 using Storage.Net.Blob;
 using Storage.Net.Blob.Files;
 using Storage.Net.Azure.Blob;
-using Storage.Net.OneDrive.Blob;
 
 namespace Storage.Net.Tests.Integration
 {
    [TestFixture("azure")]
    [TestFixture("disk-directory")]
    [TestFixture("aws-s3")]
-   //[TestFixture("onedrive-personal")]
-   //[TestFixture("onedrive-business")]
    public class BlobStorageTest : AbstractTestFixture
    {
       private readonly string _type;
@@ -43,8 +40,6 @@ namespace Storage.Net.Tests.Integration
             case "disk-directory":
                _storage = new DirectoryFilesBlobStorage(TestDir);
                break;
-            //case "onedrive-personal":
-            //_storage = new OneDriveBlobStorage();
             //break;
             case "aws-s3":
                _storage = new AwsS3BlobStorage(
