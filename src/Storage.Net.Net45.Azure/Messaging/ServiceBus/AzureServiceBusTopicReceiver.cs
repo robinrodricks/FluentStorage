@@ -70,6 +70,11 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
          bm.Complete();
       }
 
+      public void StartMessagePump(Action<QueueMessage> onMessage)
+      {
+         throw new NotImplementedException();
+      }
+
       /// <summary>
       /// Nothing to dispose
       /// </summary>

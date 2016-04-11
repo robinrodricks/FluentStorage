@@ -17,6 +17,7 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
       private readonly QueueClient _client;
       private readonly bool _peekLock;
       private readonly ConcurrentDictionary<string, BrokeredMessage> _messageIdToBrokeredMessage = new ConcurrentDictionary<string, BrokeredMessage>();
+      private Action<QueueMessage> _onMessageAction;
 
       /// <summary>
       /// Creates 
@@ -37,7 +38,7 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
       /// </summary>
       public QueueMessage ReceiveMessage()
       {
-         BrokeredMessage bm = _client.Receive();
+         BrokeredMessage bm = _client.Receive(TimeSpan.FromMilliseconds(1));
          if(bm == null) return null;
          return ProcessAndConvert(bm);
       }
@@ -76,10 +77,39 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
       }
 
       /// <summary>
-      /// Doesn't do anything
+      /// Starts message pump with AutoComplete = false, 1 minute session renewal and 1 concurrent call.
+      /// </summary>
+      /// <param name="onMessage"></param>
+      public void StartMessagePump(Action<QueueMessage> onMessage)
+      {
+         if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
+         if (_onMessageAction != null) throw new ArgumentException("message pump already started", nameof(onMessage));
+
+         _onMessageAction = onMessage;
+
+         var options = new OnMessageOptions
+         {
+            AutoComplete = false,
+            AutoRenewTimeout = TimeSpan.FromMinutes(1),
+            MaxConcurrentCalls = 1
+         };
+
+         _client.OnMessage(OnMessage, options);
+      }
+
+      private void OnMessage(BrokeredMessage bm)
+      {
+         QueueMessage qm = ProcessAndConvert(bm);
+
+         _onMessageAction?.Invoke(qm);
+      } 
+
+      /// <summary>
+      /// Stops message pump if started
       /// </summary>
       public void Dispose()
       {
+         _client.Close();  //this also stops the message pump
       }
    }
 }

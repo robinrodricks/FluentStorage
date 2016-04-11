@@ -7,7 +7,7 @@ using Storage.Net.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Storage.Net.Queue.Files;
+using System.Threading;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
@@ -21,6 +21,7 @@ namespace Storage.Net.Tests.Integration.Messaging
       private readonly string _name;
       private IMessagePublisher _publisher;
       private IMessageReceiver _receiver;
+      private int _messagesPumped;
 
       public GenericMessageQueueTest(string name)
       {
@@ -80,6 +81,8 @@ namespace Storage.Net.Tests.Integration.Messaging
          {
             _receiver.ConfirmMessage(qm);
          }
+
+         _messagesPumped = 0;
       }
 
       [TearDown]
@@ -143,5 +146,27 @@ namespace Storage.Net.Tests.Integration.Messaging
          Assert.AreEqual("v1", received.Properties["one"]);
       }
 
+      [Test]
+      public void MessagePump_AddFewMessages_CanReceiveOneAndPumpClearsThemAll()
+      {
+         for (int i = 0; i < 10; i++)
+         {
+            var qm = new QueueMessage(nameof(MessagePump_AddFewMessages_CanReceiveOneAndPumpClearsThemAll) + "#" + i);
+            _publisher.PutMessage(qm);
+         }
+
+         Assert.IsNotNull(_receiver.ReceiveMessage());
+
+         _receiver.StartMessagePump(OnMessage);
+
+         Thread.Sleep(TimeSpan.FromSeconds(10));
+
+         Assert.AreEqual(9, _messagesPumped);
+      }
+
+      private void OnMessage(QueueMessage qm)
+      {
+         _messagesPumped++;
+      }
    }
 }

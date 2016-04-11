@@ -48,6 +48,11 @@ namespace Storage.Net.Queue.Files
          throw new NotImplementedException();
       }
 
+      public void StartMessagePump(Action<QueueMessage> onMessage)
+      {
+         throw new NotImplementedException();
+      }
+
       #endregion
 
       public void Dispose()

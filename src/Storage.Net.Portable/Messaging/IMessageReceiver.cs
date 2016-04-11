@@ -27,5 +27,12 @@ namespace Storage.Net.Messaging
       /// </summary>
       /// <param name="message"></param>
       void ConfirmMessage(QueueMessage message);
+
+      /// <summary>
+      /// Starts automatic message pumping trying to use native features as much as possible. In most cases it is more efficient than calling
+      /// <see cref="ReceiveMessage"/> in a loop in your application. Message pump stops when you dispose the instance.
+      /// Disposing the instance will also stop message pump for you.
+      /// </summary>
+      void StartMessagePump(Action<QueueMessage> onMessage);
    }
 }

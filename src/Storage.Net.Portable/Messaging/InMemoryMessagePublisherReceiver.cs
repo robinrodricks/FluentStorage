@@ -79,6 +79,11 @@ namespace Storage.Net.Messaging
       {
       }
 
+      public void StartMessagePump(Action<QueueMessage> onMessage)
+      {
+         throw new NotImplementedException();
+      }
+
       /// <summary>
       /// Receives up to <paramref name="count"/> messages when available.
       /// </summary>
