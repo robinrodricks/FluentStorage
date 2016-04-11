@@ -62,7 +62,7 @@ namespace Storage.Net.Azure.Messaging.Storage
          if (_pollingThread != null) throw new ArgumentException("polling already started", nameof(onMessage));
 
          _onMessageAction = onMessage;
-         _pollingThread = new Thread(PollingThread);
+         _pollingThread = new Thread(PollingThread) { IsBackground = true };
          _pollingThread.Start();
       }
 
