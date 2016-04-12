@@ -17,6 +17,7 @@ namespace Storage.Net.Azure.Messaging.Storage
       private const int PollingBatchSize = 5;
       private readonly CloudQueue _queue;
       private readonly TimeSpan _messageVisibilityTimeout;
+      private readonly TimeSpan _messagePumpPollingTimeout;
       private Thread _pollingThread;
       private bool _disposed;
       private Action<QueueMessage> _onMessageAction;
@@ -32,13 +33,37 @@ namespace Storage.Net.Azure.Messaging.Storage
       /// will be hidden before it reappears in the queue. Therefore you must call <see cref="ConfirmMessage(QueueMessage)"/>
       /// to complete and delete it.
       /// </param>
-      public AzureStorageQueueReceiver(string accountName, string storageKey, string queueName, TimeSpan messageVisibilityTimeout)
+      public AzureStorageQueueReceiver(string accountName, string storageKey, string queueName,
+         TimeSpan messageVisibilityTimeout) :
+         this(accountName, storageKey, queueName, messageVisibilityTimeout, TimeSpan.FromMinutes(1))
+      {
+         
+      }
+
+      /// <summary>
+      /// Creates an instance of Azure Storage Queue receiver 
+      /// </summary>
+      /// <param name="accountName">Azure Storage account name</param>
+      /// <param name="storageKey">Azure Storage key</param>
+      /// <param name="queueName">Queue name</param>
+      /// <param name="messageVisibilityTimeout">
+      /// Timeout value passed in GetMessage call in the Storage Queue. The value indicates how long the message
+      /// will be hidden before it reappears in the queue. Therefore you must call <see cref="ConfirmMessage(QueueMessage)"/>
+      /// to complete and delete it.
+      /// </param>
+      /// <param name="messagePumpPollingTimeout">
+      /// Used in conjunction with <see cref="StartMessagePump(Action{QueueMessage})"/> and indicates how often message pump will ping for new
+      /// messages in the queue.
+      /// </param>
+      public AzureStorageQueueReceiver(string accountName, string storageKey, string queueName,
+         TimeSpan messageVisibilityTimeout, TimeSpan messagePumpPollingTimeout)
       {
          var account = new CloudStorageAccount(new StorageCredentials(accountName, storageKey), true);
          var client = account.CreateCloudQueueClient();
          _queue = client.GetQueueReference(queueName);
          _queue.CreateIfNotExists();
          _messageVisibilityTimeout = messageVisibilityTimeout;
+         _messagePumpPollingTimeout = messagePumpPollingTimeout;
       }
 
       /// <summary>
@@ -89,7 +114,7 @@ namespace Storage.Net.Azure.Messaging.Storage
             }
             
 
-            Thread.Sleep(TimeSpan.FromMinutes(1));
+            Thread.Sleep(_messagePumpPollingTimeout);
 
             //todo: think of smart polling, regular intervals are too expensive
          }
