@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata>
       <id>Storage.Net</id>
-      <version>2.4.1</version>
+      <version>2.5.0</version>
       <authors>Ivan Gavryliuk</authors>
       <owners>Ivan Gavryliuk</owners>
       <projectUrl>https://github.com/aloneguid/storage</projectUrl>
@@ -20,8 +20,9 @@
       </dependencies>
    </metadata>
    <files>
+      <file src="out\lib\portable\Storage.Net.*" target="lib\portable-net45+wp80+win8+wpa81+dnxcore50"/>
       <file src="out\lib\net45\Storage.Net.*" target="lib\net45"/>
-
-      <file src="out\lib\portable\Storage.Net.*" target="lib\portable-net45+sl5+wp8+win8"/>
+      <file src="out\lib\net45\Storage.Net.*" target="lib\MonoAndroid"/>
+      <file src="out\lib\net45\Storage.Net.*" target="lib\MonoTouch"/>
    </files>
 </package>

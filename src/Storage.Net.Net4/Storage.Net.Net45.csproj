@@ -110,6 +110,7 @@
     </Compile>
     <Compile Include="Application\SqliteDriver.cs" />
     <Compile Include="Blob\Files\DirectoryFilesBlobStorage.cs" />
+    <Compile Include="Blob\Files\FilePackedBlobStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queue\Files\DiskMessagePublisherReceiver.cs" />
     <Compile Include="Table\Files\CsvFileTableStorage.cs" />
