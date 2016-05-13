@@ -54,8 +54,8 @@
     <AssemblyOriginatorKeyFile>..\storage.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Aloneguid.Support.Net45, Version=1.0.0.0, Culture=neutral, PublicKeyToken=8dea52f811e261ef, processorArchitecture=MSIL">
-      <HintPath>..\packages\Aloneguid.Support.2.2.1.0\lib\net45\Aloneguid.Support.Net45.dll</HintPath>
+    <Reference Include="Aloneguid.Support, Version=1.0.0.0, Culture=neutral, PublicKeyToken=8dea52f811e261ef, processorArchitecture=MSIL">
+      <HintPath>..\packages\Aloneguid.Support.2.3.0.3\lib\net45\Aloneguid.Support.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Config.Net, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d836a57afd299520, processorArchitecture=MSIL">
@@ -63,15 +63,15 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="LogMagic, Version=1.0.0.0, Culture=neutral, PublicKeyToken=207467ebaac3ce40, processorArchitecture=MSIL">
-      <HintPath>..\packages\LogMagic.1.1.1\lib\net45\LogMagic.dll</HintPath>
+      <HintPath>..\packages\LogMagic.1.3.1\lib\net45\LogMagic.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="nunit.framework, Version=3.2.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.2.0\lib\net45\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
