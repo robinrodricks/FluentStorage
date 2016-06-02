@@ -99,7 +99,7 @@ namespace Storage.Net.Azure.Table
       /// </summary>
       public TableRow Get(string tableName, string partitionKey, string rowKey)
       {
-         return Get(tableName, partitionKey, rowKey, -1).FirstOrDefault();
+         return Get(tableName, partitionKey, rowKey, -1)?.FirstOrDefault();
       }
 
       /// <summary>
