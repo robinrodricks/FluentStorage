@@ -6,6 +6,7 @@
       <authors>Ivan Gavryliuk</authors>
       <owners>Ivan Gavryliuk</owners>
       <projectUrl>https://github.com/aloneguid/storage</projectUrl>
+      <iconUrl>https://alonestore.blob.core.windows.net/nuget/storage.png</iconUrl>
       <requireLicenseAcceptance>false</requireLicenseAcceptance>
       <description>
          .NET storage implementation for Amazon Web Services.

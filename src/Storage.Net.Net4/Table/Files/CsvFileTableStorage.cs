@@ -76,7 +76,7 @@ namespace Storage.Net.Table.Files
       /// </summary>
       public TableRow Get(string tableName, string partitionKey, string rowKey)
       {
-         return InternalGet(tableName, partitionKey, rowKey).FirstOrDefault();
+         return InternalGet(tableName, partitionKey, rowKey)?.FirstOrDefault();
       }
 
       private IEnumerable<TableRow> InternalGet(string tableName, string partitionKey, string rowKey)
