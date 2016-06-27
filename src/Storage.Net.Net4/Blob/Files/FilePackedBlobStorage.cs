@@ -10,7 +10,7 @@ namespace Storage.Net.Blob.Files
    /// <summary>
    /// File based blob storage packed into one single file.
    /// </summary>
-   public class FilePackedBlobStorage : IBlobStorage
+   class FilePackedBlobStorage : IBlobStorage
    {
       public FilePackedBlobStorage(Stream fileStream)
       {

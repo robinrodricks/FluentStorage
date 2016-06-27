@@ -70,6 +70,9 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
          bm.Complete();
       }
 
+      /// <summary>
+      /// Not implemented
+      /// </summary>
       public void StartMessagePump(Action<QueueMessage> onMessage)
       {
          throw new NotImplementedException();
@@ -107,6 +110,20 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
          QueueMessage qm = Converter.ToQueueMessage(bm);
          if(_peekLock) _messageIdToBrokeredMessage[qm.Id] = bm;
          return qm;
+      }
+
+      /// <summary>
+      /// Calls .DeadLetter explicitly
+      /// </summary>
+      public void DeadLetter(QueueMessage message, string readon, string errorDescription)
+      {
+         if (!_peekLock) return;
+
+         BrokeredMessage bm;
+         //delete the message and get the deleted element, very nice method!
+         if (!_messageIdToBrokeredMessage.TryRemove(message.Id, out bm)) return;
+
+         _client.DeadLetter(bm.LockToken, readon, errorDescription);
       }
    }
 }

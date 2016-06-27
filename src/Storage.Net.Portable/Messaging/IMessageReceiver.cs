@@ -29,6 +29,11 @@ namespace Storage.Net.Messaging
       void ConfirmMessage(QueueMessage message);
 
       /// <summary>
+      /// Moves the message to a dead letter queue
+      /// </summary>
+      void DeadLetter(QueueMessage message, string reason, string errorDescription);
+
+      /// <summary>
       /// Starts automatic message pumping trying to use native features as much as possible. In most cases it is more efficient than calling
       /// <see cref="ReceiveMessage"/> in a loop in your application. Message pump stops when you dispose the instance.
       /// Disposing the instance will also stop message pump for you.

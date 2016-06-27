@@ -86,5 +86,16 @@ namespace Storage.Net.Messaging
             return _properties;
          }
       }
+
+      /// <summary>
+      /// Clones the message
+      /// </summary>
+      /// <returns></returns>
+      public QueueMessage Clone()
+      {
+         var message = new QueueMessage(Id, Content);
+         if (_properties != null) message._properties = new Dictionary<string, string>(_properties);
+         return message;
+      }
    }
 }

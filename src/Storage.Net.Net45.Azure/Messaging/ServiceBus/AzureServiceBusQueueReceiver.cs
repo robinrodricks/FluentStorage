@@ -54,6 +54,19 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
          return batch.Select(ProcessAndConvert).ToList();
       }
 
+      /// <summary>
+      /// Calls .DeadLetter explicitly
+      /// </summary>
+      public void DeadLetter(QueueMessage message, string reason, string errorDescription)
+      {
+         if (!_peekLock) return;
+
+         BrokeredMessage bm;
+         if (!_messageIdToBrokeredMessage.TryRemove(message.Id, out bm)) return;
+
+         _client.DeadLetter(bm.LockToken, reason, errorDescription);
+      }
+
       private QueueMessage ProcessAndConvert(BrokeredMessage bm)
       {
          QueueMessage qm = Converter.ToQueueMessage(bm);

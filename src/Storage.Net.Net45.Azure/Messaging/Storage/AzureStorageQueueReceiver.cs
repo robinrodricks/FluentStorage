@@ -15,12 +15,16 @@ namespace Storage.Net.Azure.Messaging.Storage
    public class AzureStorageQueueReceiver : IMessageReceiver
    {
       private const int PollingBatchSize = 5;
+      private readonly CloudQueueClient _client;
+      private readonly string _queueName;
       private readonly CloudQueue _queue;
+      private CloudQueue _deadLetterQueue;
       private readonly TimeSpan _messageVisibilityTimeout;
       private readonly TimeSpan _messagePumpPollingTimeout;
       private Thread _pollingThread;
       private bool _disposed;
       private Action<QueueMessage> _onMessageAction;
+      private readonly object _createLock = new object();
 
       /// <summary>
       /// Creates an instance of Azure Storage Queue receiver 
@@ -59,11 +63,29 @@ namespace Storage.Net.Azure.Messaging.Storage
          TimeSpan messageVisibilityTimeout, TimeSpan messagePumpPollingTimeout)
       {
          var account = new CloudStorageAccount(new StorageCredentials(accountName, storageKey), true);
-         var client = account.CreateCloudQueueClient();
-         _queue = client.GetQueueReference(queueName);
+         _client = account.CreateCloudQueueClient();
+         _queueName = queueName;
+         _queue = _client.GetQueueReference(queueName);
          _queue.CreateIfNotExists();
          _messageVisibilityTimeout = messageVisibilityTimeout;
          _messagePumpPollingTimeout = messagePumpPollingTimeout;
+      }
+
+      private CloudQueue DeadLetterQueue
+      {
+         get
+         {
+            lock(_createLock)
+            {
+               if (_deadLetterQueue == null)
+               {
+                  _deadLetterQueue = _client.GetQueueReference(_queueName + "-deadletter");
+                  _deadLetterQueue.CreateIfNotExists();
+               }
+
+               return _deadLetterQueue;
+            }
+         }
       }
 
       /// <summary>
@@ -76,6 +98,21 @@ namespace Storage.Net.Azure.Messaging.Storage
          Converter.SplitId(message.Id, out id, out popReceipt);
          if(popReceipt == null) throw new ArgumentException("cannot delete message by short id", id);
          _queue.DeleteMessage(id, popReceipt);
+      }
+
+      /// <summary>
+      /// Moves message to a dead letter queue which has the same name as original queue prefixed with "-deadletter". This is done because 
+      /// Azure Storage queues do not support deadlettering directly.
+      /// </summary>
+      public void DeadLetter(QueueMessage message, string reason, string errorDescription)
+      {
+         var dead = (QueueMessage)message.Clone();
+         dead.Properties["deadLetterReason"] = reason;
+         dead.Properties["deadLetterError"] = errorDescription;
+
+         DeadLetterQueue.AddMessage(Converter.ToCloudQueueMessage(message));
+
+         ConfirmMessage(message);
       }
 
       /// <summary>

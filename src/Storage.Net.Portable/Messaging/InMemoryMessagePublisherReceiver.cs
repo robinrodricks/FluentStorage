@@ -14,6 +14,7 @@ namespace Storage.Net.Messaging
    public class InMemoryMessagePublisherReceiver : IMessagePublisher, IMessageReceiver
    {
       private readonly ConcurrentQueue<QueueMessage> _queue = new ConcurrentQueue<QueueMessage>();
+      private readonly ConcurrentQueue<QueueMessage> _deadLetterQueue = new ConcurrentQueue<QueueMessage>();
       private readonly string _instancePrefix = Generator.RandomString;
       private long _messageId = DateTime.UtcNow.Ticks;
 
@@ -79,6 +80,9 @@ namespace Storage.Net.Messaging
       {
       }
 
+      /// <summary>
+      /// Not implemetned
+      /// </summary>
       public void StartMessagePump(Action<QueueMessage> onMessage)
       {
          throw new NotImplementedException();
@@ -100,6 +104,14 @@ namespace Storage.Net.Messaging
             }
          }
          return result;
+      }
+
+      /// <summary>
+      /// Not implemented
+      /// </summary>
+      public void DeadLetter(QueueMessage message, string reason, string errorDescription)
+      {
+         throw new NotImplementedException();
       }
    }
 }
