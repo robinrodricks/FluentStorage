@@ -17,6 +17,7 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
       private readonly SubscriptionClient _client;
       private readonly bool _peekLock;
       private readonly ConcurrentDictionary<string, BrokeredMessage> _messageIdToBrokeredMessage = new ConcurrentDictionary<string, BrokeredMessage>();
+      private Action<QueueMessage> _onMessageAction;
 
       /// <summary>
       /// Creates an instance by connection string and topic name
@@ -75,7 +76,26 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
       /// </summary>
       public void StartMessagePump(Action<QueueMessage> onMessage)
       {
-         throw new NotImplementedException();
+         if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
+         if (_onMessageAction != null) throw new ArgumentException("message pump already started", nameof(onMessage));
+
+         _onMessageAction = onMessage;
+
+         var options = new OnMessageOptions
+         {
+            AutoComplete = false,
+            AutoRenewTimeout = TimeSpan.FromMinutes(1),
+            MaxConcurrentCalls = 1
+         };
+
+         _client.OnMessage(OnMessage, options);
+      }
+
+      private void OnMessage(BrokeredMessage bm)
+      {
+         QueueMessage qm = ProcessAndConvert(bm);
+
+         _onMessageAction?.Invoke(qm);
       }
 
       /// <summary>
@@ -90,7 +110,7 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
       /// </summary>
       public QueueMessage ReceiveMessage()
       {
-         BrokeredMessage bm = _client.Receive();
+         BrokeredMessage bm = _client.Receive(TimeSpan.FromMilliseconds(1));
          if(bm == null) return null;
          return ProcessAndConvert(bm);
       }
@@ -100,7 +120,7 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
       /// </summary>
       public IEnumerable<QueueMessage> ReceiveMessages(int count)
       {
-         IEnumerable<BrokeredMessage> batch = _client.ReceiveBatch(count);
+         IEnumerable<BrokeredMessage> batch = _client.ReceiveBatch(count, TimeSpan.FromMilliseconds(1));
          if(batch == null) return null;
          return batch.Select(ProcessAndConvert).ToList();
       }

@@ -29,6 +29,7 @@ namespace Storage.Net.Azure.Messaging.Storage
          };
          byte[] propBytes = Encoding.UTF8.GetBytes(clazz.ToCompressedJsonString());
 
+         CloudQueueMessage result;
          using (var ms = new MemoryStream())
          {
             using (var writer = new BinaryWriter(ms, Encoding.UTF8))
@@ -39,8 +40,10 @@ namespace Storage.Net.Azure.Messaging.Storage
                writer.Write(message.Content);
             }
 
-            return new CloudQueueMessage(ms.ToArray());
+            result = new CloudQueueMessage(ms.ToArray());
          }
+
+         return result;
       }
 
       public static QueueMessage ToQueueMessage(CloudQueueMessage message)
@@ -48,36 +51,44 @@ namespace Storage.Net.Azure.Messaging.Storage
          if(message == null) return null;
 
          byte[] mb = message.AsBytes;
-         if (!IsCustomMessage(mb)) return new QueueMessage(CreateId(message), mb);
-
-         using (var ms = new MemoryStream(mb))
+         QueueMessage result;
+         if (!IsCustomMessage(mb))
          {
-            //skip forward custom message flag
-            ms.Seek(CustomFlagBytes.Length, SeekOrigin.Begin);
-
-            //read the custom properties length
-            int cpl;
-            using (var br = new BinaryReader(ms, Encoding.UTF8, true))
-            {
-               cpl = br.ReadInt32();
-            }
-
-            //read the actual properties
-            byte[] propBytes = new byte[cpl];
-            ms.Read(propBytes, 0, cpl);
-            string propString = Encoding.UTF8.GetString(propBytes);
-            JsonProps props = propString.AsJsonObject<JsonProps>();
-
-            //read message data
-            byte[] leftovers = ms.ToByteArray();
-
-            var result = new QueueMessage(CreateId(message), leftovers);
-            foreach(JsonProp prop in props.Properties)
-            {
-               result.Properties[prop.Name] = prop.Value;
-            }
-            return result;
+            result = new QueueMessage(CreateId(message), mb);
          }
+         else
+         {
+            using (var ms = new MemoryStream(mb))
+            {
+               //skip forward custom message flag
+               ms.Seek(CustomFlagBytes.Length, SeekOrigin.Begin);
+
+               //read the custom properties length
+               int cpl;
+               using (var br = new BinaryReader(ms, Encoding.UTF8, true))
+               {
+                  cpl = br.ReadInt32();
+               }
+
+               //read the actual properties
+               byte[] propBytes = new byte[cpl];
+               ms.Read(propBytes, 0, cpl);
+               string propString = Encoding.UTF8.GetString(propBytes);
+               JsonProps props = propString.AsJsonObject<JsonProps>();
+
+               //read message data
+               byte[] leftovers = ms.ToByteArray();
+
+               result = new QueueMessage(CreateId(message), leftovers);
+               foreach (JsonProp prop in props.Properties)
+               {
+                  result.Properties[prop.Name] = prop.Value;
+               }
+            }
+         }
+
+         result.DequeueCount = message.DequeueCount;
+         return result;
       }
 
       private static bool IsCustomMessage(byte[] messageBytes)

@@ -38,9 +38,11 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
          {
             foreach(KeyValuePair<string, object> pair in message.Properties)
             {
-               result.Properties[pair.Key] = pair.Value == null ? pair.Value.ToString() : null;
+               result.Properties[pair.Key] = pair.Value == null ? null : pair.Value.ToString();
             }
          }
+
+         result.DequeueCount = message.DeliveryCount;
          return result;
       }
    }

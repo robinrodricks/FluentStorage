@@ -162,7 +162,7 @@ namespace Storage.Net.Tests.Integration
 
          //now use the first row (old ETag) to set the new value
          row["c"] = "2";
-         _tables.Update(_tableName, row);
+         Assert.Throws<StorageException>(() => _tables.Update(_tableName, row));
 
          _tables.Delete(_tableName, row.Id);
       }

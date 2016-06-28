@@ -48,7 +48,7 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
       /// </summary>
       public IEnumerable<QueueMessage> ReceiveMessages(int count)
       {
-         IEnumerable<BrokeredMessage> batch = _client.ReceiveBatch(count);
+         IEnumerable<BrokeredMessage> batch = _client.ReceiveBatch(count, TimeSpan.FromMilliseconds(1));
          if(batch == null) return null;
 
          return batch.Select(ProcessAndConvert).ToList();

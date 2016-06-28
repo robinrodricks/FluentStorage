@@ -128,6 +128,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          QueueMessage received = _receiver.ReceiveMessage();
 
+         Assert.IsNotNull(received);
          Assert.AreEqual(content, received.Content);
       }
 
@@ -142,6 +143,7 @@ namespace Storage.Net.Tests.Integration.Messaging
          _publisher.PutMessage(msg);
 
          QueueMessage received = _receiver.ReceiveMessage();
+         Assert.IsNotNull(received);
          Assert.AreEqual(content, received.Content);
          Assert.AreEqual("v1", received.Properties["one"]);
       }

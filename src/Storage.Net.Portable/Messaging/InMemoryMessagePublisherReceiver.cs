@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Storage.Net.Messaging
 {
@@ -17,6 +18,9 @@ namespace Storage.Net.Messaging
       private readonly ConcurrentQueue<QueueMessage> _deadLetterQueue = new ConcurrentQueue<QueueMessage>();
       private readonly string _instancePrefix = Generator.RandomString;
       private long _messageId = DateTime.UtcNow.Ticks;
+      private Action<QueueMessage> _pumpDelegate;
+      private bool _disposed;
+      private bool _pumpRunning;
 
       /// <summary>
       /// Puts the message in the inmemory queue
@@ -60,6 +64,7 @@ namespace Storage.Net.Messaging
       /// </summary>
       public void Dispose()
       {
+         _disposed = true;
       }
 
       /// <summary>
@@ -85,8 +90,37 @@ namespace Storage.Net.Messaging
       /// </summary>
       public void StartMessagePump(Action<QueueMessage> onMessage)
       {
-         throw new NotImplementedException();
+         _pumpDelegate = onMessage;
+
+         if(!_pumpRunning)
+         {
+#if PORTABLE
+            throw new Exception("pump not supported in portable version");
+#else
+            var thread = new Thread(MessagePumpThreadEntry) { IsBackground = true };
+            thread.Start();
+#endif
+            _pumpRunning = true;
+         }
+
       }
+
+#if !PORTABLE
+      private void MessagePumpThreadEntry()
+      {
+         while(!_disposed)
+         {
+            QueueMessage msg;
+
+            while(_queue.TryDequeue(out msg))
+            {
+               _pumpDelegate?.Invoke(msg);
+            }
+
+            Thread.Sleep(TimeSpan.FromSeconds(1));
+         }
+      }
+#endif
 
       /// <summary>
       /// Receives up to <paramref name="count"/> messages when available.
