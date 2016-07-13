@@ -394,5 +394,12 @@ namespace Storage.Net.Azure.Table
          //todo: read more: https://msdn.microsoft.com/library/azure/dd179338.aspx
          return HttpUtility.UrlEncode(key);
       }
+
+      /// <summary>
+      /// Nothing to dispose
+      /// </summary>
+      public void Dispose()
+      {
+      }
    }
 }

@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Storage.Net.Table
 {
    /// <summary>
    /// Common interface for working with table storage
    /// </summary>
-   public interface ISimpleTableStorage
+   public interface ISimpleTableStorage : IDisposable
    {
       /// <summary>
       /// Storage returns true if it supports optimistic concurrency. This mode affect the update

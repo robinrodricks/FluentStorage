@@ -68,7 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Aloneguid.Support, Version=1.0.0.0, Culture=neutral, PublicKeyToken=8dea52f811e261ef, processorArchitecture=MSIL">
-      <HintPath>..\packages\Aloneguid.Support.2.3.0.149\lib\portable-net45+wp80+win8+wpa81+dnxcore50\Aloneguid.Support.dll</HintPath>
+      <HintPath>..\packages\Aloneguid.Support.2.3.0.168\lib\portable-net45+wp80+win8+wpa81+dnxcore50\Aloneguid.Support.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">

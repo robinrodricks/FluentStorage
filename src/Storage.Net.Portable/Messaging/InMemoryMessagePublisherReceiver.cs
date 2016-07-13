@@ -19,8 +19,11 @@ namespace Storage.Net.Messaging
       private readonly string _instancePrefix = Generator.RandomString;
       private long _messageId = DateTime.UtcNow.Ticks;
       private Action<QueueMessage> _pumpDelegate;
+
+#if !PORTABLE
       private bool _disposed;
       private bool _pumpRunning;
+#endif
 
       /// <summary>
       /// Puts the message in the inmemory queue
@@ -64,7 +67,9 @@ namespace Storage.Net.Messaging
       /// </summary>
       public void Dispose()
       {
+#if !PORTABLE
          _disposed = true;
+#endif
       }
 
       /// <summary>
@@ -92,17 +97,18 @@ namespace Storage.Net.Messaging
       {
          _pumpDelegate = onMessage;
 
+
+#if PORTABLE
+         throw new Exception("pump not supported in portable version");
+#else
          if(!_pumpRunning)
          {
-#if PORTABLE
-            throw new Exception("pump not supported in portable version");
-#else
             var thread = new Thread(MessagePumpThreadEntry) { IsBackground = true };
             thread.Start();
-#endif
             _pumpRunning = true;
          }
 
+#endif
       }
 
 #if !PORTABLE

@@ -6,11 +6,14 @@ using NUnit.Framework;
 using Storage.Net.Table;
 using Storage.Net.Table.Files;
 using Storage.Net.Azure.Table;
+using Storage.Net.Net45.Esent;
+using System.IO;
 
 namespace Storage.Net.Tests.Integration
 {
    [TestFixture("csv-files")]
    [TestFixture("azure")]
+   [TestFixture("esent")]
    public class TableStorageTest : AbstractTestFixture
    {
       private readonly string _name;
@@ -35,6 +38,11 @@ namespace Storage.Net.Tests.Integration
                Cfg.Read(TestSettings.AzureStorageName),
                Cfg.Read(TestSettings.AzureStorageKey));
          }
+         else if(_name == "esent")
+         {
+            _tables = new EsentTableStorage(
+               Path.Combine(TestDir.FullName, "test.edb"));
+         }
 
          _tableName = "TableStorageTest" + Guid.NewGuid().ToString().Replace("-", "");
       }
@@ -45,6 +53,8 @@ namespace Storage.Net.Tests.Integration
          Cleanup();
 
          _tables.Delete(_tableName);
+
+         _tables.Dispose();
       }
 
       [Test]

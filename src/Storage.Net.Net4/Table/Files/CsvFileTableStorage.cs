@@ -416,6 +416,13 @@ namespace Storage.Net.Table.Files
          return row;
       }
 
+      /// <summary>
+      /// Nothing to dispose
+      /// </summary>
+      public void Dispose()
+      {
+      }
+
       #endregion
 
    }

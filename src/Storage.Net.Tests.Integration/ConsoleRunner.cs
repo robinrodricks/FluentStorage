@@ -1,5 +1,4 @@
 ﻿using LogMagic;
-using LogMagic.Receivers;
 using System;
 
 namespace Storage.Net.Tests.Integration
@@ -10,11 +9,8 @@ namespace Storage.Net.Tests.Integration
 
       public static void Main(string[] args)
       {
-         L.AddReceiver(new PoshConsoleLogReceiver());
-         //L.AddReceiver(new ConsoleLogReceiver());
-
+         L.Config.WriteTo.PoshConsole();
          new ConsoleRunner().Run();
-
       }
 
       public void Run()
