@@ -25,6 +25,7 @@ namespace Storage.Net.Tests.Integration
          //add store which contains private keys for integration testing that can't be shared
          Cfg.Configuration.RemoveAllStores();
          Cfg.Configuration.AddStore(new IniFileConfigStore("c:\\tmp\\integration-tests.ini"));
+         Cfg.Configuration.AddStore(new EnvironmentVariablesStore());
       }
 
       private static bool CertificateValidationCallback(
