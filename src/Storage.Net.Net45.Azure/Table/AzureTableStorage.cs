@@ -334,18 +334,32 @@ namespace Storage.Net.Azure.Table
       {
          private readonly TableRow _row;
 
-         public EntityAdapter(TableRow row) : this(row == null ? null : row.Id)
+         public EntityAdapter(TableRow row)
          {
             _row = row;
+
+            Init(row?.Id, true);
          }
 
          public EntityAdapter(TableRowId rowId)
+         {
+            Init(rowId, false);
+         }
+
+         private void Init(TableRowId rowId, bool useConcurencyKey)
          {
             if (rowId == null) throw new ArgumentNullException("rowId");
 
             PartitionKey = ToInternalId(rowId.PartitionKey);
             RowKey = ToInternalId(rowId.RowKey);
-            ETag = rowId.ConcurrencyKey ?? "*";
+            if(useConcurencyKey && rowId.ConcurrencyKey != null)
+            {
+               ETag = rowId.ConcurrencyKey;
+            }
+            else
+            {
+               ETag = "*";
+            }
             Timestamp = rowId.LastModified;
          }
 
