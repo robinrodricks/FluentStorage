@@ -343,7 +343,7 @@ namespace Storage.Net.Azure.Table
 
          public EntityAdapter(TableRowId rowId)
          {
-            Init(rowId, false);
+            Init(rowId, true);
          }
 
          private void Init(TableRowId rowId, bool useConcurencyKey)
