@@ -174,7 +174,7 @@ namespace Storage.Net.Tests.Integration
          row["c"] = "2";
          Assert.Throws<StorageException>(() => _tables.Update(_tableName, row));
 
-         Assert.Throws<StorageException>(() => _tables.Delete(_tableName, row.Id);
+         Assert.Throws<StorageException>(() => _tables.Delete(_tableName, row.Id));
       }
 
       [Test]

@@ -88,8 +88,8 @@ namespace Storage.Net.Tests.Integration.Messaging
       [TearDown]
       public void TearDown()
       {
-         _publisher.Dispose();
-         _receiver.Dispose();
+         if(_publisher != null) _publisher.Dispose();
+         if(_receiver != null) _receiver.Dispose();
       }
 
       [Test]
