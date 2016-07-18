@@ -10,6 +10,10 @@ namespace Storage.Net.Tests.Integration
 
       public static readonly Setting<string> ServiceBusConnectionString = new Setting<string>("Azure.ServiceBus.ConnectionString", null);
 
+      public static readonly Setting<string> ServiceBusQueueName = new Setting<string>("Azure.ServiceBus.QueueName", "testqueuelocal");
+
+      public static readonly Setting<string> ServiceBusTopicName = new Setting<string>("Azure.ServiceBus.TopicName", "testtopiclocal");
+
       public static readonly Setting<string> OneDriveClientId = new Setting<string>("OneDrive.ClientId", null);
 
       public static readonly Setting<string> OneDriveClientSecret = new Setting<string>("OneDrive.ClientSecret", null);

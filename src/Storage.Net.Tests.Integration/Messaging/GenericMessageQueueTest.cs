@@ -35,21 +35,22 @@ namespace Storage.Net.Tests.Integration.Messaging
          {
             case "azure-storage-queue":
                _publisher = new AzureStorageQueuePublisher(
-                  Cfg.Read(TestSettings.AzureStorageName),
-                  Cfg.Read(TestSettings.AzureStorageKey),
-                  "testqueue");
+                  TestSettings.AzureStorageName,
+                  TestSettings.AzureStorageKey,
+                  TestSettings.ServiceBusQueueName);
                _receiver = new AzureStorageQueueReceiver(
-                  Cfg.Read(TestSettings.AzureStorageName),
-                  Cfg.Read(TestSettings.AzureStorageKey),
-                  "testqueue", TimeSpan.FromMinutes(1));
+                  TestSettings.AzureStorageName,
+                  TestSettings.AzureStorageKey,
+                  TestSettings.ServiceBusQueueName,
+                  TimeSpan.FromMinutes(1));
                break;
             case "azure-servicebus-topic":
                _publisher = new AzureServiceBusTopicPublisher(
-                  Cfg.Read(TestSettings.ServiceBusConnectionString),
-                  "testtopic");
+                  TestSettings.ServiceBusConnectionString,
+                  TestSettings.ServiceBusTopicName);
                _receiver = new AzureServiceBusTopicReceiver(
-                  Cfg.Read(TestSettings.ServiceBusConnectionString),
-                  "testtopic",
+                  TestSettings.ServiceBusConnectionString,
+                  TestSettings.ServiceBusTopicName,
                   "AllMessages",
                   null,
                   true);
