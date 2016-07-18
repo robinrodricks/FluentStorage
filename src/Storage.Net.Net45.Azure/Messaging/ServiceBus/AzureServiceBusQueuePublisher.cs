@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
@@ -22,7 +23,14 @@ namespace Storage.Net.Azure.Messaging.ServiceBus
       /// <param name="queueName">Queue name in Service Bus. If queue doesn't exist it will be created for you.</param>
       public AzureServiceBusQueuePublisher(string connectionString, string queueName)
       {
-         _ns = NamespaceManager.CreateFromConnectionString(connectionString);
+         try
+         {
+            _ns = NamespaceManager.CreateFromConnectionString(connectionString);
+         }
+         catch(Exception ex)
+         {
+            throw new ArgumentException("cannot use connection string: " + connectionString, nameof(connectionString), ex);
+         }
          _queueName = queueName;
 
          PrepareQueue();
