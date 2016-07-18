@@ -107,7 +107,11 @@ namespace Storage.Net.Tests.Integration.Messaging
             _publisher.PutMessage(new QueueMessage("test content at " + DateTime.UtcNow));
          }
 
-         List<QueueMessage> batch = _receiver.ReceiveMessages(3).ToList();
+         //there is a delay between messages sent and received on subscription, so sleep for a bit
+
+         Thread.Sleep(TimeSpan.FromSeconds(10));
+
+         List<QueueMessage> batch = _receiver.ReceiveMessages(10).ToList();
          Assert.Greater(batch.Count, 0);
       }
 
