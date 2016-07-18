@@ -140,7 +140,14 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          _publisher.PutMessage(new QueueMessage(content));
 
-         QueueMessage received = _receiver.ReceiveMessage();
+         QueueMessage received = null;
+
+         for (int i = 0; i < 10; i++)
+         {
+            received = _receiver.ReceiveMessage();
+            if (received != null) break;
+            Thread.Sleep(TimeSpan.FromSeconds(2));
+         }
 
          Assert.IsNotNull(received);
          Assert.AreEqual(content, received.Content);
@@ -156,7 +163,15 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          _publisher.PutMessage(msg);
 
-         QueueMessage received = _receiver.ReceiveMessage();
+         QueueMessage received = null;
+
+         for (int i = 0; i < 10; i++)
+         {
+            received = _receiver.ReceiveMessage();
+            if (received != null) break;
+            Thread.Sleep(TimeSpan.FromSeconds(2));
+         }
+
          Assert.IsNotNull(received);
          Assert.AreEqual(content, received.Content);
          Assert.AreEqual("v1", received.Properties["one"]);
@@ -177,7 +192,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          Thread.Sleep(TimeSpan.FromSeconds(10));
 
-         Assert.AreEqual(9, _messagesPumped);
+         Assert.GreaterOrEqual(_messagesPumped, 9);
       }
 
       private void OnMessage(QueueMessage qm)
