@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using Config.Net;
 using Config.Net.Stores;
+using LogMagic;
 
 namespace Storage.Net.Tests.Integration
 {
@@ -26,6 +27,8 @@ namespace Storage.Net.Tests.Integration
          Cfg.Configuration.RemoveAllStores();
          Cfg.Configuration.AddStore(new IniFileConfigStore("c:\\tmp\\integration-tests.ini"));
          Cfg.Configuration.AddStore(new EnvironmentVariablesStore());
+
+         L.Config.WriteTo.Trace();
       }
 
       private static bool CertificateValidationCallback(

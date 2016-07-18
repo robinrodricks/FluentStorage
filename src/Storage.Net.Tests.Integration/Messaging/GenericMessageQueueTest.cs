@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using LogMagic;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
@@ -18,6 +19,7 @@ namespace Storage.Net.Tests.Integration.Messaging
    //[TestFixture("disk")]
    public class GenericMessageQueueTest : AbstractTestFixture
    {
+      private readonly ILog _log = L.G();
       private readonly string _name;
       private IMessagePublisher _publisher;
       private IMessageReceiver _receiver;
@@ -109,9 +111,16 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          //there is a delay between messages sent and received on subscription, so sleep for a bit
 
-         Thread.Sleep(TimeSpan.FromSeconds(10));
+         List<QueueMessage> batch = null;
 
-         List<QueueMessage> batch = _receiver.ReceiveMessages(10).ToList();
+         for (int i = 0; i < 50; i++)
+         {
+            batch = _receiver.ReceiveMessages(10).ToList();
+            if (batch != null && batch.Count > 0) break;
+            Thread.Sleep(TimeSpan.FromSeconds(1));
+         }
+
+         Assert.IsNotNull(batch);
          Assert.Greater(batch.Count, 0);
       }
 
