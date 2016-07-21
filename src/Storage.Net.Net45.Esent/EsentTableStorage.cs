@@ -12,12 +12,15 @@ using ETable = Microsoft.Isam.Esent.Interop.Table;
 namespace Storage.Net.Net45.Esent
 {
    //see http://managedesent.codeplex.com/wikipage?title=StockSample&referringTitle=ManagedEsentDocumentation
+   //full (and useful) documentation here: https://msdn.microsoft.com/en-us/library/gg269259(v=exchg.10).aspx
    public class EsentTableStorage : ITableStorage
    {
       //ISAM - Indexed Sequential Access Method
 
       private const string PartitionKeyName = "PartitionKey";
       private const string RowKeyName = "RowKey";
+      private const string PKIndexName = "PK";
+      private const string PKRKIndexName = "PKRK";
 
       private string _databasePath;
       private string _databaseFolder;
@@ -112,11 +115,13 @@ namespace Storage.Net.Net45.Esent
                   Api.JetAddColumn(_jetSession, tableId, "RowKey", columnDef, null, 0, out columnId);
 
                   //index key columns
-                  string indexDef = $"+{PartitionKeyName}\0\0";
-                  Api.JetCreateIndex(_jetSession, tableId, "PK", CreateIndexGrbit.IndexPrimary, indexDef, indexDef.Length, 100);
+                  string indexDefPrimary = $"+{PartitionKeyName}\0+{RowKeyName}\0\0";
+                  Api.JetCreateIndex(_jetSession, tableId, PKRKIndexName, CreateIndexGrbit.IndexUnique, indexDefPrimary, indexDefPrimary.Length, 100);
 
-                  indexDef = $"+{PartitionKeyName}\0+{RowKeyName}\0\0";
-                  Api.JetCreateIndex(_jetSession, tableId, "PKRK", CreateIndexGrbit.IndexUnique, indexDef, indexDef.Length, 100);
+
+                  string indexDefPartition = $"+{PartitionKeyName}\0\0";
+                  Api.JetCreateIndex(_jetSession, tableId, PKIndexName, CreateIndexGrbit.IndexPrimary, indexDefPartition, indexDefPartition.Length, 100);
+
 
                   transaction.Commit(CommitTransactionGrbit.LazyFlush);
                }
@@ -225,8 +230,6 @@ namespace Storage.Net.Net45.Esent
 
       public void Delete(string tableName)
       {
-         IEnumerable<string> allNames = Api.GetTableNames(_jetSession, _jetDbId);
-
          Api.JetDeleteTable(_jetSession, _jetDbId, tableName);
       }
 
@@ -242,17 +245,27 @@ namespace Storage.Net.Net45.Esent
 
       public IEnumerable<TableRow> Get(string tableName, string partitionKey)
       {
-         throw new NotImplementedException();
+         return Get(tableName, partitionKey, null, int.MaxValue);
       }
 
       public TableRow Get(string tableName, string partitionKey, string rowKey)
       {
-         throw new NotImplementedException();
+         return Get(tableName, partitionKey, rowKey, 1).FirstOrDefault();
       }
 
       public IEnumerable<TableRow> Get(string tableName, string partitionKey, string rowKey, int maxRecords)
       {
-         throw new NotImplementedException();
+         using (ETable table = OpenTable(tableName, false))
+         {
+            if (table == null) return null;
+
+            //how to perform search: https://msdn.microsoft.com/en-us/library/gg269342(v=exchg.10).aspx
+
+            //choose index to use
+            string indexName = rowKey == null ? PKIndexName : PKRKIndexName;
+            Api.JetSetCurrentIndex(_jetSession, table.JetTableid, indexName);
+
+         }
       }
 
       public void Insert(string tableName, TableRow row)
@@ -292,7 +305,7 @@ namespace Storage.Net.Net45.Esent
 
       public IEnumerable<string> ListTableNames()
       {
-         throw new NotImplementedException();
+         return Api.GetTableNames(_jetSession, _jetDbId).ToList();
       }
 
       public void Merge(string tableName, TableRow row)

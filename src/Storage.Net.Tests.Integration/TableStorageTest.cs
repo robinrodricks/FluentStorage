@@ -58,7 +58,7 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Test]
-      public void WriteRows_TwoRows_ReadsBack()
+      public void WriteRows_TwoRows_DoesntFail()
       {
          var row1 = new TableRow("part1", "k1");
          row1["col1"] = "value1";
