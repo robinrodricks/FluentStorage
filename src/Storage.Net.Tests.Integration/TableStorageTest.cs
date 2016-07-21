@@ -13,7 +13,7 @@ namespace Storage.Net.Tests.Integration
 {
    [TestFixture("csv-files")]
    [TestFixture("azure")]
-   //[TestFixture("esent")]
+   [TestFixture("esent")]
    public class TableStorageTest : AbstractTestFixture
    {
       private readonly string _name;
@@ -65,7 +65,7 @@ namespace Storage.Net.Tests.Integration
 
          var row2 = new TableRow("part2", "1");
          row2["col1"] = "value2";
-
+            
          _tables.Insert("test", new[] {row1, row2});
       }
 
