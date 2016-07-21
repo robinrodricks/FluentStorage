@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,6 +11,7 @@ using ETable = Microsoft.Isam.Esent.Interop.Table;
 
 namespace Storage.Net.Net45.Esent
 {
+   //see http://managedesent.codeplex.com/wikipage?title=StockSample&referringTitle=ManagedEsentDocumentation
    public class EsentTableStorage : ITableStorage
    {
       //ISAM - Indexed Sequential Access Method
@@ -74,7 +76,7 @@ namespace Storage.Net.Net45.Esent
          return instance;
       }
 
-      private ETable OpenTable(string tableName)
+      private ETable OpenTable(string tableName, bool createIfNotExists)
       {
          ETable result;
 
@@ -87,7 +89,7 @@ namespace Storage.Net.Net45.Esent
             result = null;
          }
 
-         if(result == null)
+         if(result == null && createIfNotExists)
          {
             //create table
             using (var transaction = new Transaction(_jetSession))
@@ -128,6 +130,82 @@ namespace Storage.Net.Net45.Esent
          }
 
          return result;
+      }
+
+      private void SetValue(JET_TABLEID tableId, JET_COLUMNID column, TableCell cell)
+      {
+         switch(cell.DataType)
+         {
+            case CellType.String:
+               Api.SetColumn(_jetSession, tableId, column, cell.RawValue, Encoding.Unicode);
+               break;
+            default:
+               throw new NotSupportedException($"date type '{cell.DataType}' is not supported");
+         }
+      }
+
+      private void SetValue(JET_TABLEID tableId, IDictionary<string, JET_COLUMNID> columns, TableRowId rowId)
+      {
+         Api.SetColumn(_jetSession, tableId, columns[PartitionKeyName], rowId.PartitionKey, Encoding.Unicode);
+         Api.SetColumn(_jetSession, tableId, columns[RowKeyName], rowId.RowKey, Encoding.Unicode);
+      }
+      
+      private IDictionary<string, JET_COLUMNID> GetOrCreateColumns(JET_TABLEID tableId, IEnumerable<TableRow> rows)
+      {
+         IDictionary<string, JET_COLUMNID> columns = Api.GetColumnDictionary(_jetSession, tableId);
+
+         //first detect all possible columns
+         var columnNameToType = new Dictionary<string, CellType>();
+         foreach(TableRow row in rows)
+         {
+            //todo: it is possible to have two rows with same column name but different types, this needs to be checked
+            //and probably on higher level
+
+            foreach (var column in row)
+            {
+               if (!columnNameToType.ContainsKey(column.Key))
+               {
+                  columnNameToType[column.Key] = column.Value.DataType;
+               }
+            }
+         }
+
+         //check against live columns and add missing
+         Transaction t = null;
+         try
+         {
+            foreach (var nt in columnNameToType)
+            {
+               if (!columns.ContainsKey(nt.Key))
+               {
+                  if (t == null) t = new Transaction(_jetSession);
+
+                  //there is no column in live table, add it now
+                  JET_COLUMNDEF def;
+                  switch (nt.Value)
+                  {
+                     case CellType.String:
+                        def = new JET_COLUMNDEF { coltyp = JET_coltyp.LongText, cp = JET_CP.Unicode };
+                        break;
+                     default:
+                        throw new NotSupportedException($"column type '{nt.Value}' is not supported.");
+                  }
+
+                  JET_COLUMNID columnId;
+                  Api.JetAddColumn(_jetSession, tableId, nt.Key, def, null, 0, out columnId);
+               }
+
+            }
+         }
+         finally
+         {
+            if (t != null) t.Commit(CommitTransactionGrbit.LazyFlush);
+         }
+
+         //re-read live columns to get most up-to-date result
+         columns = Api.GetColumnDictionary(_jetSession, tableId);
+
+         return columns;
       }
 
       private void ShutdownDatabase()
@@ -182,15 +260,24 @@ namespace Storage.Net.Net45.Esent
 
       public void Insert(string tableName, IEnumerable<TableRow> rows)
       {
-         using (ETable table = OpenTable(tableName))
+         using (ETable table = OpenTable(tableName, true))
          {
+            JET_TABLEID tableId = table.JetTableid;
+
+            IDictionary<string, JET_COLUMNID> columns = GetOrCreateColumns(tableId, rows);
+
             using (var transaction = new Transaction(_jetSession))
             {
                foreach(TableRow row in rows)
                {
                   using (var update = new Update(_jetSession, table.JetTableid, JET_prep.Insert))
                   {
-                     //Api.SetColumn(_jetSession, table.JetTableid, )
+                     SetValue(tableId, columns, row.Id);
+
+                     foreach(KeyValuePair<string, TableCell> column in row)
+                     {
+                        SetValue(tableId, columns[column.Key], column.Value);
+                     }
 
                      update.Save();
                   }

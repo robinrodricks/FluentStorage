@@ -50,11 +50,11 @@ namespace Storage.Net.Tests.Integration
       [TearDown]
       public void TearDown()
       {
-         Cleanup();
-
          _tables.Delete(_tableName);
 
          _tables.Dispose();
+
+         Cleanup();
       }
 
       [Test]
