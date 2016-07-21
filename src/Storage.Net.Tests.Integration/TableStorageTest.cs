@@ -11,8 +11,8 @@ using System.IO;
 
 namespace Storage.Net.Tests.Integration
 {
-   [TestFixture("csv-files")]
-   [TestFixture("azure")]
+   //[TestFixture("csv-files")]
+   //[TestFixture("azure")]
    [TestFixture("esent")]
    public class TableStorageTest : AbstractTestFixture
    {
@@ -66,7 +66,7 @@ namespace Storage.Net.Tests.Integration
          var row2 = new TableRow("part2", "1");
          row2["col1"] = "value2";
             
-         _tables.Insert("test", new[] {row1, row2});
+         _tables.Insert(_tableName, new[] {row1, row2});
       }
 
       [Test]

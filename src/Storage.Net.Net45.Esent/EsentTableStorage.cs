@@ -225,7 +225,9 @@ namespace Storage.Net.Net45.Esent
 
       public void Delete(string tableName)
       {
-         throw new NotImplementedException();
+         IEnumerable<string> allNames = Api.GetTableNames(_jetSession, _jetDbId);
+
+         Api.JetDeleteTable(_jetSession, _jetDbId, tableName);
       }
 
       public void Delete(string tableName, TableRowId rowId)
