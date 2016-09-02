@@ -150,7 +150,7 @@ namespace Storage.Net.Tests.Integration.Messaging
          }
 
          Assert.IsNotNull(received);
-         Assert.AreEqual(content, received.Content);
+         Assert.AreEqual(content, received.StringContent);
       }
 
       [Test]

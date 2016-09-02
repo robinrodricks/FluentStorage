@@ -296,7 +296,7 @@ namespace Storage.Net.Net45.Esent
             Dictionary<string, JET_COLUMNID> columns = _tableNameToColumnNameToId[tableName];
 
             SeekToPkRk(table.JetTableid, partitionKey, rowKey);
-            return ReadAllRows(table.JetTableid, columns);
+            return ReadAllRows(tableName, table.JetTableid, columns);
          }
       }
 
@@ -305,7 +305,7 @@ namespace Storage.Net.Net45.Esent
          //how to perform search: https://msdn.microsoft.com/en-us/library/gg269342(v=exchg.10).aspx
 
          //choose index to use
-         Api.JetSetCurrentIndex(_jetSession, tableId, PrimaryIndexName);
+         Api.JetSetCurrentIndex(_jetSession, tableId, null);
 
          //create search key
          //To make a key for an index that has multiple columns in it you need to make one call to JetMakeKey
@@ -313,12 +313,13 @@ namespace Storage.Net.Net45.Esent
 
          Api.MakeKey(_jetSession, tableId, partitionKey, Encoding.Unicode, MakeKeyGrbit.NewKey);
          Api.MakeKey(_jetSession, tableId, rowKey, Encoding.Unicode, MakeKeyGrbit.None);
-         Api.JetSeek(_jetSession, tableId, SeekGrbit.SeekEQ);
+         JET_wrn r = Api.JetSeek(_jetSession, tableId, SeekGrbit.SeekEQ);
       }
 
-      private IEnumerable<TableRow> ReadAllRows(JET_TABLEID tableId, Dictionary<string, JET_COLUMNID> columns)
+      private IEnumerable<TableRow> ReadAllRows(string tableName, JET_TABLEID tableId, Dictionary<string, JET_COLUMNID> columns)
       {
          var result = new List<TableRow>();
+         List<string> valueColumns = columns.Keys.Where(n => n != PartitionKeyName && n != RowKeyName).ToList();
 
          if(Api.TryMoveFirst(_jetSession, tableId))
          {
@@ -326,8 +327,24 @@ namespace Storage.Net.Net45.Esent
             {
                string partitionKey = Api.RetrieveColumnAsString(_jetSession, tableId, columns[PartitionKeyName]);
                string rowKey = Api.RetrieveColumnAsString(_jetSession, tableId, columns[RowKeyName]);
-
                var row = new TableRow(partitionKey, rowKey);
+
+               foreach(string colName in valueColumns)
+               {
+                  JET_COLUMNID colId = columns[colName];
+                  JET_COLUMNDEF colDef;
+                  Api.JetGetColumnInfo(_jetSession, _jetDbId, tableName, colName, out colDef);
+
+                  switch(colDef.coltyp)
+                  {
+                     case JET_coltyp.LongText:
+                        row[colName] = Api.RetrieveColumnAsString(_jetSession, tableId, colId);
+                        break;
+                     default:
+                        throw new ApplicationException($"column type {colDef.coltyp} is not supported");
+                  }
+               }
+
                result.Add(row);
             }
             while(Api.TryMoveNext(_jetSession, tableId));
