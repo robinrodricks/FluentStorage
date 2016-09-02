@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Isam.Esent.Interop;
 using Storage.Net.Table;
 using ETable = Microsoft.Isam.Esent.Interop.Table;
@@ -13,14 +11,20 @@ namespace Storage.Net.Net45.Esent
 {
    //see http://managedesent.codeplex.com/wikipage?title=StockSample&referringTitle=ManagedEsentDocumentation
    //full (and useful) documentation here: https://msdn.microsoft.com/en-us/library/gg269259(v=exchg.10).aspx
+
+   //Note: The ESENT database file cannot be shared between multiple processes simultaneously.
+   //ESENT works best for applications with simple, predefined queries; if you have an application with complex,
+   //ad-hoc queries, a storage solution that provides a query layer will work better for you.
+
    public class EsentTableStorage : ITableStorage
    {
       //ISAM - Indexed Sequential Access Method
 
       private const string PartitionKeyName = "PartitionKey";
       private const string RowKeyName = "RowKey";
-      private const string PKIndexName = "PK";
-      private const string PKRKIndexName = "PKRK";
+      //private const string PKIndexName = "PK";
+      //private const string PKRKIndexName = "PKRK";
+      private const string PrimaryIndexName = "primary";
 
       private string _databasePath;
       private string _databaseFolder;
@@ -28,6 +32,8 @@ namespace Storage.Net.Net45.Esent
       private Session _jetSession;
       private readonly string _instanceName = Guid.NewGuid().ToString();
       private JET_DBID _jetDbId;
+      private readonly Dictionary<string, Dictionary<string, JET_COLUMNID>> _tableNameToColumnNameToId =
+         new Dictionary<string, Dictionary<string, JET_COLUMNID>>();
 
       public EsentTableStorage(string databasePath)
       {
@@ -115,12 +121,12 @@ namespace Storage.Net.Net45.Esent
                   Api.JetAddColumn(_jetSession, tableId, "RowKey", columnDef, null, 0, out columnId);
 
                   //index key columns
+                  //+ indicates ascending order, - descending
                   string indexDefPrimary = $"+{PartitionKeyName}\0+{RowKeyName}\0\0";
-                  Api.JetCreateIndex(_jetSession, tableId, PKRKIndexName, CreateIndexGrbit.IndexUnique, indexDefPrimary, indexDefPrimary.Length, 100);
+                  Api.JetCreateIndex(_jetSession, tableId, PrimaryIndexName, CreateIndexGrbit.IndexPrimary, indexDefPrimary, indexDefPrimary.Length, 100);
 
-
-                  string indexDefPartition = $"+{PartitionKeyName}\0\0";
-                  Api.JetCreateIndex(_jetSession, tableId, PKIndexName, CreateIndexGrbit.IndexPrimary, indexDefPartition, indexDefPartition.Length, 100);
+                  //string indexDefPartition = $"+{PartitionKeyName}\0\0";
+                  //Api.JetCreateIndex(_jetSession, tableId, PKIndexName, CreateIndexGrbit.IndexUnique, indexDefPartition, indexDefPartition.Length, 100);
 
 
                   transaction.Commit(CommitTransactionGrbit.LazyFlush);
@@ -154,10 +160,32 @@ namespace Storage.Net.Net45.Esent
          Api.SetColumn(_jetSession, tableId, columns[PartitionKeyName], rowId.PartitionKey, Encoding.Unicode);
          Api.SetColumn(_jetSession, tableId, columns[RowKeyName], rowId.RowKey, Encoding.Unicode);
       }
-      
-      private IDictionary<string, JET_COLUMNID> GetOrCreateColumns(JET_TABLEID tableId, IEnumerable<TableRow> rows)
+
+      private Dictionary<string, JET_COLUMNID> RefreshColumnDictionary(string tableName, JET_TABLEID tableId)
       {
-         IDictionary<string, JET_COLUMNID> columns = Api.GetColumnDictionary(_jetSession, tableId);
+         IDictionary<string, JET_COLUMNID> freshColumns = Api.GetColumnDictionary(_jetSession, tableId);
+
+         Dictionary<string, JET_COLUMNID> columnNameToId;
+         if(_tableNameToColumnNameToId.TryGetValue(tableName, out columnNameToId))
+         {
+            columnNameToId.Clear();
+         }
+         else
+         {
+            columnNameToId = new Dictionary<string, JET_COLUMNID>();
+            _tableNameToColumnNameToId[tableName] = columnNameToId;
+         }
+
+         columnNameToId.AddRange(freshColumns);
+
+         return columnNameToId;
+      }
+      
+      private Dictionary<string, JET_COLUMNID> EnsureColumnsExist(string tableName, JET_TABLEID tableId, IEnumerable<TableRow> rows)
+      {
+         if (!_tableNameToColumnNameToId.ContainsKey(tableName)) RefreshColumnDictionary(tableName, tableId);
+
+         Dictionary<string, JET_COLUMNID> columns = _tableNameToColumnNameToId[tableName];
 
          //first detect all possible columns
          var columnNameToType = new Dictionary<string, CellType>();
@@ -208,7 +236,7 @@ namespace Storage.Net.Net45.Esent
          }
 
          //re-read live columns to get most up-to-date result
-         columns = Api.GetColumnDictionary(_jetSession, tableId);
+         RefreshColumnDictionary(tableName, tableId);
 
          return columns;
       }
@@ -230,7 +258,14 @@ namespace Storage.Net.Net45.Esent
 
       public void Delete(string tableName)
       {
-         Api.JetDeleteTable(_jetSession, _jetDbId, tableName);
+         try
+         {
+            Api.JetDeleteTable(_jetSession, _jetDbId, tableName);
+         }
+         catch(EsentObjectNotFoundException)
+         {
+            //table doesn't exist
+         }
       }
 
       public void Delete(string tableName, TableRowId rowId)
@@ -258,19 +293,54 @@ namespace Storage.Net.Net45.Esent
          using (ETable table = OpenTable(tableName, false))
          {
             if (table == null) return null;
+            Dictionary<string, JET_COLUMNID> columns = _tableNameToColumnNameToId[tableName];
 
-            //how to perform search: https://msdn.microsoft.com/en-us/library/gg269342(v=exchg.10).aspx
-
-            //choose index to use
-            string indexName = rowKey == null ? PKIndexName : PKRKIndexName;
-            Api.JetSetCurrentIndex(_jetSession, table.JetTableid, indexName);
-
+            SeekToPkRk(table.JetTableid, partitionKey, rowKey);
+            return ReadAllRows(table.JetTableid, columns);
          }
+      }
+
+      private void SeekToPkRk(JET_TABLEID tableId, string partitionKey, string rowKey)
+      {
+         //how to perform search: https://msdn.microsoft.com/en-us/library/gg269342(v=exchg.10).aspx
+
+         //choose index to use
+         Api.JetSetCurrentIndex(_jetSession, tableId, PrimaryIndexName);
+
+         //create search key
+         //To make a key for an index that has multiple columns in it you need to make one call to JetMakeKey
+         //for each column. The first call should use the NewKey option.
+
+         Api.MakeKey(_jetSession, tableId, partitionKey, Encoding.Unicode, MakeKeyGrbit.NewKey);
+         Api.MakeKey(_jetSession, tableId, rowKey, Encoding.Unicode, MakeKeyGrbit.None);
+         Api.JetSeek(_jetSession, tableId, SeekGrbit.SeekEQ);
+      }
+
+      private IEnumerable<TableRow> ReadAllRows(JET_TABLEID tableId, Dictionary<string, JET_COLUMNID> columns)
+      {
+         var result = new List<TableRow>();
+
+         if(Api.TryMoveFirst(_jetSession, tableId))
+         {
+            do
+            {
+               string partitionKey = Api.RetrieveColumnAsString(_jetSession, tableId, columns[PartitionKeyName]);
+               string rowKey = Api.RetrieveColumnAsString(_jetSession, tableId, columns[RowKeyName]);
+
+               var row = new TableRow(partitionKey, rowKey);
+               result.Add(row);
+            }
+            while(Api.TryMoveNext(_jetSession, tableId));
+         }
+
+         return result;
       }
 
       public void Insert(string tableName, TableRow row)
       {
-         throw new NotImplementedException();
+         if (row == null) throw new ArgumentNullException(nameof(row));
+
+         Insert(tableName, new[] { row });
       }
 
       public void Insert(string tableName, IEnumerable<TableRow> rows)
@@ -279,7 +349,7 @@ namespace Storage.Net.Net45.Esent
          {
             JET_TABLEID tableId = table.JetTableid;
 
-            IDictionary<string, JET_COLUMNID> columns = GetOrCreateColumns(tableId, rows);
+            Dictionary<string, JET_COLUMNID> columns = EnsureColumnsExist(tableName, tableId, rows);
 
             using (var transaction = new Transaction(_jetSession))
             {
