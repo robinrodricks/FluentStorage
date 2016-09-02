@@ -16,6 +16,11 @@ namespace Storage.Net.Net45.Esent
    //ESENT works best for applications with simple, predefined queries; if you have an application with complex,
    //ad-hoc queries, a storage solution that provides a query layer will work better for you.
 
+   /// <summary>
+   /// ESENT (Jet Blue) backed engine for <see cref="ITableStorage"/>.
+   /// The instance is not thread-safe. You should only use one instance per application, it's cannot be shared
+   /// and is very expensive.
+   /// </summary>
    public class EsentTableStorage : ITableStorage
    {
       //ISAM - Indexed Sequential Access Method
@@ -296,7 +301,7 @@ namespace Storage.Net.Net45.Esent
             Dictionary<string, JET_COLUMNID> columns = _tableNameToColumnNameToId[tableName];
 
             SeekToPkRk(table.JetTableid, partitionKey, rowKey);
-            return ReadAllRows(tableName, table.JetTableid, columns);
+            return ReadAllRows(tableName, table.JetTableid, columns, rowKey != null ? maxRecords : 1);
          }
       }
 
@@ -313,42 +318,43 @@ namespace Storage.Net.Net45.Esent
 
          Api.MakeKey(_jetSession, tableId, partitionKey, Encoding.Unicode, MakeKeyGrbit.NewKey);
          Api.MakeKey(_jetSession, tableId, rowKey, Encoding.Unicode, MakeKeyGrbit.None);
+
+         //the next JetSeek call essentially positions the cursor to the first matching record meaning
+         //that you can start reading straight away. Do not call MoveFirst because that will reset cursor
+         //to the beginning of the index so the search result will be lost
          JET_wrn r = Api.JetSeek(_jetSession, tableId, SeekGrbit.SeekEQ);
       }
 
-      private IEnumerable<TableRow> ReadAllRows(string tableName, JET_TABLEID tableId, Dictionary<string, JET_COLUMNID> columns)
+      private IEnumerable<TableRow> ReadAllRows(string tableName, JET_TABLEID tableId, Dictionary<string, JET_COLUMNID> columns, int maxRecords)
       {
          var result = new List<TableRow>();
          List<string> valueColumns = columns.Keys.Where(n => n != PartitionKeyName && n != RowKeyName).ToList();
 
-         if(Api.TryMoveFirst(_jetSession, tableId))
+         do
          {
-            do
+            string partitionKey = Api.RetrieveColumnAsString(_jetSession, tableId, columns[PartitionKeyName]);
+            string rowKey = Api.RetrieveColumnAsString(_jetSession, tableId, columns[RowKeyName]);
+            var row = new TableRow(partitionKey, rowKey);
+
+            foreach (string colName in valueColumns)
             {
-               string partitionKey = Api.RetrieveColumnAsString(_jetSession, tableId, columns[PartitionKeyName]);
-               string rowKey = Api.RetrieveColumnAsString(_jetSession, tableId, columns[RowKeyName]);
-               var row = new TableRow(partitionKey, rowKey);
+               JET_COLUMNID colId = columns[colName];
+               JET_COLUMNDEF colDef;
+               Api.JetGetColumnInfo(_jetSession, _jetDbId, tableName, colName, out colDef);
 
-               foreach(string colName in valueColumns)
+               switch (colDef.coltyp)
                {
-                  JET_COLUMNID colId = columns[colName];
-                  JET_COLUMNDEF colDef;
-                  Api.JetGetColumnInfo(_jetSession, _jetDbId, tableName, colName, out colDef);
-
-                  switch(colDef.coltyp)
-                  {
-                     case JET_coltyp.LongText:
-                        row[colName] = Api.RetrieveColumnAsString(_jetSession, tableId, colId);
-                        break;
-                     default:
-                        throw new ApplicationException($"column type {colDef.coltyp} is not supported");
-                  }
+                  case JET_coltyp.LongText:
+                     row[colName] = Api.RetrieveColumnAsString(_jetSession, tableId, colId);
+                     break;
+                  default:
+                     throw new ApplicationException($"column type {colDef.coltyp} is not supported");
                }
-
-               result.Add(row);
             }
-            while(Api.TryMoveNext(_jetSession, tableId));
+
+            result.Add(row);
          }
+         while (result.Count < maxRecords && Api.TryMoveNext(_jetSession, tableId));
 
          return result;
       }

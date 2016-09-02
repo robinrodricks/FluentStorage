@@ -11,8 +11,8 @@ using System.IO;
 
 namespace Storage.Net.Tests.Integration
 {
-   //[TestFixture("csv-files")]
-   //[TestFixture("azure")]
+   [TestFixture("csv-files")]
+   [TestFixture("azure")]
    [TestFixture("esent")]
    public class TableStorageTest : AbstractTestFixture
    {
@@ -221,6 +221,25 @@ namespace Storage.Net.Tests.Integration
          IEnumerable<TableRow> rows = _tables.Get(_tableName, "test");
 
          Assert.IsNull(rows);
+      }
+
+      [Test]
+      public void ReadWritePartitions_TwoPartitions_ReadSeparately()
+      {
+         var row1 = new TableRow("pk1", "rk1");
+         var row2 = new TableRow("pk2", "rk1");
+
+         _tables.Insert("test", new[] { row1, row2 });
+
+         TableRow row11 = _tables.Get("test", "pk1", "rk1");
+         TableRow row22 = _tables.Get("test", "pk2", "rk1");
+
+         Assert.IsNotNull(row11);
+         Assert.IsNotNull(row22);
+         Assert.AreEqual("pk1", row11.PartitionKey);
+         Assert.AreEqual("rk1", row11.RowKey);
+         Assert.AreEqual("pk2", row22.PartitionKey);
+         Assert.AreEqual("rk1", row22.RowKey);
       }
    }
 }
