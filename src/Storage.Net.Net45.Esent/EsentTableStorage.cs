@@ -54,13 +54,20 @@ namespace Storage.Net.Net45.Esent
 
       private void CreateDatabase()
       {
-         using (var instance = CreateInstance())
+         try
          {
-            using (var session = new Session(instance))
+            using (var instance = CreateInstance())
             {
-               JET_DBID dbid;
-               Api.JetCreateDatabase(session, _databasePath, null, out dbid, CreateDatabaseGrbit.OverwriteExisting);
+               using (var session = new Session(instance))
+               {
+                  JET_DBID dbid;
+                  Api.JetCreateDatabase(session, _databasePath, null, out dbid, CreateDatabaseGrbit.OverwriteExisting);
+               }
             }
+         }
+         catch(Exception ex)
+         {
+            throw new StorageException($"cannot create database in '{_databasePath}'", ex);
          }
       }
 
@@ -308,15 +315,28 @@ namespace Storage.Net.Net45.Esent
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
 
-         return Get(tableName, partitionKey, null, int.MaxValue);
+         return InternalGet(tableName, partitionKey, null, int.MaxValue);
       }
 
       public TableRow Get(string tableName, string partitionKey, string rowKey)
       {
-         return Get(tableName, partitionKey, rowKey, 1).FirstOrDefault();
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
+         if (rowKey == null) throw new ArgumentNullException(nameof(rowKey));
+
+         return InternalGet(tableName, partitionKey, rowKey, 1).FirstOrDefault();
       }
 
       public IEnumerable<TableRow> Get(string tableName, string partitionKey, string rowKey, int maxRecords)
+      {
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
+         if (rowKey == null) throw new ArgumentNullException(nameof(rowKey));
+
+         return InternalGet(tableName, partitionKey, rowKey, maxRecords);
+      }
+
+      private IEnumerable<TableRow> InternalGet(string tableName, string partitionKey, string rowKey, int maxRecords)
       {
          using (ETable table = OpenTable(tableName, false))
          {

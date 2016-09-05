@@ -62,8 +62,10 @@ namespace Storage.Net.Tests.Integration
 
       protected void Cleanup()
       {
+         //todo: only cleanup old folders, this doesn't work when tests run in parallel
+
          //FS cleanup
-         foreach (DirectoryInfo oldDir in BuildDir.GetDirectories(TestDirPrefix + "*", SearchOption.TopDirectoryOnly))
+         /*foreach (DirectoryInfo oldDir in BuildDir.GetDirectories(TestDirPrefix + "*", SearchOption.TopDirectoryOnly))
          {
             try
             {
@@ -73,7 +75,7 @@ namespace Storage.Net.Tests.Integration
             {
 
             }
-         }
+         }*/
          _testDir = null;
       }
 

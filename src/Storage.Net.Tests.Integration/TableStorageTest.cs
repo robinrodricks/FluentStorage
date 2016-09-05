@@ -239,11 +239,11 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void Read_WholePartitionNullTableName_ArgumentNullException()
+      public void Read_NoTablePartition_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() =>
          {
-            _tables.Get(null, null);
+            _tables.Get(null, "p");
          });
       }
 
@@ -251,6 +251,24 @@ namespace Storage.Net.Tests.Integration
       public void Read_TableButNotPartition_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() => _tables.Get(_tableName, null));
+      }
+
+      [Fact]
+      public void Read_TableNoPartitionRowKey_ArgumentNullException()
+      {
+         Assert.Throws<ArgumentNullException>(() => _tables.Get(_tableName, null, "rk"));
+      }
+
+      [Fact]
+      public void Read_NoTablePartitionRowKey_ArgumentNullException()
+      {
+         Assert.Throws<ArgumentNullException>(() => _tables.Get(null, "pk", "rk"));
+      }
+
+      [Fact]
+      public void Read_TablePartitionNoRowKey_ArgumentNullException()
+      {
+         Assert.Throws<ArgumentNullException>(() => _tables.Get(_tableName, "pk", null));
       }
 
       [Fact]

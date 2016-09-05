@@ -44,6 +44,10 @@ namespace Storage.Net.Table
       /// <param name="tableName">Table name, required.</param>
       /// <param name="partitionKey">Partition key of the table, required.</param>
       /// <param name="rowKey">Row key, required.</param>
+      /// <returns>
+      /// List of table rows in the table's partition. This method never returns null and if no records
+      /// are found an empty collection is returned.
+      /// </returns>
       TableRow Get(string tableName, string partitionKey, string rowKey);
 
       /// <summary>

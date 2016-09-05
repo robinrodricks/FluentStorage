@@ -94,7 +94,7 @@ namespace Storage.Net.Azure.Table
          if(tableName == null) throw new ArgumentNullException(nameof(tableName));
          if(partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
 
-         return Get(tableName, partitionKey, null, -1);
+         return InternalGet(tableName, partitionKey, null, -1);
       }
 
       /// <summary>
@@ -102,7 +102,11 @@ namespace Storage.Net.Azure.Table
       /// </summary>
       public TableRow Get(string tableName, string partitionKey, string rowKey)
       {
-         return Get(tableName, partitionKey, rowKey, -1)?.FirstOrDefault();
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
+         if (rowKey == null) throw new ArgumentNullException(nameof(rowKey));
+
+         return InternalGet(tableName, partitionKey, rowKey, -1)?.FirstOrDefault();
       }
 
       /// <summary>
@@ -110,7 +114,16 @@ namespace Storage.Net.Azure.Table
       /// </summary>
       public IEnumerable<TableRow> Get(string tableName, string partitionKey, string rowKey, int maxRecords)
       {
-         if (tableName == null) throw new ArgumentNullException("tableName");
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
+         if (rowKey == null) throw new ArgumentNullException(nameof(rowKey));
+
+         return InternalGet(tableName, partitionKey, rowKey, maxRecords);
+      }
+
+      private IEnumerable<TableRow> InternalGet(string tableName, string partitionKey, string rowKey, int maxRecords)
+      {
+
          CloudTable table = GetTable(tableName, false);
          if (table == null) return Enumerable.Empty<TableRow>();
 

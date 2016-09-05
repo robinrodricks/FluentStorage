@@ -79,6 +79,10 @@ namespace Storage.Net.Table.Files
       /// </summary>
       public TableRow Get(string tableName, string partitionKey, string rowKey)
       {
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
+         if (rowKey == null) throw new ArgumentNullException(nameof(rowKey));
+
          return InternalGet(tableName, partitionKey, rowKey)?.FirstOrDefault();
       }
 
