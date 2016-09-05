@@ -71,11 +71,18 @@ namespace Storage.Net.Net45.Esent
 
       private void OpenDatabase()
       {
-         _jetInstance = CreateInstance();
-         _jetSession = new Session(_jetInstance);
+         try
+         {
+            _jetInstance = CreateInstance();
+            _jetSession = new Session(_jetInstance);
 
-         Api.JetAttachDatabase(_jetSession, _databasePath, AttachDatabaseGrbit.None);
-         Api.JetOpenDatabase(_jetSession, _databasePath, null, out _jetDbId, OpenDatabaseGrbit.None);
+            Api.JetAttachDatabase(_jetSession, _databasePath, AttachDatabaseGrbit.None);
+            Api.JetOpenDatabase(_jetSession, _databasePath, null, out _jetDbId, OpenDatabaseGrbit.None);
+         }
+         catch(Exception ex)
+         {
+            throw new StorageException($"failed to open database at '{_databasePath}'", ex);
+         }
       }
 
       private Instance CreateInstance()
@@ -262,6 +269,8 @@ namespace Storage.Net.Net45.Esent
 
       public void Delete(string tableName)
       {
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+
          try
          {
             Api.JetDeleteTable(_jetSession, _jetDbId, tableName);

@@ -67,6 +67,37 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public void DeleteTable_NonExisting_DoesntCrash()
+      {
+         _tables.Delete(_tableName + "del");
+      }
+
+      [Fact]
+      public void DeleteTable_CreateAndDelete_BackToPreviousState()
+      {
+         int tableNo1 = _tables.ListTableNames().Count();
+
+         _tables.Insert(_tableName, new TableRow("pk", "rk"));
+
+         int tableNo2 = _tables.ListTableNames().Count();
+         Assert.Equal(tableNo1 + 1, tableNo2);
+
+         _tables.Delete(_tableName);
+
+         int tableNo3 = _tables.ListTableNames().Count();
+         Assert.Equal(tableNo3, tableNo1);
+      }
+
+      [Fact]
+      public void DeleteTable_NullInput_ArgumentNullException()
+      {
+         Assert.Throws<ArgumentNullException>(() =>
+         {
+            _tables.Delete(null);
+         });
+      }
+
+      [Fact]
       public void WriteRows_TwoRows_DoesntFail()
       {
          var row1 = new TableRow("part1", "k1");
@@ -88,12 +119,6 @@ namespace Storage.Net.Tests.Integration
 
          var foundRow = _tables.Get("test", "partition", "ivan@si.com");
          Assert.NotNull(foundRow);
-      }
-
-      [Fact]
-      public void ListTableNames_Unknown_DoesntCrash()
-      {
-         _tables.ListTableNames();
       }
 
       [Fact]
