@@ -16,20 +16,27 @@ namespace Storage.Net.Table
       bool HasOptimisticConcurrency { get; }
 
       /// <summary>
-      /// Returns the list of all table names in the table storage
+      /// Returns the list of all table names in the table storage.
       /// </summary>
       /// <returns></returns>
       IEnumerable<string> ListTableNames();
 
       /// <summary>
-      /// Deletes entire table
+      /// Deletes entire table. If table doesn't exist no errors are raised.
       /// </summary>
-      /// <param name="tableName"></param>
+      /// <param name="tableName">Name of the table to delete. Passing null raises <see cref="ArgumentNullException"/></param>
       void Delete(string tableName);
 
       /// <summary>
-      /// Gets rows by partition key
+      /// Gets rows by partition key.
       /// </summary>
+      /// <param name="tableName">Non-null table name. Passing null raises <see cref="ArgumentNullException"/>.
+      /// If the table doesn't exist an empty result is returned.</param>
+      /// <param name="partitionKey">Partition key of the table. If this parameter is null returns all records in this table.</param>
+      /// <returns>
+      /// List of table rows in the table's partition or table. This method never returns null and if no records
+      /// are found an empty collection is returned.
+      /// </returns>
       IEnumerable<TableRow> Get(string tableName, string partitionKey);
 
       /// <summary>

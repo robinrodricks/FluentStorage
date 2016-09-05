@@ -109,7 +109,7 @@ namespace Storage.Net.Table.Files
             }
          }
 
-         return result.Count > 0 ? result : null;
+         return result;
       }
 
       /// <summary>

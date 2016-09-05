@@ -317,7 +317,7 @@ namespace Storage.Net.Net45.Esent
       {
          using (ETable table = OpenTable(tableName, false))
          {
-            if (table == null) return null;
+            if (table == null) return Enumerable.Empty<TableRow>();
             Dictionary<string, JET_COLUMNID> columns = _tableNameToColumnNameToId[tableName];
 
             SeekToPkRk(table.JetTableid, partitionKey, rowKey);

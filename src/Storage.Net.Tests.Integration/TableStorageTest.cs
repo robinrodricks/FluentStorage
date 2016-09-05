@@ -170,21 +170,6 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void GetOne_AddTwoRows_ReturnsTheOne()
-      {
-         var row1 = new TableRow("part1", "1");
-         row1["col1"] = "value1";
-         var row2 = new TableRow("part1", "2");
-         row2["col1"] = "value2";
-
-         _tables.Insert(_tableName, new[] {row1, row2});
-
-         TableRow theOne = _tables.Get(_tableName, "part1", "2");
-         Assert.Equal("part1", theOne.PartitionKey);
-         Assert.Equal("2", theOne.RowKey);
-      }
-
-      [Fact]
       public void Concurrency_DeleteWithWrongEtag_Fails()
       {
          if (!_tables.HasOptimisticConcurrency) return;
@@ -254,7 +239,25 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void ReadFromAllPartitions_WriteToTwoPartitions_GetsAll()
+      public void Read_WholePartitionNullTableName_ArgumentNullException()
+      {
+         Assert.Throws<ArgumentNullException>(() =>
+         {
+            _tables.Get(null, null);
+         });
+      }
+
+      [Fact]
+      public void Read_NonExistingTable_EmptyNotNull()
+      {
+         IEnumerable<TableRow> rows = _tables.Get(_tableName, "pk");
+
+         Assert.NotNull(rows);
+         Assert.True(rows.Count() == 0);
+      }
+
+      [Fact]
+      public void Read_WriteToTwoPartitions_GetsAll()
       {
          var row1 = new TableRow("pk1", "rk1");
          var row2 = new TableRow("pk2", "rk2");
@@ -267,15 +270,31 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void Read_TableDoesNotExist_ReturnsNull()
+      public void Read_AddTwoRows_ReturnsTheOne()
       {
-         IEnumerable<TableRow> rows = _tables.Get(_tableName, "test");
+         var row1 = new TableRow("part1", "1");
+         row1["col1"] = "value1";
+         var row2 = new TableRow("part1", "2");
+         row2["col1"] = "value2";
 
-         Assert.Null(rows);
+         _tables.Insert(_tableName, new[] { row1, row2 });
+
+         TableRow theOne = _tables.Get(_tableName, "part1", "2");
+         Assert.Equal("part1", theOne.PartitionKey);
+         Assert.Equal("2", theOne.RowKey);
       }
 
       [Fact]
-      public void ReadWritePartitions_TwoPartitions_ReadSeparately()
+      public void Read_TableDoesNotExist_ReturnsEmpty()
+      {
+         IEnumerable<TableRow> rows = _tables.Get(_tableName, "test");
+
+         Assert.NotNull(rows);
+         Assert.Equal(1, rows.Count());
+      }
+
+      [Fact]
+      public void Read_TwoPartitions_ReadSeparately()
       {
          var row1 = new TableRow("pk1", "rk1");
          var row2 = new TableRow("pk2", "rk1");

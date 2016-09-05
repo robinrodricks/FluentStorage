@@ -109,7 +109,7 @@ namespace Storage.Net.Azure.Table
       {
          if (tableName == null) throw new ArgumentNullException("tableName");
          CloudTable table = GetTable(tableName, false);
-         if (table == null) return null;
+         if (table == null) return Enumerable.Empty<TableRow>();
 
          var query = new TableQuery();
 
