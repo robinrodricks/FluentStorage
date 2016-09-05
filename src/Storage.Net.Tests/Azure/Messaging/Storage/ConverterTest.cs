@@ -4,16 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Queue;
-using NUnit.Framework;
+using Xunit;
 using Storage.Net.Azure.Messaging.Storage;
 using Storage.Net.Messaging;
 
 namespace Storage.Net.Tests.Azure.Messaging.Storage
 {
-   [TestFixture]
    public class ConverterTest
    {
-      [Test]
+      [Fact]
       public void ToCloudQueueMessage_WithProps_ConvertsTwoWay()
       {
          var qm = new QueueMessage("a string");
@@ -23,9 +22,9 @@ namespace Storage.Net.Tests.Azure.Messaging.Storage
 
          QueueMessage qm2 = Converter.ToQueueMessage(cm);
 
-         Assert.AreEqual(qm.Properties.Count, qm2.Properties.Count);
-         Assert.AreEqual(qm.Properties["one"], qm2.Properties["one"]);
-         Assert.AreEqual(qm.StringContent, qm2.StringContent);
+         Assert.Equal(qm.Properties.Count, qm2.Properties.Count);
+         Assert.Equal(qm.Properties["one"], qm2.Properties["one"]);
+         Assert.Equal(qm.StringContent, qm2.StringContent);
       }
    }
 }

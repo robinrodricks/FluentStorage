@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Aloneguid.Support;
 using Config.Net;
-using NUnit.Framework;
+using Xunit;
 using Storage.Net.Aws.Blob;
 using Storage.Net.Blob;
 using Storage.Net.Blob.Files;
@@ -13,10 +13,26 @@ using Storage.Net.Azure.Blob;
 
 namespace Storage.Net.Tests.Integration
 {
-   [TestFixture("azure")]
-   [TestFixture("disk-directory")]
-   [TestFixture("aws-s3")]
-   public class BlobStorageTest : AbstractTestFixture
+   #region [ Test Variations ]
+
+   public class AzureBlobStorageTest : BlobStorageTest
+   {
+      public AzureBlobStorageTest() : base("azure") { }
+   }
+
+   public class DiskDirectoryBlobStorageTest : BlobStorageTest
+   {
+      public DiskDirectoryBlobStorageTest() : base("disk-directory") { }
+   }
+
+   public class AwsS3BlobStorageTest : BlobStorageTest
+   {
+      public AwsS3BlobStorageTest() : base("aws-s3") { }
+   }
+
+   #endregion
+
+   public abstract class BlobStorageTest : AbstractTestFixture
    {
       private readonly string _type;
       private IBlobStorage _storage;
@@ -24,11 +40,7 @@ namespace Storage.Net.Tests.Integration
       public BlobStorageTest(string type)
       {
          _type = type;
-      }
 
-      [SetUp]
-      public void SetUp()
-      {
          switch (_type)
          {
             case "azure":
@@ -62,13 +74,13 @@ namespace Storage.Net.Tests.Integration
          return id;
       }
 
-      [Test]
+      [Fact]
       public void List_All_DoesntCrash()
       {
          List<string> allBlobNames = _storage.List(null).ToList();
       }
 
-      [Test]
+      [Fact]
       public void Upload_New_CanDownload()
       {
          string content = Generator.GetRandomString(10000, false);
@@ -86,10 +98,10 @@ namespace Storage.Net.Tests.Integration
             contentRead = Encoding.UTF8.GetString(s.ToArray());
          }
 
-         Assert.AreEqual(content, contentRead);
+         Assert.Equal(content, contentRead);
       }
 
-      [Test]
+      [Fact]
       public void OpenStream_New_CanDownload()
       {
          string id = GetRandomStreamId();
@@ -99,11 +111,11 @@ namespace Storage.Net.Tests.Integration
             var ms = new MemoryStream();
             s.CopyTo(ms);
 
-            Assert.Greater(ms.Length, 0);
+            Assert.True(ms.Length > 0);
          }
       }
 
-      [Test]
+      [Fact]
       public void Download_DoesNotExist_ConsistentException()
       {
          string id = Generator.RandomString;
@@ -114,40 +126,40 @@ namespace Storage.Net.Tests.Integration
             {
                _storage.DownloadToStream(id, ms);
 
-               Assert.Fail("the call must fail");
+               Assert.True(false, "the call must fail");
             }
             catch(StorageException ex)
             {
-               Assert.AreEqual(ErrorCode.NotFound, ex.ErrorCode);
+               Assert.Equal(ErrorCode.NotFound, ex.ErrorCode);
             }
             catch(Exception ex)
             {
-               Assert.Fail("this exception is not expected: " + ex);
+               Assert.True(false, "this exception is not expected: " + ex);
             }
          }
       }
 
-      [Test]
+      [Fact]
       public void Exists_ByNull_ConsistentException()
       {
          Assert.Throws<ArgumentNullException>(() => _storage.Exists(null));
       }
 
-      [Test]
+      [Fact]
       public void Exists_NoObject_ReturnsFalse()
       {
-         Assert.IsFalse(_storage.Exists(Generator.RandomString));
+         Assert.False(_storage.Exists(Generator.RandomString));
       }
 
-      [Test]
+      [Fact]
       public void Exists_HasObject_ReturnsTrue()
       {
          string id = GetRandomStreamId();
 
-         Assert.IsTrue(_storage.Exists(id));
+         Assert.True(_storage.Exists(id));
       }
 
-      [Test]
+      [Fact]
       public void Delete_CreateNewAndDelete_CannotFindAgain()
       {
          string id = GetRandomStreamId();
@@ -158,7 +170,7 @@ namespace Storage.Net.Tests.Integration
          Assert.Throws<StorageException>(() => _storage.DownloadToStream(id, ms));
       }
 
-      [Test]
+      [Fact]
       public void Delete_NullInKey_ConsistentException()
       {
          Assert.Throws<ArgumentNullException>(() => _storage.Delete(null));

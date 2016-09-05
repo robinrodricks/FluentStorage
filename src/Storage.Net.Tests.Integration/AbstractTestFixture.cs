@@ -11,7 +11,7 @@ using LogMagic;
 
 namespace Storage.Net.Tests.Integration
 {
-   public class AbstractTestFixture
+   public class AbstractTestFixture : IDisposable
    {
       private const string TestDirPrefix = "INTEGRATION-TEST-";
       private const string TestStorageDirName = "INTEGRATION-STATE";
@@ -65,7 +65,14 @@ namespace Storage.Net.Tests.Integration
          //FS cleanup
          foreach (DirectoryInfo oldDir in BuildDir.GetDirectories(TestDirPrefix + "*", SearchOption.TopDirectoryOnly))
          {
-            oldDir.Delete(true);
+            try
+            {
+               oldDir.Delete(true);
+            }
+            catch(IOException)
+            {
+
+            }
          }
          _testDir = null;
       }
@@ -117,6 +124,12 @@ namespace Storage.Net.Tests.Integration
 
          return string.Format("{0}.{1}", testClassType.Namespace, testMethodName);
       }
+
+      public virtual void Dispose()
+      {
+         
+      }
+
 
       #region [ Assert Helpers ]
 

@@ -1,6 +1,6 @@
 ﻿using Aloneguid.Support;
 using Config.Net;
-using NUnit.Framework;
+using Xunit;
 using Storage.Net.Azure.Messaging.ServiceBus;
 using Storage.Net.Azure.Messaging.Storage;
 using Storage.Net.Messaging;
@@ -12,12 +12,36 @@ using LogMagic;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
-   [TestFixture("azure-storage-queue")]
-   [TestFixture("azure-servicebus-topic")]
-   [TestFixture("azure-servicebus-queue")]
-   [TestFixture("inmemory")]
-   //[TestFixture("disk")]
-   public class GenericMessageQueueTest : AbstractTestFixture
+   #region [ Test Variations ]
+
+   public class AzureStorageQueueMessageQueueTest : GenericMessageQueueTest
+   {
+      public AzureStorageQueueMessageQueueTest() : base("azure-storage-queue") { }
+   }
+
+   public class AzureServiceBusTopicMessageQeueueTest : GenericMessageQueueTest
+   {
+      public AzureServiceBusTopicMessageQeueueTest() : base("azure-servicebus-topic") { }
+   }
+
+   public class AzureServiceBusQueueMessageQeueueTest : GenericMessageQueueTest
+   {
+      public AzureServiceBusQueueMessageQeueueTest() : base("azure-servicebus-queue") { }
+   }
+
+   public class InMemoryMessageQueueTest : GenericMessageQueueTest
+   {
+      public InMemoryMessageQueueTest() : base("inmemory") { }
+   }
+
+   public class DiskMessageQeueuTest : GenericMessageQueueTest
+   {
+      public DiskMessageQeueuTest() : base("disk") { }
+   }
+
+   #endregion
+
+   public abstract class GenericMessageQueueTest : AbstractTestFixture
    {
       private readonly ILog _log = L.G();
       private readonly string _name;
@@ -25,14 +49,10 @@ namespace Storage.Net.Tests.Integration.Messaging
       private IMessageReceiver _receiver;
       private int _messagesPumped;
 
-      public GenericMessageQueueTest(string name)
+      protected GenericMessageQueueTest(string name)
       {
          _name = name;
-      }
 
-      [SetUp]
-      public void SetUp()
-      {
          switch(_name)
          {
             case "azure-storage-queue":
@@ -88,20 +108,22 @@ namespace Storage.Net.Tests.Integration.Messaging
          _messagesPumped = 0;
       }
 
-      [TearDown]
-      public void TearDown()
+
+      public override void Dispose()
       {
          if(_publisher != null) _publisher.Dispose();
          if(_receiver != null) _receiver.Dispose();
+
+         base.Dispose();
       }
 
-      [Test]
+      [Fact]
       public void SendMessage_OneMessage_DoesntCrash()
       {
          _publisher.PutMessage(new QueueMessage("test content at " + DateTime.UtcNow));
       }
 
-      [Test]
+      [Fact]
       public void SendMessage_SendAFew_ReceivesAsBatch()
       {
          for(int i = 0; i < 2; i++)
@@ -120,11 +142,11 @@ namespace Storage.Net.Tests.Integration.Messaging
             Thread.Sleep(TimeSpan.FromSeconds(1));
          }
 
-         Assert.IsNotNull(batch);
-         Assert.Greater(batch.Count, 0);
+         Assert.NotNull(batch);
+         Assert.True(batch.Count > 0);
       }
 
-      [Test]
+      [Fact]
       public void SendMessage_ExtraProperties_DoesntCrash()
       {
          var msg = new QueueMessage("prop content at " + DateTime.UtcNow);
@@ -133,7 +155,7 @@ namespace Storage.Net.Tests.Integration.Messaging
          _publisher.PutMessage(msg);
       }
 
-      [Test]
+      [Fact]
       public void SendMessage_SimpleOne_Received()
       {
          string content = Generator.RandomString;
@@ -149,11 +171,11 @@ namespace Storage.Net.Tests.Integration.Messaging
             Thread.Sleep(TimeSpan.FromSeconds(2));
          }
 
-         Assert.IsNotNull(received);
-         Assert.AreEqual(content, received.StringContent);
+         Assert.NotNull(received);
+         Assert.Equal(content, received.StringContent);
       }
 
-      [Test]
+      [Fact]
       public void SendMessage_WithProperties_Received()
       {
          string content = Generator.RandomString;
@@ -172,12 +194,12 @@ namespace Storage.Net.Tests.Integration.Messaging
             Thread.Sleep(TimeSpan.FromSeconds(2));
          }
 
-         Assert.IsNotNull(received);
-         Assert.AreEqual(content, received.Content);
-         Assert.AreEqual("v1", received.Properties["one"]);
+         Assert.NotNull(received);
+         Assert.Equal(content, received.StringContent);
+         Assert.Equal("v1", received.Properties["one"]);
       }
 
-      [Test]
+      [Fact]
       public void MessagePump_AddFewMessages_CanReceiveOneAndPumpClearsThemAll()
       {
          for (int i = 0; i < 10; i++)
@@ -186,13 +208,13 @@ namespace Storage.Net.Tests.Integration.Messaging
             _publisher.PutMessage(qm);
          }
 
-         Assert.IsNotNull(_receiver.ReceiveMessage());
+         Assert.NotNull(_receiver.ReceiveMessage());
 
          _receiver.StartMessagePump(OnMessage);
 
          Thread.Sleep(TimeSpan.FromSeconds(10));
 
-         Assert.GreaterOrEqual(_messagesPumped, 9);
+         Assert.True(_messagesPumped >= 9);
       }
 
       private void OnMessage(QueueMessage qm)

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Config.Net;
-using NUnit.Framework;
+using Xunit;
 using Storage.Net.Table;
 using Storage.Net.Table.Files;
 using Storage.Net.Azure.Table;
@@ -11,23 +11,31 @@ using System.IO;
 
 namespace Storage.Net.Tests.Integration
 {
-   [TestFixture("csv-files")]
-   [TestFixture("azure")]
-   [TestFixture("esent")]
-   public class TableStorageTest : AbstractTestFixture
+   public class CsvFilesTableStorageTest : TableStorageTest
+   {
+      public CsvFilesTableStorageTest() : base("csv-files") { }
+   }
+
+   public class AzureTableStorageTest : TableStorageTest
+   {
+      public AzureTableStorageTest() : base("azure") { }
+   }
+
+   public class EsentTableStorageTest : TableStorageTest
+   {
+      public EsentTableStorageTest() : base("esent") { }
+   }
+
+   public abstract class TableStorageTest : AbstractTestFixture
    {
       private readonly string _name;
       private ITableStorage _tables;
       private string _tableName;
 
-      public TableStorageTest(string name)
+      protected TableStorageTest(string name)
       {
          _name = name;
-      }
-
-      [SetUp]
-      public void SetUp()
-      {
+   
          if(_name == "csv-files")
          {
             _tables = new CsvFileTableStorage(TestDir);
@@ -47,17 +55,18 @@ namespace Storage.Net.Tests.Integration
          _tableName = "TableStorageTest" + Guid.NewGuid().ToString().Replace("-", "");
       }
 
-      [TearDown]
-      public void TearDown()
+      public override void Dispose()
       {
          _tables.Delete(_tableName);
 
          _tables.Dispose();
 
          Cleanup();
+
+         base.Dispose();
       }
 
-      [Test]
+      [Fact]
       public void WriteRows_TwoRows_DoesntFail()
       {
          var row1 = new TableRow("part1", "k1");
@@ -69,7 +78,7 @@ namespace Storage.Net.Tests.Integration
          _tables.Insert(_tableName, new[] {row1, row2});
       }
 
-      [Test]
+      [Fact]
       public void WriteRows_EmailRowKey_CanFetchBack()
       {
          //this only tests encoding problem
@@ -78,16 +87,16 @@ namespace Storage.Net.Tests.Integration
          _tables.Insert("test", row);
 
          var foundRow = _tables.Get("test", "partition", "ivan@si.com");
-         Assert.IsNotNull(foundRow);
+         Assert.NotNull(foundRow);
       }
 
-      [Test]
+      [Fact]
       public void ListTableNames_Unknown_DoesntCrash()
       {
          _tables.ListTableNames();
       }
 
-      [Test]
+      [Fact]
       public void ListTables_NoTablesWriteARow_OneTable()
       {
          int count = _tables.ListTableNames().Count();
@@ -97,12 +106,12 @@ namespace Storage.Net.Tests.Integration
          _tables.Insert(_tableName, new[] {row1});
 
          var names = _tables.ListTableNames().ToList();
-         Assert.AreEqual(count + 1, names.Count);
-         Assert.IsTrue(names.Contains(_tableName));
+         Assert.Equal(count + 1, names.Count);
+         Assert.True(names.Contains(_tableName));
          _tables.Delete(_tableName);
       }
 
-      [Test]
+      [Fact]
       public void DeleteRows_AddTwoRows_DeletedDisappears()
       {
          var row1 = new TableRow("part1", "1");
@@ -114,11 +123,11 @@ namespace Storage.Net.Tests.Integration
          _tables.Delete(_tableName, new[] {new TableRowId("part1", "2")});
          var rows = _tables.Get(_tableName, "part1");
 
-         Assert.AreEqual(1, rows.Count());
+         Assert.Equal(1, rows.Count());
 
       }
 
-      [Test]
+      [Fact]
       public void GetOne_AddTwoRows_ReturnsTheOne()
       {
          var row1 = new TableRow("part1", "1");
@@ -129,20 +138,20 @@ namespace Storage.Net.Tests.Integration
          _tables.Insert(_tableName, new[] {row1, row2});
 
          TableRow theOne = _tables.Get(_tableName, "part1", "2");
-         Assert.AreEqual("part1", theOne.PartitionKey);
-         Assert.AreEqual("2", theOne.RowKey);
+         Assert.Equal("part1", theOne.PartitionKey);
+         Assert.Equal("2", theOne.RowKey);
       }
 
-      [Test]
+      [Fact]
       public void Concurrency_DeleteWithWrongEtag_Fails()
       {
-         if(!_tables.HasOptimisticConcurrency) Assert.Ignore();
+         if (!_tables.HasOptimisticConcurrency) return;
 
          //insert one row
          var row = new TableRow("pk", "rk");
          row["c"] = "1";
          _tables.Insert(_tableName, row);
-         Assert.IsNotNull(row.Id.ConcurrencyKey);
+         Assert.NotNull(row.Id.ConcurrencyKey);
 
          //change it's ETag and try to delete which must fail!
          row.Id.ConcurrencyKey = Guid.NewGuid().ToString();
@@ -152,23 +161,23 @@ namespace Storage.Net.Tests.Integration
          });
       }
 
-      [Test]
+      [Fact]
       public void Concurrency_RowOldCopy_MustNotUpdate()
       {
-         if(!_tables.HasOptimisticConcurrency) Assert.Ignore();
+         if (!_tables.HasOptimisticConcurrency) return;
 
          //insert one row
          var row = new TableRow("pk", "rk");
          row["c"] = "1";
          _tables.Insert(_tableName, row);
-         Assert.IsNotNull(row.Id.ConcurrencyKey);
+         Assert.NotNull(row.Id.ConcurrencyKey);
 
          //update with a new value
          var row1 = new TableRow("pk", "rk");
          row1["c"] = "2";
          _tables.Merge(_tableName, row1);
-         Assert.IsNotNull(row1.Id.ConcurrencyKey);
-         Assert.AreNotEqual(row.Id.ConcurrencyKey, row1.Id.ConcurrencyKey);
+         Assert.NotNull(row1.Id.ConcurrencyKey);
+         Assert.NotEqual(row.Id.ConcurrencyKey, row1.Id.ConcurrencyKey);
 
          //now use the first row (old ETag) to set the new value
          row["c"] = "2";
@@ -177,7 +186,7 @@ namespace Storage.Net.Tests.Integration
          Assert.Throws<StorageException>(() => _tables.Delete(_tableName, row.Id));
       }
 
-      [Test]
+      [Fact]
       public void WriteReadValues_VariableRows_StillReads()
       {
          var row1 = new TableRow("pk", "rk1");
@@ -194,15 +203,15 @@ namespace Storage.Net.Tests.Integration
          TableRow row12 = _tables.Get("test", "pk", "rk2");
 
 
-         Assert.AreEqual("val1", (string)row11["col1"]);
-         Assert.AreEqual("val2", (string)row11["col2"]);
+         Assert.Equal("val1", (string)row11["col1"]);
+         Assert.Equal("val2", (string)row11["col2"]);
 
-         Assert.AreEqual("val2", (string)row12["col2"]);
-         Assert.AreEqual("val3", (string)row12["col3"]);
+         Assert.Equal("val2", (string)row12["col2"]);
+         Assert.Equal("val3", (string)row12["col3"]);
 
       }
 
-      [Test]
+      [Fact]
       public void ReadFromAllPartitions_WriteToTwoPartitions_GetsAll()
       {
          var row1 = new TableRow("pk1", "rk1");
@@ -212,18 +221,18 @@ namespace Storage.Net.Tests.Integration
 
          List<TableRow> rows = _tables.Get("test", null).ToList();
 
-         Assert.GreaterOrEqual(rows.Count, 2);
+         Assert.True(rows.Count >= 2);
       }
 
-      [Test]
+      [Fact]
       public void Read_TableDoesNotExist_ReturnsNull()
       {
          IEnumerable<TableRow> rows = _tables.Get(_tableName, "test");
 
-         Assert.IsNull(rows);
+         Assert.Null(rows);
       }
 
-      [Test]
+      [Fact]
       public void ReadWritePartitions_TwoPartitions_ReadSeparately()
       {
          var row1 = new TableRow("pk1", "rk1");
@@ -234,12 +243,12 @@ namespace Storage.Net.Tests.Integration
          TableRow row11 = _tables.Get("test", "pk1", "rk1");
          TableRow row22 = _tables.Get("test", "pk2", "rk1");
 
-         Assert.IsNotNull(row11);
-         Assert.IsNotNull(row22);
-         Assert.AreEqual("pk1", row11.PartitionKey);
-         Assert.AreEqual("rk1", row11.RowKey);
-         Assert.AreEqual("pk2", row22.PartitionKey);
-         Assert.AreEqual("rk1", row22.RowKey);
+         Assert.NotNull(row11);
+         Assert.NotNull(row22);
+         Assert.Equal("pk1", row11.PartitionKey);
+         Assert.Equal("rk1", row11.RowKey);
+         Assert.Equal("pk2", row22.PartitionKey);
+         Assert.Equal("rk1", row22.RowKey);
       }
    }
 }
