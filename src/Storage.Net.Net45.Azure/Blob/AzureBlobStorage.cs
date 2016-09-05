@@ -71,9 +71,8 @@ namespace Storage.Net.Azure.Blob
       /// </summary>
       public IEnumerable<string> List(string prefix)
       {
-         return _blobContainer.ListBlobs()
+         return _blobContainer.ListBlobs(prefix ?? null)
             .OfType<CloudBlockBlob>()
-            .Where(b => string.IsNullOrEmpty(prefix) || b.Name.StartsWith(prefix))
             .Select(b => ToUserId(b.Name));
       }
 
