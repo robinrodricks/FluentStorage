@@ -164,7 +164,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          QueueMessage received = null;
 
-         for (int i = 0; i < 10; i++)
+         for (int i = 0; i < 20; i++)
          {
             received = _receiver.ReceiveMessage();
             if (received != null) break;
