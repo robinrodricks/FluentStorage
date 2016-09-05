@@ -211,6 +211,8 @@ namespace Storage.Net.Azure.Table
       /// </summary>
       public void Delete(string tableName, IEnumerable<TableRowId> rowIds)
       {
+         if (rowIds == null) return;
+
          BatchedOperation(tableName, true,
             (b, te) => b.Delete(te),
             rowIds);
@@ -222,6 +224,8 @@ namespace Storage.Net.Azure.Table
       /// </summary>
       public void Delete(string tableName, TableRowId rowId)
       {
+         if (rowId == null) return;
+
          Delete(tableName, new[] { rowId });
       }
 

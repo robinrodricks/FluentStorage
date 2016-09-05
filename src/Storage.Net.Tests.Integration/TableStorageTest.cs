@@ -124,7 +124,24 @@ namespace Storage.Net.Tests.Integration
          var rows = _tables.Get(_tableName, "part1");
 
          Assert.Equal(1, rows.Count());
+      }
 
+      [Fact]
+      public void DeleteRows_NullArrayInput_DoesntCrash()
+      {
+         _tables.Delete(_tableName, (TableRowId[])null);
+      }
+
+      [Fact]
+      public void DeleteRows_NullInput_DoesntCrash()
+      {
+         _tables.Delete(_tableName, (TableRowId)null);
+      }
+
+      [Fact]
+      public void DeleteRows_TableDoesNotExist_DoesntCrash()
+      {
+         _tables.Delete(_tableName + "d", (TableRowId)null);
       }
 
       [Fact]

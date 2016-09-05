@@ -179,6 +179,8 @@ namespace Storage.Net.Table.Files
       /// </summary>
       public void Merge(string tableName, TableRow row)
       {
+         if (row == null) return;
+
          Merge(tableName, new[] {row});
       }
 
@@ -206,6 +208,8 @@ namespace Storage.Net.Table.Files
       /// </summary>
       public void Delete(string tableName, TableRowId rowId)
       {
+         if (rowId == null) return;
+
          Delete(tableName, new[] {rowId});
       }
 

@@ -27,9 +27,8 @@ namespace Storage.Net.Net45.Esent
 
       private const string PartitionKeyName = "PartitionKey";
       private const string RowKeyName = "RowKey";
-      //private const string PKIndexName = "PK";
-      //private const string PKRKIndexName = "PKRK";
       private const string PrimaryIndexName = "primary";
+      private const string PartitionIndexName = "partition";
 
       private string _databasePath;
       private string _databaseFolder;
@@ -130,8 +129,8 @@ namespace Storage.Net.Net45.Esent
                   string indexDefPrimary = $"+{PartitionKeyName}\0+{RowKeyName}\0\0";
                   Api.JetCreateIndex(_jetSession, tableId, PrimaryIndexName, CreateIndexGrbit.IndexPrimary, indexDefPrimary, indexDefPrimary.Length, 100);
 
-                  //string indexDefPartition = $"+{PartitionKeyName}\0\0";
-                  //Api.JetCreateIndex(_jetSession, tableId, PKIndexName, CreateIndexGrbit.IndexUnique, indexDefPartition, indexDefPartition.Length, 100);
+                  string indexDefPartition = $"+{PartitionKeyName}\0\0";
+                  Api.JetCreateIndex(_jetSession, tableId, PartitionIndexName, CreateIndexGrbit.None, indexDefPartition, indexDefPartition.Length, 100);
 
 
                   transaction.Commit(CommitTransactionGrbit.LazyFlush);
@@ -275,12 +274,24 @@ namespace Storage.Net.Net45.Esent
 
       public void Delete(string tableName, TableRowId rowId)
       {
-         throw new NotImplementedException();
+         if (rowId == null) return;
+
+         Delete(tableName, new[] { rowId });
       }
 
       public void Delete(string tableName, IEnumerable<TableRowId> rowIds)
       {
-         throw new NotImplementedException();
+         if (rowIds == null) return;
+
+         using (ETable table = OpenTable(tableName, false))
+         {
+            foreach (TableRowId id in rowIds)
+            {
+               SeekToPkRk(table.JetTableid, id.PartitionKey, id.RowKey);
+
+               Api.JetDelete(_jetSession, table.JetTableid);   //deletes current record
+            }
+         }
       }
 
       public IEnumerable<TableRow> Get(string tableName, string partitionKey)
@@ -301,7 +312,7 @@ namespace Storage.Net.Net45.Esent
             Dictionary<string, JET_COLUMNID> columns = _tableNameToColumnNameToId[tableName];
 
             SeekToPkRk(table.JetTableid, partitionKey, rowKey);
-            return ReadAllRows(tableName, table.JetTableid, columns, rowKey != null ? maxRecords : 1);
+            return ReadAllRows(tableName, table.JetTableid, columns, rowKey == null ? maxRecords : 1);
          }
       }
 
@@ -309,20 +320,38 @@ namespace Storage.Net.Net45.Esent
       {
          //how to perform search: https://msdn.microsoft.com/en-us/library/gg269342(v=exchg.10).aspx
 
-         //choose index to use
-         Api.JetSetCurrentIndex(_jetSession, tableId, null);
+         if (partitionKey == null && rowKey == null)
+         {
+            //reading all table
+            Api.JetSetCurrentIndex(_jetSession, tableId, null);
+            Api.TryMoveFirst(_jetSession, tableId);
+         }
+         else if(rowKey == null)
+         {
+            //set index to partition index
+            Api.JetSetCurrentIndex(_jetSession, tableId, PartitionIndexName);
 
-         //create search key
-         //To make a key for an index that has multiple columns in it you need to make one call to JetMakeKey
-         //for each column. The first call should use the NewKey option.
+            //partition index has only partition name
+            Api.MakeKey(_jetSession, tableId, partitionKey, Encoding.Unicode, MakeKeyGrbit.NewKey);
+            Api.JetSeek(_jetSession, tableId, SeekGrbit.SeekEQ);
+         }
+         else
+         {
+            //choose index to use
+            Api.JetSetCurrentIndex(_jetSession, tableId, null);
 
-         Api.MakeKey(_jetSession, tableId, partitionKey, Encoding.Unicode, MakeKeyGrbit.NewKey);
-         Api.MakeKey(_jetSession, tableId, rowKey, Encoding.Unicode, MakeKeyGrbit.None);
+            //create search key
+            //To make a key for an index that has multiple columns in it you need to make one call to JetMakeKey
+            //for each column. The first call should use the NewKey option.
 
-         //the next JetSeek call essentially positions the cursor to the first matching record meaning
-         //that you can start reading straight away. Do not call MoveFirst because that will reset cursor
-         //to the beginning of the index so the search result will be lost
-         JET_wrn r = Api.JetSeek(_jetSession, tableId, SeekGrbit.SeekEQ);
+            Api.MakeKey(_jetSession, tableId, partitionKey, Encoding.Unicode, MakeKeyGrbit.NewKey);
+            Api.MakeKey(_jetSession, tableId, rowKey, Encoding.Unicode, MakeKeyGrbit.None);
+
+            //the next JetSeek call essentially positions the cursor to the first matching record meaning
+            //that you can start reading straight away. Do not call MoveFirst because that will reset cursor
+            //to the beginning of the index so the search result will be lost
+            JET_wrn r = Api.JetSeek(_jetSession, tableId, SeekGrbit.SeekEQ);
+         }
       }
 
       private IEnumerable<TableRow> ReadAllRows(string tableName, JET_TABLEID tableId, Dictionary<string, JET_COLUMNID> columns, int maxRecords)
