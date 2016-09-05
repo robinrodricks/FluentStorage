@@ -30,18 +30,20 @@ namespace Storage.Net.Table
       /// <summary>
       /// Gets rows by partition key.
       /// </summary>
-      /// <param name="tableName">Non-null table name. Passing null raises <see cref="ArgumentNullException"/>.
-      /// If the table doesn't exist an empty result is returned.</param>
-      /// <param name="partitionKey">Partition key of the table. If this parameter is null returns all records in this table.</param>
+      /// <param name="tableName">Table name, required.</param>
+      /// <param name="partitionKey">Partition key of the table, required.</param>
       /// <returns>
-      /// List of table rows in the table's partition or table. This method never returns null and if no records
+      /// List of table rows in the table's partition. This method never returns null and if no records
       /// are found an empty collection is returned.
       /// </returns>
       IEnumerable<TableRow> Get(string tableName, string partitionKey);
 
       /// <summary>
-      /// Gets a single row by partition key and row key as this uniquely idendifies a row
+      /// Gets a single row by partition key and row key as this uniquely idendifies a row.
       /// </summary>
+      /// <param name="tableName">Table name, required.</param>
+      /// <param name="partitionKey">Partition key of the table, required.</param>
+      /// <param name="rowKey">Row key, required.</param>
       TableRow Get(string tableName, string partitionKey, string rowKey);
 
       /// <summary>

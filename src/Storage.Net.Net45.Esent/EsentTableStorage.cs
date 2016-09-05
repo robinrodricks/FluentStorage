@@ -305,6 +305,9 @@ namespace Storage.Net.Net45.Esent
 
       public IEnumerable<TableRow> Get(string tableName, string partitionKey)
       {
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
+
          return Get(tableName, partitionKey, null, int.MaxValue);
       }
 

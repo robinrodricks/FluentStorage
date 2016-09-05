@@ -91,6 +91,9 @@ namespace Storage.Net.Azure.Table
       /// </summary>
       public IEnumerable<TableRow> Get(string tableName, string partitionKey)
       {
+         if(tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if(partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
+
          return Get(tableName, partitionKey, null, -1);
       }
 

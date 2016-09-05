@@ -248,6 +248,12 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public void Read_TableButNotPartition_ArgumentNullException()
+      {
+         Assert.Throws<ArgumentNullException>(() => _tables.Get(_tableName, null));
+      }
+
+      [Fact]
       public void Read_NonExistingTable_EmptyNotNull()
       {
          IEnumerable<TableRow> rows = _tables.Get(_tableName, "pk");
@@ -264,9 +270,11 @@ namespace Storage.Net.Tests.Integration
 
          _tables.Insert("test", new[] { row1, row2 });
 
-         List<TableRow> rows = _tables.Get("test", null).ToList();
+         List<TableRow> rows1 = _tables.Get("test", "pk1").ToList();
+         List<TableRow> rows2 = _tables.Get("test", "pk2").ToList();
 
-         Assert.True(rows.Count >= 2);
+         Assert.True(rows1.Count >= 1);
+         Assert.True(rows2.Count >= 1);
       }
 
       [Fact]
@@ -282,15 +290,6 @@ namespace Storage.Net.Tests.Integration
          TableRow theOne = _tables.Get(_tableName, "part1", "2");
          Assert.Equal("part1", theOne.PartitionKey);
          Assert.Equal("2", theOne.RowKey);
-      }
-
-      [Fact]
-      public void Read_TableDoesNotExist_ReturnsEmpty()
-      {
-         IEnumerable<TableRow> rows = _tables.Get(_tableName, "test");
-
-         Assert.NotNull(rows);
-         Assert.Equal(1, rows.Count());
       }
 
       [Fact]
