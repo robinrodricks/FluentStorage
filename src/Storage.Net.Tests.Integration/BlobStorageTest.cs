@@ -62,9 +62,10 @@ namespace Storage.Net.Tests.Integration
          }
       }
 
-      private string GetRandomStreamId()
+      private string GetRandomStreamId(string prefix = null)
       {
          string id = Guid.NewGuid().ToString();
+         if (prefix != null) id = prefix + id;
 
          using (Stream s = "kjhlkhlkhlkhlkh".ToMemoryStream())
          {
@@ -78,6 +79,23 @@ namespace Storage.Net.Tests.Integration
       public void List_All_DoesntCrash()
       {
          List<string> allBlobNames = _storage.List(null).ToList();
+      }
+
+      [Fact]
+      public void List_ByPrefix_Filtered()
+      {
+         int countBefore1 = _storage.List("pref1").ToList().Count;
+         int countBefore2 = _storage.List("pref2").ToList().Count;
+
+         string blob1 = GetRandomStreamId("pref1");
+         string blob2 = GetRandomStreamId("pref1");
+         string blob3 = GetRandomStreamId("pref2");
+
+         List<string> pref1 = _storage.List("pref1").ToList();
+         List<string> pref2 = _storage.List("pref2").ToList();
+
+         Assert.Equal(2 + countBefore1, pref1.Count);
+         Assert.Equal(1 + countBefore2, pref2.Count);
       }
 
       [Fact]

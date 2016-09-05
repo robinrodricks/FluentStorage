@@ -105,14 +105,13 @@ namespace Storage.Net.Aws.Blob
       /// </summary>
       public IEnumerable<string> List(string prefix)
       {
-         ListBucketsResponse response = _client.ListBuckets();
-
-         if(string.IsNullOrEmpty(prefix))
+         ListObjectsV2Response response = _client.ListObjectsV2(new ListObjectsV2Request()
          {
-            return response.Buckets.Select(b => b.BucketName);
-         }
+            BucketName = _bucketName,
+            Prefix = prefix ?? null
+         });
 
-         return response.Buckets.Where(b => b.BucketName.StartsWith(prefix)).Select(b => b.BucketName);
+         return response.S3Objects.Select(s3Obj => s3Obj.Key);
       }
 
       /// <summary>
