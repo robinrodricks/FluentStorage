@@ -34,10 +34,10 @@ namespace Storage.Net.Tests.Integration.Messaging
       public InMemoryMessageQueueTest() : base("inmemory") { }
    }
 
-   public class DiskMessageQeueuTest : GenericMessageQueueTest
+   /*public class DiskMessageQeueuTest : GenericMessageQueueTest
    {
       public DiskMessageQeueuTest() : base("disk") { }
-   }
+   }*/
 
    #endregion
 
