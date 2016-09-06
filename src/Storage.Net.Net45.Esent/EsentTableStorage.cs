@@ -303,9 +303,10 @@ namespace Storage.Net.Net45.Esent
          {
             foreach (TableRowId id in rowIds)
             {
-               SeekToPkRk(table.JetTableid, id.PartitionKey, id.RowKey);
-
-               Api.JetDelete(_jetSession, table.JetTableid);   //deletes current record
+               if (SeekToPkRk(table.JetTableid, id.PartitionKey, id.RowKey))
+               {
+                  Api.JetDelete(_jetSession, table.JetTableid);   //deletes current record
+               }
             }
          }
       }
@@ -343,12 +344,12 @@ namespace Storage.Net.Net45.Esent
             if (table == null) return Enumerable.Empty<TableRow>();
             Dictionary<string, JET_COLUMNID> columns = _tableNameToColumnNameToId[tableName];
 
-            SeekToPkRk(table.JetTableid, partitionKey, rowKey);
+            if (!SeekToPkRk(table.JetTableid, partitionKey, rowKey)) return Enumerable.Empty<TableRow>();
             return ReadAllRows(tableName, table.JetTableid, columns, rowKey == null ? maxRecords : 1);
          }
       }
 
-      private void SeekToPkRk(JET_TABLEID tableId, string partitionKey, string rowKey)
+      private bool SeekToPkRk(JET_TABLEID tableId, string partitionKey, string rowKey)
       {
          //how to perform search: https://msdn.microsoft.com/en-us/library/gg269342(v=exchg.10).aspx
 
@@ -357,6 +358,7 @@ namespace Storage.Net.Net45.Esent
             //reading all table
             Api.JetSetCurrentIndex(_jetSession, tableId, null);
             Api.TryMoveFirst(_jetSession, tableId);
+            return true;
          }
          else if(rowKey == null)
          {
@@ -365,7 +367,7 @@ namespace Storage.Net.Net45.Esent
 
             //partition index has only partition name
             Api.MakeKey(_jetSession, tableId, partitionKey, Encoding.Unicode, MakeKeyGrbit.NewKey);
-            Api.JetSeek(_jetSession, tableId, SeekGrbit.SeekEQ);
+            return Api.TrySeek(_jetSession, tableId, SeekGrbit.SeekEQ);
          }
          else
          {
@@ -382,7 +384,7 @@ namespace Storage.Net.Net45.Esent
             //the next JetSeek call essentially positions the cursor to the first matching record meaning
             //that you can start reading straight away. Do not call MoveFirst because that will reset cursor
             //to the beginning of the index so the search result will be lost
-            JET_wrn r = Api.JetSeek(_jetSession, tableId, SeekGrbit.SeekEQ);
+            return Api.TrySeek(_jetSession, tableId, SeekGrbit.SeekEQ);
          }
       }
 

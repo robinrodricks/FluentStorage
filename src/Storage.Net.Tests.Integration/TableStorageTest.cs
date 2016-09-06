@@ -272,7 +272,7 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void Get_NoTablePartition_ArgumentNullException()
+      public void Get_NullTablePartition_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() =>
          {
@@ -281,25 +281,25 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void Get_TableButNotPartition_ArgumentNullException()
+      public void Get_TableButNullPartition_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() => _tables.Get(_tableName, null));
       }
 
       [Fact]
-      public void Get_TableNoPartitionRowKey_ArgumentNullException()
+      public void Get_TableNullPartitionRowKey_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() => _tables.Get(_tableName, null, "rk"));
       }
 
       [Fact]
-      public void Get_NoTablePartitionRowKey_ArgumentNullException()
+      public void Get_NullTablePartitionRowKey_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() => _tables.Get(null, "pk", "rk"));
       }
 
       [Fact]
-      public void Get_TablePartitionNoRowKey_ArgumentNullException()
+      public void Get_TablePartitionNullRowKey_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() => _tables.Get(_tableName, "pk", null));
       }
@@ -360,6 +360,36 @@ namespace Storage.Net.Tests.Integration
          Assert.Equal("rk1", row11.RowKey);
          Assert.Equal("pk2", row22.PartitionKey);
          Assert.Equal("rk1", row22.RowKey);
+      }
+
+      [Fact]
+      public void Get_PartitionDoesntExist_EmptyCollection()
+      {
+         IEnumerable<TableRow> rows = _tables.Get(_tableName, Guid.NewGuid().ToString());
+
+         Assert.NotNull(rows);
+         Assert.Equal(0, rows.Count());
+      }
+
+      [Fact]
+      public void Get_RowDoesntExist_Null()
+      {
+         _tables.Insert(_tableName, new TableRow("pk", "rk1"));
+
+         TableRow row = _tables.Get(_tableName, "pk", Guid.NewGuid().ToString());
+
+         Assert.Null(row);
+      }
+
+      [Fact]
+      public void Get_RowsDontExist_EmptyCollection()
+      {
+         _tables.Insert(_tableName, new TableRow("pk", "rk1"));
+         _tables.Delete(_tableName, new TableRowId("pk", "rk1"));
+
+         IEnumerable<TableRow> rows = _tables.Get(_tableName, "pk");
+         Assert.NotNull(rows);
+         Assert.Equal(0, rows.Count());
       }
    }
 }
