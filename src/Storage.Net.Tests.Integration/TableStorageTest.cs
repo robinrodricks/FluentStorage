@@ -98,30 +98,6 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void WriteRows_TwoRows_DoesntFail()
-      {
-         var row1 = new TableRow("part1", "k1");
-         row1["col1"] = "value1";
-
-         var row2 = new TableRow("part2", "1");
-         row2["col1"] = "value2";
-            
-         _tables.Insert(_tableName, new[] {row1, row2});
-      }
-
-      [Fact]
-      public void WriteRows_EmailRowKey_CanFetchBack()
-      {
-         //this only tests encoding problem
-
-         var row = new TableRow("partition", "ivan@si.com");
-         _tables.Insert("test", row);
-
-         var foundRow = _tables.Get("test", "partition", "ivan@si.com");
-         Assert.NotNull(foundRow);
-      }
-
-      [Fact]
       public void ListTables_NoTablesWriteARow_OneTable()
       {
          int count = _tables.ListTableNames().Count();
@@ -214,7 +190,7 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void WriteReadValues_VariableRows_StillReads()
+      public void Insert_VariableRows_StillReads()
       {
          var row1 = new TableRow("pk", "rk1");
          row1["col1"] = "val1";
@@ -236,6 +212,30 @@ namespace Storage.Net.Tests.Integration
          Assert.Equal("val2", (string)row12["col2"]);
          Assert.Equal("val3", (string)row12["col3"]);
 
+      }
+
+      [Fact]
+      public void Insert_TwoRows_DoesntFail()
+      {
+         var row1 = new TableRow("part1", "k1");
+         row1["col1"] = "value1";
+
+         var row2 = new TableRow("part2", "1");
+         row2["col1"] = "value2";
+
+         _tables.Insert(_tableName, new[] { row1, row2 });
+      }
+
+      [Fact]
+      public void Insert_EmailRowKey_CanFetchBack()
+      {
+         //this only tests encoding problem
+
+         var row = new TableRow("partition", "ivan@si.com");
+         _tables.Insert("test", row);
+
+         var foundRow = _tables.Get("test", "partition", "ivan@si.com");
+         Assert.NotNull(foundRow);
       }
 
       [Fact]
