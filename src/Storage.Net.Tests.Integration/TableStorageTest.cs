@@ -190,6 +190,21 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public void Insert_OneRowNullTable_ArgumentNullException()
+      {
+         Assert.Throws<ArgumentNullException>(() => _tables.Insert(null, new TableRow("pk", "rk")));
+      }
+
+      [Fact]
+      public void insert_MultipleRowsNullTable_ArgumentNullException()
+      {
+         Assert.Throws<ArgumentNullException>(() =>
+         {
+            _tables.Insert(null, new[] { new TableRow("pk", "rk1"), new TableRow("pk", "rk2") });
+         });
+      }
+
+      [Fact]
       public void Insert_VariableRows_StillReads()
       {
          var row1 = new TableRow("pk", "rk1");
