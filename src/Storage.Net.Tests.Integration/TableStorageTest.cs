@@ -239,7 +239,7 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void Read_NoTablePartition_ArgumentNullException()
+      public void Get_NoTablePartition_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() =>
          {
@@ -248,31 +248,31 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void Read_TableButNotPartition_ArgumentNullException()
+      public void Get_TableButNotPartition_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() => _tables.Get(_tableName, null));
       }
 
       [Fact]
-      public void Read_TableNoPartitionRowKey_ArgumentNullException()
+      public void Get_TableNoPartitionRowKey_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() => _tables.Get(_tableName, null, "rk"));
       }
 
       [Fact]
-      public void Read_NoTablePartitionRowKey_ArgumentNullException()
+      public void Get_NoTablePartitionRowKey_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() => _tables.Get(null, "pk", "rk"));
       }
 
       [Fact]
-      public void Read_TablePartitionNoRowKey_ArgumentNullException()
+      public void Get_TablePartitionNoRowKey_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() => _tables.Get(_tableName, "pk", null));
       }
 
       [Fact]
-      public void Read_NonExistingTable_EmptyNotNull()
+      public void Get_NonExistingTable_EmptyNotNull()
       {
          IEnumerable<TableRow> rows = _tables.Get(_tableName, "pk");
 
@@ -281,7 +281,7 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void Read_WriteToTwoPartitions_GetsAll()
+      public void Get_WriteToTwoPartitions_GetsAll()
       {
          var row1 = new TableRow("pk1", "rk1");
          var row2 = new TableRow("pk2", "rk2");
@@ -296,7 +296,7 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void Read_AddTwoRows_ReturnsTheOne()
+      public void Get_AddTwoRows_ReturnsTheOne()
       {
          var row1 = new TableRow("part1", "1");
          row1["col1"] = "value1";
@@ -311,7 +311,7 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void Read_TwoPartitions_ReadSeparately()
+      public void Get_TwoPartitions_ReadSeparately()
       {
          var row1 = new TableRow("pk1", "rk1");
          var row2 = new TableRow("pk2", "rk1");
