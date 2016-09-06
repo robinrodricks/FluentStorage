@@ -233,10 +233,10 @@ namespace Storage.Net.Tests.Integration
          row2["col2"] = "val2";
          row2["col3"] = "val3";
 
-         _tables.Insert("test", new[] {row1, row2});
+         _tables.Insert(_tableName, new[] {row1, row2});
 
-         TableRow row11 = _tables.Get("test", "pk", "rk1");
-         TableRow row12 = _tables.Get("test", "pk", "rk2");
+         TableRow row11 = _tables.Get(_tableName, "pk", "rk1");
+         TableRow row12 = _tables.Get(_tableName, "pk", "rk2");
 
 
          Assert.Equal("val1", (string)row11["col1"]);
@@ -265,9 +265,9 @@ namespace Storage.Net.Tests.Integration
          //this only tests encoding problem
 
          var row = new TableRow("partition", "ivan@si.com");
-         _tables.Insert("test", row);
+         _tables.Insert(_tableName, row);
 
-         var foundRow = _tables.Get("test", "partition", "ivan@si.com");
+         var foundRow = _tables.Get(_tableName, "partition", "ivan@si.com");
          Assert.NotNull(foundRow);
       }
 
@@ -329,10 +329,10 @@ namespace Storage.Net.Tests.Integration
          var row1 = new TableRow("pk1", "rk1");
          var row2 = new TableRow("pk2", "rk2");
 
-         _tables.Insert("test", new[] { row1, row2 });
+         _tables.Insert(_tableName, new[] { row1, row2 });
 
-         List<TableRow> rows1 = _tables.Get("test", "pk1").ToList();
-         List<TableRow> rows2 = _tables.Get("test", "pk2").ToList();
+         List<TableRow> rows1 = _tables.Get(_tableName, "pk1").ToList();
+         List<TableRow> rows2 = _tables.Get(_tableName, "pk2").ToList();
 
          Assert.True(rows1.Count >= 1);
          Assert.True(rows2.Count >= 1);
@@ -359,10 +359,10 @@ namespace Storage.Net.Tests.Integration
          var row1 = new TableRow("pk1", "rk1");
          var row2 = new TableRow("pk2", "rk1");
 
-         _tables.Insert("test", new[] { row1, row2 });
+         _tables.Insert(_tableName, new[] { row1, row2 });
 
-         TableRow row11 = _tables.Get("test", "pk1", "rk1");
-         TableRow row22 = _tables.Get("test", "pk2", "rk1");
+         TableRow row11 = _tables.Get(_tableName, "pk1", "rk1");
+         TableRow row22 = _tables.Get(_tableName, "pk2", "rk1");
 
          Assert.NotNull(row11);
          Assert.NotNull(row22);
