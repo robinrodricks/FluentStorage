@@ -124,10 +124,10 @@ namespace Storage.Net.Table.Files
       /// </summary>
       public void Insert(string tableName, IEnumerable<TableRow> rows)
       {
-         if(tableName == null) throw new ArgumentNullException(nameof(tableName));
-         if(rows == null) return;
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (rows == null) throw new ArgumentNullException(nameof(rows));
 
-         foreach(var group in rows.GroupBy(r => r.PartitionKey))
+         foreach (var group in rows.GroupBy(r => r.PartitionKey))
          {
             string partitionKey = group.Key;
 
@@ -143,6 +143,9 @@ namespace Storage.Net.Table.Files
       /// </summary>
       public void Insert(string tableName, TableRow row)
       {
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (row == null) throw new ArgumentNullException(nameof(row));
+
          Insert(tableName, new[] {row});
       }
 

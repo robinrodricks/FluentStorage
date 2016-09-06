@@ -422,6 +422,7 @@ namespace Storage.Net.Net45.Esent
 
       public void Insert(string tableName, TableRow row)
       {
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (row == null) throw new ArgumentNullException(nameof(row));
 
          Insert(tableName, new[] { row });
@@ -429,6 +430,9 @@ namespace Storage.Net.Net45.Esent
 
       public void Insert(string tableName, IEnumerable<TableRow> rows)
       {
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (rows == null) throw new ArgumentNullException(nameof(rows));
+
          using (ETable table = OpenTable(tableName, true))
          {
             JET_TABLEID tableId = table.JetTableid;
