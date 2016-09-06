@@ -67,24 +67,24 @@ namespace Storage.Net.Tests.Integration.Messaging
                   TimeSpan.FromMinutes(1));
                break;
             case "azure-servicebus-topic":
-               _publisher = new AzureServiceBusTopicPublisher(
-                  TestSettings.ServiceBusConnectionString,
-                  TestSettings.ServiceBusTopicName);
                _receiver = new AzureServiceBusTopicReceiver(
                   TestSettings.ServiceBusConnectionString,
                   TestSettings.ServiceBusTopicName,
                   "AllMessages",
                   null,
                   true);
+               _publisher = new AzureServiceBusTopicPublisher(
+                  TestSettings.ServiceBusConnectionString,
+                  TestSettings.ServiceBusTopicName);
                break;
             case "azure-servicebus-queue":
-               _publisher = new AzureServiceBusQueuePublisher(
-                  Cfg.Read(TestSettings.ServiceBusConnectionString),
-                  "testqueue");
                _receiver = new AzureServiceBusQueueReceiver(
                   Cfg.Read(TestSettings.ServiceBusConnectionString),
                   "testqueue",
                   true);
+               _publisher = new AzureServiceBusQueuePublisher(
+                  Cfg.Read(TestSettings.ServiceBusConnectionString),
+                  "testqueue");
                break;
             case "inmemory":
                var inmem = new InMemoryMessagePublisherReceiver();
