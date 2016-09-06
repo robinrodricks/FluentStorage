@@ -177,7 +177,7 @@ namespace Storage.Net.Azure.Table
          if (rows == null) throw new ArgumentNullException(nameof(rows));
 
          BatchedOperation(tableName, true,
-            (b, te) => b.InsertOrReplace(te),
+            (b, te) => b.Insert(te),
             rows);
       }
 
@@ -352,6 +352,11 @@ namespace Storage.Net.Azure.Table
          }
          catch (AzSE ex)
          {
+            if(ex.RequestInformation.HttpStatusCode == 409)
+            {
+               throw new MeSE(ErrorCode.DuplicateKey, ex);
+            }
+
             throw new MeSE(ex.Message, ex);
          }
       }

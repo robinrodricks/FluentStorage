@@ -272,6 +272,16 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public void Insert_DuplicateRow_WhatHappens()
+      {
+         var row = new TableRow("pk", "rk");
+         _tables.Insert(_tableName, row);
+
+         StorageException ex = Assert.Throws<StorageException>(() => _tables.Insert(_tableName, row));
+         Assert.Equal(ErrorCode.DuplicateKey, ex.ErrorCode);
+      }
+
+      [Fact]
       public void Get_NullTablePartition_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() =>

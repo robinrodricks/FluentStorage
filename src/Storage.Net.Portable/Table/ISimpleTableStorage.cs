@@ -58,6 +58,11 @@ namespace Storage.Net.Table
       /// <summary>
       /// Inserts a single row
       /// </summary>
+      /// <param name="tableName">Table name, required.</param>
+      /// <param name="row">Row to insert, required.</param>
+      /// <exception cref="StorageException">
+      /// If the row already exists throws this exception with <see cref="ErrorCode.DuplicateKey"/>
+      /// </exception>
       void Insert(string tableName, TableRow row);
 
       /// <summary>

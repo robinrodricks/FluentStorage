@@ -454,7 +454,14 @@ namespace Storage.Net.Net45.Esent
                         SetValue(tableId, columns[column.Key], column.Value);
                      }
 
-                     update.Save();
+                     try
+                     {
+                        update.Save();
+                     }
+                     catch(EsentKeyDuplicateException ex)
+                     {
+                        throw new StorageException(ErrorCode.DuplicateKey, ex);
+                     }
                   }
                }
 

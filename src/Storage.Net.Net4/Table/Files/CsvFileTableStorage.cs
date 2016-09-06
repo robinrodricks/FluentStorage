@@ -237,6 +237,11 @@ namespace Storage.Net.Table.Files
       {
          foreach(TableRow row in rows)
          {
+            if(data.ContainsKey(row.RowKey))
+            {
+               throw new StorageException(ErrorCode.DuplicateKey, null);
+            } 
+
             data[row.RowKey] = row;
          }
       }
