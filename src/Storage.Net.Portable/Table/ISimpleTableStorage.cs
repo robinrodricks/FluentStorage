@@ -54,7 +54,7 @@ namespace Storage.Net.Table
       /// Inserts rows in the table.
       /// </summary>
       /// <param name="tableName">Table name, required.</param>
-      /// <param name="rows">Rows to insert, required.</param>
+      /// <param name="rows">Rows to insert, required. The rows can belong to different partitions.</param>
       /// <exception cref="StorageException">
       /// If the row already exists throws this exception with <see cref="ErrorCode.DuplicateKey"/>.
       /// Note that exception is thrown only for partiton batch. If rows contains more than one partition to insert
@@ -71,6 +71,20 @@ namespace Storage.Net.Table
       /// If the row already exists throws this exception with <see cref="ErrorCode.DuplicateKey"/>
       /// </exception>
       void Insert(string tableName, TableRow row);
+
+      /// <summary>
+      /// Inserts rows in the table, and if they exist replaces them with a new value.
+      /// </summary>
+      /// <param name="tableName">Table name, required.</param>
+      /// <param name="rows">Rows to insert, required. The rows can belong to different partitions.</param>
+      void InsertOrReplace(string tableName, IEnumerable<TableRow> rows);
+
+      /// <summary>
+      /// Inserts a single row, or replaces the value if row already exists.
+      /// </summary>
+      /// <param name="tableName">Table name, required.</param>
+      /// <param name="row">Row to insert, required.</param>
+      void InsertOrReplace(string tableName, TableRow row);
 
       /// <summary>
       /// Updates multiple rows. Note that all the rows must belong to the same partition.

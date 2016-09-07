@@ -127,15 +127,7 @@ namespace Storage.Net.Table.Files
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
 
-         foreach (var group in rows.GroupBy(r => r.PartitionKey))
-         {
-            string partitionKey = group.Key;
-
-            Dictionary<string, TableRow> partition = ReadPartition(tableName, partitionKey) ??
-                                                     new Dictionary<string, TableRow>();
-            Insert(partition, group);
-            WritePartition(tableName, partitionKey, partition.Values);
-         }
+         OperateRows(tableName, rows, (p, g) => Insert(p, g, true));
       }
 
       /// <summary>
@@ -147,6 +139,28 @@ namespace Storage.Net.Table.Files
          if (row == null) throw new ArgumentNullException(nameof(row));
 
          Insert(tableName, new[] {row});
+      }
+
+      /// <summary>
+      /// See interface
+      /// </summary>
+      public void InsertOrReplace(string tableName, IEnumerable<TableRow> rows)
+      {
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (rows == null) throw new ArgumentNullException(nameof(rows));
+
+         OperateRows(tableName, rows, (p, g) => Insert(p, g, false));
+      }
+
+      /// <summary>
+      /// See interface
+      /// </summary>
+      public void InsertOrReplace(string tableName, TableRow row)
+      {
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (row == null) throw new ArgumentNullException(nameof(row));
+
+         InsertOrReplace(tableName, new[] { row });
       }
 
       /// <summary>
@@ -233,14 +247,31 @@ namespace Storage.Net.Table.Files
 
       #region [ Big Data Processing ]
 
-      private void Insert(Dictionary<string, TableRow> data, IEnumerable<TableRow> rows)
+      private void OperateRows(string tableName, IEnumerable<TableRow> rows,
+         Action<Dictionary<string, TableRow>, IEnumerable<TableRow>> partitionAction)
+      {
+         foreach (var group in rows.GroupBy(r => r.PartitionKey))
+         {
+            string partitionKey = group.Key;
+
+            Dictionary<string, TableRow> partition = ReadPartition(tableName, partitionKey) ??
+                                                     new Dictionary<string, TableRow>();
+            partitionAction(partition, group);
+            WritePartition(tableName, partitionKey, partition.Values);
+         }
+      }
+
+      private void Insert(Dictionary<string, TableRow> data, IEnumerable<TableRow> rows, bool detectDuplicates)
       {
          var rowsList = rows.ToList();
          if (rowsList.Count == 0) return;
 
-         if(!TableRow.AreDistinct(rowsList) || rowsList.Any(r => data.ContainsKey(r.RowKey)))
+         if (detectDuplicates)
          {
-            throw new StorageException(ErrorCode.DuplicateKey, null);
+            if (!TableRow.AreDistinct(rowsList) || rowsList.Any(r => data.ContainsKey(r.RowKey)))
+            {
+               throw new StorageException(ErrorCode.DuplicateKey, null);
+            }
          }
 
          foreach(TableRow row in rowsList)

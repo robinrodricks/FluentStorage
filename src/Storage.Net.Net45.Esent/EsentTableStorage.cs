@@ -477,6 +477,16 @@ namespace Storage.Net.Net45.Esent
          }
       }
 
+      public void InsertOrReplace(string tableName, IEnumerable<TableRow> rows)
+      {
+         throw new NotImplementedException();
+      }
+
+      public void InsertOrReplace(string tableName, TableRow row)
+      {
+         throw new NotImplementedException();
+      }
+
       public IEnumerable<string> ListTableNames()
       {
          return Api.GetTableNames(_jetSession, _jetDbId).ToList();

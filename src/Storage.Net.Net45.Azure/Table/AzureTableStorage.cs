@@ -185,7 +185,7 @@ namespace Storage.Net.Azure.Table
 
          BatchedOperation(tableName, true,
             (b, te) => b.Insert(te),
-            rows);
+            rowsList);
       }
 
       /// <summary>
@@ -197,6 +197,30 @@ namespace Storage.Net.Azure.Table
          if (row == null) throw new ArgumentNullException(nameof(row));
 
          Insert(tableName, new[] { row });
+      }
+
+      /// <summary>
+      /// See interface
+      /// </summary>
+      public void InsertOrReplace(string tableName, IEnumerable<TableRow> rows)
+      {
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (rows == null) throw new ArgumentNullException(nameof(rows));
+
+         BatchedOperation(tableName, true,
+            (b, te) => b.InsertOrReplace(te),
+            rows);
+      }
+
+      /// <summary>
+      /// See interface
+      /// </summary>
+      public void InsertOrReplace(string tableName, TableRow row)
+      {
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (row == null) throw new ArgumentNullException(nameof(row));
+
+         InsertOrReplace(tableName, new[] { row });
       }
 
       /// <summary>
