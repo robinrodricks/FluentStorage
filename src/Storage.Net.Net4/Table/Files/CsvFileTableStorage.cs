@@ -235,13 +235,27 @@ namespace Storage.Net.Table.Files
 
       private void Insert(Dictionary<string, TableRow> data, IEnumerable<TableRow> rows)
       {
-         foreach(TableRow row in rows)
+         var rowsList = rows.ToList();
+
+         if (rowsList.Count == 0) return;
+
+         bool hasDuplicates = rowsList.Any(r => data.ContainsKey(r.RowKey)) ||
+            rowsList.GroupBy(r => r.RowKey).Select(g => g.Count()).OrderByDescending(c => c).First() > 1;
+         if (hasDuplicates)
          {
-            if(data.ContainsKey(row.RowKey))
+            if (rowsList.Count == 1)
             {
                throw new StorageException(ErrorCode.DuplicateKey, null);
-            } 
+            }
+            else
+            {
+               //we know there are duplicates, however this code must be throws according to the spec
+               throw new StorageException(ErrorCode.Unknown, null);
+            }
+         }
 
+         foreach(TableRow row in rowsList)
+         {
             data[row.RowKey] = row;
          }
       }

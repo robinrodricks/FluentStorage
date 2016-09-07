@@ -51,8 +51,14 @@ namespace Storage.Net.Table
       TableRow Get(string tableName, string partitionKey, string rowKey);
 
       /// <summary>
-      /// Inserts rows in the table
+      /// Inserts rows in the table.
       /// </summary>
+      /// <param name="tableName">Table name, required.</param>
+      /// <param name="rows">Rows to insert, required.</param>
+      /// <exception cref="StorageException">
+      /// This exception is thrown with error code <see cref="ErrorCode.Unknown"/> if batch operation fails.
+      /// In case of failure the whole partition batch does not get commited.
+      /// </exception>
       void Insert(string tableName, IEnumerable<TableRow> rows);
 
       /// <summary>

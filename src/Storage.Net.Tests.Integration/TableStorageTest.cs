@@ -272,13 +272,30 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void Insert_DuplicateRow_WhatHappens()
+      public void Insert_DuplicateRow_StorageExceptionWithDuplicateKeyCode()
       {
          var row = new TableRow("pk", "rk");
          _tables.Insert(_tableName, row);
 
          StorageException ex = Assert.Throws<StorageException>(() => _tables.Insert(_tableName, row));
          Assert.Equal(ErrorCode.DuplicateKey, ex.ErrorCode);
+      }
+
+      [Fact]
+      public void Insert_DuplicateRows_FailsWithUnknownCodeAndNoRowsInserted()
+      {
+         var rows = new[]
+         {
+            new TableRow("pk", "rk"),
+            new TableRow("pk", "rk"),
+            new TableRow("pk", "rk1")
+         };
+
+         StorageException ex = Assert.Throws<StorageException>(() => _tables.Insert(_tableName, rows));
+         Assert.Equal(ErrorCode.Unknown, ex.ErrorCode);
+
+         var rows2 = _tables.Get(_tableName, "pk");
+         Assert.Equal(0, rows2.Count());
       }
 
       [Fact]

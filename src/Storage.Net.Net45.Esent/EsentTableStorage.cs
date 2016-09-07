@@ -435,15 +435,19 @@ namespace Storage.Net.Net45.Esent
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
 
+         var rowsList = rows.ToList();
+         if (rowsList.Count == 0) return;
+
          using (ETable table = OpenTable(tableName, true))
          {
             JET_TABLEID tableId = table.JetTableid;
 
-            Dictionary<string, JET_COLUMNID> columns = EnsureColumnsExist(tableName, tableId, rows);
+
+            Dictionary<string, JET_COLUMNID> columns = EnsureColumnsExist(tableName, tableId, rowsList);
 
             using (var transaction = new Transaction(_jetSession))
             {
-               foreach(TableRow row in rows)
+               foreach(TableRow row in rowsList)
                {
                   using (var update = new Update(_jetSession, table.JetTableid, JET_prep.Insert))
                   {
@@ -460,7 +464,15 @@ namespace Storage.Net.Net45.Esent
                      }
                      catch(EsentKeyDuplicateException ex)
                      {
-                        throw new StorageException(ErrorCode.DuplicateKey, ex);
+                        if (rowsList.Count == 1)
+                        {
+                           throw new StorageException(ErrorCode.DuplicateKey, ex);
+                        }
+                        else
+                        {
+                           //we know it's a duplicate key, but can't throw the code according to the spec
+                           throw new StorageException(ErrorCode.Unknown, ex);
+                        }
                      }
                   }
                }
