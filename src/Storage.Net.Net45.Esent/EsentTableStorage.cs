@@ -479,12 +479,12 @@ namespace Storage.Net.Net45.Esent
 
       public void InsertOrReplace(string tableName, IEnumerable<TableRow> rows)
       {
-         throw new NotImplementedException();
+         Insert(tableName, rows);
       }
 
       public void InsertOrReplace(string tableName, TableRow row)
       {
-         throw new NotImplementedException();
+         InsertOrReplace(tableName, new[] { row });
       }
 
       public IEnumerable<string> ListTableNames()

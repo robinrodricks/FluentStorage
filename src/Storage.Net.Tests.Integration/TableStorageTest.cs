@@ -314,6 +314,24 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public void InsertOrReplace_CleanTableDuplicateRowsInRequest_ContinuesAnyway()
+      {
+         var rows = new[]
+         {
+            new TableRow("pk", "rk"),
+            new TableRow("pk", "rk"),
+            new TableRow("pk", "rk1")
+         };
+
+
+         StorageException ex = Assert.Throws<StorageException>(() => _tables.InsertOrReplace(_tableName, rows));
+         Assert.Equal(ErrorCode.DuplicateKey, ex.ErrorCode);
+
+         var rows2 = _tables.Get(_tableName, "pk");
+         Assert.Equal(0, rows2.Count());
+      }
+
+      [Fact]
       public void Get_NullTablePartition_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() =>

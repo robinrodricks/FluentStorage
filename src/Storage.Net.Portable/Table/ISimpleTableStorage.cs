@@ -77,6 +77,9 @@ namespace Storage.Net.Table
       /// </summary>
       /// <param name="tableName">Table name, required.</param>
       /// <param name="rows">Rows to insert, required. The rows can belong to different partitions.</param>
+      /// <exception cref="StorageException">
+      /// If input rows have duplicated keys throws this exception with <see cref="ErrorCode.DuplicateKey"/>
+      /// </exception>
       void InsertOrReplace(string tableName, IEnumerable<TableRow> rows);
 
       /// <summary>

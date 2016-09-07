@@ -127,7 +127,7 @@ namespace Storage.Net.Table.Files
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
 
-         OperateRows(tableName, rows, (p, g) => Insert(p, g, true));
+         OperateRows(tableName, rows, (p, g) => Insert(p, g, true, true));
       }
 
       /// <summary>
@@ -149,7 +149,7 @@ namespace Storage.Net.Table.Files
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
 
-         OperateRows(tableName, rows, (p, g) => Insert(p, g, false));
+         OperateRows(tableName, rows, (p, g) => Insert(p, g, true, false));
       }
 
       /// <summary>
@@ -261,20 +261,23 @@ namespace Storage.Net.Table.Files
          }
       }
 
-      private void Insert(Dictionary<string, TableRow> data, IEnumerable<TableRow> rows, bool detectDuplicates)
+      private void Insert(Dictionary<string, TableRow> data, IEnumerable<TableRow> rows,
+         bool detectInputDuplicates, bool detectDataDuplicates)
       {
          var rowsList = rows.ToList();
          if (rowsList.Count == 0) return;
 
-         if (detectDuplicates)
+         if (detectInputDuplicates && !TableRow.AreDistinct(rowsList))
          {
-            if (!TableRow.AreDistinct(rowsList) || rowsList.Any(r => data.ContainsKey(r.RowKey)))
-            {
-               throw new StorageException(ErrorCode.DuplicateKey, null);
-            }
+            throw new StorageException(ErrorCode.DuplicateKey, null);
          }
 
-         foreach(TableRow row in rowsList)
+         if(detectDataDuplicates && rowsList.Any(r => data.ContainsKey(r.RowKey)))
+         {
+            throw new StorageException(ErrorCode.DuplicateKey, null);
+         }
+
+         foreach (TableRow row in rowsList)
          {
             data[row.RowKey] = row;
          }
