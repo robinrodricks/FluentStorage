@@ -155,7 +155,7 @@ namespace Storage.Net.Tests.Integration.Messaging
          _publisher.PutMessage(msg);
       }
 
-      [Fact]
+      //[Fact]
       public void SendMessage_SimpleOne_Received()
       {
          string content = Generator.RandomString;
