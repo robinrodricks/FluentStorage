@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Storage.Net.Table
 {
@@ -226,6 +227,18 @@ namespace Storage.Net.Table
       public override string ToString()
       {
          return $"{PartitionKey} : {RowKey}";
+      }
+
+      /// <summary>
+      /// Checks if all rows have uniqueue keys
+      /// </summary>
+      public static bool AreDistinct(IEnumerable<TableRow> rows)
+      {
+         if (rows == null) return true;
+
+         var groups = rows.GroupBy(r => r.Id);
+         IEnumerable<int> counts = groups.Select(g => g.Count());
+         return counts.OrderByDescending(c => c).First() == 1;
       }
 
       #region [ Value Helpers ]

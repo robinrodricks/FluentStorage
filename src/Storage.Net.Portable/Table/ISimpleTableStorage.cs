@@ -56,8 +56,9 @@ namespace Storage.Net.Table
       /// <param name="tableName">Table name, required.</param>
       /// <param name="rows">Rows to insert, required.</param>
       /// <exception cref="StorageException">
-      /// This exception is thrown with error code <see cref="ErrorCode.Unknown"/> if batch operation fails.
-      /// In case of failure the whole partition batch does not get commited.
+      /// If the row already exists throws this exception with <see cref="ErrorCode.DuplicateKey"/>.
+      /// Note that exception is thrown only for partiton batch. If rows contains more than one partition to insert
+      /// some of them may succeed and some may fail.
       /// </exception>
       void Insert(string tableName, IEnumerable<TableRow> rows);
 

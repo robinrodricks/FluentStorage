@@ -282,7 +282,7 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void Insert_DuplicateRows_FailsWithUnknownCodeAndNoRowsInserted()
+      public void Insert_CleanTableDuplicateRows_FailsWithDuplicateKeyCode()
       {
          var rows = new[]
          {
@@ -292,10 +292,25 @@ namespace Storage.Net.Tests.Integration
          };
 
          StorageException ex = Assert.Throws<StorageException>(() => _tables.Insert(_tableName, rows));
-         Assert.Equal(ErrorCode.Unknown, ex.ErrorCode);
+         Assert.Equal(ErrorCode.DuplicateKey, ex.ErrorCode);
 
          var rows2 = _tables.Get(_tableName, "pk");
          Assert.Equal(0, rows2.Count());
+      }
+
+      [Fact]
+      public void Insert_RowsExistInsertDuplicateRows_FailsWithDuplicateKeyCode()
+      {
+         var dupeRow = new TableRow("pk", "rk1");
+         var insertRows = new[] { new TableRow("pk", "rk2"), dupeRow };
+
+         _tables.Insert(_tableName, dupeRow);
+
+         StorageException ex = Assert.Throws<StorageException>(() => _tables.Insert(_tableName, insertRows));
+         Assert.Equal(ErrorCode.DuplicateKey, ex.ErrorCode);
+
+         var rows2 = _tables.Get(_tableName, "pk");
+         Assert.Equal(1, rows2.Count());
       }
 
       [Fact]

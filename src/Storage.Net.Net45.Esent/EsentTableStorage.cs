@@ -437,11 +437,14 @@ namespace Storage.Net.Net45.Esent
 
          var rowsList = rows.ToList();
          if (rowsList.Count == 0) return;
+         if(!TableRow.AreDistinct(rowsList))
+         {
+            throw new StorageException(ErrorCode.DuplicateKey, null);
+         }
 
          using (ETable table = OpenTable(tableName, true))
          {
             JET_TABLEID tableId = table.JetTableid;
-
 
             Dictionary<string, JET_COLUMNID> columns = EnsureColumnsExist(tableName, tableId, rowsList);
 
@@ -464,15 +467,7 @@ namespace Storage.Net.Net45.Esent
                      }
                      catch(EsentKeyDuplicateException ex)
                      {
-                        if (rowsList.Count == 1)
-                        {
-                           throw new StorageException(ErrorCode.DuplicateKey, ex);
-                        }
-                        else
-                        {
-                           //we know it's a duplicate key, but can't throw the code according to the spec
-                           throw new StorageException(ErrorCode.Unknown, ex);
-                        }
+                        throw new StorageException(ErrorCode.DuplicateKey, ex);
                      }
                   }
                }

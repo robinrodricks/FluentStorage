@@ -176,6 +176,13 @@ namespace Storage.Net.Azure.Table
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
 
+         var rowsList = rows.ToList();
+         if (rowsList.Count == 0) return;
+         if(!TableRow.AreDistinct(rowsList))
+         {
+            throw new MeSE(ErrorCode.DuplicateKey, null);
+         }
+
          BatchedOperation(tableName, true,
             (b, te) => b.Insert(te),
             rows);
