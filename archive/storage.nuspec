@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+   <metadata>
+      <id>Storage.Net</id>
+      <version>2.5.2</version>
+      <authors>Ivan Gavryliuk</authors>
+      <owners>Ivan Gavryliuk</owners>
+      <projectUrl>https://github.com/aloneguid/storage</projectUrl>
+      <iconUrl>https://alonestore.blob.core.windows.net/nuget/storage.png</iconUrl>
+      <requireLicenseAcceptance>false</requireLicenseAcceptance>
+      <description>
+         .NET storage abstractions with impelementations for local on premise, Azure and more
+      </description>
+      <summary>
+         Storage abstractions for .NET including Blobs, Queues, Tables and more.
+      </summary>
+      <copyright>Copyright (c) 2015 by Ivan Gavryliuk</copyright>
+      <tags>Common</tags>
+      <dependencies>
+         <dependency id="Aloneguid.Support" version="2.0" />
+      </dependencies>
+   </metadata>
+   <files>
+      <file src="out\lib\portable\Storage.Net.*" target="lib\portable-net45+wp80+win8+wpa81+dnxcore50"/>
+      <file src="out\lib\net45\Storage.Net.*" target="lib\net45"/>
+      <file src="out\lib\net45\Storage.Net.*" target="lib\MonoAndroid"/>
+      <file src="out\lib\net45\Storage.Net.*" target="lib\MonoTouch"/>
+   </files>
+</package>
