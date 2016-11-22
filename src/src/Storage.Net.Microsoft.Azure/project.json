@@ -1,0 +1,40 @@
+﻿{
+   "version": "1.0.0-*",
+
+   "authors": [ "Ivan Gavryliuk" ],
+
+   "title": "Storage.Net",
+
+   "copyright": "Copyright (c) 2015-2016 by Ivan Gavryliuk",
+
+   "packOptions": {
+
+      "iconUrl": "https://alonestore.blob.core.windows.net/nuget/storage.png",
+
+      "projectUrl": "https://github.com/aloneguid/storage",
+
+      "summary": ""
+   },
+
+   "buildOptions": {
+      "keyFile": "../../storage.snk"
+   },
+
+   "dependencies": {
+      "netbox": "1.0.0",
+      "NETStandard.Library": "1.6.0",
+      "Storage.Net": "1.0.0-*"
+   },
+
+   "frameworks": {
+      "net45": {
+         "buildOptions": {
+            "define": [ "NETFULL" ]
+         },
+         "dependencies": {
+            "WindowsAzure.Storage": "7.2.1",
+            "WindowsAzure.ServiceBus": "3.4.2"
+         }
+      }
+   }
+}
