@@ -5,7 +5,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Storage.Net.Azure.Messaging.ServiceBus
+namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
 {
    /// <summary>
    /// Implements message receiver on Azure Service Bus Queues

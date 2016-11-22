@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using QueueMessage = Storage.Net.Messaging.QueueMessage;
 
-namespace Storage.Net.Azure.Messaging.ServiceBus
+namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
 {
    static class Converter
    {

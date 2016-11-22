@@ -5,7 +5,7 @@ using Microsoft.ServiceBus.Messaging;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Storage.Net.Azure.Messaging.ServiceBus
+namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
 {
    /// <summary>
    /// Represents queues as Azure Service Bus Topics. Note that you must have at least one subscription

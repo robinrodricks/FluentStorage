@@ -6,7 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Storage.Net.Azure.Messaging.ServiceBus
+namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
 {
    /// <summary>
    /// Subscribes to messages in a Service Bus Topic. This version subscribes to ALL messages.

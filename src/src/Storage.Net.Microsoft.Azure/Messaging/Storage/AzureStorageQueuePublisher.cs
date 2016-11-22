@@ -5,7 +5,7 @@ using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Queue;
 using System.Collections.Generic;
 
-namespace Storage.Net.Azure.Messaging.Storage
+namespace Storage.Net.Microsoft.Azure.Messaging.Storage
 {
    /// <summary>
    /// Azure Storage queue publisher

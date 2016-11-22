@@ -1,9 +1,7 @@
-﻿{
+{
    "version": "1.0.0-*",
 
-   "authors": [ "Ivan Gavryliuk" ],
-
-   "title": "Storage.Net.Microsoft.Azure",
+   "title": "Storage.Net.Amazon.Aws",
 
    "copyright": "Copyright (c) 2015-2016 by Ivan Gavryliuk",
 
@@ -20,8 +18,8 @@
       "keyFile": "../../storage.snk"
    },
 
+
    "dependencies": {
-      "netbox": "1.0.0",
       "NETStandard.Library": "1.6.0",
       "Storage.Net": "1.0.0-*"
    },
@@ -29,8 +27,8 @@
    "frameworks": {
       "net45": {
          "dependencies": {
-            "WindowsAzure.Storage": "7.2.1",
-            "WindowsAzure.ServiceBus": "3.4.2"
+            "AWSSDK.Core": "3.3.5",
+            "AWSSDK.S3": "3.3.2"
          }
       }
    }

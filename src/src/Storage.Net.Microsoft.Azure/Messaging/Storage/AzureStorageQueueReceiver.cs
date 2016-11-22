@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Storage.Net.Azure.Messaging.Storage
+namespace Storage.Net.Microsoft.Azure.Messaging.Storage
 {
    /// <summary>
    /// Queue receiver based on Azure Storage Queues

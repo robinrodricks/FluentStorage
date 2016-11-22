@@ -13,7 +13,7 @@ using MeSE = Storage.Net.StorageException;
 using Storage.Net.Table;
 using System.Collections.Generics;
 
-namespace Storage.Net.Azure.Table
+namespace Storage.Net.Microsoft.Azure.Table
 {
    /// <summary>
    /// Microsoft Azure Table storage

@@ -8,7 +8,7 @@ using Storage.Net.Blob;
 using Microsoft.WindowsAzure.Storage.Blob;
 using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
 
-namespace Storage.Net.Azure.Blob
+namespace Storage.Net.Microsoft.Azure
 {
    /// <summary>
    /// Azure Blob Storage

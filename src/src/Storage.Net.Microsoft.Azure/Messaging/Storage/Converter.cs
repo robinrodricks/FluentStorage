@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Storage.Net.Azure.Messaging.Storage
+namespace Storage.Net.Microsoft.Azure.Messaging.Storage
 {
    internal static class Converter
    {

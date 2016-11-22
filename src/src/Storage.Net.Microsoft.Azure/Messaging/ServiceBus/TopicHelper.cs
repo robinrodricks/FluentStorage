@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Storage.Net.Azure.Messaging.ServiceBus
+namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
 {
    static class TopicHelper
    {
