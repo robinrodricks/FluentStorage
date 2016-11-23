@@ -1,9 +1,9 @@
 ﻿{
-   "version": "3.0.0",
+   "version": "1.0.0",
 
    "authors": [ "Ivan Gavryliuk" ],
 
-   "title": "Storage.Net.Microsoft.Azure",
+   "title": "Storage.Net.Esent",
 
    "copyright": "Copyright (c) 2015-2016 by Ivan Gavryliuk",
 
@@ -13,7 +13,7 @@
 
       "projectUrl": "https://github.com/aloneguid/storage",
 
-      "summary": ""
+      "summary": "Managed ESENT table storage implementation for Storage.Net library"
    },
 
    "buildOptions": {
@@ -21,7 +21,6 @@
    },
 
    "dependencies": {
-      "netbox": "1.0.0",
       "NETStandard.Library": "1.6.0",
       "Storage.Net": "3.0.0"
    },
@@ -29,8 +28,7 @@
    "frameworks": {
       "net45": {
          "dependencies": {
-            "WindowsAzure.Storage": "7.2.1",
-            "WindowsAzure.ServiceBus": "3.4.2"
+            "ManagedEsent": "1.9.4"
          }
       }
    }

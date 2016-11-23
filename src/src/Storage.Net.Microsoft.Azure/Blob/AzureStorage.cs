@@ -2,7 +2,7 @@
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 
-namespace Storage.Net.Microsoft.Azure
+namespace Storage.Net.Microsoft.Azure.Blob
 {
    /// <summary>
    /// General Azure methods
