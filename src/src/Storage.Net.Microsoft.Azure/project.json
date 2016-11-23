@@ -23,7 +23,7 @@
    "dependencies": {
       "netbox": "1.0.0",
       "NETStandard.Library": "1.6.0",
-      "Storage.Net": "1.0.0-*"
+      "Storage.Net": "3.0.0"
    },
 
    "frameworks": {

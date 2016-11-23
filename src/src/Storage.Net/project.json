@@ -1,5 +1,5 @@
 ﻿{
-   "version": "1.0.0-*",
+   "version": "3.0.0",
 
    "authors": [ "Ivan Gavryliuk" ],
 
@@ -9,7 +9,7 @@
 
    "packOptions": {
 
-      "iconUrl": "https://alonestore.blob.core.windows.net/nuget/storage.png",
+      "iconUrl": "http://images.gavryli.uk/nuget/storage.png",
 
       "projectUrl": "https://github.com/aloneguid/storage",
 

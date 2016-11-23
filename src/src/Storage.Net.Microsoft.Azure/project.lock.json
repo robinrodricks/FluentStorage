@@ -608,7 +608,7 @@
           "lib/net40/Microsoft.WindowsAzure.Storage.dll": {}
         }
       },
-      "Storage.Net/1.0.0": {
+      "Storage.Net/3.0.0": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
@@ -2979,7 +2979,7 @@
         "lib/wpa/Microsoft.WindowsAzure.Storage.pdb"
       ]
     },
-    "Storage.Net/1.0.0": {
+    "Storage.Net/3.0.0": {
       "type": "project",
       "path": "../Storage.Net/project.json",
       "msbuildProject": "../Storage.Net/Storage.Net.xproj"
@@ -2988,7 +2988,7 @@
   "projectFileDependencyGroups": {
     "": [
       "NETStandard.Library >= 1.6.0",
-      "Storage.Net >= 1.0.0-*",
+      "Storage.Net >= 3.0.0",
       "netbox >= 1.0.0"
     ],
     ".NETFramework,Version=v4.5": [
