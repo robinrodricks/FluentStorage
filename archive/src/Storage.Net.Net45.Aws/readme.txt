@@ -1,1 +1,0 @@
-﻿Work on AWS is coming soon, I didn't have time to extract it in a nice framework but you're welcome to do so asap!
