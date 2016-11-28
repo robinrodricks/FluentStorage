@@ -721,7 +721,7 @@
       "xunit.runner.visualstudio/2.1.0": {
         "type": "package"
       },
-      "Storage.Net/3.0.0": {
+      "Storage.Net/3.0.1": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
@@ -735,14 +735,14 @@
           "net45/Storage.Net.dll": {}
         }
       },
-      "Storage.Net.Amazon.Aws/3.0.0": {
+      "Storage.Net.Amazon.Aws/3.0.1": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
           "AWSSDK.Core": "3.3.5",
           "AWSSDK.S3": "3.3.3",
           "NETStandard.Library": "1.6.0",
-          "Storage.Net": "3.0.0"
+          "Storage.Net": "3.0.1"
         },
         "compile": {
           "net45/Storage.Net.Amazon.Aws.dll": {}
@@ -766,12 +766,12 @@
           "net45/Storage.Net.Esent.dll": {}
         }
       },
-      "Storage.Net.Microsoft.Azure/3.0.0": {
+      "Storage.Net.Microsoft.Azure/3.0.1": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
           "NETStandard.Library": "1.6.0",
-          "Storage.Net": "3.0.0",
+          "Storage.Net": "3.0.1",
           "WindowsAzure.ServiceBus": "3.4.2",
           "WindowsAzure.Storage": "7.2.1",
           "netbox": "1.0.0"
@@ -3461,12 +3461,12 @@
         "xunit.runner.visualstudio.nuspec"
       ]
     },
-    "Storage.Net/3.0.0": {
+    "Storage.Net/3.0.1": {
       "type": "project",
       "path": "../Storage.Net/project.json",
       "msbuildProject": "../Storage.Net/Storage.Net.xproj"
     },
-    "Storage.Net.Amazon.Aws/3.0.0": {
+    "Storage.Net.Amazon.Aws/3.0.1": {
       "type": "project",
       "path": "../Storage.Net.Amazon.Aws/project.json",
       "msbuildProject": "../Storage.Net.Amazon.Aws/Storage.Net.Amazon.Aws.xproj"
@@ -3476,7 +3476,7 @@
       "path": "../Storage.Net.Esent/project.json",
       "msbuildProject": "../Storage.Net.Esent/Storage.Net.Esent.xproj"
     },
-    "Storage.Net.Microsoft.Azure/3.0.0": {
+    "Storage.Net.Microsoft.Azure/3.0.1": {
       "type": "project",
       "path": "../Storage.Net.Microsoft.Azure/project.json",
       "msbuildProject": "../Storage.Net.Microsoft.Azure/Storage.Net.Microsoft.Azure.xproj"

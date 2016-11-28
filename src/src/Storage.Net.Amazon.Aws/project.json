@@ -1,5 +1,5 @@
 {
-   "version": "3.0.0",
+   "version": "3.0.1",
 
    "title": "Storage.Net.Amazon.Aws",
 
@@ -21,7 +21,7 @@
 
    "dependencies": {
       "NETStandard.Library": "1.6.0",
-      "Storage.Net": "3.0.0"
+      "Storage.Net": "3.0.1"
    },
 
    "frameworks": {
