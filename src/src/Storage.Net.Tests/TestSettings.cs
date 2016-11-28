@@ -4,6 +4,8 @@ namespace Storage.Net.Tests.Integration
 {
    public class TestSettings : SettingsContainer
    {
+      #region [ Azure ]
+
       public readonly Option<string> AzureStorageName = new Option<string>("Azure.Storage.Name", null);
 
       public readonly Option<string> AzureStorageKey = new Option<string>("Azure.Storage.Key", null);
@@ -14,15 +16,17 @@ namespace Storage.Net.Tests.Integration
 
       public readonly Option<string> ServiceBusTopicName = new Option<string>("Azure.ServiceBus.TopicName", "testtopiclocal");
 
-      public readonly Option<string> OneDriveClientId = new Option<string>("OneDrive.ClientId", null);
+      #endregion
 
-      public readonly Option<string> OneDriveClientSecret = new Option<string>("OneDrive.ClientSecret", null);
+      #region [ Amazon Web Services ]
 
       public readonly Option<string> AwsAccessKeyId = new Option<string>("Aws.AccessKeyId", null);
 
       public readonly Option<string> AwsSecretAccessKey = new Option<string>("Aws.SecretAccessKey", null);
 
       public readonly Option<string> AwsTestBucketName = new Option<string>("Aws.TestBucketName", null);
+
+      #endregion
 
       protected override void OnConfigure(IConfigConfiguration configuration)
       {

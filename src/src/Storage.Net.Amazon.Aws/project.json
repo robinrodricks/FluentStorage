@@ -28,7 +28,7 @@
       "net45": {
          "dependencies": {
             "AWSSDK.Core": "3.3.5",
-            "AWSSDK.S3": "3.3.2"
+            "AWSSDK.S3": "3.3.3"
          }
       }
    }

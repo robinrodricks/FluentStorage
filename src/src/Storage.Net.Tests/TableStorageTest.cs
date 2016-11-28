@@ -35,7 +35,7 @@ namespace Storage.Net.Tests.Integration
       protected TableStorageTest(string name)
       {
          _name = name;
-   
+
          if(_name == "csv-files")
          {
             _tables = new CsvFileTableStorage(TestDir);

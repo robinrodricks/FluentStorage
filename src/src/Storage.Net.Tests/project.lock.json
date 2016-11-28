@@ -12,7 +12,7 @@
           "lib/net45/AWSSDK.Core.dll": {}
         }
       },
-      "AWSSDK.S3/3.3.2": {
+      "AWSSDK.S3/3.3.3": {
         "type": "package",
         "dependencies": {
           "AWSSDK.Core": "[3.3.5, 3.4.0)"
@@ -740,7 +740,7 @@
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
           "AWSSDK.Core": "3.3.5",
-          "AWSSDK.S3": "3.3.2",
+          "AWSSDK.S3": "3.3.3",
           "NETStandard.Library": "1.6.0",
           "Storage.Net": "3.0.0"
         },
@@ -829,12 +829,12 @@
         "tools/account-management.ps1"
       ]
     },
-    "AWSSDK.S3/3.3.2": {
-      "sha512": "NWttEDL8y71V1bnJJwpzSB2lpx97UYezSaXJBi449MZ9UU7iWmzcndzym/1fA/Zv28eQNAkvKW4GX3v2T53yqA==",
+    "AWSSDK.S3/3.3.3": {
+      "sha512": "rC2LgAVOqYeVMcr7hu89+pK/xsMyI2QhL+a2259WgplO5DjN3atLRe1+rS9HvmlzzBKkmIgi9+lUg/sap4LlYQ==",
       "type": "package",
-      "path": "AWSSDK.S3/3.3.2",
+      "path": "AWSSDK.S3/3.3.3",
       "files": [
-        "AWSSDK.S3.3.3.2.nupkg.sha512",
+        "AWSSDK.S3.3.3.3.nupkg.sha512",
         "AWSSDK.S3.nuspec",
         "analyzers/dotnet/cs/AWSSDK.S3.CodeAnalysis.dll",
         "lib/MonoAndroid10/AWSSDK.S3.XML",
