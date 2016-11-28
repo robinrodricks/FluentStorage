@@ -38,17 +38,17 @@ namespace Storage.Net.Tests.Integration
 
          if(_name == "csv-files")
          {
-            _tables = new CsvFileTableStorage(TestDir);
+            _tables = StorageFactory.Tables.CsvFiles(TestDir);
          }
          else if(_name == "azure")
          {
-            _tables = new AzureTableStorage(
+            _tables = StorageFactory.Tables.AzureTableStorage(
                TestSettings.Instance.AzureStorageName,
                TestSettings.Instance.AzureStorageKey);
          }
          else if(_name == "esent")
          {
-            _tables = new EsentTableStorage(
+            _tables = StorageFactory.Tables.Esent(
                Path.Combine(TestDir.FullName, "test.edb"));
          }
 
