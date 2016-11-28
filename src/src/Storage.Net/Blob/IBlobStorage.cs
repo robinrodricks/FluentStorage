@@ -11,7 +11,8 @@ namespace Storage.Net.Blob
       /// <summary>
       /// Returns the list of available blobs
       /// </summary>
-      /// <param name="prefix">Blob prefix to filter by. When null returns all blobs.</param>
+      /// <param name="prefix">Blob prefix to filter by. When null returns all blobs.
+      /// Cannot be longer than 50 characters.</param>
       /// <returns>List of blob IDs</returns>
       IEnumerable<string> List(string prefix);
 

@@ -35,8 +35,8 @@ namespace Storage.Net.Microsoft.Azure.Blob
       {
          if (containerName == null) throw new ArgumentNullException(nameof(containerName));
 
-         /* from MSDN: 
-          * 
+         /* from MSDN:
+          *
           A container name must be a valid DNS name, conforming to the following naming rules:
           1. Container names must start with a letter or number, and can contain only letters, numbers, and the dash (-) character.
           2. Every dash (-) character must be immediately preceded and followed by a letter or number; consecutive dashes are not permitted in container names.
@@ -71,6 +71,8 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       public IEnumerable<string> List(string prefix)
       {
+         GenericValidation.CheckBlobPrefix(prefix);
+
          return _blobContainer.ListBlobs(prefix ?? null)
             .OfType<CloudBlockBlob>()
             .Select(b => ToUserId(b.Name));

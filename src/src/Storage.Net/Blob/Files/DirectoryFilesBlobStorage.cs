@@ -25,6 +25,8 @@ namespace Storage.Net.Blob.Files
       /// </summary>
       public IEnumerable<string> List(string prefix)
       {
+         GenericValidation.CheckBlobPrefix(prefix);
+
          if(!_directory.Exists) return null;
 
          return _directory

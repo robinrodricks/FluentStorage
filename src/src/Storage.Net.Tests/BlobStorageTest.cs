@@ -99,6 +99,12 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public void List_VeryLongPrefix_NoResultsNoCrash()
+      {
+         Assert.Throws<ArgumentException>(() => _storage.List(Generator.GetRandomString(100000, false)));
+      }
+
+      [Fact]
       public void Upload_New_CanDownload()
       {
          string content = Generator.GetRandomString(10000, false);

@@ -105,6 +105,8 @@ namespace Storage.Net.Aws.Blob
       /// </summary>
       public IEnumerable<string> List(string prefix)
       {
+         GenericValidation.CheckBlobPrefix(prefix);
+
          ListObjectsV2Response response = _client.ListObjectsV2(new ListObjectsV2Request()
          {
             BucketName = _bucketName,
