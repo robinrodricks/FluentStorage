@@ -117,7 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="BlobId_TooLong" xml:space="preserve">
+    <value>blob ID cannot exceed {0} characters</value>
+  </data>
   <data name="BlobPrefix_TooLong" xml:space="preserve">
-    <value>blob prefix cannot be longer than 50 characters</value>
+    <value>blob prefix cannot exceed {0} characters</value>
   </data>
 </root>

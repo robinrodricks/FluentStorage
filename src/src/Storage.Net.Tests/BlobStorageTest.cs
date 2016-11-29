@@ -199,5 +199,11 @@ namespace Storage.Net.Tests.Integration
       {
          Assert.Throws<ArgumentNullException>(() => _storage.Delete(null));
       }
+
+      [Fact]
+      public void Delete_IdTooLong_ConsistentException()
+      {
+         Assert.Throws<ArgumentException>(() => _storage.Delete(Generator.GetRandomString(10000, false)));
+      }
    }
 }

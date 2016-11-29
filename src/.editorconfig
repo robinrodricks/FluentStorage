@@ -1,7 +1,5 @@
-#replicates formatting from https://github.com/dotnet/corefx/blob/master/Documentation/coding-guidelines/coding-style.md
-
 root=true
 
 [*.cs]
 indent_style=space
-indent_size=4
+indent_size=3

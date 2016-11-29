@@ -60,7 +60,16 @@ namespace Storage.Net {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to blob prefix cannot be longer than 50 characters.
+        ///    Looks up a localized string similar to blob ID cannot exceed {0} characters.
+        /// </summary>
+        public static string BlobId_TooLong {
+            get {
+                return ResourceManager.GetString("BlobId_TooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to blob prefix cannot exceed {0} characters.
         /// </summary>
         public static string BlobPrefix_TooLong {
             get {

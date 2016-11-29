@@ -41,6 +41,7 @@ namespace Storage.Net.Blob.Files
       public void Delete(string id)
       {
          if(id == null) throw new ArgumentNullException(nameof(id));
+         GenericValidation.CheckBlobId(id);
 
          string path = GetFilePath(id);
          if(File.Exists(path)) File.Delete(path);
@@ -52,6 +53,7 @@ namespace Storage.Net.Blob.Files
       public void UploadFromStream(string id, Stream sourceStream)
       {
          if(id == null) throw new ArgumentNullException(nameof(id));
+         GenericValidation.CheckBlobId(id);
          if(sourceStream == null) throw new ArgumentNullException(nameof(sourceStream));
 
          using(Stream target = CreateStream(id))
@@ -66,7 +68,8 @@ namespace Storage.Net.Blob.Files
       public void DownloadToStream(string id, Stream targetStream)
       {
          if(id == null) throw new ArgumentNullException(nameof(id));
-         if(targetStream == null) throw new ArgumentNullException(nameof(targetStream));
+         GenericValidation.CheckBlobId(id);
+         if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
 
          using(Stream source = OpenStream(id))
          {
@@ -86,6 +89,7 @@ namespace Storage.Net.Blob.Files
       public Stream OpenStreamToRead(string id)
       {
          if(id == null) throw new ArgumentNullException(nameof(id));
+         GenericValidation.CheckBlobId(id);
 
          return OpenStream(id);
       }
@@ -96,18 +100,21 @@ namespace Storage.Net.Blob.Files
       public bool Exists(string id)
       {
          if(id == null) throw new ArgumentNullException(nameof(id));
+         GenericValidation.CheckBlobId(id);
 
          return File.Exists(GetFilePath(id));
       }
 
       private string GetFilePath(string id)
       {
+         GenericValidation.CheckBlobId(id);
          return Path.Combine(_directory.FullName, id.SanitizePath());
       }
 
       private Stream CreateStream(string id)
       {
-         if(!_directory.Exists) _directory.Create();
+         GenericValidation.CheckBlobId(id);
+         if (!_directory.Exists) _directory.Create();
          string path = GetFilePath(id);
 
          return File.Create(path);
@@ -115,6 +122,7 @@ namespace Storage.Net.Blob.Files
 
       private Stream OpenStream(string id)
       {
+         GenericValidation.CheckBlobId(id);
          string path = GetFilePath(id);
          if(!File.Exists(path)) return null;
 

@@ -63,6 +63,7 @@ namespace Storage.Net.Aws.Blob
       public void Delete(string id)
       {
          if(id == null) throw new ArgumentNullException(nameof(id));
+         GenericValidation.CheckBlobId(id);
 
          _client.DeleteObject(_bucketName, id);
       }
@@ -72,7 +73,10 @@ namespace Storage.Net.Aws.Blob
       /// </summary>
       public void DownloadToStream(string id, Stream targetStream)
       {
-         using(GetObjectResponse response = GetObject(id))
+         if (id == null) throw new ArgumentNullException(nameof(id));
+         GenericValidation.CheckBlobId(id);
+
+         using (GetObjectResponse response = GetObject(id))
          {
             response.ResponseStream.CopyTo(targetStream);
          }
@@ -83,7 +87,8 @@ namespace Storage.Net.Aws.Blob
       /// </summary>
       public bool Exists(string id)
       {
-         if(id == null) throw new ArgumentNullException(nameof(id));
+         if (id == null) throw new ArgumentNullException(nameof(id));
+         GenericValidation.CheckBlobId(id);
 
          try
          {
@@ -124,6 +129,9 @@ namespace Storage.Net.Aws.Blob
       /// <returns></returns>
       public Stream OpenStreamToRead(string id)
       {
+         if (id == null) throw new ArgumentNullException(nameof(id));
+         GenericValidation.CheckBlobId(id);
+
          GetObjectResponse response = GetObject(id);
          return new AwsS3BlobStorageExternalStream(response);
       }
@@ -135,6 +143,9 @@ namespace Storage.Net.Aws.Blob
       /// <param name="sourceStream">Stream to upload</param>
       public void UploadFromStream(string id, Stream sourceStream)
       {
+         if (id == null) throw new ArgumentNullException(nameof(id));
+         GenericValidation.CheckBlobId(id);
+
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
 
          _fileTransferUtility.Upload(sourceStream, _bucketName, id);
