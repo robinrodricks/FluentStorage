@@ -40,7 +40,6 @@ namespace Storage.Net.Blob.Files
       /// <param name="id"></param>
       public void Delete(string id)
       {
-         if(id == null) throw new ArgumentNullException(nameof(id));
          GenericValidation.CheckBlobId(id);
 
          string path = GetFilePath(id);
@@ -52,7 +51,6 @@ namespace Storage.Net.Blob.Files
       /// </summary>
       public void UploadFromStream(string id, Stream sourceStream)
       {
-         if(id == null) throw new ArgumentNullException(nameof(id));
          GenericValidation.CheckBlobId(id);
          if(sourceStream == null) throw new ArgumentNullException(nameof(sourceStream));
 
@@ -67,7 +65,6 @@ namespace Storage.Net.Blob.Files
       /// </summary>
       public void DownloadToStream(string id, Stream targetStream)
       {
-         if(id == null) throw new ArgumentNullException(nameof(id));
          GenericValidation.CheckBlobId(id);
          if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
 
@@ -88,7 +85,6 @@ namespace Storage.Net.Blob.Files
       /// </summary>
       public Stream OpenStreamToRead(string id)
       {
-         if(id == null) throw new ArgumentNullException(nameof(id));
          GenericValidation.CheckBlobId(id);
 
          return OpenStream(id);
@@ -99,7 +95,6 @@ namespace Storage.Net.Blob.Files
       /// </summary>
       public bool Exists(string id)
       {
-         if(id == null) throw new ArgumentNullException(nameof(id));
          GenericValidation.CheckBlobId(id);
 
          return File.Exists(GetFilePath(id));

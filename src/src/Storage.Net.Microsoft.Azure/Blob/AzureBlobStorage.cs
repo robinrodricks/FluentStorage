@@ -83,7 +83,6 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       public void Delete(string id)
       {
-         if (id == null) throw new ArgumentNullException(nameof(id));
          GenericValidation.CheckBlobId(id);
 
          id = ToInternalId(id);
@@ -97,7 +96,6 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       public void UploadFromStream(string id, Stream sourceStream)
       {
-         if (id == null) throw new ArgumentNullException(nameof(id));
          GenericValidation.CheckBlobId(id);
          if (sourceStream == null) throw new ArgumentNullException(nameof(sourceStream));
          id = ToInternalId(id);
@@ -111,7 +109,6 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       public void DownloadToStream(string id, Stream targetStream)
       {
-         if (id == null) throw new ArgumentNullException(nameof(id));
          GenericValidation.CheckBlobId(id);
          if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
          id = ToInternalId(id);
@@ -135,7 +132,6 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// <returns></returns>
       public Stream OpenStreamToRead(string id)
       {
-         if (id == null) throw new ArgumentNullException(nameof(id));
          GenericValidation.CheckBlobId(id);
 
          id = ToInternalId(id);
@@ -149,7 +145,6 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       public bool Exists(string id)
       {
-         if (id == null) throw new ArgumentNullException(nameof(id));
          GenericValidation.CheckBlobId(id);
 
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(ToInternalId(id));

@@ -19,7 +19,7 @@ namespace Storage.Net
 
       public static void CheckBlobId(string id)
       {
-         if (id == null) return;
+         if (id == null) throw new ArgumentNullException(nameof(id));
 
          if (id.Length > MaxBlobIdLength)
             throw new ArgumentException(string.Format(Exceptions.BlobId_TooLong, MaxBlobIdLength),
