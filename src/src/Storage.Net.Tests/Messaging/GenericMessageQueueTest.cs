@@ -56,40 +56,38 @@ namespace Storage.Net.Tests.Integration.Messaging
          switch(_name)
          {
             case "azure-storage-queue":
-               _publisher = new AzureStorageQueuePublisher(
+               _publisher = StorageFactory.Messages.AzureStorageQueuePublisher(
                   TestSettings.Instance.AzureStorageName,
                   TestSettings.Instance.AzureStorageKey,
                   TestSettings.Instance.ServiceBusQueueName);
-               _receiver = new AzureStorageQueueReceiver(
+               _receiver = StorageFactory.Messages.AzureStorageQueueReceiver(
                   TestSettings.Instance.AzureStorageName,
                   TestSettings.Instance.AzureStorageKey,
                   TestSettings.Instance.ServiceBusQueueName,
                   TimeSpan.FromMinutes(1));
                break;
             case "azure-servicebus-topic":
-               _receiver = new AzureServiceBusTopicReceiver(
+               _receiver = StorageFactory.Messages.AzureServiceBusTopicReceiver(
                   TestSettings.Instance.ServiceBusConnectionString,
                   TestSettings.Instance.ServiceBusTopicName,
                   "AllMessages",
                   null,
                   true);
-               _publisher = new AzureServiceBusTopicPublisher(
+               _publisher = StorageFactory.Messages.AzureServiceBusTopicPublisher(
                   TestSettings.Instance.ServiceBusConnectionString,
                   TestSettings.Instance.ServiceBusTopicName);
                break;
             case "azure-servicebus-queue":
-               _receiver = new AzureServiceBusQueueReceiver(
+               _receiver = StorageFactory.Messages.AzureServiceBusQueueReceiver(
                   TestSettings.Instance.ServiceBusConnectionString,
                   "testqueue",
                   true);
-               _publisher = new AzureServiceBusQueuePublisher(
+               _publisher = StorageFactory.Messages.AzureServiceBusQueuePublisher(
                   TestSettings.Instance.ServiceBusConnectionString,
                   "testqueue");
                break;
             case "inmemory":
-               var inmem = new InMemoryMessagePublisherReceiver();
-               _publisher = inmem;
-               _receiver = inmem;
+               _publisher = StorageFactory.Messages.InMemory(out _receiver);
                break;
             /*case "disk":
                var disk = new DiskMessagePublisherReceiver(TestDir);

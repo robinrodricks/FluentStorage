@@ -757,7 +757,7 @@
         "dependencies": {
           "ManagedEsent": "1.9.4",
           "NETStandard.Library": "1.6.0",
-          "Storage.Net": "3.0.0"
+          "Storage.Net": "3.0.1"
         },
         "compile": {
           "net45/Storage.Net.Esent.dll": {}
@@ -3487,10 +3487,10 @@
       "Config.Net >= 3.0.1",
       "LogMagic >= 2.0.0.264",
       "NETStandard.Library >= 1.6.1",
-      "Storage.Net >= 3.0.0",
-      "Storage.Net.Amazon.Aws >= 3.0.0",
+      "Storage.Net >= 3.0.1",
+      "Storage.Net.Amazon.Aws >= 3.0.1",
       "Storage.Net.Esent >= 1.0.0",
-      "Storage.Net.Microsoft.Azure >= 3.0.0"
+      "Storage.Net.Microsoft.Azure >= 3.0.1"
     ],
     ".NETFramework,Version=v4.5": [
       "WindowsAzure.ServiceBus >= 3.4.2",

@@ -417,7 +417,7 @@
           "lib/net45/_._": {}
         }
       },
-      "Storage.Net/3.0.0": {
+      "Storage.Net/3.0.1": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
@@ -2555,7 +2555,7 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "Storage.Net/3.0.0": {
+    "Storage.Net/3.0.1": {
       "type": "project",
       "path": "../Storage.Net/project.json",
       "msbuildProject": "../Storage.Net/Storage.Net.xproj"
@@ -2564,7 +2564,7 @@
   "projectFileDependencyGroups": {
     "": [
       "NETStandard.Library >= 1.6.0",
-      "Storage.Net >= 3.0.0"
+      "Storage.Net >= 3.0.1"
     ],
     ".NETFramework,Version=v4.5": [
       "ManagedEsent >= 1.9.4"

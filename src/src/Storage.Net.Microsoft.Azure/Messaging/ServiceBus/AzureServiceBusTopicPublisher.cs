@@ -20,7 +20,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       private TopicClient _client;
 
       /// <summary>
-      /// Constructor
+      /// Creates an instance of Azure Service Bus Topic publisher
       /// </summary>
       /// <param name="connectionString">Service Bus connection string</param>
       /// <param name="topicName">Name of the Service Bus topic</param>

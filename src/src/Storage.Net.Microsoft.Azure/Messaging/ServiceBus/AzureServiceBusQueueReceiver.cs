@@ -20,11 +20,11 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       private Action<QueueMessage> _onMessageAction;
 
       /// <summary>
-      /// Creates 
+      /// Creates an instance of Azure Service Bus receiver with connection
       /// </summary>
-      /// <param name="connectionString"></param>
-      /// <param name="queueName"></param>
-      /// <param name="peekLock"></param>
+      /// <param name="connectionString">Service Bus connection string</param>
+      /// <param name="queueName">Queue name in Service Bus</param>
+      /// <param name="peekLock">When true listens in PeekLock mode, otherwise ReceiveAndDelete</param>
       public AzureServiceBusQueueReceiver(string connectionString, string queueName, bool peekLock = true)
       {
          _client = QueueClient.CreateFromConnectionString(connectionString, queueName,
