@@ -1,4 +1,4 @@
-﻿{
+{
    "version": "3.0.1",
 
    "authors": [ "Ivan Gavryliuk" ],
@@ -17,7 +17,8 @@
    },
 
    "buildOptions": {
-      "keyFile": "../../storage.snk"
+      "keyFile": "../../storage.snk",
+      "xmlDoc": true
    },
 
 

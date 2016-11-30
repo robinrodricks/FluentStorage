@@ -14,6 +14,7 @@ namespace Storage.Net.Blob.Files
 
       /// <summary>
       /// Creates an instance in a specific disk directory
+      /// <param name="directory">Root directory</param>
       /// </summary>
       public DirectoryFilesBlobStorage(DirectoryInfo directory)
       {
