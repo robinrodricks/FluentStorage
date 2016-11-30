@@ -74,9 +74,9 @@ namespace Storage.Net
       /// <param name="topicName">Name of the Service Bus topic</param>
       public static IMessagePublisher AzureServiceBusTopicPublisher(this IMessagingFactory factory,
          string connectionString,
-         string queueName)
+         string topicName)
       {
-         return new AzureServiceBusTopicPublisher(connectionString, queueName);
+         return new AzureServiceBusTopicPublisher(connectionString, topicName);
       }
 
       /// <summary>

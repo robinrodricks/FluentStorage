@@ -1,4 +1,4 @@
-﻿{
+{
    "version": "1.0.0-*",
 
    "dependencies": {
@@ -12,7 +12,8 @@
    },
 
    "buildOptions": {
-      "keyFile": "../../storage.snk"
+      "keyFile": "../../storage.snk",
+      "xmlDoc": false
    },
 
    "frameworks": {

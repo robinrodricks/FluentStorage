@@ -15,7 +15,8 @@
    },
 
    "buildOptions": {
-      "keyFile": "../../storage.snk"
+      "keyFile": "../../storage.snk",
+      "xmlDoc": true
    },
 
 

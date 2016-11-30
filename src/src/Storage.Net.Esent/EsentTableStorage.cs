@@ -267,13 +267,22 @@ namespace Storage.Net.Net45.Esent
 
       #region [ ITableStorage ]
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public void Dispose()
       {
          ShutdownDatabase();
       }
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public bool HasOptimisticConcurrency => false;
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public void Delete(string tableName)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
@@ -288,6 +297,9 @@ namespace Storage.Net.Net45.Esent
          }
       }
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public void Delete(string tableName, TableRowId rowId)
       {
          if (rowId == null) return;
