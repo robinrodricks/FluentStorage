@@ -126,6 +126,31 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public void Upload_NullId_ConsistentException()
+      {
+         using (var ms = new MemoryStream(Generator.GetRandomBytes(10, 11)))
+         {
+            Assert.Throws<ArgumentNullException>(() => _storage.UploadFromStream(null, ms));
+         }
+      }
+
+      [Fact]
+      public void Upload_VeryLongId_ConsistenException()
+      {
+         using (var ms = new MemoryStream(Generator.GetRandomBytes(10, 11)))
+         {
+            string id = Generator.GetRandomString(100000, false);
+            Assert.Throws<ArgumentException>(() => _storage.UploadFromStream(id, ms));
+         }
+      }
+
+      [Fact]
+      public void Upload_NullStream_ConsistentException()
+      {
+         Assert.Throws<ArgumentNullException>(() => _storage.UploadFromStream(Generator.GetRandomString(5, false), null));
+      }
+
+      [Fact]
       public void OpenStream_New_CanDownload()
       {
          string id = GetRandomStreamId();
