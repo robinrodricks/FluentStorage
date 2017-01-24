@@ -33,7 +33,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "netbox/1.0.0": {
+      "netbox/1.0.1701.1901": {
         "type": "package",
         "dependencies": {
           "Newtonsoft.Json": "8.0.3"
@@ -434,7 +434,7 @@
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
           "NETStandard.Library": "1.6.0",
-          "netbox": "1.0.0"
+          "netbox": "1.0.1701.1901"
         },
         "compile": {
           "net45/Storage.Net.dll": {}
@@ -533,25 +533,24 @@
         "runtime.json"
       ]
     },
-    "netbox/1.0.0": {
-      "sha512": "vvSYRxQCNKgsPEr3nacM0JC7TPBa3rzwyQwhujZvZPqqKjMO9PpGCsrkdu/ubJS148o9Py+jOH+wSSeuyHBBNQ==",
+    "netbox/1.0.1701.1901": {
+      "sha512": "uJYtpaWzpOoQzCintGxZGcT/xUCmDRCW0wRNbnSxh0BsXQb/ulVPkiXuCxTrqARNRSRnEO0UwK3fLtvtnbOvbg==",
       "type": "package",
-      "path": "netbox/1.0.0",
+      "path": "netbox/1.0.1701.1901",
       "files": [
         "lib/net45/netbox.dll",
         "lib/net45/netbox.pdb",
+        "lib/net45/netbox.xml",
         "lib/netstandard1.6/netbox.dll",
         "lib/netstandard1.6/netbox.pdb",
-        "netbox.1.0.0.nupkg.sha512",
+        "lib/netstandard1.6/netbox.xml",
+        "netbox.1.0.1701.1901.nupkg.sha512",
         "netbox.nuspec",
         "src/netbox/Application/Ascii85.cs",
         "src/netbox/Application/ByteFormat.cs",
         "src/netbox/Application/Compressor.cs",
         "src/netbox/Application/Cryptography/FullHashAlgorithm.cs",
         "src/netbox/Application/Cryptography/IHashAlgorithm.cs",
-        "src/netbox/Application/FileFormats/CsvFormat.cs",
-        "src/netbox/Application/FileFormats/CsvReader.cs",
-        "src/netbox/Application/FileFormats/CsvWriter.cs",
         "src/netbox/Application/Hashing.cs",
         "src/netbox/Application/HttpUtility/HtmlEntity.cs",
         "src/netbox/Application/HttpUtility/HtmlEntityDecoder.cs",
@@ -570,24 +569,36 @@
         "src/netbox/Extensions/DateTimeExtensions.cs",
         "src/netbox/Extensions/DictionaryExtensions.cs",
         "src/netbox/Extensions/EnumExtensions.cs",
+        "src/netbox/Extensions/EnumerableEx.cs",
         "src/netbox/Extensions/EnumerableExtensions.cs",
         "src/netbox/Extensions/GuidExtensions.cs",
         "src/netbox/Extensions/IntExtensions.cs",
         "src/netbox/Extensions/LongExtensions.cs",
         "src/netbox/Extensions/NetFile.cs",
         "src/netbox/Extensions/NetPath.cs",
+        "src/netbox/Extensions/NetworkCredentialExtensions.cs",
         "src/netbox/Extensions/ObjectExtensions.cs",
         "src/netbox/Extensions/StreamExtensions.cs",
         "src/netbox/Extensions/StringExtensions.cs",
         "src/netbox/Extensions/TypeExtensions.cs",
+        "src/netbox/FileFormats/CsvFormat.cs",
+        "src/netbox/FileFormats/CsvReader.cs",
+        "src/netbox/FileFormats/CsvWriter.cs",
         "src/netbox/G.cs",
         "src/netbox/Generator.cs",
+        "src/netbox/JavaScriptUtils.cs",
+        "src/netbox/Measure.cs",
         "src/netbox/Model/EnumTagAttribute.cs",
         "src/netbox/Model/HashType.cs",
         "src/netbox/NameGenerator.cs",
         "src/netbox/PasswordGenerator.cs",
         "src/netbox/PasswordPolicy.cs",
-        "src/netbox/Properties/AssemblyInfo.cs"
+        "src/netbox/Properties/AssemblyInfo.cs",
+        "src/netbox/Serialization/Core/Node.cs",
+        "src/netbox/Serialization/Core/NodeType.cs",
+        "src/netbox/Serialization/DictionarySerializer.cs",
+        "src/netbox/Serialization/JsonSerializer.cs",
+        "src/netbox/Serialization/WalkingSerializer.cs"
       ]
     },
     "NETStandard.Library/1.6.0": {

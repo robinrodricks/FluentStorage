@@ -24,10 +24,10 @@
           "lib/net45/AWSSDK.S3.dll": {}
         }
       },
-      "Config.Net/3.0.1": {
+      "Config.Net/3.0.1701.1901": {
         "type": "package",
         "dependencies": {
-          "NETStandard.Library": "1.6.0"
+          "netbox": "1.0.1701.1901"
         },
         "frameworkAssemblies": [
           "System.Configuration"
@@ -39,8 +39,15 @@
           "lib/net45/Config.Net.dll": {}
         }
       },
-      "LogMagic/2.0.0.264": {
+      "LogMagic/2.1.0": {
         "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "8.0.3",
+          "netbox": "1.0.2"
+        },
+        "frameworkAssemblies": [
+          "System.Net.Http"
+        ],
         "compile": {
           "lib/net45/LogMagic.dll": {}
         },
@@ -196,7 +203,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "netbox/1.0.0": {
+      "netbox/1.0.1701.1901": {
         "type": "package",
         "dependencies": {
           "Newtonsoft.Json": "8.0.3"
@@ -726,7 +733,7 @@
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
           "NETStandard.Library": "1.6.0",
-          "netbox": "1.0.0"
+          "netbox": "1.0.1701.1901"
         },
         "compile": {
           "net45/Storage.Net.dll": {}
@@ -774,7 +781,7 @@
           "Storage.Net": "3.0.1",
           "WindowsAzure.ServiceBus": "3.4.2",
           "WindowsAzure.Storage": "7.2.1",
-          "netbox": "1.0.0"
+          "netbox": "1.0.1701.1901"
         },
         "compile": {
           "net45/Storage.Net.Microsoft.Azure.dll": {}
@@ -860,12 +867,12 @@
         "tools/uninstall.ps1"
       ]
     },
-    "Config.Net/3.0.1": {
-      "sha512": "ht0H/0Zs7FKxVj7KoDzPCKoJ/juC+2JF2Ea6IfSvaTxx3L4KBF3R5nMD7NDKGj0x8lSCNg7rX6s5yzwEOAApGw==",
+    "Config.Net/3.0.1701.1901": {
+      "sha512": "4gP/E+qrw/5addfa8pHmC5lWLkoGlbjKgydsi+fGzDXwkFVV7RpMsZdYzdYLc/HTKqFWEU9PzWfyXkzYatyttA==",
       "type": "package",
-      "path": "Config.Net/3.0.1",
+      "path": "Config.Net/3.0.1701.1901",
       "files": [
-        "Config.Net.3.0.1.nupkg.sha512",
+        "Config.Net.3.0.1701.1901.nupkg.sha512",
         "Config.Net.nuspec",
         "lib/net45/Config.Net.dll",
         "lib/net45/Config.Net.pdb",
@@ -883,6 +890,7 @@
         "src/Config.Net/SettingsContainer.cs",
         "src/Config.Net/Stores/AppConfigStore.cs",
         "src/Config.Net/Stores/AssemblyConfigStore.cs",
+        "src/Config.Net/Stores/CommandLineConfigStore.cs",
         "src/Config.Net/Stores/EnvironmentVariablesStore.cs",
         "src/Config.Net/Stores/Formats/IniComment.cs",
         "src/Config.Net/Stores/Formats/IniEntity.cs",
@@ -891,7 +899,6 @@
         "src/Config.Net/Stores/Formats/StructuredIniFile.cs",
         "src/Config.Net/Stores/InMemoryConfigStore.cs",
         "src/Config.Net/Stores/IniFileConfigStore.cs",
-        "src/Config.Net/TypeParsers/BoolParser.cs",
         "src/Config.Net/TypeParsers/CoreParsers.cs",
         "src/Config.Net/TypeParsers/DateTimeParser.cs",
         "src/Config.Net/TypeParsers/DefaultParser.cs",
@@ -899,42 +906,60 @@
         "src/Config.Net/TypeParsers/IntParser.cs",
         "src/Config.Net/TypeParsers/JiraTimeParser.cs",
         "src/Config.Net/TypeParsers/LongParser.cs",
+        "src/Config.Net/TypeParsers/NetworkCredentialParser.cs",
         "src/Config.Net/TypeParsers/StringArrayParser.cs",
         "src/Config.Net/TypeParsers/StringParser.cs",
         "src/Config.Net/TypeParsers/TimeSpanParser.cs",
         "src/Config.Net/TypeParsers/TypeParserSettings.cs"
       ]
     },
-    "LogMagic/2.0.0.264": {
-      "sha512": "1GXRO2hucn4amXaX2so2cJjfa0zjsDq2CKEAg8p3iDWStOgzdZ+W1TSRv/OCASQWc+77jjywDgCznJwQId63QQ==",
+    "LogMagic/2.1.0": {
+      "sha512": "GNizR2xNHTthYLkIRZ4H6MYLoGI+1ycznL01mPnV7wXZB2cRxmSaxJwf7vmqf0PgmE8MWSwrjp20BRz9MoVBHg==",
       "type": "package",
-      "path": "LogMagic/2.0.0.264",
+      "path": "LogMagic/2.1.0",
       "files": [
-        "LogMagic.2.0.0.264.nupkg.sha512",
+        "LogMagic.2.1.0.nupkg.sha512",
         "LogMagic.nuspec",
-        "lib/MonoAndroid/LogMagic.dll",
-        "lib/MonoAndroid/LogMagic.pdb",
-        "lib/MonoAndroid/LogMagic.xml",
-        "lib/MonoTouch/LogMagic.dll",
-        "lib/MonoTouch/LogMagic.pdb",
-        "lib/MonoTouch/LogMagic.xml",
-        "lib/dotnet/LogMagic.NetCore.deps.json",
-        "lib/dotnet/LogMagic.NetCore.dll",
-        "lib/dotnet/LogMagic.NetCore.pdb",
-        "lib/dotnet/LogMagic.NetCore.xml",
-        "lib/net45/LogMagic.XML",
         "lib/net45/LogMagic.dll",
         "lib/net45/LogMagic.pdb",
-        "lib/portable-net45+wp80+win8+wpa81+dnxcore50/LogMagic.dll",
-        "lib/portable-net45+wp80+win8+wpa81+dnxcore50/LogMagic.pdb",
-        "lib/portable-net45+wp80+win8+wpa81+dnxcore50/LogMagic.xml",
-        "tools/install.ps1",
-        "tools/vssnippets/lcfgposhcon.snippet",
-        "tools/vssnippets/ld.snippet",
-        "tools/vssnippets/ldef.snippet",
-        "tools/vssnippets/le.snippet",
-        "tools/vssnippets/li.snippet",
-        "tools/vssnippets/lw.snippet"
+        "lib/net45/LogMagic.xml",
+        "lib/netstandard1.6/LogMagic.dll",
+        "lib/netstandard1.6/LogMagic.pdb",
+        "lib/netstandard1.6/LogMagic.xml",
+        "src/LogMagic/Configuration/LogConfiguration.cs",
+        "src/LogMagic/Enrichers/ConstantEnricher.cs",
+        "src/LogMagic/Enrichers/EnrichersConfigurationExtensions.cs",
+        "src/LogMagic/Enrichers/MachineIpEnricher.cs",
+        "src/LogMagic/Enrichers/MachineNameEnricher.cs",
+        "src/LogMagic/Enrichers/MethodNameEnricher.cs",
+        "src/LogMagic/Enrichers/ThreadInfoEnricher.cs",
+        "src/LogMagic/EventFactory.cs",
+        "src/LogMagic/IEnricher.cs",
+        "src/LogMagic/IEnricherConfiguration.cs",
+        "src/LogMagic/ILog.cs",
+        "src/LogMagic/ILogConfiguration.cs",
+        "src/LogMagic/ILogWriter.cs",
+        "src/LogMagic/IWriterConfiguration.cs",
+        "src/LogMagic/L.cs",
+        "src/LogMagic/LogClient.cs",
+        "src/LogMagic/LogEvent.cs",
+        "src/LogMagic/LogEventPump.cs",
+        "src/LogMagic/LogSeverity.cs",
+        "src/LogMagic/Properties/AssemblyInfo.cs",
+        "src/LogMagic/TextFormatter.cs",
+        "src/LogMagic/Tokenisation/FormattedString.cs",
+        "src/LogMagic/Tokenisation/Token.cs",
+        "src/LogMagic/Tokenisation/TokenType.cs",
+        "src/LogMagic/TypeFormatters/EnumerableFormatter.cs",
+        "src/LogMagic/TypeFormatters/FormatterEntry.cs",
+        "src/LogMagic/TypeFormatters/ITypeFormatter.cs",
+        "src/LogMagic/Writers/ConsoleLogWriter.cs",
+        "src/LogMagic/Writers/FileLogWriter.cs",
+        "src/LogMagic/Writers/PoshConsoleLogWriter.cs",
+        "src/LogMagic/Writers/PoshConsoleLogWriterSettings.cs",
+        "src/LogMagic/Writers/SeqWriter.cs",
+        "src/LogMagic/Writers/TraceLogWriter.cs",
+        "src/LogMagic/Writers/WritersConfigurationExtensions.cs"
       ]
     },
     "ManagedEsent/1.9.4": {
@@ -1125,25 +1150,24 @@
         "runtime.json"
       ]
     },
-    "netbox/1.0.0": {
-      "sha512": "vvSYRxQCNKgsPEr3nacM0JC7TPBa3rzwyQwhujZvZPqqKjMO9PpGCsrkdu/ubJS148o9Py+jOH+wSSeuyHBBNQ==",
+    "netbox/1.0.1701.1901": {
+      "sha512": "uJYtpaWzpOoQzCintGxZGcT/xUCmDRCW0wRNbnSxh0BsXQb/ulVPkiXuCxTrqARNRSRnEO0UwK3fLtvtnbOvbg==",
       "type": "package",
-      "path": "netbox/1.0.0",
+      "path": "netbox/1.0.1701.1901",
       "files": [
         "lib/net45/netbox.dll",
         "lib/net45/netbox.pdb",
+        "lib/net45/netbox.xml",
         "lib/netstandard1.6/netbox.dll",
         "lib/netstandard1.6/netbox.pdb",
-        "netbox.1.0.0.nupkg.sha512",
+        "lib/netstandard1.6/netbox.xml",
+        "netbox.1.0.1701.1901.nupkg.sha512",
         "netbox.nuspec",
         "src/netbox/Application/Ascii85.cs",
         "src/netbox/Application/ByteFormat.cs",
         "src/netbox/Application/Compressor.cs",
         "src/netbox/Application/Cryptography/FullHashAlgorithm.cs",
         "src/netbox/Application/Cryptography/IHashAlgorithm.cs",
-        "src/netbox/Application/FileFormats/CsvFormat.cs",
-        "src/netbox/Application/FileFormats/CsvReader.cs",
-        "src/netbox/Application/FileFormats/CsvWriter.cs",
         "src/netbox/Application/Hashing.cs",
         "src/netbox/Application/HttpUtility/HtmlEntity.cs",
         "src/netbox/Application/HttpUtility/HtmlEntityDecoder.cs",
@@ -1162,24 +1186,36 @@
         "src/netbox/Extensions/DateTimeExtensions.cs",
         "src/netbox/Extensions/DictionaryExtensions.cs",
         "src/netbox/Extensions/EnumExtensions.cs",
+        "src/netbox/Extensions/EnumerableEx.cs",
         "src/netbox/Extensions/EnumerableExtensions.cs",
         "src/netbox/Extensions/GuidExtensions.cs",
         "src/netbox/Extensions/IntExtensions.cs",
         "src/netbox/Extensions/LongExtensions.cs",
         "src/netbox/Extensions/NetFile.cs",
         "src/netbox/Extensions/NetPath.cs",
+        "src/netbox/Extensions/NetworkCredentialExtensions.cs",
         "src/netbox/Extensions/ObjectExtensions.cs",
         "src/netbox/Extensions/StreamExtensions.cs",
         "src/netbox/Extensions/StringExtensions.cs",
         "src/netbox/Extensions/TypeExtensions.cs",
+        "src/netbox/FileFormats/CsvFormat.cs",
+        "src/netbox/FileFormats/CsvReader.cs",
+        "src/netbox/FileFormats/CsvWriter.cs",
         "src/netbox/G.cs",
         "src/netbox/Generator.cs",
+        "src/netbox/JavaScriptUtils.cs",
+        "src/netbox/Measure.cs",
         "src/netbox/Model/EnumTagAttribute.cs",
         "src/netbox/Model/HashType.cs",
         "src/netbox/NameGenerator.cs",
         "src/netbox/PasswordGenerator.cs",
         "src/netbox/PasswordPolicy.cs",
-        "src/netbox/Properties/AssemblyInfo.cs"
+        "src/netbox/Properties/AssemblyInfo.cs",
+        "src/netbox/Serialization/Core/Node.cs",
+        "src/netbox/Serialization/Core/NodeType.cs",
+        "src/netbox/Serialization/DictionarySerializer.cs",
+        "src/netbox/Serialization/JsonSerializer.cs",
+        "src/netbox/Serialization/WalkingSerializer.cs"
       ]
     },
     "NETStandard.Library/1.6.1": {
@@ -3484,8 +3520,8 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "Config.Net >= 3.0.1",
-      "LogMagic >= 2.0.0.264",
+      "Config.Net >= 3.0.1701.1901",
+      "LogMagic >= 2.1.0",
       "NETStandard.Library >= 1.6.1",
       "Storage.Net >= 3.0.1",
       "Storage.Net.Amazon.Aws >= 3.0.1",

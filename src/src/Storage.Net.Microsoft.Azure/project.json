@@ -21,11 +21,11 @@
       "xmlDoc": true
    },
 
-   "dependencies": {
-      "netbox": "1.0.0",
-      "NETStandard.Library": "1.6.0",
-      "Storage.Net": "3.0.1"
-   },
+    "dependencies": {
+        "netbox": "1.0.1701.1901",
+        "NETStandard.Library": "1.6.0",
+        "Storage.Net": "3.0.1"
+    },
 
    "frameworks": {
       "net45": {
