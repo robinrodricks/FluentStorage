@@ -1,6 +1,6 @@
 ﻿using Config.Net;
 
-namespace Storage.Net.Tests.Integration
+namespace Storage.Net.Tests
 {
    public class TestSettings : SettingsContainer
    {
