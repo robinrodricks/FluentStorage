@@ -9,6 +9,9 @@ using Storage.Net.Table;
 
 namespace Storage.Net
 {
+   /// <summary>
+   /// Factory class that implement factory methods for Microsoft Azure implememtations
+   /// </summary>
    public static class Factory
    {
       public static ITableStorage AzureTableStorage(this ITableStorageFactory factory,
