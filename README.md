@@ -2,22 +2,24 @@
 
 [![Visual Studio Team services](https://img.shields.io/vso/build/aloneguid/0227dea8-0e2f-40c1-b170-2e8830087355/15.svg)]()
 
-Storage.Net abstracts storage implementation from the applicatiion developer. The library started as an internal experiment in one of the companies I worked for and quickly grown into a separate library as I saw more and more repeating patterns.
+## Intentions
 
-Storage.Net abstracts the following types of storage patterns:
+`Storage.Net` abstracts storage implementation like `blobs`, `tables` and `messages` from the .NET Applicatiion Developer. It's aimed to provide a generic interface regardless on which storage provider you are using.
 
-- [Blobs](https://github.com/aloneguid/storage/wiki/Blobs)
-- [Simple tables](https://github.com/aloneguid/storage/wiki/Tables)
-- [Queues](https://github.com/aloneguid/storage/wiki/Queues)
+Storage.Net also implements inmemory and on disk versions of all the abstractions, therefore you can develop fast on local machine or use vendor free serverless implementations for parts of your applciation which don't require a separate third party backend at a particular point in development.
 
-The biggest advantage of Storage.Net framework comparing to similar frameworks like [NServiceBus](http://particular.net/nservicebus) or [MassTransit](http://masstransit-project.com/) and others is that it's not just aimed to abstract different big vendor implementation, but to also define a common easy standard for those technologies.
+Storage.Net defines three different storage types:
 
-Storage.Net also implements inmemory and on disk versions of all the abstractions, therefore you can develop fast on local machine or use vendor free serverless implementations for parts of your applciation which don't require a separate third party backend yet.
+- [**Blob Storage**](doc/blob-storage/index.md) is used to store arbitrary files of any size.
+- **Table Storage** is a simplistic way to store non-relational tabular data.
+- **Messaging** is an asynchronous mechanism to send simple messages between disconnected system.
 
-Read the [Wiki](https://github.com/aloneguid/storage/wiki) for more information on how to work with those.
+## Installation
 
-This framework is available through NuGet:
+All packages are available on `nuget` and I consider it the primary release target. This is the list of curated packages we know about:
 
-- [Core Package](https://www.nuget.org/packages/Storage.Net)
-- [Windows Azure Package](https://www.nuget.org/packages/Storage.Net.WindowsAzure)
-- [Amazon Web Services Package](https://www.nuget.org/packages/Storage.Net.AmazonWebServices/)
+### Core
+
+todo
+
+> Help Wanted to write the documentation
