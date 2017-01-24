@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		..\ChangeVersion.ps1 = ..\ChangeVersion.ps1
 		global.json = global.json
+		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Storage.Net", "src\Storage.Net\Storage.Net.xproj", "{E025A581-C3EC-42F9-A473-5F2544E28E30}"

@@ -1,6 +1,13 @@
-# Storage
+# Storage.Net
 
-![](https://aloneguid.visualstudio.com/DefaultCollection/_apis/public/build/definitions/323c5f4c-c814-452d-9eaf-1006c83fd44c/2/badge)
+[![Visual Studio Team services](https://img.shields.io/vso/build/aloneguid/0227dea8-0e2f-40c1-b170-2e8830087355/15.svg)]()
+
+## Stable Versions
+
+| Core  |  Azure  | AWS   |
+|-------|---------|-------|
+|[![NuGet](https://img.shields.io/nuget/v/Storage.Net.svg)]()|[![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.Azure.svg)]()|[![NuGet](https://img.shields.io/nuget/v/Storage.Net.Amazon.Aws.svg)]()|
+  
 
 Storage.Net abstracts storage implementation from the applicatiion developer. The library started as an internal experiment in one of the companies I worked for and quickly grown into a separate library as I saw more and more repeating patterns.
 
