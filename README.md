@@ -1,6 +1,6 @@
 # Storage.Net
 
-[![Visual Studio Team services](https://img.shields.io/vso/build/aloneguid/0227dea8-0e2f-40c1-b170-2e8830087355/15.svg)]()
+![Visual Studio Team services](https://img.shields.io/vso/build/aloneguid/0227dea8-0e2f-40c1-b170-2e8830087355/15.svg)
 
 ## Stable Versions
 
