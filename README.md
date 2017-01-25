@@ -16,6 +16,10 @@ Storage.Net defines three different storage types:
 - **Table Storage** is a simplistic way to store non-relational tabular data.
 - **Messaging** is an asynchronous mechanism to send simple messages between disconnected system.
 
+## Implementations
+
+There are various implementations of storage types curated on a [separate page](doc/implementations/index.md)
+
 ## Installation
 
 All packages are available on `nuget` and I consider it the primary release target. This is the list of curated packages we know about:

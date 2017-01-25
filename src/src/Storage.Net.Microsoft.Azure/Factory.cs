@@ -21,6 +21,15 @@ namespace Storage.Net
          return new AzureTableStorage(accountName, storageKey);
       }
 
+      /// <summary>
+      /// Creates a blob storage implementation based on Microsoft Azure Blob Storage using account name and key.
+      /// </summary>
+      /// <param name="factory">Reference to factory</param>
+      /// <param name="accountName">Storage Account name</param>
+      /// <param name="key">Storage Account key</param>
+      /// <param name="containerName">Container name in the blob storage. If the container doesn't exist it will be automatically
+      /// created for you.</param>
+      /// <returns>Generic blob storage interface</returns>
       public static IBlobStorage AzureBlobStorage(this IBlobStorageFactory factory,
          string accountName,
          string key,
