@@ -36,6 +36,26 @@ namespace Storage.Net.Microsoft.Azure.Blob
          _blobContainer.CreateIfNotExists();
       }
 
+      /// <summary>
+      /// Creates an insance from connection string
+      /// </summary>
+      public AzureBlobStorage(string connectionString, string containerName)
+      {
+         if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
+         ValidateContainerName(containerName);
+
+         CloudStorageAccount account;
+         if(!CloudStorageAccount.TryParse(connectionString, out account))
+         {
+            throw new ArgumentException("could not parse provided connection string");
+         }
+
+         CloudBlobClient blobClient = account.CreateCloudBlobClient();
+
+         _blobContainer = blobClient.GetContainerReference(containerName);
+         _blobContainer.CreateIfNotExists();
+      }
+
       private void ValidateContainerName(string containerName)
       {
          if (containerName == null) throw new ArgumentNullException(nameof(containerName));

@@ -38,6 +38,21 @@ namespace Storage.Net
          return new AzureBlobStorage(accountName, key, containerName);
       }
 
+      /// <summary>
+      /// Creates a blob storage implementation
+      /// </summary>
+      /// <param name="factory">Reference to factory</param>
+      /// <param name="connectionString">Storage account connection string</param>
+      /// <param name="containerName">Container name in the blob storage. If the container doesn't exist it will be automatically
+      /// create for you.</param>
+      /// <returns>Generic blob storage  interface</returns>
+      public static IBlobStorage AzureBlobStorage(this IBlobStorageFactory factory,
+         string connectionString,
+         string containerName)
+      {
+         return new AzureBlobStorage(connectionString, containerName);
+      }
+
       public static IMessagePublisher AzureStorageQueuePublisher(this IMessagingFactory factory,
          string accountName,
          string storageKey,

@@ -8,6 +8,8 @@ Blobs are interfacing with the official [Blob Storage](https://azure.microsoft.c
 
 This document assumes you are already familiar [how blobs are implemented in Storage.Net](../blob-storage/index.md)
 
+### Creating the blob client
+
 The easiest way to create a blob storage is to use the factory method
 
 ```csharp
@@ -19,6 +21,8 @@ IBlobStorage storage = StorageFactory.Blobs.AzureBlobStorage("acc_name", "acc_ke
 You need to provide Azure specific information like account name and key. Container name is the root container where blob operations will refer to. If the container doesn't exist it will be created first.
 
 This storage is working with `block blobs` only. We are planning to add `append blobs` support but that requires some architectural changes and as always you're welcome to help.
+
+> todo: create from SAS token
 
 ## Tables
 
