@@ -43,20 +43,21 @@ namespace Storage.Net.Blob
       /// <exception cref="StorageException">Thrown when blob does not exist, error code set to <see cref="ErrorCode.NotFound"/></exception>
       void DownloadToStream(string id, Stream targetStream);
 
-      // --- consistency checks done up to here -----
-
       /// <summary>
       /// Opens the stream asynchronously to read on demand.
       /// </summary>
-      /// <param name="id">Blob ID</param>
-      /// <returns></returns>
+      /// <param name="id">Blob ID, required</param>
+      /// <returns>Stream in an open state, or null if blob doesn't exist by this ID. It is your responsibility to close and dispose this
+      /// stream after use.</returns>
+      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
       Stream OpenStreamToRead(string id);
 
       /// <summary>
       /// Checks if a blob exists
       /// </summary>
-      /// <param name="id"></param>
-      /// <returns></returns>
+      /// <param name="id">Blob ID, required</param>
+      /// <returns>True if blob exists, false otherwise</returns>
       bool Exists(string id);
    }
 }

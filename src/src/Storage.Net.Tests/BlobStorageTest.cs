@@ -151,6 +151,18 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public void OpenStream_NullId_ConsistentException()
+      {
+         Assert.Throws<ArgumentNullException>(() => _storage.OpenStreamToRead(null));
+      }
+
+      [Fact]
+      public void OpenStream_LargeId_ConsistentException()
+      {
+         Assert.Throws<ArgumentException>(() => _storage.OpenStreamToRead(Generator.GetRandomString(500, false)));
+      }
+
+      [Fact]
       public void OpenStream_New_CanDownload()
       {
          string id = GetRandomStreamId();
