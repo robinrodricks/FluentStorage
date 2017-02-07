@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{9305459F-A91
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "blob-storage", "blob-storage", "{3778B2D6-0A15-4BB9-8CAE-102B1F4BE560}"
 	ProjectSection(SolutionItems) = preProject
+		..\doc\blob-storage\dirtextfile.png = ..\doc\blob-storage\dirtextfile.png
+		..\doc\blob-storage\dirtextfileindir.png = ..\doc\blob-storage\dirtextfileindir.png
 		..\doc\blob-storage\index.md = ..\doc\blob-storage\index.md
 	EndProjectSection
 EndProject

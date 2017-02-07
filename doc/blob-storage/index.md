@@ -62,7 +62,44 @@ namespace Scenario
 
 ### Save file to a specific folder
 
-todo
+This scenario demonstrates how to save files to a folder on local disk. Notice that we are still using `IBlobStorage` interface and don't really care where we are writing to. Here is how we create an instance of `IBlobStorage` which is mapped to `c:\tmp\files` folder:
+
+```csharp
+IBlobStorage storage = StorageFactory.Blobs.DirectoryFiles(new DirectoryInfo("c:\\tmp\\files"));
+```
+
+Now let's create a blob called `test.txt` with sample content and see what happened to that folder:
+
+```csharp
+string content = "test content";
+using (var s = new MemoryStream(Encoding.UTF8.GetBytes(content)))
+{
+    storage.UploadFromStream("text.txt", s);
+}
+
+```
+
+As you can see on disk a file was created with the same name as blob ID:
+
+![Dirtextfile](dirtextfile.png)
+
+This is close, but not exactly what we want, right? I'd like to save it to a specific folder. There is no interface method though to specify the folder name. However, the disk implementation treats forward slashes as folder separators, therefore you can place a file in the folder if you name it like this: `level 0/level 1/in the folder.log`. For example:
+
+```csharp
+using (var s = new MemoryStream(Encoding.UTF8.GetBytes(content)))
+{
+    //using helper method to combine path parts, essentially this equals to 'level 0/level 1/in the folder.log'
+    string subfolderBlobId = StoragePath.Combine("level 0", "level 1", "in the folder.log");
+
+    storage.UploadFromStream(subfolderBlobId, s);
+}
+```
+
+Looking back to folder contents:
+
+![Dirtextfile](dirtextfileindir.png)
+
+Job done.
 
 ### List all files in a folder
 
