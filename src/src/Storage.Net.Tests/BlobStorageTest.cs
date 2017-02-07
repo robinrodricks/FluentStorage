@@ -165,6 +165,29 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public void Download_ByNullId_ConsistentException()
+      {
+         var ms = new MemoryStream();
+
+         Assert.Throws<ArgumentNullException>(() => _storage.DownloadToStream(null, ms));
+      }
+
+      [Fact]
+      public void Download_ByVeryLargeId_ConsistentException()
+      {
+         var ms = new MemoryStream();
+
+         Assert.Throws<ArgumentException>(() => _storage.DownloadToStream(Generator.GetRandomString(100, false), ms));
+      }
+
+      [Fact]
+      public void Download_ToNullStream_ConsistentException()
+      {
+         Assert.Throws<ArgumentNullException>(() => _storage.DownloadToStream("1", null));
+      }
+
+
+      [Fact]
       public void Download_DoesNotExist_ConsistentException()
       {
          string id = Generator.RandomString;

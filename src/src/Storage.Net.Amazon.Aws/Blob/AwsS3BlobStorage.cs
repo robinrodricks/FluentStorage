@@ -73,6 +73,7 @@ namespace Storage.Net.Aws.Blob
       public void DownloadToStream(string id, Stream targetStream)
       {
          GenericValidation.CheckBlobId(id);
+         if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
 
          using (GetObjectResponse response = GetObject(id))
          {

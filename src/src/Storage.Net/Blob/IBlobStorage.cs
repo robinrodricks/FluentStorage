@@ -33,15 +33,17 @@ namespace Storage.Net.Blob
       /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
       void UploadFromStream(string id, Stream sourceStream);
 
-      // --- consistency checks done up to here -----
-
       /// <summary>
       /// Downloads blob to a stream
       /// </summary>
-      /// <param name="id">Blob ID</param>
-      /// <param name="targetStream">Target stream to copy to</param>
+      /// <param name="id">Blob ID, required</param>
+      /// <param name="targetStream">Target stream to copy to, required</param>
+      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
       /// <exception cref="StorageException">Thrown when blob does not exist, error code set to <see cref="ErrorCode.NotFound"/></exception>
       void DownloadToStream(string id, Stream targetStream);
+
+      // --- consistency checks done up to here -----
 
       /// <summary>
       /// Opens the stream asynchronously to read on demand.
