@@ -24,6 +24,9 @@ EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Storage.Net.Tests", "src\Storage.Net.Tests\Storage.Net.Tests.xproj", "{B075B1BE-8A7C-4070-AF62-EE2EA8AF5DA1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{9305459F-A911-49A1-ABA1-2BBAEC42338B}"
+	ProjectSection(SolutionItems) = preProject
+		..\doc\slide.jpg = ..\doc\slide.jpg
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "blob-storage", "blob-storage", "{3778B2D6-0A15-4BB9-8CAE-102B1F4BE560}"
 	ProjectSection(SolutionItems) = preProject
