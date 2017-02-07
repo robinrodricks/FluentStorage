@@ -11,6 +11,7 @@ namespace Storage.Net.Blob.Files
    public class DirectoryFilesBlobStorage : IBlobStorage
    {
       private readonly DirectoryInfo _directory;
+      private static readonly string FsPathSeparator = new string(Path.DirectorySeparatorChar, 1);
 
       /// <summary>
       /// Creates an instance in a specific disk directory
@@ -30,9 +31,19 @@ namespace Storage.Net.Blob.Files
 
          if(!_directory.Exists) return null;
 
-         return _directory
-            .GetFiles(prefix == null ? "*" : (prefix.SanitizePath() + "*"))
-            .Select(f => f.Name);
+         string[] allIds = _directory.GetFiles("*", SearchOption.AllDirectories).Select(ToId).ToArray();
+
+         if (string.IsNullOrEmpty(prefix)) return allIds;
+
+         string wildcard = prefix + "*";
+         return allIds.Where(id => id.MatchesWildcard(wildcard));
+      }
+
+      private string ToId(FileInfo fi)
+      {
+         string name = fi.FullName.Substring(_directory.FullName.Length + 1);
+
+         return name.Replace(Path.DirectorySeparatorChar, StoragePath.PathSeparator);
       }
 
       /// <summary>
@@ -104,7 +115,26 @@ namespace Storage.Net.Blob.Files
       private string GetFilePath(string id)
       {
          GenericValidation.CheckBlobId(id);
-         return Path.Combine(_directory.FullName, id.SanitizePath());
+
+         //id can contain path separators
+         string[] parts = id.Split(StoragePath.PathSeparator);
+         string name = parts[parts.Length - 1].SanitizePath();
+         DirectoryInfo dir;
+         if(parts.Length == 1)
+         {
+            dir = _directory;
+         }
+         else
+         {
+            string extraPath = string.Join(FsPathSeparator, parts, 0, parts.Length - 1);
+
+            string fullPath = Path.Combine(_directory.FullName, extraPath);
+
+            dir = new DirectoryInfo(fullPath);
+            if (!dir.Exists) dir.Create();
+         }
+
+         return Path.Combine(dir.FullName, name.SanitizePath());
       }
 
       private Stream CreateStream(string id)

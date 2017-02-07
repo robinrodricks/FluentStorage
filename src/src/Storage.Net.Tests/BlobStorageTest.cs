@@ -265,5 +265,19 @@ namespace Storage.Net.Tests.Integration
       {
          Assert.Throws<ArgumentException>(() => _storage.Delete(Generator.GetRandomString(10000, false)));
       }
+
+      [Fact]
+      public void Folders_SaveToSubfolders_FilesListed()
+      {
+         _storage.UploadFromStream("one/two/three.json", "{}".ToMemoryStream());
+         _storage.UploadFromStream("two/three/four.json", "{p:1}".ToMemoryStream());
+
+         string[] files = _storage.List(null).ToArray();
+
+         Assert.True(files.Length >= 2);
+         Assert.Contains("one/two/three.json", files);
+         Assert.Contains("two/three/four.json", files);
+
+      }
    }
 }
