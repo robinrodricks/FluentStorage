@@ -73,6 +73,20 @@ namespace Storage.Net.Blob.Files
       }
 
       /// <summary>
+      /// Append chunk to file
+      /// </summary>
+      public void AppendFromStream(string id, Stream chunkStream)
+      {
+         GenericValidation.CheckBlobId(id);
+         if (chunkStream == null) throw new ArgumentNullException(nameof(chunkStream));
+
+         using (Stream target = CreateStream(id, false))
+         {
+            chunkStream.CopyTo(target);
+         }
+      }
+
+      /// <summary>
       /// Reads blob from file and writes to the target stream
       /// </summary>
       public void DownloadToStream(string id, Stream targetStream)
@@ -112,6 +126,23 @@ namespace Storage.Net.Blob.Files
          return File.Exists(GetFilePath(id));
       }
 
+      /// <summary>
+      /// Gets blob metadata
+      /// </summary>
+      public BlobMeta GetMeta(string id)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         string path = GetFilePath(id);
+
+         if (!File.Exists(path)) return null;
+
+         var fi = new FileInfo(path);
+
+         return new BlobMeta(
+            fi.Length);
+      }
+
       private string GetFilePath(string id)
       {
          GenericValidation.CheckBlobId(id);
@@ -137,13 +168,15 @@ namespace Storage.Net.Blob.Files
          return Path.Combine(dir.FullName, name.SanitizePath());
       }
 
-      private Stream CreateStream(string id)
+      private Stream CreateStream(string id, bool overwrite = true)
       {
          GenericValidation.CheckBlobId(id);
          if (!_directory.Exists) _directory.Create();
          string path = GetFilePath(id);
 
-         return File.Create(path);
+         Stream s = overwrite ? File.Create(path) : File.OpenWrite(path);
+         s.Seek(0, SeekOrigin.End);
+         return s;
       }
 
       private Stream OpenStream(string id)
@@ -154,5 +187,6 @@ namespace Storage.Net.Blob.Files
 
          return File.OpenRead(path);
       }
+
    }
 }

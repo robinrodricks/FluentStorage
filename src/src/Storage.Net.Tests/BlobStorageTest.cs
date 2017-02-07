@@ -279,5 +279,31 @@ namespace Storage.Net.Tests.Integration
          Assert.Contains("two/three/four.json", files);
 
       }
+
+      [Fact]
+      public void Append_KeepAppending_Grows()
+      {
+         string id = Generator.GetRandomString(10, false);
+
+         _storage.Delete(id);
+
+         try
+         {
+            var ms = Generator.RandomString.ToMemoryStream();
+            _storage.AppendFromStream(id, ms);
+
+            var meta = _storage.GetMeta(id);
+            Assert.Equal(ms.Length, meta.Size);
+
+            var ms1 = Generator.RandomString.ToMemoryStream();
+            _storage.AppendFromStream(id, ms1);
+            meta = _storage.GetMeta(id);
+            Assert.Equal(ms.Length + ms1.Length, meta.Size);
+         }
+         catch(NotSupportedException)
+         {
+            //AWS doesnt' support appends!
+         }
+      }
    }
 }

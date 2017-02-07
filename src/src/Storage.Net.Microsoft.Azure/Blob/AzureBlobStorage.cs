@@ -130,6 +130,21 @@ namespace Storage.Net.Microsoft.Azure.Blob
       }
 
       /// <summary>
+      /// Appends to the append blob.
+      /// </summary>
+      public void AppendFromStream(string id, Stream chunkStream)
+      {
+         GenericValidation.CheckBlobId(id);
+         if (chunkStream == null) throw new ArgumentNullException(nameof(chunkStream));
+         id = ToInternalId(id);
+
+         CloudAppendBlob cab = _blobContainer.GetAppendBlobReference(id);
+         if (!cab.Exists()) cab.CreateOrReplace();
+
+         cab.AppendBlock(chunkStream);
+      }
+
+      /// <summary>
       /// Downloads to stream
       /// </summary>
       public void DownloadToStream(string id, Stream targetStream)
@@ -191,6 +206,22 @@ namespace Storage.Net.Microsoft.Azure.Blob
             throw;
          }
 
+      }
+
+      /// <summary>
+      /// Gets blob metadata
+      /// </summary>
+      public BlobMeta GetMeta(string id)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         CloudBlob blob = _blobContainer.GetBlobReference(id);
+         if (!blob.Exists()) return null;
+
+         blob.FetchAttributes();
+
+         return new BlobMeta(
+            blob.Properties.Length);
       }
 
       private static string ToInternalId(string userId)

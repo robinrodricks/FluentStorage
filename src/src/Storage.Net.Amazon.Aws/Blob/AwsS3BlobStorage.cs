@@ -8,6 +8,7 @@ using Amazon.S3;
 using Amazon.Runtime;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using NetBox;
 
 namespace Storage.Net.Aws.Blob
 {
@@ -104,6 +105,27 @@ namespace Storage.Net.Aws.Blob
       }
 
       /// <summary>
+      /// Gets blob metadata
+      /// </summary>
+      public BlobMeta GetMeta(string id)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         try
+         {
+            using (GetObjectResponse obj = GetObject(id))
+            {
+               return new BlobMeta(
+                  obj.ContentLength);
+            }
+         }
+         catch(StorageException ex) when (ex.ErrorCode == ErrorCode.NotFound)
+         {
+            return null;
+         }
+      }
+
+      /// <summary>
       /// Lists all buckets, optionaly filtering by prefix. Prefix filtering happens on client side.
       /// </summary>
       public IEnumerable<string> List(string prefix)
@@ -145,6 +167,35 @@ namespace Storage.Net.Aws.Blob
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
 
          _fileTransferUtility.Upload(sourceStream, _bucketName, id);
+      }
+
+      /// <summary>
+      /// Simulates append operation in a very inefficient way as AWS doesn't support appending to blobs. Avoid at all costs!
+      /// </summary>
+      /// <param name="id"></param>
+      /// <param name="chunkStream"></param>
+      public void AppendFromStream(string id, Stream chunkStream)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         //AWS doesn't support appending, so here is what we are going to do:
+
+         //1. If blob already exist, move it to a new name and delete old one
+         string oldDataId = null;
+         if(Exists(id))
+         {
+            oldDataId = Generator.RandomString;
+            using (Stream source = OpenStreamToRead(id))
+            {
+               UploadFromStream(oldDataId, source);
+            }
+            Delete(id);
+         }
+
+         //2. Create a new blob and copy data from old and new chunks
+         //todo: need to combine streams to do this, no luck yet
+
+         throw new NotSupportedException();
       }
 
       private GetObjectResponse GetObject(string key)

@@ -34,6 +34,13 @@ namespace Storage.Net.Blob
       void UploadFromStream(string id, Stream sourceStream);
 
       /// <summary>
+      /// Appends a blob of data to the end of the blob.
+      /// </summary>
+      /// <param name="id">Blob ID. If blob doesn't exist it will be created.</param>
+      /// <param name="chunkStream">Block data</param>
+      void AppendFromStream(string id, Stream chunkStream);
+
+      /// <summary>
       /// Downloads blob to a stream
       /// </summary>
       /// <param name="id">Blob ID, required</param>
@@ -59,5 +66,12 @@ namespace Storage.Net.Blob
       /// <param name="id">Blob ID, required</param>
       /// <returns>True if blob exists, false otherwise</returns>
       bool Exists(string id);
+
+      /// <summary>
+      /// Gets basic blob metadata
+      /// </summary>
+      /// <param name="id">Blob id</param>
+      /// <returns>Blob metadata or null if blob doesn't exist</returns>
+      BlobMeta GetMeta(string id);
    }
 }
