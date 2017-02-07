@@ -22,6 +22,16 @@ You need to provide Azure specific information like account name and key. Contai
 
 This storage is working with `block blobs` only. We are planning to add `append blobs` support but that requires some architectural changes and as always you're welcome to help.
 
+Another way to create the blob storage is using connection strings, as there is an overloaded method for this:
+
+```csharp
+using Storage.Net;
+
+IBlobStorage storage = StorageFactory.Blobs.AzureBlobStorage("connection_string", "container_name");
+```
+
+Alternatively, you can construct the blob storage client from the SAS signature token like this:
+
 > todo: create from SAS token
 
 ## Tables
