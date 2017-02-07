@@ -7,13 +7,15 @@ using System.Web;
 using Storage.Net.Blob;
 using Microsoft.WindowsAzure.Storage.Blob;
 using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Auth;
 
 namespace Storage.Net.Microsoft.Azure.Blob
 {
    /// <summary>
    /// Azure Blob Storage
    /// </summary>
-   public class AzureBlobStorage : AzureStorage, IBlobStorage
+   public class AzureBlobStorage : IBlobStorage
    {
       private readonly CloudBlobContainer _blobContainer;
 
@@ -21,11 +23,14 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// Creates an instance from account name, private key and container name
       /// </summary>
       public AzureBlobStorage(string accountName, string key, string containerName)
-         : base(accountName, key)
       {
          ValidateContainerName(containerName);
 
-         CloudBlobClient blobClient = Account.CreateCloudBlobClient();
+         var account = new CloudStorageAccount(
+            new StorageCredentials(accountName, key),
+            true);
+
+         CloudBlobClient blobClient = account.CreateCloudBlobClient();
 
          _blobContainer = blobClient.GetContainerReference(containerName);
          _blobContainer.CreateIfNotExists();

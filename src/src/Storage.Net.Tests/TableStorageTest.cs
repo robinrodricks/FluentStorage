@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Config.Net;
 using Xunit;
 using Storage.Net.Table;
-using Storage.Net.Table.Files;
-using Storage.Net.Microsoft.Azure.Table;
-using Storage.Net.Net45.Esent;
 using System.IO;
 
 namespace Storage.Net.Tests.Integration
