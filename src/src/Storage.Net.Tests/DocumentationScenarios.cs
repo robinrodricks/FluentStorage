@@ -1,6 +1,9 @@
-﻿using Storage.Net;
+﻿using NetBox;
+using Storage.Net;
 using Storage.Net.Blob;
+using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Xunit;
 
@@ -8,11 +11,26 @@ namespace Storage.Net.Tests
 {
    public class DocumentationScenarios
    {
-      //[Fact]
+      [Fact]
       public void Run()
       {
          //Blobs_save_file_to_azure_storage_and_read_it_later();
-         Blobs_save_file_to_a_specific_folder();
+         //Blobs_save_file_to_a_specific_folder();
+         Blobs_list_files_in_a_folder();
+      }
+
+      public void Blobs_list_files_in_a_folder()
+      {
+         IBlobStorage storage = StorageFactory.Blobs.AmazonS3BlobStorage(
+            TestSettings.Instance.AwsAccessKeyId,
+            TestSettings.Instance.AwsSecretAccessKey,
+            TestSettings.Instance.AwsTestBucketName);
+
+         storage.UploadFromStream("folder1/file1", Generator.RandomString.ToMemoryStream());
+         storage.UploadFromStream("folder1/file2", Generator.RandomString.ToMemoryStream());
+         storage.UploadFromStream("folder2/file1", Generator.RandomString.ToMemoryStream());
+
+         string[] folderBlobs =storage.List("folder1").ToArray();
       }
 
       public void Blobs_save_file_to_a_specific_folder()

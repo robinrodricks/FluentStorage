@@ -103,9 +103,45 @@ Job done.
 
 ### List all files in a folder
 
-todo
+There is no concept of folders in most of the blob storages, just a flat file structure. However, file names can contain folder separators, that's how they are virtually aligned into folders. This this example I'm going to upload three files to Amazon S3 storage - two files to one folder and another file to the second folder, and then list the contents of the first folder which will contain only two files.
 
-### Copy folder from the local filesystem to Amazon S3 preserving folder structure
+```csharp
+using Storage.Net;
+using Storage.Net.Blob;
+using System.IO;
+using System.Text;
 
-todo
+namespace Scenario
+{
+   public class DocumentationScenarios
+   {
+      public void Run()
+      {
+         //create the storage using a factory method
+         IBlobStorage storage = StorageFactory.Blobs.AmazonS3BlobStorage(
+            "aws_access_key_id",
+            "aws_secret_access_key",
+            "bucket_name");
+
+
+         //upload three files
+         //Generator is just a utility method to generate a random stream
+         storage.UploadFromStream("folder1/file1", Generator.RandomString.ToMemoryStream());
+         storage.UploadFromStream("folder1/file2", Generator.RandomString.ToMemoryStream());
+         storage.UploadFromStream("folder2/file1", Generator.RandomString.ToMemoryStream());
+
+         //list the contents of folder1
+         string[] folderBlobs =storage.List("folder1").ToArray();
+      }
+   }
+}
+```
+
+The last line of this code sample contains exactly two entries. Note that I've used the `List(prefix)` method which filters out anything not starting with a specific string.
+
+### Copy files between different storage providers
+
+This sample is useful if you want to transfer files between two storage providers like from Microsot Azure to Amazon S3 or vice versa. Or copy files from the local disk to one of the cloud providers, it doesn't matter as we are using the same interface. You can even build your own blob transfer utility which supports all of the cloud providers.
+
+> todo
 
