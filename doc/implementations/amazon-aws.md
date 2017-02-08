@@ -11,3 +11,7 @@ Blobs are implemented as [S3](https://aws.amazon.com/s3/) interface.
 The easiest way to create a blob storage is to use the factory method
 
 > todo
+
+### Limitations
+
+Unfortunately, S3 storage doesn't support appending contents to an existing blob like some other providers do. This implementation at the moment throws `NotSupportedException` if you try to do this, and we may implement a workaround for this to work, however it's not recommended to use append blobs with S3 storage.

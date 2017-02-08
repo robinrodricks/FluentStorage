@@ -36,8 +36,8 @@ Alternatively, you can construct the blob storage client from the SAS signature 
 
 ## Tables
 
-todo
+> todo
 
 ## Messaging
 
-todo
+> todo

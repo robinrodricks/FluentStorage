@@ -7,7 +7,7 @@
         "Storage.Net.Amazon.Aws": "3.0.1",
         "Storage.Net.Microsoft.Azure": "3.0.1",
         "Storage.Net.Esent": "1.0.0",
-        "Config.Net": "3.0.1701.1901",
+        "Config.Net": "3.0.1701.3101",
         "LogMagic": "2.1.0"
     },
 
@@ -21,8 +21,8 @@
          "dependencies": {
             "xunit": "2.1.0",
             "xunit.runner.visualstudio": "2.1.0",
-            "WindowsAzure.Storage": "7.2.1",
-            "WindowsAzure.ServiceBus": "3.4.2"
+            "WindowsAzure.Storage": "8.0.1",
+            "WindowsAzure.ServiceBus": "3.4.5"
          }
       }
    }

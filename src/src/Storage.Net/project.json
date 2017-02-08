@@ -23,8 +23,8 @@
 
 
     "dependencies": {
-        "netbox": "1.0.1701.1901",
-        "NETStandard.Library": "1.6.0"
+        "netbox": "1.0.1702.201",
+        "NETStandard.Library": "1.6.1"
     },
 
    "frameworks": {
@@ -34,7 +34,7 @@
             "define": [ "NETSTANDARD" ]
          },
          "dependencies": {
-            "System.Threading.Thread": "4.0.0"
+            "System.Threading.Thread": "4.3.0"
          }
       },
       "net45": {

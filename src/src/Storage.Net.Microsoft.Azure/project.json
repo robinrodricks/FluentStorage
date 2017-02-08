@@ -22,17 +22,19 @@
    },
 
     "dependencies": {
-        "netbox": "1.0.1701.1901",
-        "NETStandard.Library": "1.6.0",
-        "Storage.Net": "3.0.1"
+        "netbox": "1.0.1702.201",
+        "Storage.Net": "3.0.1",
+        "WindowsAzure.Storage": "8.0.1"
     },
 
-   "frameworks": {
-      "net45": {
-         "dependencies": {
-            "WindowsAzure.Storage": "7.2.1",
-            "WindowsAzure.ServiceBus": "3.4.2"
-         }
-      }
-   }
+    "frameworks": {
+        "net45": {
+            "dependencies": {
+                "WindowsAzure.ServiceBus": "3.4.5"
+            },
+            "buildOptions": {
+                "define": [ "NETFULL" ]
+            }
+        }
+    }
 }
