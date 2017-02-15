@@ -66,7 +66,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
          _client = account.CreateCloudQueueClient();
          _queueName = queueName;
          _queue = _client.GetQueueReference(queueName);
-         _queue.CreateIfNotExists();
+         _queue.CreateIfNotExistsAsync().Wait();
          _messageVisibilityTimeout = messageVisibilityTimeout;
          _messagePumpPollingTimeout = messagePumpPollingTimeout;
       }
@@ -97,7 +97,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
          string id, popReceipt;
          Converter.SplitId(message.Id, out id, out popReceipt);
          if(popReceipt == null) throw new ArgumentException("cannot delete message by short id", id);
-         _queue.DeleteMessage(id, popReceipt);
+         _queue.DeleteMessageAsync(id, popReceipt).Wait();
       }
 
       /// <summary>
@@ -110,7 +110,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
          dead.Properties["deadLetterReason"] = reason;
          dead.Properties["deadLetterError"] = errorDescription;
 
-         DeadLetterQueue.AddMessage(Converter.ToCloudQueueMessage(message));
+         DeadLetterQueue.AddMessageAsync(Converter.ToCloudQueueMessage(message)).Wait();
 
          ConfirmMessage(message);
       }
@@ -174,7 +174,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
       /// </summary>
       public QueueMessage ReceiveMessage()
       {
-         CloudQueueMessage message = _queue.GetMessage(_messageVisibilityTimeout);
+         CloudQueueMessage message = _queue.GetMessageAsync(_messageVisibilityTimeout).Result;
          if(message == null) return null;
 
          return Converter.ToQueueMessage(message);

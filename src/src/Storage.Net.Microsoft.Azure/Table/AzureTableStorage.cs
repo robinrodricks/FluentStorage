@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Web;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -79,7 +78,7 @@ namespace Storage.Net.Microsoft.Azure.Table
          {
             lock (RefLock)
             {
-               table.Delete();
+               table.DeleteAsync().Wait();
                TableTag tag;
                TableNameToTableTag.TryRemove(tableName, out tag);
             }
@@ -373,7 +372,7 @@ namespace Storage.Net.Microsoft.Azure.Table
 
             if (!tag.Exists && createIfNotExists)
             {
-               tag.Table.Create();
+               tag.Table.CreateAsync().Wait();
                tag.Exists = true;
             }
 
@@ -386,7 +385,7 @@ namespace Storage.Net.Microsoft.Azure.Table
       {
          try
          {
-            return table.ExecuteBatch(op).ToList();
+            return table.ExecuteBatchAsync(op).Result.ToList();
          }
          catch (AzSE ex)
          {
@@ -456,7 +455,7 @@ namespace Storage.Net.Microsoft.Azure.Table
 
          private static string ToInternalId(string userId)
          {
-            return HttpUtility.UrlEncode(userId);
+            return userId.UrlEncode();
          }
       }
 
@@ -475,7 +474,7 @@ namespace Storage.Net.Microsoft.Azure.Table
       private static string EncodeKey(string key)
       {
          //todo: read more: https://msdn.microsoft.com/library/azure/dd179338.aspx
-         return HttpUtility.UrlEncode(key);
+         return key.UrlEncode();
       }
 
       /// <summary>
@@ -497,7 +496,7 @@ namespace Storage.Net.Microsoft.Azure.Table
          if (string.IsNullOrEmpty(id)) return false;
          if (id.Length == 0) return false;
          if (id.Length > 1024) return false;
-         if (HttpUtility.UrlEncode(id) != id) return false;
+         if (id.UrlEncode() != id) return false;
 
          return true;
       }

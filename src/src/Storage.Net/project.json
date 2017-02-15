@@ -23,7 +23,7 @@
 
 
     "dependencies": {
-        "netbox": "1.0.1702.201",
+        "netbox": "1.0.1702.1501",
         "NETStandard.Library": "1.6.1"
     },
 

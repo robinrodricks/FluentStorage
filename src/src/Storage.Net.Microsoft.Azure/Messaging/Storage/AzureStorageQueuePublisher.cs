@@ -29,7 +29,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
          var account = new CloudStorageAccount(new StorageCredentials(accountName, storageKey), true);
          var client = account.CreateCloudQueueClient();
          _queue = client.GetQueueReference(queueName);
-         _queue.CreateIfNotExists();
+         _queue.CreateIfNotExistsAsync().Wait();
       }
 
       /// <summary>
@@ -39,7 +39,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
       {
          if(message == null) return;
          CloudQueueMessage nativeMessage = Converter.ToCloudQueueMessage(message);
-         _queue.AddMessage(nativeMessage);
+         _queue.AddMessageAsync(nativeMessage).Wait();
       }
 
       /// <summary>

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Web;
 using Storage.Net.Blob;
 using Microsoft.WindowsAzure.Storage.Blob;
 using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
@@ -33,7 +32,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
          CloudBlobClient blobClient = account.CreateCloudBlobClient();
 
          _blobContainer = blobClient.GetContainerReference(containerName);
-         _blobContainer.CreateIfNotExists();
+         _blobContainer.CreateIfNotExistsAsync().Wait();
       }
 
       /// <summary>
@@ -53,7 +52,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
          CloudBlobClient blobClient = account.CreateCloudBlobClient();
 
          _blobContainer = blobClient.GetContainerReference(containerName);
-         _blobContainer.CreateIfNotExists();
+         _blobContainer.CreateIfNotExistsAsync().Wait();
       }
 
       private void ValidateContainerName(string containerName)
@@ -126,7 +125,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
          id = ToInternalId(id);
 
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
-         blob.UploadFromStream(sourceStream);
+         blob.UploadFromStreamAsync(sourceStream).Wait();
       }
 
       /// <summary>
@@ -139,9 +138,9 @@ namespace Storage.Net.Microsoft.Azure.Blob
          id = ToInternalId(id);
 
          CloudAppendBlob cab = _blobContainer.GetAppendBlobReference(id);
-         if (!cab.Exists()) cab.CreateOrReplace();
+         if (!cab.ExistsAsync().Result) cab.CreateOrReplaceAsync().Wait();
 
-         cab.AppendBlock(chunkStream);
+         cab.AppendBlockAsync(chunkStream).Wait();
       }
 
       /// <summary>
@@ -216,9 +215,9 @@ namespace Storage.Net.Microsoft.Azure.Blob
          GenericValidation.CheckBlobId(id);
 
          CloudBlob blob = _blobContainer.GetBlobReference(id);
-         if (!blob.Exists()) return null;
+         if (!blob.ExistsAsync().Result) return null;
 
-         blob.FetchAttributes();
+         blob.FetchAttributesAsync().Wait();
 
          return new BlobMeta(
             blob.Properties.Length);
@@ -226,12 +225,12 @@ namespace Storage.Net.Microsoft.Azure.Blob
 
       private static string ToInternalId(string userId)
       {
-         return HttpUtility.UrlEncode(userId);
+         return userId.UrlEncode();
       }
 
       private static string ToUserId(string internalId)
       {
-         return HttpUtility.UrlDecode(internalId);
+         return internalId.UrlDecode();
       }
 
       private static bool TryHandleStorageException(AzureStorageException ex)
