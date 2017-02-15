@@ -18,7 +18,9 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
          //when there are no properties pack the data as binary in raw form
          if(message.Properties == null || message.Properties.Count == 0)
          {
-            return new CloudQueueMessage(message.Content);
+            var r = new CloudQueueMessage((string)null);
+            r.SetMessageContent(message.Content);
+            return r;
          }
 
          //note that Azure Storage doesn't have properties on message, therefore I can do a simulation instead
@@ -40,7 +42,8 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
                writer.Write(message.Content);
             }
 
-            result = new CloudQueueMessage(ms.ToArray());
+            result = new CloudQueueMessage((string)null);
+            result.SetMessageContent(ms.ToArray());
          }
 
          return result;
