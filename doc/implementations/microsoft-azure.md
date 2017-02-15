@@ -2,6 +2,10 @@
 
 Microsoft Azure implementations reside in a separate package hosted on [NuGet](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure/). Follow the link for installation instructions. The package implements all three aspects of storage - blobs, tables and queues.
 
+> Current implementation only supports .NET 4.5 (Windows) and .NET Standard 1.6 with "portable-net451+win8" target. This is due to limitations in client library for .NET Core from Microsoft.
+
+> Note that only Azure Storage functionality is supported in .NET Core because there is no impelmentation of underlying Service Bus libraries for .NET Core. .NET 4.5 version supports everything.
+
 ## Blobs
 
 Blobs are interfacing with the official [Blob Storage](https://azure.microsoft.com/en-gb/services/storage/blobs/) and implement a good subset of functionality from the rich Blob Storage ecosystem in Azure.

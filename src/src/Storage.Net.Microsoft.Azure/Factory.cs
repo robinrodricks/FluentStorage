@@ -2,7 +2,9 @@
 using Storage.Net.Blob;
 using Storage.Net.Messaging;
 using Storage.Net.Microsoft.Azure.Blob;
+#if NETFULL
 using Storage.Net.Microsoft.Azure.Messaging.ServiceBus;
+#endif
 using Storage.Net.Microsoft.Azure.Messaging.Storage;
 using Storage.Net.Microsoft.Azure.Table;
 using Storage.Net.Table;
@@ -70,6 +72,7 @@ namespace Storage.Net
          return new AzureStorageQueueReceiver(accountName, storageKey, queueName, messageVisibilityTimeout);
       }
 
+#if NETFULL
       /// <summary>
       /// Creates a new instance of Azure Service Bus Queue by connection string and queue name
       /// </summary>
@@ -123,5 +126,7 @@ namespace Storage.Net
       {
          return new AzureServiceBusTopicReceiver(connectionString, topicName, subscriptionName, subscriptionSqlFilter, peekLock);
       }
+#endif
+
    }
 }

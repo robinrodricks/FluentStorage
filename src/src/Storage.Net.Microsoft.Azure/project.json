@@ -1,39 +1,49 @@
 {
-   "version": "3.0.1",
+    "version": "3.0.1",
 
-   "authors": [ "Ivan Gavryliuk" ],
+    "authors": [ "Ivan Gavryliuk" ],
 
-   "title": "Storage.Net.Microsoft.Azure",
+    "title": "Storage.Net.Microsoft.Azure",
 
-   "copyright": "Copyright (c) 2015-2016 by Ivan Gavryliuk",
+    "copyright": "Copyright (c) 2015-2016 by Ivan Gavryliuk",
 
-   "packOptions": {
+    "packOptions": {
 
-      "iconUrl": "http://images.gavryli.uk/nuget/storage.png",
+        "iconUrl": "http://images.gavryli.uk/nuget/storage.png",
 
-      "projectUrl": "https://github.com/aloneguid/storage",
+        "projectUrl": "https://github.com/aloneguid/storage",
 
-      "summary": ""
-   },
+        "summary": ""
+    },
 
-   "buildOptions": {
-      "keyFile": "../../storage.snk",
-      "xmlDoc": true
-   },
+    "buildOptions": {
+        "keyFile": "../../storage.snk",
+        "xmlDoc": true
+    },
 
     "dependencies": {
         "netbox": "1.0.1702.201",
-        "Storage.Net": "3.0.1",
-        "WindowsAzure.Storage": "8.0.1"
+        "Storage.Net": "3.0.1"
+        
     },
 
     "frameworks": {
         "net45": {
             "dependencies": {
-                "WindowsAzure.ServiceBus": "3.4.5"
+                "WindowsAzure.ServiceBus": "3.4.5",
+                "WindowsAzure.Storage": "8.0.1"
             },
             "buildOptions": {
                 "define": [ "NETFULL" ]
+            }
+        },
+        "netstandard1.6": {
+            "imports": [ "dnxcore50", "portable-net451+win8" ],
+            "buildOptions": {
+                "define": [ "NETSTANDARD" ]
+            },
+            "dependencies": {
+                "WindowsAzure.Storage": "8.0.1"
             }
         }
     }
