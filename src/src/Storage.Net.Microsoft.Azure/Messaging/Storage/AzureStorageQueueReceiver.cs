@@ -6,6 +6,7 @@ using Microsoft.WindowsAzure.Storage.Auth;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Microsoft.Azure.Messaging.Storage
 {
@@ -71,21 +72,15 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
          _messagePumpPollingTimeout = messagePumpPollingTimeout;
       }
 
-      private CloudQueue DeadLetterQueue
+      private async Task<CloudQueue> GetDeadLetterQueue()
       {
-         get
+         if (_deadLetterQueue == null)
          {
-            lock(_createLock)
-            {
-               if (_deadLetterQueue == null)
-               {
-                  _deadLetterQueue = _client.GetQueueReference(_queueName + "-deadletter");
-                  _deadLetterQueue.CreateIfNotExists();
-               }
-
-               return _deadLetterQueue;
-            }
+            _deadLetterQueue = _client.GetQueueReference(_queueName + "-deadletter");
+            await _deadLetterQueue.CreateIfNotExistsAsync();
          }
+
+         return _deadLetterQueue;
       }
 
       /// <summary>
@@ -94,10 +89,20 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
       /// <param name="message"></param>
       public void ConfirmMessage(QueueMessage message)
       {
+         ConfirmMessageAsync(message).Wait();
+      }
+
+
+      /// <summary>
+      /// Deletes the message from the queue
+      /// </summary>
+      /// <param name="message"></param>
+      private async Task ConfirmMessageAsync(QueueMessage message)
+      {
          string id, popReceipt;
          Converter.SplitId(message.Id, out id, out popReceipt);
          if(popReceipt == null) throw new ArgumentException("cannot delete message by short id", id);
-         _queue.DeleteMessageAsync(id, popReceipt).Wait();
+         await _queue.DeleteMessageAsync(id, popReceipt);
       }
 
       /// <summary>
@@ -106,13 +111,24 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
       /// </summary>
       public void DeadLetter(QueueMessage message, string reason, string errorDescription)
       {
+         DeadLetterAsync(message, reason, errorDescription).Wait();
+      }
+
+      /// <summary>
+      /// Moves message to a dead letter queue which has the same name as original queue prefixed with "-deadletter". This is done because 
+      /// Azure Storage queues do not support deadlettering directly.
+      /// </summary>
+      public async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
+      {
          var dead = (QueueMessage)message.Clone();
          dead.Properties["deadLetterReason"] = reason;
          dead.Properties["deadLetterError"] = errorDescription;
 
-         DeadLetterQueue.AddMessageAsync(Converter.ToCloudQueueMessage(message)).Wait();
+         CloudQueue deadLetterQueue = await GetDeadLetterQueue();
 
-         ConfirmMessage(message);
+         await deadLetterQueue.AddMessageAsync(Converter.ToCloudQueueMessage(message));
+
+         await ConfirmMessageAsync(message);
       }
 
       /// <summary>
@@ -174,7 +190,16 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
       /// </summary>
       public QueueMessage ReceiveMessage()
       {
-         CloudQueueMessage message = _queue.GetMessageAsync(_messageVisibilityTimeout).Result;
+         return ReceiveMessageAsync().Result;
+      }
+
+
+      /// <summary>
+      /// Calls .GetMessage on storage queue
+      /// </summary>
+      private async Task<QueueMessage> ReceiveMessageAsync()
+      {
+         CloudQueueMessage message = await _queue.GetMessageAsync(_messageVisibilityTimeout, null, null);
          if(message == null) return null;
 
          return Converter.ToQueueMessage(message);
@@ -185,7 +210,16 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
       /// </summary>
       public IEnumerable<QueueMessage> ReceiveMessages(int count)
       {
-         IEnumerable<CloudQueueMessage> batch = _queue.GetMessages(count, _messageVisibilityTimeout);
+         return ReceiveMessagesAsync(count).Result;
+      }
+
+
+      /// <summary>
+      /// Calls .GetMessages on storage queue
+      /// </summary>
+      private async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
+      {
+         IEnumerable<CloudQueueMessage> batch = await _queue.GetMessagesAsync(count, _messageVisibilityTimeout, null, null);
          if(batch == null) return null;
          return batch.Select(Converter.ToQueueMessage).ToList();
       }
