@@ -11,6 +11,7 @@ using AzSE = Microsoft.WindowsAzure.Storage.StorageException;
 using MeSE = Storage.Net.StorageException;
 using Storage.Net.Table;
 using System.Collections.Generics;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Microsoft.Azure.Table
 {
@@ -24,7 +25,6 @@ namespace Storage.Net.Microsoft.Azure.Table
       private const string RowKeyName = "RowKey";
       private readonly CloudTableClient _client;
       private static readonly ConcurrentDictionary<string, TableTag> TableNameToTableTag = new ConcurrentDictionary<string, TableTag>();
-      private static readonly object RefLock = new object();
       private static readonly Regex TableNameRgx = new Regex("^[A-Za-z][A-Za-z0-9]{2,62}$");
 
       private class TableTag
@@ -62,9 +62,34 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// <returns></returns>
       public IEnumerable<string> ListTableNames()
       {
-         IEnumerable<CloudTable> tables = _client.ListTables();
+         return ListTableNamesAsync().Result;
+      }
 
-         return tables == null ? null : tables.Select(t => t.Name);
+
+      /// <summary>
+      /// Returns the list of table names in this storage
+      /// </summary>
+      /// <returns></returns>
+      private async Task<IEnumerable<string>> ListTableNamesAsync()
+      {
+         var result = new List<string>();
+
+         TableContinuationToken token = null;
+
+         do
+         {
+            TableResultSegment segment = await _client.ListTablesSegmentedAsync(token);
+
+            foreach(CloudTable table in segment.Results)
+            {
+               result.Add(table.Name);
+            }
+
+            token = segment.ContinuationToken;
+         }
+         while (token != null);
+
+         return result;
       }
 
       /// <summary>
@@ -73,15 +98,22 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// <param name="tableName"></param>
       public void Delete(string tableName)
       {
-         CloudTable table = GetTable(tableName, false);
+         DeleteAsync(tableName).Wait();
+      }
+
+
+      /// <summary>
+      /// Deletes table completely
+      /// </summary>
+      /// <param name="tableName"></param>
+      private async Task DeleteAsync(string tableName)
+      {
+         CloudTable table = await GetTableAsync(tableName, false);
          if (table != null)
          {
-            lock (RefLock)
-            {
-               table.DeleteAsync().Wait();
-               TableTag tag;
-               TableNameToTableTag.TryRemove(tableName, out tag);
-            }
+            await table.DeleteAsync();
+            TableTag tag;
+            TableNameToTableTag.TryRemove(tableName, out tag);
          }
       }
 
@@ -122,8 +154,12 @@ namespace Storage.Net.Microsoft.Azure.Table
 
       private IEnumerable<TableRow> InternalGet(string tableName, string partitionKey, string rowKey, int maxRecords)
       {
+         return InternalGetAsync(tableName, partitionKey, rowKey, maxRecords).Result;
+      }
 
-         CloudTable table = GetTable(tableName, false);
+      private async Task<IEnumerable<TableRow>> InternalGetAsync(string tableName, string partitionKey, string rowKey, int maxRecords)
+      {
+         CloudTable table = await GetTableAsync(tableName, false);
          if (table == null) return Enumerable.Empty<TableRow>();
 
          var query = new TableQuery();
@@ -163,7 +199,7 @@ namespace Storage.Net.Microsoft.Azure.Table
             query = query.Take(maxRecords);
          }
 
-         IEnumerable<DynamicTableEntity> entities = table.ExecuteQuery(query);
+         IEnumerable<DynamicTableEntity> entities = await table.ExecuteQuerySegmentedAsync(query, null);
          return entities.Select(ToTableRow);
       }
 
@@ -171,6 +207,15 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// As per interface
       /// </summary>
       public void Insert(string tableName, IEnumerable<TableRow> rows)
+      {
+         InsertAsync(tableName, rows).Wait();
+      }
+
+
+      /// <summary>
+      /// As per interface
+      /// </summary>
+      private async Task InsertAsync(string tableName, IEnumerable<TableRow> rows)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
@@ -182,7 +227,7 @@ namespace Storage.Net.Microsoft.Azure.Table
             throw new MeSE(ErrorCode.DuplicateKey, null);
          }
 
-         BatchedOperation(tableName, true,
+         await BatchedOperationAsync(tableName, true,
             (b, te) => b.Insert(te),
             rowsList);
       }
@@ -203,6 +248,15 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// </summary>
       public void InsertOrReplace(string tableName, IEnumerable<TableRow> rows)
       {
+         InsertOrReplaceAsync(tableName, rows).Wait();
+      }
+
+
+      /// <summary>
+      /// See interface
+      /// </summary>
+      private async Task InsertOrReplaceAsync(string tableName, IEnumerable<TableRow> rows)
+      {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
 
@@ -213,7 +267,7 @@ namespace Storage.Net.Microsoft.Azure.Table
             throw new MeSE(ErrorCode.DuplicateKey, null);
          }
 
-         BatchedOperation(tableName, true,
+         await BatchedOperationAsync(tableName, true,
             (b, te) => b.InsertOrReplace(te),
             rowsList);
       }
@@ -234,7 +288,16 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// </summary>
       public void Update(string tableName, IEnumerable<TableRow> rows)
       {
-         BatchedOperation(tableName, false,
+         UpdateAsync(tableName, rows).Wait();
+      }
+
+
+      /// <summary>
+      /// As per interface
+      /// </summary>
+      public async Task UpdateAsync(string tableName, IEnumerable<TableRow> rows)
+      {
+         await BatchedOperationAsync(tableName, false,
             (b, te) => b.Replace(te),
             rows);
       }
@@ -252,7 +315,16 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// </summary>
       public void Merge(string tableName, IEnumerable<TableRow> rows)
       {
-         BatchedOperation(tableName, true,
+         MergeAsync(tableName, rows).Wait();
+      }
+
+
+      /// <summary>
+      /// As per interface
+      /// </summary>
+      private async Task MergeAsync(string tableName, IEnumerable<TableRow> rows)
+      {
+         await BatchedOperationAsync(tableName, true,
             (b, te) => b.InsertOrMerge(te),
             rows);
       }
@@ -270,9 +342,18 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// </summary>
       public void Delete(string tableName, IEnumerable<TableRowId> rowIds)
       {
+         DeleteAsync(tableName, rowIds).Wait();
+      }
+
+
+      /// <summary>
+      /// As per interface
+      /// </summary>
+      private async Task DeleteAsync(string tableName, IEnumerable<TableRowId> rowIds)
+      {
          if (rowIds == null) return;
 
-         BatchedOperation(tableName, true,
+         await BatchedOperationAsync(tableName, true,
             (b, te) => b.Delete(te),
             rowIds);
       }
@@ -288,14 +369,14 @@ namespace Storage.Net.Microsoft.Azure.Table
          Delete(tableName, new[] { rowId });
       }
 
-      private void BatchedOperation(string tableName, bool createTable,
+      private async Task BatchedOperationAsync(string tableName, bool createTable,
          Action<TableBatchOperation, IAzTableEntity> azAction,
          IEnumerable<TableRow> rows)
       {
          if (tableName == null) throw new ArgumentNullException("tableName");
          if (rows == null) return;
 
-         CloudTable table = GetTable(tableName, createTable);
+         CloudTable table = await GetTableAsync(tableName, createTable);
          if (table == null) return;
 
          foreach (var group in rows.GroupBy(e => e.PartitionKey))
@@ -311,7 +392,7 @@ namespace Storage.Net.Microsoft.Azure.Table
                   azAction(batch, new EntityAdapter(row));
                }
 
-               List<TableResult> result = ExecOrThrow(table, batch);
+               List<TableResult> result = await ExecOrThrowAsync(table, batch);
                for (int i = 0; i < result.Count && i < chunkLst.Count; i++)
                {
                   TableResult tr = result[i];
@@ -323,14 +404,14 @@ namespace Storage.Net.Microsoft.Azure.Table
          }
       }
 
-      private void BatchedOperation(string tableName, bool createTable,
+      private async Task BatchedOperationAsync(string tableName, bool createTable,
          Action<TableBatchOperation, IAzTableEntity> azAction,
          IEnumerable<TableRowId> rowIds)
       {
          if (tableName == null) throw new ArgumentNullException("tableName");
          if (rowIds == null) return;
 
-         CloudTable table = GetTable(tableName, createTable);
+         CloudTable table = await GetTableAsync(tableName, createTable);
          if (table == null) return;
 
          foreach (var group in rowIds.GroupBy(e => e.PartitionKey))
@@ -345,47 +426,44 @@ namespace Storage.Net.Microsoft.Azure.Table
                   azAction(batch, new EntityAdapter(row));
                }
 
-               ExecOrThrow(table, batch);
+               await ExecOrThrowAsync(table, batch);
             }
          }
       }
 
-      private CloudTable GetTable(string name, bool createIfNotExists)
+      private async Task<CloudTable> GetTableAsync(string name, bool createIfNotExists)
       {
          if (name == null) throw new ArgumentNullException(nameof(name));
          if (!TableNameRgx.IsMatch(name)) throw new ArgumentException(@"invalid table name: " + name, nameof(name));
 
-         lock (RefLock)
+         TableTag tag;
+         bool cached = TableNameToTableTag.TryGetValue(name, out tag);
+
+         if (!cached)
          {
-            TableTag tag;
-            bool cached = TableNameToTableTag.TryGetValue(name, out tag);
-
-            if (!cached)
+            tag = new TableTag
             {
-               tag = new TableTag
-               {
-                  Table = _client.GetTableReference(name),
-               };
-               tag.Exists = tag.Table.Exists();
-               TableNameToTableTag[name] = tag;
-            }
-
-            if (!tag.Exists && createIfNotExists)
-            {
-               tag.Table.CreateAsync().Wait();
-               tag.Exists = true;
-            }
-
-            if (!tag.Exists) return null;
-            return tag.Table;
+               Table = _client.GetTableReference(name),
+            };
+            tag.Exists = await tag.Table.ExistsAsync();
+            TableNameToTableTag[name] = tag;
          }
+
+         if (!tag.Exists && createIfNotExists)
+         {
+            await tag.Table.CreateAsync();
+            tag.Exists = true;
+         }
+
+         if (!tag.Exists) return null;
+         return tag.Table;
       }
 
-      private List<TableResult> ExecOrThrow(CloudTable table, TableBatchOperation op)
+      private async Task<List<TableResult>> ExecOrThrowAsync(CloudTable table, TableBatchOperation op)
       {
          try
          {
-            return table.ExecuteBatchAsync(op).Result.ToList();
+            return (await table.ExecuteBatchAsync(op)).ToList();
          }
          catch (AzSE ex)
          {
