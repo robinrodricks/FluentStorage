@@ -62,7 +62,14 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// <returns></returns>
       public IEnumerable<string> ListTableNames()
       {
-         return ListTableNamesAsync().Result;
+         try
+         {
+            return ListTableNamesAsync().Result;
+         }
+         catch(AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
       }
 
 
@@ -98,7 +105,14 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// <param name="tableName"></param>
       public void Delete(string tableName)
       {
-         DeleteAsync(tableName).Wait();
+         try
+         {
+            DeleteAsync(tableName).Wait();
+         }
+         catch(AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
       }
 
 
@@ -154,7 +168,14 @@ namespace Storage.Net.Microsoft.Azure.Table
 
       private IEnumerable<TableRow> InternalGet(string tableName, string partitionKey, string rowKey, int maxRecords)
       {
-         return InternalGetAsync(tableName, partitionKey, rowKey, maxRecords).Result;
+         try
+         {
+            return InternalGetAsync(tableName, partitionKey, rowKey, maxRecords).Result;
+         }
+         catch(AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
       }
 
       private async Task<IEnumerable<TableRow>> InternalGetAsync(string tableName, string partitionKey, string rowKey, int maxRecords)
@@ -208,7 +229,14 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// </summary>
       public void Insert(string tableName, IEnumerable<TableRow> rows)
       {
-         InsertAsync(tableName, rows).Wait();
+         try
+         {
+            InsertAsync(tableName, rows).Wait();
+         }
+         catch(AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
       }
 
 
@@ -248,7 +276,14 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// </summary>
       public void InsertOrReplace(string tableName, IEnumerable<TableRow> rows)
       {
-         InsertOrReplaceAsync(tableName, rows).Wait();
+         try
+         {
+            InsertOrReplaceAsync(tableName, rows).Wait();
+         }
+         catch(AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
       }
 
 
@@ -288,7 +323,14 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// </summary>
       public void Update(string tableName, IEnumerable<TableRow> rows)
       {
-         UpdateAsync(tableName, rows).Wait();
+         try
+         {
+            UpdateAsync(tableName, rows).Wait();
+         }
+         catch(AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
       }
 
 
@@ -315,7 +357,14 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// </summary>
       public void Merge(string tableName, IEnumerable<TableRow> rows)
       {
-         MergeAsync(tableName, rows).Wait();
+         try
+         {
+            MergeAsync(tableName, rows).Wait();
+         }
+         catch(AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
       }
 
 
@@ -342,7 +391,14 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// </summary>
       public void Delete(string tableName, IEnumerable<TableRowId> rowIds)
       {
-         DeleteAsync(tableName, rowIds).Wait();
+         try
+         {
+            DeleteAsync(tableName, rowIds).Wait();
+         }
+         catch(AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
       }
 
 
