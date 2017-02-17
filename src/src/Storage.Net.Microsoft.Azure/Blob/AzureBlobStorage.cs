@@ -96,7 +96,14 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       public IEnumerable<string> List(string prefix)
       {
-         return ListAsync(prefix).Result;
+         try
+         {
+            return ListAsync(prefix).Result;
+         }
+         catch(AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
       }
 
       private async Task<IEnumerable<string>> ListAsync(string prefix)
@@ -127,7 +134,14 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       public void Delete(string id)
       {
-         DeleteAsync(id).Wait();
+         try
+         {
+            DeleteAsync(id).Wait();
+         }
+         catch(AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
       }
 
 
@@ -149,12 +163,28 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       public void UploadFromStream(string id, Stream sourceStream)
       {
+         try
+         {
+            UploadFromStreamAsync(id, sourceStream).Wait();
+         }
+         catch(AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
+      }
+
+
+      /// <summary>
+      /// Uploads from stream
+      /// </summary>
+      private async Task UploadFromStreamAsync(string id, Stream sourceStream)
+      {
          GenericValidation.CheckBlobId(id);
          if (sourceStream == null) throw new ArgumentNullException(nameof(sourceStream));
          id = ToInternalId(id);
 
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
-         blob.UploadFromStreamAsync(sourceStream).Wait();
+         await blob.UploadFromStreamAsync(sourceStream);
       }
 
       /// <summary>
@@ -177,7 +207,14 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       public void DownloadToStream(string id, Stream targetStream)
       {
-         DownloadToStreamAsync(id, targetStream).Wait();
+         try
+         {
+            DownloadToStreamAsync(id, targetStream).Wait();
+         }
+         catch(AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
       }
 
       /// <summary>
@@ -193,7 +230,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
 
          try
          {
-            blob.DownloadToStreamAsync(targetStream);
+            await blob.DownloadToStreamAsync(targetStream);
          }
          catch(AzureStorageException ex)
          {
@@ -208,7 +245,14 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// <returns></returns>
       public Stream OpenStreamToRead(string id)
       {
-         return OpenStreamToReadAsync(id).Result;
+         try
+         {
+            return OpenStreamToReadAsync(id).Result;
+         }
+         catch(AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
       }
 
 
@@ -232,7 +276,14 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       public bool Exists(string id)
       {
-         return ExistsAsync(id).Result;
+         try
+         {
+            return ExistsAsync(id).Result;
+         }
+         catch(AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
       }
 
 
@@ -274,9 +325,8 @@ namespace Storage.Net.Microsoft.Azure.Blob
 
       private static bool TryHandleStorageException(AzureStorageException ex)
       {
-         return false;
-
-         /*WebException wex = ex.InnerException as WebException;
+#if NETFULL
+         WebException wex = ex.InnerException as WebException;
          if(wex != null)
          {
             var response = wex.Response as HttpWebResponse;
@@ -288,8 +338,9 @@ namespace Storage.Net.Microsoft.Azure.Blob
                }
             }
          }
+#endif
 
-         return false;*/
+         return false;
       }
    }
 }
