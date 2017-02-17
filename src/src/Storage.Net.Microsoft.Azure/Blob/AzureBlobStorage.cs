@@ -8,6 +8,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Microsoft.Azure.Blob
 {
@@ -95,11 +96,30 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       public IEnumerable<string> List(string prefix)
       {
+         return ListAsync(prefix).Result;
+      }
+
+      private async Task<IEnumerable<string>> ListAsync(string prefix)
+      {
          GenericValidation.CheckBlobPrefix(prefix);
 
-         return _blobContainer.ListBlobs(prefix ?? null)
-            .OfType<CloudBlockBlob>()
-            .Select(b => ToUserId(b.Name));
+         var result = new List<string>();
+
+         BlobContinuationToken token = null;
+
+         do
+         {
+            BlobResultSegment segment = await _blobContainer.ListBlobsSegmentedAsync(prefix, true, BlobListingDetails.None, null, token, null, null);
+
+            foreach (CloudBlockBlob blob in segment.Results.OfType<CloudBlockBlob>())
+            {
+               result.Add(ToUserId(blob.Name));
+            }
+
+         }
+         while (token != null);
+
+         return result;
       }
 
       /// <summary>
@@ -107,12 +127,21 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       public void Delete(string id)
       {
+         DeleteAsync(id).Wait();
+      }
+
+
+      /// <summary>
+      /// Deletes blob remotely
+      /// </summary>
+      private async Task DeleteAsync(string id)
+      {
          GenericValidation.CheckBlobId(id);
 
          id = ToInternalId(id);
 
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
-         blob.DeleteIfExists();
+         await blob.DeleteIfExistsAsync();
       }
 
       /// <summary>
@@ -148,6 +177,14 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       public void DownloadToStream(string id, Stream targetStream)
       {
+         DownloadToStreamAsync(id, targetStream).Wait();
+      }
+
+      /// <summary>
+      /// Downloads to stream
+      /// </summary>
+      private async Task DownloadToStreamAsync(string id, Stream targetStream)
+      {
          GenericValidation.CheckBlobId(id);
          if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
          id = ToInternalId(id);
@@ -156,7 +193,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
 
          try
          {
-            blob.DownloadToStream(targetStream);
+            blob.DownloadToStreamAsync(targetStream);
          }
          catch(AzureStorageException ex)
          {
@@ -171,12 +208,23 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// <returns></returns>
       public Stream OpenStreamToRead(string id)
       {
+         return OpenStreamToReadAsync(id).Result;
+      }
+
+
+      /// <summary>
+      /// Opens stream to read
+      /// </summary>
+      /// <param name="id"></param>
+      /// <returns></returns>
+      private async Task<Stream> OpenStreamToReadAsync(string id)
+      {
          GenericValidation.CheckBlobId(id);
 
          id = ToInternalId(id);
 
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
-         return blob.OpenRead();
+         return await blob.OpenReadAsync();
       }
 
       /// <summary>
@@ -184,27 +232,18 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       public bool Exists(string id)
       {
+         return ExistsAsync(id).Result;
+      }
+
+
+      /// <summary>
+      /// Checks if the blob exists by trying to fetch attributes from the blob reference and checkign if that fails
+      /// </summary>
+      private async Task<bool> ExistsAsync(string id)
+      {
          GenericValidation.CheckBlobId(id);
-
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(ToInternalId(id));
-         try
-         {
-            //this is the only reliable way to check the existence :(
-            blob.FetchAttributes();
-            return true;
-         }
-         catch(AzureStorageException ex)
-         {
-            WebException wex = ex.InnerException as WebException;
-            var hwr = wex?.Response as HttpWebResponse;
-            if(hwr != null && hwr.StatusCode == HttpStatusCode.NotFound)
-            {
-               return false;
-            }
-
-            throw;
-         }
-
+         return await blob.ExistsAsync();
       }
 
       /// <summary>
@@ -235,7 +274,9 @@ namespace Storage.Net.Microsoft.Azure.Blob
 
       private static bool TryHandleStorageException(AzureStorageException ex)
       {
-         WebException wex = ex.InnerException as WebException;
+         return false;
+
+         /*WebException wex = ex.InnerException as WebException;
          if(wex != null)
          {
             var response = wex.Response as HttpWebResponse;
@@ -248,7 +289,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
             }
          }
 
-         return false;
+         return false;*/
       }
    }
 }
