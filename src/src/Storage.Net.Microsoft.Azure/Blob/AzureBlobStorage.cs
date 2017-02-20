@@ -37,6 +37,17 @@ namespace Storage.Net.Microsoft.Azure.Blob
       }
 
       /// <summary>
+      /// Creates and instance from network credential and container name
+      /// </summary>
+      /// <param name="credential"></param>
+      /// <param name="containerName"></param>
+      public AzureBlobStorage(NetworkCredential credential, string containerName) :
+         this(credential.UserName, credential.Password, containerName)
+      {
+
+      }
+
+      /// <summary>
       /// Creates an insance from connection string
       /// </summary>
       public AzureBlobStorage(string connectionString, string containerName)

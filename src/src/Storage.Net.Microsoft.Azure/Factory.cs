@@ -8,6 +8,7 @@ using Storage.Net.Microsoft.Azure.Messaging.ServiceBus;
 using Storage.Net.Microsoft.Azure.Messaging.Storage;
 using Storage.Net.Microsoft.Azure.Table;
 using Storage.Net.Table;
+using System.Net;
 
 namespace Storage.Net
 {
@@ -45,6 +46,21 @@ namespace Storage.Net
          string containerName)
       {
          return new AzureBlobStorage(accountName, key, containerName);
+      }
+
+      /// <summary>
+      /// Creates a blob storage implementation based on Microsoft Azure Blob Storage using account name and key.
+      /// </summary>
+      /// <param name="factory">Reference to factory</param>
+      /// <param name="credential">Credential structure cotnaining account name in username and account key in password.</param>
+      /// <param name="containerName">Container name in the blob storage. If the container doesn't exist it will be automatically
+      /// created for you.</param>
+      /// <returns>Generic blob storage interface</returns>
+      public static IBlobStorage AzureBlobStorage(this IBlobStorageFactory factory,
+         NetworkCredential credential,
+         string containerName)
+      {
+         return new AzureBlobStorage(credential, containerName);
       }
 
       /// <summary>
