@@ -8,6 +8,15 @@ namespace Storage.Net
    /// </summary>
    public static class Factory
    {
+
+      /// <summary>
+      /// Creates an Amazon S3 storage
+      /// </summary>
+      /// <param name="factory">Factory reference</param>
+      /// <param name="accessKeyId">Access key ID</param>
+      /// <param name="secretAccessKey">Secret access key</param>
+      /// <param name="bucketName">Bucket name</param>
+      /// <returns>A reference to the created storage</returns>
       public static IBlobStorage AmazonS3BlobStorage(this IBlobStorageFactory factory,
          string accessKeyId,
          string secretAccessKey,
