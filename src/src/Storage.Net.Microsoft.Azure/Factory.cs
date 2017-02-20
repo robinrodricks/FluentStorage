@@ -16,6 +16,13 @@ namespace Storage.Net
    /// </summary>
    public static class Factory
    {
+      /// <summary>
+      /// Creates an instance of Azure Table Storage using account name and key.
+      /// </summary>
+      /// <param name="factory">Factory reference</param>
+      /// <param name="accountName">Account name</param>
+      /// <param name="storageKey">Account key</param>
+      /// <returns></returns>
       public static ITableStorage AzureTableStorage(this ITableStorageFactory factory,
          string accountName,
          string storageKey)
