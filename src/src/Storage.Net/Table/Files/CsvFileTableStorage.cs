@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Table.Files
 {
@@ -50,6 +51,14 @@ namespace Storage.Net.Table.Files
          return _rootDir
             .GetDirectories(TableNamesSearchPattern, SearchOption.TopDirectoryOnly)
             .Select(d => d.Name.Substring(0, d.Name.Length - TableNamesSuffix.Length));
+      }
+
+      /// <summary>
+      /// See interface documentation
+      /// </summary>
+      public Task<IEnumerable<string>> ListTableNamesAsync()
+      {
+         return Task.FromResult(ListTableNames());
       }
 
       /// <summary>

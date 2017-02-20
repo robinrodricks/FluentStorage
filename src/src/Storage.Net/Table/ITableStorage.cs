@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Table
 {
@@ -20,6 +21,13 @@ namespace Storage.Net.Table
       /// </summary>
       /// <returns></returns>
       IEnumerable<string> ListTableNames();
+
+      /// <summary>
+      /// Returns the list of all table names in the table storage.
+      /// </summary>
+      /// <returns></returns>
+      Task<IEnumerable<string>> ListTableNamesAsync();
+
 
       /// <summary>
       /// Deletes entire table. If table doesn't exist no errors are raised.

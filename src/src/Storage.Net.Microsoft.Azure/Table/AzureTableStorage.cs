@@ -77,7 +77,7 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// Returns the list of table names in this storage
       /// </summary>
       /// <returns></returns>
-      private async Task<IEnumerable<string>> ListTableNamesAsync()
+      public async Task<IEnumerable<string>> ListTableNamesAsync()
       {
          var result = new List<string>();
 

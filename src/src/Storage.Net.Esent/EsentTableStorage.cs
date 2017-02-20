@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.Isam.Esent.Interop;
 using Storage.Net.Table;
 using ETable = Microsoft.Isam.Esent.Interop.Table;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Net45.Esent
 {
@@ -534,6 +535,15 @@ namespace Storage.Net.Net45.Esent
       {
          return Api.GetTableNames(_jetSession, _jetDbId).ToList();
       }
+
+      /// <summary>
+      /// See base
+      /// </summary>
+      public Task<IEnumerable<string>> ListTableNamesAsync()
+      {
+         return Task.FromResult(ListTableNames());
+      }
+
 
       /// <summary>
       /// See base
