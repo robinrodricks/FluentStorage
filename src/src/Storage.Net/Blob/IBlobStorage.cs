@@ -34,6 +34,14 @@ namespace Storage.Net.Blob
       void Delete(string id);
 
       /// <summary>
+      /// Deletes a blob by id
+      /// </summary>
+      /// <param name="id">Blob ID, required.</param>
+      /// <exception cref="System.ArgumentNullException">Thrown when ID is null.</exception>
+      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      Task DeleteAsync(string id);
+
+      /// <summary>
       /// Uploads a new blob. When a blob with identical name already exists overwrites it.
       /// </summary>
       /// <param name="id">Blob ID, required.</param>

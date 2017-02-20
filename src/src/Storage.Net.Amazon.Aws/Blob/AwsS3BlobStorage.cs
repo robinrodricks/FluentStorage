@@ -64,9 +64,25 @@ namespace Storage.Net.Aws.Blob
       /// </summary>
       public void Delete(string id)
       {
+         try
+         {
+            DeleteAsync(id).Wait();
+         }
+         catch(AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
+      }
+
+
+      /// <summary>
+      /// deletes object from current bucket
+      /// </summary>
+      public async Task DeleteAsync(string id)
+      {
          GenericValidation.CheckBlobId(id);
 
-         _client.DeleteObject(_bucketName, id);
+         await _client.DeleteObjectAsync(_bucketName, id);
       }
 
       /// <summary>

@@ -151,7 +151,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// <summary>
       /// Deletes blob remotely
       /// </summary>
-      private async Task DeleteAsync(string id)
+      public async Task DeleteAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 

@@ -69,6 +69,17 @@ namespace Storage.Net.Blob.Files
       }
 
       /// <summary>
+      /// Deletes blob file
+      /// </summary>
+      /// <param name="id"></param>
+      public Task DeleteAsync(string id)
+      {
+         Delete(id);
+
+         return Task.FromResult(true);
+      }
+
+      /// <summary>
       /// Writes blob to file
       /// </summary>
       public void UploadFromStream(string id, Stream sourceStream)
