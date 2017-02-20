@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Blob.Files
 {
@@ -38,6 +39,15 @@ namespace Storage.Net.Blob.Files
          string wildcard = prefix + "*";
          return allIds.Where(id => id.MatchesWildcard(wildcard));
       }
+
+      /// <summary>
+      /// Returns the list of blob names in this storage, optionally filtered by prefix
+      /// </summary>
+      public Task<IEnumerable<string>> ListAsync(string prefix)
+      {
+         return Task.FromResult(List(prefix));
+      }
+
 
       private string ToId(FileInfo fi)
       {

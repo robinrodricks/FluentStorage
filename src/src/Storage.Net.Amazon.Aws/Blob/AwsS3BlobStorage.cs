@@ -9,6 +9,7 @@ using Amazon.Runtime;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using NetBox;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Aws.Blob
 {
@@ -133,6 +134,22 @@ namespace Storage.Net.Aws.Blob
          GenericValidation.CheckBlobPrefix(prefix);
 
          ListObjectsV2Response response = _client.ListObjectsV2(new ListObjectsV2Request()
+         {
+            BucketName = _bucketName,
+            Prefix = prefix ?? null
+         });
+
+         return response.S3Objects.Select(s3Obj => s3Obj.Key);
+      }
+
+      /// <summary>
+      /// Lists all buckets, optionaly filtering by prefix. Prefix filtering happens on client side.
+      /// </summary>
+      public async Task<IEnumerable<string>> ListAsync(string prefix)
+      {
+         GenericValidation.CheckBlobPrefix(prefix);
+
+         ListObjectsV2Response response = await _client.ListObjectsV2Async(new ListObjectsV2Request()
          {
             BucketName = _bucketName,
             Prefix = prefix ?? null

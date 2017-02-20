@@ -106,7 +106,10 @@ namespace Storage.Net.Microsoft.Azure.Blob
          }
       }
 
-      private async Task<IEnumerable<string>> ListAsync(string prefix)
+      /// <summary>
+      /// Gets all the blob names, then filters by prefix optionally
+      /// </summary>
+      public async Task<IEnumerable<string>> ListAsync(string prefix)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
