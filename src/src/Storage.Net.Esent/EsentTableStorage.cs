@@ -39,6 +39,10 @@ namespace Storage.Net.Net45.Esent
       private readonly Dictionary<string, Dictionary<string, JET_COLUMNID>> _tableNameToColumnNameToId =
          new Dictionary<string, Dictionary<string, JET_COLUMNID>>();
 
+      /// <summary>
+      /// Creates an instance of ESENT storage wrapper
+      /// </summary>
+      /// <param name="databasePath">Path to a file on disk where database will be stored. If it doesn't exist it will be created.</param>
       public EsentTableStorage(string databasePath)
       {
          _databasePath = databasePath;
@@ -307,6 +311,9 @@ namespace Storage.Net.Net45.Esent
          Delete(tableName, new[] { rowId });
       }
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public void Delete(string tableName, IEnumerable<TableRowId> rowIds)
       {
          if (rowIds == null) return;
@@ -323,6 +330,9 @@ namespace Storage.Net.Net45.Esent
          }
       }
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public IEnumerable<TableRow> Get(string tableName, string partitionKey)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
@@ -331,6 +341,9 @@ namespace Storage.Net.Net45.Esent
          return InternalGet(tableName, partitionKey, null, int.MaxValue);
       }
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public TableRow Get(string tableName, string partitionKey, string rowKey)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
@@ -340,6 +353,9 @@ namespace Storage.Net.Net45.Esent
          return InternalGet(tableName, partitionKey, rowKey, 1).FirstOrDefault();
       }
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public IEnumerable<TableRow> Get(string tableName, string partitionKey, string rowKey, int maxRecords)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
@@ -434,6 +450,9 @@ namespace Storage.Net.Net45.Esent
          return result;
       }
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public void Insert(string tableName, TableRow row)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
@@ -442,6 +461,9 @@ namespace Storage.Net.Net45.Esent
          Insert(tableName, new[] { row });
       }
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public void Insert(string tableName, IEnumerable<TableRow> rows)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
@@ -489,36 +511,57 @@ namespace Storage.Net.Net45.Esent
          }
       }
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public void InsertOrReplace(string tableName, IEnumerable<TableRow> rows)
       {
          Insert(tableName, rows);
       }
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public void InsertOrReplace(string tableName, TableRow row)
       {
          InsertOrReplace(tableName, new[] { row });
       }
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public IEnumerable<string> ListTableNames()
       {
          return Api.GetTableNames(_jetSession, _jetDbId).ToList();
       }
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public void Merge(string tableName, TableRow row)
       {
          throw new NotImplementedException();
       }
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public void Merge(string tableName, IEnumerable<TableRow> rows)
       {
          throw new NotImplementedException();
       }
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public void Update(string tableName, TableRow row)
       {
          throw new NotImplementedException();
       }
 
+      /// <summary>
+      /// See base
+      /// </summary>
       public void Update(string tableName, IEnumerable<TableRow> rows)
       {
          throw new NotImplementedException();
