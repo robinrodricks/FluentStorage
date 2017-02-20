@@ -94,6 +94,20 @@ namespace Storage.Net.Blob.Files
       }
 
       /// <summary>
+      /// Writes blob to file
+      /// </summary>
+      public async Task UploadFromStreamAsync(string id, Stream sourceStream)
+      {
+         GenericValidation.CheckBlobId(id);
+         if (sourceStream == null) throw new ArgumentNullException(nameof(sourceStream));
+
+         using (Stream target = CreateStream(id))
+         {
+            await sourceStream.CopyToAsync(target);
+         }
+      }
+
+      /// <summary>
       /// Append chunk to file
       /// </summary>
       public void AppendFromStream(string id, Stream chunkStream)
@@ -104,6 +118,20 @@ namespace Storage.Net.Blob.Files
          using (Stream target = CreateStream(id, false))
          {
             chunkStream.CopyTo(target);
+         }
+      }
+
+      /// <summary>
+      /// Append chunk to file
+      /// </summary>
+      public async Task AppendFromStreamAsync(string id, Stream chunkStream)
+      {
+         GenericValidation.CheckBlobId(id);
+         if (chunkStream == null) throw new ArgumentNullException(nameof(chunkStream));
+
+         using (Stream target = CreateStream(id, false))
+         {
+            await chunkStream.CopyToAsync(target);
          }
       }
 
@@ -128,6 +156,26 @@ namespace Storage.Net.Blob.Files
       }
 
       /// <summary>
+      /// Reads blob from file and writes to the target stream
+      /// </summary>
+      public async Task DownloadToStreamAsync(string id, Stream targetStream)
+      {
+         GenericValidation.CheckBlobId(id);
+         if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
+
+         using (Stream source = OpenStream(id))
+         {
+            if (source == null)
+            {
+               throw new StorageException(ErrorCode.NotFound, null);
+            }
+
+            await source.CopyToAsync(targetStream);
+            await targetStream.FlushAsync();
+         }
+      }
+
+      /// <summary>
       /// Opens the blob as a readable stream
       /// </summary>
       public Stream OpenStreamToRead(string id)
@@ -138,6 +186,15 @@ namespace Storage.Net.Blob.Files
       }
 
       /// <summary>
+      /// Opens the blob as a readable stream
+      /// </summary>
+      public Task<Stream> OpenStreamToReadAsync(string id)
+      {
+         return Task.FromResult(OpenStreamToRead(id));
+      }
+
+
+      /// <summary>
       /// Checks if file exists
       /// </summary>
       public bool Exists(string id)
@@ -145,6 +202,14 @@ namespace Storage.Net.Blob.Files
          GenericValidation.CheckBlobId(id);
 
          return File.Exists(GetFilePath(id));
+      }
+
+      /// <summary>
+      /// Checks if file exists
+      /// </summary>
+      public Task<bool> ExistsAsync(string id)
+      {
+         return Task.FromResult(Exists(id));
       }
 
       /// <summary>
@@ -162,6 +227,14 @@ namespace Storage.Net.Blob.Files
 
          return new BlobMeta(
             fi.Length);
+      }
+
+      /// <summary>
+      /// Gets blob metadata
+      /// </summary>
+      public Task<BlobMeta> GetMetaAsync(string id)
+      {
+         return Task.FromResult(GetMeta(id));
       }
 
       private string GetFilePath(string id)

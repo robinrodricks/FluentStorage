@@ -6,7 +6,7 @@ Blob Storage is really simple abstraction - you read or write file data by it's 
 
 ## Using
 
-The entry point to a blog storage is `IBlobStorage` interface. This interface is small but contains all possible methods to work with blobs.
+The entry point to a blog storage is `IBlobStorage` interface. This interface is small but contains all possible methods to work with blobs. All the interface method have both blocking and non-blocking (async) variants.
 
 Usually you instantiate `IBlobStorage` with a specific instance implementing it, for instance Amazon S3 or Microsoft Azure Blob Storage, or even a local file system. The framework makes it trivial to create one.
 

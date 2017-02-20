@@ -51,11 +51,27 @@ namespace Storage.Net.Blob
       void UploadFromStream(string id, Stream sourceStream);
 
       /// <summary>
+      /// Uploads a new blob. When a blob with identical name already exists overwrites it.
+      /// </summary>
+      /// <param name="id">Blob ID, required.</param>
+      /// <param name="sourceStream">Source stream to copy from.</param>
+      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      Task UploadFromStreamAsync(string id, Stream sourceStream);
+
+      /// <summary>
       /// Appends a blob of data to the end of the blob.
       /// </summary>
       /// <param name="id">Blob ID. If blob doesn't exist it will be created.</param>
       /// <param name="chunkStream">Block data</param>
       void AppendFromStream(string id, Stream chunkStream);
+
+      /// <summary>
+      /// Appends a blob of data to the end of the blob.
+      /// </summary>
+      /// <param name="id">Blob ID. If blob doesn't exist it will be created.</param>
+      /// <param name="chunkStream">Block data</param>
+      Task AppendFromStreamAsync(string id, Stream chunkStream);
 
       /// <summary>
       /// Downloads blob to a stream
@@ -68,6 +84,16 @@ namespace Storage.Net.Blob
       void DownloadToStream(string id, Stream targetStream);
 
       /// <summary>
+      /// Downloads blob to a stream
+      /// </summary>
+      /// <param name="id">Blob ID, required</param>
+      /// <param name="targetStream">Target stream to copy to, required</param>
+      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      /// <exception cref="StorageException">Thrown when blob does not exist, error code set to <see cref="ErrorCode.NotFound"/></exception>
+      Task DownloadToStreamAsync(string id, Stream targetStream);
+
+      /// <summary>
       /// Opens the stream asynchronously to read on demand.
       /// </summary>
       /// <param name="id">Blob ID, required</param>
@@ -78,6 +104,17 @@ namespace Storage.Net.Blob
       Stream OpenStreamToRead(string id);
 
       /// <summary>
+      /// Opens the stream asynchronously to read on demand.
+      /// </summary>
+      /// <param name="id">Blob ID, required</param>
+      /// <returns>Stream in an open state, or null if blob doesn't exist by this ID. It is your responsibility to close and dispose this
+      /// stream after use.</returns>
+      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      Task<Stream> OpenStreamToReadAsync(string id);
+
+
+      /// <summary>
       /// Checks if a blob exists
       /// </summary>
       /// <param name="id">Blob ID, required</param>
@@ -85,10 +122,25 @@ namespace Storage.Net.Blob
       bool Exists(string id);
 
       /// <summary>
+      /// Checks if a blob exists
+      /// </summary>
+      /// <param name="id">Blob ID, required</param>
+      /// <returns>True if blob exists, false otherwise</returns>
+      Task<bool> ExistsAsync(string id);
+
+      /// <summary>
       /// Gets basic blob metadata
       /// </summary>
       /// <param name="id">Blob id</param>
       /// <returns>Blob metadata or null if blob doesn't exist</returns>
       BlobMeta GetMeta(string id);
+
+      /// <summary>
+      /// Gets basic blob metadata
+      /// </summary>
+      /// <param name="id">Blob id</param>
+      /// <returns>Blob metadata or null if blob doesn't exist</returns>
+      Task<BlobMeta> GetMetaAsync(string id);
+
    }
 }

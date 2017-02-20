@@ -100,6 +100,21 @@ namespace Storage.Net.Aws.Blob
       }
 
       /// <summary>
+      /// Downloads object to the stream
+      /// </summary>
+      public async Task DownloadToStreamAsync(string id, Stream targetStream)
+      {
+         GenericValidation.CheckBlobId(id);
+         if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
+
+         using (GetObjectResponse response = await GetObjectAsync(id))
+         {
+            await response.ResponseStream.CopyToAsync(targetStream);
+         }
+      }
+
+
+      /// <summary>
       /// Checks if the object exists by trying to fetch the details
       /// </summary>
       public bool Exists(string id)
@@ -116,6 +131,28 @@ namespace Storage.Net.Aws.Blob
          catch(StorageException ex)
          {
             if(ex.ErrorCode == ErrorCode.NotFound) return false;
+         }
+
+         return true;
+      }
+
+      /// <summary>
+      /// Checks if the object exists by trying to fetch the details
+      /// </summary>
+      public async Task<bool> ExistsAsync(string id)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         try
+         {
+            using (await GetObjectAsync(id))
+            {
+
+            }
+         }
+         catch (StorageException ex)
+         {
+            if (ex.ErrorCode == ErrorCode.NotFound) return false;
          }
 
          return true;
@@ -141,6 +178,28 @@ namespace Storage.Net.Aws.Blob
             return null;
          }
       }
+
+      /// <summary>
+      /// Gets blob metadata
+      /// </summary>
+      public async Task<BlobMeta> GetMetaAsync(string id)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         try
+         {
+            using (GetObjectResponse obj = await GetObjectAsync(id))
+            {
+               return new BlobMeta(
+                  obj.ContentLength);
+            }
+         }
+         catch (StorageException ex) when (ex.ErrorCode == ErrorCode.NotFound)
+         {
+            return null;
+         }
+      }
+
 
       /// <summary>
       /// Lists all buckets, optionaly filtering by prefix. Prefix filtering happens on client side.
@@ -189,6 +248,21 @@ namespace Storage.Net.Aws.Blob
       }
 
       /// <summary>
+      /// Opens AWS stream and returns it. Note that you absolutely have to dispose it yourself in order for this
+      /// adapter to close the network connection properly.
+      /// </summary>
+      /// <param name="id"></param>
+      /// <returns></returns>
+      public async Task<Stream> OpenStreamToReadAsync(string id)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         GetObjectResponse response = await GetObjectAsync(id);
+         return new AwsS3BlobStorageExternalStream(response);
+      }
+
+
+      /// <summary>
       /// Uploads the stream using transfer manager
       /// </summary>
       /// <param name="id">Unique resource ID</param>
@@ -203,6 +277,21 @@ namespace Storage.Net.Aws.Blob
       }
 
       /// <summary>
+      /// Uploads the stream using transfer manager
+      /// </summary>
+      /// <param name="id">Unique resource ID</param>
+      /// <param name="sourceStream">Stream to upload</param>
+      public async Task UploadFromStreamAsync(string id, Stream sourceStream)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
+
+         await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, id);
+      }
+
+
+      /// <summary>
       /// Simulates append operation in a very inefficient way as AWS doesn't support appending to blobs. Avoid at all costs!
       /// </summary>
       /// <param name="id"></param>
@@ -211,10 +300,12 @@ namespace Storage.Net.Aws.Blob
       {
          GenericValidation.CheckBlobId(id);
 
+         throw new NotSupportedException();
+
          //AWS doesn't support appending, so here is what we are going to do:
 
          //1. If blob already exist, move it to a new name and delete old one
-         string oldDataId = null;
+         /*string oldDataId = null;
          if(Exists(id))
          {
             oldDataId = Generator.RandomString;
@@ -223,11 +314,20 @@ namespace Storage.Net.Aws.Blob
                UploadFromStream(oldDataId, source);
             }
             Delete(id);
-         }
+         }*/
 
          //2. Create a new blob and copy data from old and new chunks
          //todo: need to combine streams to do this, no luck yet
 
+      }
+
+      /// <summary>
+      /// Simulates append operation in a very inefficient way as AWS doesn't support appending to blobs. Avoid at all costs!
+      /// </summary>
+      /// <param name="id"></param>
+      /// <param name="chunkStream"></param>
+      public Task AppendFromStreamAsync(string id, Stream chunkStream)
+      {
          throw new NotSupportedException();
       }
 
@@ -246,6 +346,23 @@ namespace Storage.Net.Aws.Blob
             throw;
          }
       }
+
+      private async Task<GetObjectResponse> GetObjectAsync(string key)
+      {
+         var request = new GetObjectRequest { BucketName = _bucketName, Key = key };
+
+         try
+         {
+            GetObjectResponse response = await _client.GetObjectAsync(request);
+            return response;
+         }
+         catch (AmazonS3Exception ex)
+         {
+            TryHandleException(ex);
+            throw;
+         }
+      }
+
 
       private static bool TryHandleException(AmazonS3Exception ex)
       {

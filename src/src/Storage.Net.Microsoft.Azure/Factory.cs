@@ -62,6 +62,14 @@ namespace Storage.Net
          return new AzureBlobStorage(connectionString, containerName);
       }
 
+      /// <summary>
+      /// Creates an instance of a publisher to Azure Storage Queues
+      /// </summary>
+      /// <param name="factory">Factory reference</param>
+      /// <param name="accountName">Account name</param>
+      /// <param name="storageKey">Storage key</param>
+      /// <param name="queueName">Queue name</param>
+      /// <returns>Generic message publisher interface</returns>
       public static IMessagePublisher AzureStorageQueuePublisher(this IMessagingFactory factory,
          string accountName,
          string storageKey,
@@ -70,6 +78,15 @@ namespace Storage.Net
          return new AzureStorageQueuePublisher(accountName, storageKey, queueName);
       }
 
+      /// <summary>
+      /// Creates an instance of a receiver from Azure Storage Queues
+      /// </summary>
+      /// <param name="factory">Factory reference</param>
+      /// <param name="accountName">Account name</param>
+      /// <param name="storageKey">Storage key</param>
+      /// <param name="queueName">Queue name</param>
+      /// <param name="messageVisibilityTimeout">Message visibility timeout</param>
+      /// <returns>Generic message receiver interface</returns>
       public static IMessageReceiver AzureStorageQueueReceiver(this IMessagingFactory factory,
          string accountName,
          string storageKey,
