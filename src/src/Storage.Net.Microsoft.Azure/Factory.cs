@@ -76,6 +76,7 @@ namespace Storage.Net
       /// <summary>
       /// Creates a new instance of Azure Service Bus Queue by connection string and queue name
       /// </summary>
+      /// <param name="factory">Factory reference</param>
       /// <param name="connectionString">Service Bus connection string</param>
       /// <param name="queueName">Queue name in Service Bus. If queue doesn't exist it will be created for you.</param>
       public static IMessagePublisher AzureServiceBusQueuePublisher(this IMessagingFactory factory,
@@ -88,6 +89,7 @@ namespace Storage.Net
       /// <summary>
       /// Creates an instance of Azure Service Bus receiver with connection
       /// </summary>
+      /// <param name="factory">Factory reference</param>
       /// <param name="connectionString">Service Bus connection string</param>
       /// <param name="queueName">Queue name in Service Bus</param>
       /// <param name="peekLock">When true listens in PeekLock mode, otherwise ReceiveAndDelete</param>
@@ -100,6 +102,7 @@ namespace Storage.Net
       /// <summary>
       /// Creates an instance of Azure Service Bus Topic publisher
       /// </summary>
+      /// <param name="factory">Factory reference</param>
       /// <param name="connectionString">Service Bus connection string</param>
       /// <param name="topicName">Name of the Service Bus topic</param>
       public static IMessagePublisher AzureServiceBusTopicPublisher(this IMessagingFactory factory,
@@ -112,6 +115,7 @@ namespace Storage.Net
       /// <summary>
       /// Creates an instance by connection string and topic name
       /// </summary>
+      /// <param name="factory">Factory reference</param>
       /// <param name="connectionString">Full connection string to the Service Bus service, it looks like Endpoint=sb://myservice.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=aLongKey</param>
       /// <param name="topicName">Name of the topic to subscribe to. If the topic does not exist it is created on the go.</param>
       /// <param name="subscriptionName">Name of the subscription inside the topic. It is created on the go when does not exist.</param>
