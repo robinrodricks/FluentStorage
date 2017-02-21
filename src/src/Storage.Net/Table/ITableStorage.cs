@@ -53,6 +53,17 @@ namespace Storage.Net.Table
       IEnumerable<TableRow> Get(string tableName, string partitionKey);
 
       /// <summary>
+      /// Gets rows by partition key.
+      /// </summary>
+      /// <param name="tableName">Table name, required.</param>
+      /// <param name="partitionKey">Partition key of the table, required.</param>
+      /// <returns>
+      /// List of table rows in the table's partition. This method never returns null and if no records
+      /// are found an empty collection is returned.
+      /// </returns>
+      Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey);
+
+      /// <summary>
       /// Gets a single row by partition key and row key as this uniquely idendifies a row.
       /// </summary>
       /// <param name="tableName">Table name, required.</param>

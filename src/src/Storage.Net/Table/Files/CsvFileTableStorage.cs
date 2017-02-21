@@ -96,6 +96,14 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
+      public Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey)
+      {
+         return Task.FromResult(Get(tableName, partitionKey));
+      }
+
+      /// <summary>
+      /// See interface documentation
+      /// </summary>
       public TableRow Get(string tableName, string partitionKey, string rowKey)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));

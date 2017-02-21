@@ -355,6 +355,14 @@ namespace Storage.Net.Net45.Esent
       /// <summary>
       /// See base
       /// </summary>
+      public Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey)
+      {
+         return Task.FromResult(Get(tableName, partitionKey));
+      }
+
+      /// <summary>
+      /// See base
+      /// </summary>
       public TableRow Get(string tableName, string partitionKey, string rowKey)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));

@@ -143,6 +143,18 @@ namespace Storage.Net.Microsoft.Azure.Table
       }
 
       /// <summary>
+      /// Gets the list of rows in a specified partition
+      /// </summary>
+      public async Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey)
+      {
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
+
+         return await InternalGetAsync(tableName, partitionKey, null, -1);
+      }
+
+
+      /// <summary>
       /// Gets the list of rows in a table by partition and row key
       /// </summary>
       public TableRow Get(string tableName, string partitionKey, string rowKey)
