@@ -18,7 +18,7 @@ namespace Storage.Net.Microsoft.Azure.Table
    /// <summary>
    /// Microsoft Azure Table storage
    /// </summary>
-   public class AzureTableStorage : ITableStorage
+   public class AzureTableStorage : AsyncTableStorage
    {
       private const int MaxInsertLimit = 100;
       private const string PartitionKeyName = "PartitionKey";
@@ -51,7 +51,7 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// <summary>
       /// Returns true as Azure supports optimistic concurrency
       /// </summary>
-      public bool HasOptimisticConcurrency
+      public override bool HasOptimisticConcurrency
       {
          get { return true; }
       }
@@ -60,24 +60,7 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// Returns the list of table names in this storage
       /// </summary>
       /// <returns></returns>
-      public IEnumerable<string> ListTableNames()
-      {
-         try
-         {
-            return ListTableNamesAsync().Result;
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
-      }
-
-
-      /// <summary>
-      /// Returns the list of table names in this storage
-      /// </summary>
-      /// <returns></returns>
-      public async Task<IEnumerable<string>> ListTableNamesAsync()
+      public override async Task<IEnumerable<string>> ListTableNamesAsync()
       {
          var result = new List<string>();
 
@@ -103,24 +86,7 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// Deletes table completely
       /// </summary>
       /// <param name="tableName"></param>
-      public void Delete(string tableName)
-      {
-         try
-         {
-            DeleteAsync(tableName).Wait();
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
-      }
-
-
-      /// <summary>
-      /// Deletes table completely
-      /// </summary>
-      /// <param name="tableName"></param>
-      public async Task DeleteAsync(string tableName)
+      public override async Task DeleteAsync(string tableName)
       {
          CloudTable table = await GetTableAsync(tableName, false);
          if (table != null)
@@ -134,18 +100,7 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// <summary>
       /// Gets the list of rows in a specified partition
       /// </summary>
-      public IEnumerable<TableRow> Get(string tableName, string partitionKey)
-      {
-         if(tableName == null) throw new ArgumentNullException(nameof(tableName));
-         if(partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
-
-         return InternalGet(tableName, partitionKey, null, -1);
-      }
-
-      /// <summary>
-      /// Gets the list of rows in a specified partition
-      /// </summary>
-      public async Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey)
+      public override async Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
@@ -176,18 +131,6 @@ namespace Storage.Net.Microsoft.Azure.Table
          if (rowKey == null) throw new ArgumentNullException(nameof(rowKey));
 
          return InternalGet(tableName, partitionKey, rowKey, maxRecords);
-      }
-
-      private IEnumerable<TableRow> InternalGet(string tableName, string partitionKey, string rowKey, int maxRecords)
-      {
-         try
-         {
-            return InternalGetAsync(tableName, partitionKey, rowKey, maxRecords).Result;
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
       }
 
       private async Task<IEnumerable<TableRow>> InternalGetAsync(string tableName, string partitionKey, string rowKey, int maxRecords)
