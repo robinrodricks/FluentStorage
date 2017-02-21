@@ -153,7 +153,7 @@ namespace Storage.Net.Blob
       {
          try
          {
-            lambda().Wait();
+            Task.Run(lambda).Wait();
          }
          catch (AggregateException ex)
          {
@@ -165,7 +165,7 @@ namespace Storage.Net.Blob
       {
          try
          {
-            return lambda().Result;
+            return Task.Run(lambda).Result;
          }
          catch (AggregateException ex)
          {

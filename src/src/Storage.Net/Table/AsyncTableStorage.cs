@@ -270,7 +270,7 @@ namespace Storage.Net.Table
       {
          try
          {
-            lambda().Wait();
+            Task.Run(lambda).Wait();
          }
          catch (AggregateException ex)
          {
@@ -282,7 +282,7 @@ namespace Storage.Net.Table
       {
          try
          {
-            return lambda().Result;
+            return Task.Run(lambda).Result;
          }
          catch (AggregateException ex)
          {
