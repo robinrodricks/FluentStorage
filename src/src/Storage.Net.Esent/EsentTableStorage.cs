@@ -305,6 +305,16 @@ namespace Storage.Net.Net45.Esent
       /// <summary>
       /// See base
       /// </summary>
+      public Task DeleteAsync(string tableName)
+      {
+         Delete(tableName);
+
+         return Task.FromResult(true);
+      }
+
+      /// <summary>
+      /// See base
+      /// </summary>
       public void Delete(string tableName, TableRowId rowId)
       {
          if (rowId == null) return;

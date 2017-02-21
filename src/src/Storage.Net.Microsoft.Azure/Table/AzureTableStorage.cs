@@ -120,7 +120,7 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// Deletes table completely
       /// </summary>
       /// <param name="tableName"></param>
-      private async Task DeleteAsync(string tableName)
+      public async Task DeleteAsync(string tableName)
       {
          CloudTable table = await GetTableAsync(tableName, false);
          if (table != null)

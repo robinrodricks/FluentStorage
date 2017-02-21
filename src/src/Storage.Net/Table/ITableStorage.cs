@@ -36,6 +36,12 @@ namespace Storage.Net.Table
       void Delete(string tableName);
 
       /// <summary>
+      /// Deletes entire table. If table doesn't exist no errors are raised.
+      /// </summary>
+      /// <param name="tableName">Name of the table to delete. Passing null raises <see cref="ArgumentNullException"/></param>
+      Task DeleteAsync(string tableName);
+
+      /// <summary>
       /// Gets rows by partition key.
       /// </summary>
       /// <param name="tableName">Table name, required.</param>

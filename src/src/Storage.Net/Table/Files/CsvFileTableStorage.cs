@@ -75,6 +75,16 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
+      public Task DeleteAsync(string tableName)
+      {
+         Delete(tableName);
+
+         return Task.FromResult(true);
+      }
+
+      /// <summary>
+      /// See interface documentation
+      /// </summary>
       public IEnumerable<TableRow> Get(string tableName, string partitionKey)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
