@@ -34,11 +34,15 @@ namespace Storage.Net.Table
 
       public virtual void Delete(string tableName, TableRowId rowId)
       {
+         if (rowId == null) return;
+
          Delete(tableName, new[] { rowId });
       }
 
       public virtual async Task DeleteAsync(string tableName, TableRowId rowId)
       {
+         if (rowId == null) return;
+
          await DeleteAsync(tableName, new[] { rowId });
       }
 
@@ -80,6 +84,8 @@ namespace Storage.Net.Table
 
       public virtual void Insert(string tableName, TableRow row)
       {
+         if (row == null) throw new ArgumentNullException(nameof(row));
+
          Insert(tableName, new[] { row });
       }
 
