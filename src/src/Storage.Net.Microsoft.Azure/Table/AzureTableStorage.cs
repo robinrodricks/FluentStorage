@@ -459,12 +459,5 @@ namespace Storage.Net.Microsoft.Azure.Table
 
          return true;
       }
-
-      /// <summary>
-      /// Nothing to dispose
-      /// </summary>
-      public void Dispose()
-      {
-      }
    }
 }

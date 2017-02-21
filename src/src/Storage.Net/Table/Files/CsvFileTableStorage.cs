@@ -390,7 +390,6 @@ namespace Storage.Net.Table.Files
             var result = new Dictionary<string, TableRow>();
 
             var reader = new CsvReader(s, Encoding.UTF8);
-
             string[] allColumns = reader.ReadNextRow()?.ToArray();
             if(allColumns == null) return null;
 
@@ -421,13 +420,6 @@ namespace Storage.Net.Table.Files
          }
 
          return row;
-      }
-
-      /// <summary>
-      /// Nothing to dispose
-      /// </summary>
-      public void Dispose()
-      {
       }
 
       #endregion

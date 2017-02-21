@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -7,7 +8,7 @@ namespace Storage.Net.Blob
    /// <summary>
    /// Generic interface for blob storage implementations
    /// </summary>
-   public interface IBlobStorage
+   public interface IBlobStorage : IDisposable
    {
       /// <summary>
       /// Returns the list of available blobs

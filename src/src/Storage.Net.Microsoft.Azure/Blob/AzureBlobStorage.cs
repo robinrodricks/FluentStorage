@@ -15,7 +15,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
    /// <summary>
    /// Azure Blob Storage
    /// </summary>
-   public class AzureBlobStorage : IBlobStorage
+   public class AzureBlobStorage : AsyncBlobStorage
    {
       private readonly CloudBlobContainer _blobContainer;
 
@@ -105,22 +105,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// <summary>
       /// Gets all the blob names, then filters by prefix optionally
       /// </summary>
-      public IEnumerable<string> List(string prefix)
-      {
-         try
-         {
-            return ListAsync(prefix).Result;
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
-      }
-
-      /// <summary>
-      /// Gets all the blob names, then filters by prefix optionally
-      /// </summary>
-      public async Task<IEnumerable<string>> ListAsync(string prefix)
+      public override async Task<IEnumerable<string>> ListAsync(string prefix)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
@@ -146,23 +131,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// <summary>
       /// Deletes blob remotely
       /// </summary>
-      public void Delete(string id)
-      {
-         try
-         {
-            DeleteAsync(id).Wait();
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
-      }
-
-
-      /// <summary>
-      /// Deletes blob remotely
-      /// </summary>
-      public async Task DeleteAsync(string id)
+      public override async Task DeleteAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -175,23 +144,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// <summary>
       /// Uploads from stream
       /// </summary>
-      public void UploadFromStream(string id, Stream sourceStream)
-      {
-         try
-         {
-            UploadFromStreamAsync(id, sourceStream).Wait();
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
-      }
-
-
-      /// <summary>
-      /// Uploads from stream
-      /// </summary>
-      public async Task UploadFromStreamAsync(string id, Stream sourceStream)
+      public override async Task UploadFromStreamAsync(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
          if (sourceStream == null) throw new ArgumentNullException(nameof(sourceStream));
@@ -204,22 +157,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// <summary>
       /// Appends to the append blob.
       /// </summary>
-      public void AppendFromStream(string id, Stream chunkStream)
-      {
-         try
-         {
-            AppendFromStreamAsync(id, chunkStream).Wait();
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
-      }
-
-      /// <summary>
-      /// Appends to the append blob.
-      /// </summary>
-      public async Task AppendFromStreamAsync(string id, Stream chunkStream)
+      public override async Task AppendFromStreamAsync(string id, Stream chunkStream)
       {
          GenericValidation.CheckBlobId(id);
          if (chunkStream == null) throw new ArgumentNullException(nameof(chunkStream));
@@ -234,22 +172,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// <summary>
       /// Downloads to stream
       /// </summary>
-      public void DownloadToStream(string id, Stream targetStream)
-      {
-         try
-         {
-            DownloadToStreamAsync(id, targetStream).Wait();
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
-      }
-
-      /// <summary>
-      /// Downloads to stream
-      /// </summary>
-      public async Task DownloadToStreamAsync(string id, Stream targetStream)
+      public override async Task DownloadToStreamAsync(string id, Stream targetStream)
       {
          GenericValidation.CheckBlobId(id);
          if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
@@ -272,25 +195,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       /// <param name="id"></param>
       /// <returns></returns>
-      public Stream OpenStreamToRead(string id)
-      {
-         try
-         {
-            return OpenStreamToReadAsync(id).Result;
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
-      }
-
-
-      /// <summary>
-      /// Opens stream to read
-      /// </summary>
-      /// <param name="id"></param>
-      /// <returns></returns>
-      public async Task<Stream> OpenStreamToReadAsync(string id)
+      public override async Task<Stream> OpenStreamToReadAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -303,23 +208,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// <summary>
       /// Checks if the blob exists by trying to fetch attributes from the blob reference and checkign if that fails
       /// </summary>
-      public bool Exists(string id)
-      {
-         try
-         {
-            return ExistsAsync(id).Result;
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
-      }
-
-
-      /// <summary>
-      /// Checks if the blob exists by trying to fetch attributes from the blob reference and checkign if that fails
-      /// </summary>
-      public async Task<bool> ExistsAsync(string id)
+      public override async Task<bool> ExistsAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(ToInternalId(id));
@@ -329,22 +218,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// <summary>
       /// Gets blob metadata
       /// </summary>
-      public BlobMeta GetMeta(string id)
-      {
-         try
-         {
-            return GetMetaAsync(id).Result;
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
-      }
-
-      /// <summary>
-      /// Gets blob metadata
-      /// </summary>
-      public async Task<BlobMeta> GetMetaAsync(string id)
+      public override async Task<BlobMeta> GetMetaAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 

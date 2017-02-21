@@ -9,7 +9,7 @@ namespace Storage.Net.Blob.Files
    /// <summary>
    /// Blob storage implementation which uses local file system directory
    /// </summary>
-   public class DirectoryFilesBlobStorage : IBlobStorage
+   public class DirectoryFilesBlobStorage : AsyncBlobStorage
    {
       private readonly DirectoryInfo _directory;
       private static readonly string FsPathSeparator = new string(Path.DirectorySeparatorChar, 1);
@@ -26,7 +26,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Returns the list of blob names in this storage, optionally filtered by prefix
       /// </summary>
-      public IEnumerable<string> List(string prefix)
+      public override IEnumerable<string> List(string prefix)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
@@ -40,15 +40,6 @@ namespace Storage.Net.Blob.Files
          return allIds.Where(id => id.MatchesWildcard(wildcard));
       }
 
-      /// <summary>
-      /// Returns the list of blob names in this storage, optionally filtered by prefix
-      /// </summary>
-      public Task<IEnumerable<string>> ListAsync(string prefix)
-      {
-         return Task.FromResult(List(prefix));
-      }
-
-
       private string ToId(FileInfo fi)
       {
          string name = fi.FullName.Substring(_directory.FullName.Length + 1);
@@ -60,7 +51,7 @@ namespace Storage.Net.Blob.Files
       /// Deletes blob file
       /// </summary>
       /// <param name="id"></param>
-      public void Delete(string id)
+      public override void Delete(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -69,20 +60,9 @@ namespace Storage.Net.Blob.Files
       }
 
       /// <summary>
-      /// Deletes blob file
-      /// </summary>
-      /// <param name="id"></param>
-      public Task DeleteAsync(string id)
-      {
-         Delete(id);
-
-         return Task.FromResult(true);
-      }
-
-      /// <summary>
       /// Writes blob to file
       /// </summary>
-      public void UploadFromStream(string id, Stream sourceStream)
+      public override void UploadFromStream(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
          if(sourceStream == null) throw new ArgumentNullException(nameof(sourceStream));
@@ -96,7 +76,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Writes blob to file
       /// </summary>
-      public async Task UploadFromStreamAsync(string id, Stream sourceStream)
+      public override async Task UploadFromStreamAsync(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
          if (sourceStream == null) throw new ArgumentNullException(nameof(sourceStream));
@@ -110,7 +90,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Append chunk to file
       /// </summary>
-      public void AppendFromStream(string id, Stream chunkStream)
+      public override void AppendFromStream(string id, Stream chunkStream)
       {
          GenericValidation.CheckBlobId(id);
          if (chunkStream == null) throw new ArgumentNullException(nameof(chunkStream));
@@ -124,7 +104,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Append chunk to file
       /// </summary>
-      public async Task AppendFromStreamAsync(string id, Stream chunkStream)
+      public override async Task AppendFromStreamAsync(string id, Stream chunkStream)
       {
          GenericValidation.CheckBlobId(id);
          if (chunkStream == null) throw new ArgumentNullException(nameof(chunkStream));
@@ -138,7 +118,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Reads blob from file and writes to the target stream
       /// </summary>
-      public void DownloadToStream(string id, Stream targetStream)
+      public override void DownloadToStream(string id, Stream targetStream)
       {
          GenericValidation.CheckBlobId(id);
          if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
@@ -158,7 +138,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Reads blob from file and writes to the target stream
       /// </summary>
-      public async Task DownloadToStreamAsync(string id, Stream targetStream)
+      public override async Task DownloadToStreamAsync(string id, Stream targetStream)
       {
          GenericValidation.CheckBlobId(id);
          if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
@@ -178,7 +158,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Opens the blob as a readable stream
       /// </summary>
-      public Stream OpenStreamToRead(string id)
+      public override Stream OpenStreamToRead(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -186,18 +166,9 @@ namespace Storage.Net.Blob.Files
       }
 
       /// <summary>
-      /// Opens the blob as a readable stream
-      /// </summary>
-      public Task<Stream> OpenStreamToReadAsync(string id)
-      {
-         return Task.FromResult(OpenStreamToRead(id));
-      }
-
-
-      /// <summary>
       /// Checks if file exists
       /// </summary>
-      public bool Exists(string id)
+      public override bool Exists(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -205,17 +176,9 @@ namespace Storage.Net.Blob.Files
       }
 
       /// <summary>
-      /// Checks if file exists
-      /// </summary>
-      public Task<bool> ExistsAsync(string id)
-      {
-         return Task.FromResult(Exists(id));
-      }
-
-      /// <summary>
       /// Gets blob metadata
       /// </summary>
-      public BlobMeta GetMeta(string id)
+      public override BlobMeta GetMeta(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -227,14 +190,6 @@ namespace Storage.Net.Blob.Files
 
          return new BlobMeta(
             fi.Length);
-      }
-
-      /// <summary>
-      /// Gets blob metadata
-      /// </summary>
-      public Task<BlobMeta> GetMetaAsync(string id)
-      {
-         return Task.FromResult(GetMeta(id));
       }
 
       private string GetFilePath(string id)
@@ -281,6 +236,5 @@ namespace Storage.Net.Blob.Files
 
          return File.OpenRead(path);
       }
-
    }
 }

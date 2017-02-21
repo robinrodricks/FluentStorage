@@ -22,7 +22,7 @@
     },
 
     "dependencies": {
-        "netbox": "1.0.1702.1501",
+        "netbox": "1.0.1702.2101",
         "Storage.Net": "3.0.1"
     },
 
