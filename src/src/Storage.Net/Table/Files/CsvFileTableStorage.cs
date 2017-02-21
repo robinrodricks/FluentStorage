@@ -13,7 +13,7 @@ namespace Storage.Net.Table.Files
    /// Works relative to the root directory specified in the constructor.
    /// Each table will be a separate subfolder, where files are partitions.
    /// </summary>
-   public class CsvFileTableStorage : ITableStorage
+   public class CsvFileTableStorage : AsyncTableStorage
    {
       private const string TablePartitionFormat = "{0}.partition.csv";
       private const string TablePartitionSearchFilter = "*.partition.csv";
@@ -41,12 +41,12 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public bool HasOptimisticConcurrency => false;
+      public override bool HasOptimisticConcurrency => false;
 
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public IEnumerable<string> ListTableNames()
+      public override IEnumerable<string> ListTableNames()
       {
          return _rootDir
             .GetDirectories(TableNamesSearchPattern, SearchOption.TopDirectoryOnly)
@@ -56,15 +56,7 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public Task<IEnumerable<string>> ListTableNamesAsync()
-      {
-         return Task.FromResult(ListTableNames());
-      }
-
-      /// <summary>
-      /// See interface documentation
-      /// </summary>
-      public void Delete(string tableName)
+      public override void Delete(string tableName)
       {
          if(tableName == null) throw new ArgumentNullException(nameof(tableName));
 
@@ -75,17 +67,7 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public Task DeleteAsync(string tableName)
-      {
-         Delete(tableName);
-
-         return Task.FromResult(true);
-      }
-
-      /// <summary>
-      /// See interface documentation
-      /// </summary>
-      public IEnumerable<TableRow> Get(string tableName, string partitionKey)
+      public override IEnumerable<TableRow> Get(string tableName, string partitionKey)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
@@ -96,15 +78,7 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey)
-      {
-         return Task.FromResult(Get(tableName, partitionKey));
-      }
-
-      /// <summary>
-      /// See interface documentation
-      /// </summary>
-      public TableRow Get(string tableName, string partitionKey, string rowKey)
+      public override TableRow Get(string tableName, string partitionKey, string rowKey)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
@@ -149,7 +123,7 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public void Insert(string tableName, IEnumerable<TableRow> rows)
+      public override void Insert(string tableName, IEnumerable<TableRow> rows)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
@@ -158,20 +132,9 @@ namespace Storage.Net.Table.Files
       }
 
       /// <summary>
-      /// See interface documentation
-      /// </summary>
-      public void Insert(string tableName, TableRow row)
-      {
-         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
-         if (row == null) throw new ArgumentNullException(nameof(row));
-
-         Insert(tableName, new[] {row});
-      }
-
-      /// <summary>
       /// See interface
       /// </summary>
-      public void InsertOrReplace(string tableName, IEnumerable<TableRow> rows)
+      public override void InsertOrReplace(string tableName, IEnumerable<TableRow> rows)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
@@ -180,20 +143,9 @@ namespace Storage.Net.Table.Files
       }
 
       /// <summary>
-      /// See interface
-      /// </summary>
-      public void InsertOrReplace(string tableName, TableRow row)
-      {
-         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
-         if (row == null) throw new ArgumentNullException(nameof(row));
-
-         InsertOrReplace(tableName, new[] { row });
-      }
-
-      /// <summary>
       /// See interface documentation
       /// </summary>
-      public void Update(string tableName, IEnumerable<TableRow> rows)
+      public override void Update(string tableName, IEnumerable<TableRow> rows)
       {
          throw new NotImplementedException();
       }
@@ -201,15 +153,7 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public void Update(string tableName, TableRow row)
-      {
-         throw new NotImplementedException();
-      }
-
-      /// <summary>
-      /// See interface documentation
-      /// </summary>
-      public void Merge(string tableName, IEnumerable<TableRow> rows)
+      public override void Merge(string tableName, IEnumerable<TableRow> rows)
       {
          if(tableName == null) throw new ArgumentNullException(nameof(tableName));
          if(rows == null) return;
@@ -228,17 +172,7 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public void Merge(string tableName, TableRow row)
-      {
-         if (row == null) return;
-
-         Merge(tableName, new[] {row});
-      }
-
-      /// <summary>
-      /// See interface documentation
-      /// </summary>
-      public void Delete(string tableName, IEnumerable<TableRowId> rowIds)
+      public override void Delete(string tableName, IEnumerable<TableRowId> rowIds)
       {
          if(tableName == null) throw new ArgumentNullException(nameof(tableName));
          if(rowIds == null) return;
@@ -252,16 +186,6 @@ namespace Storage.Net.Table.Files
             Delete(partition, group);
             WritePartition(tableName, partitionKey, partition.Values);
          }
-      }
-
-      /// <summary>
-      /// See interface documentation
-      /// </summary>
-      public void Delete(string tableName, TableRowId rowId)
-      {
-         if (rowId == null) return;
-
-         Delete(tableName, new[] {rowId});
       }
 
       /// <summary>

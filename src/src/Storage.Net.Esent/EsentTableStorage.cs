@@ -22,7 +22,7 @@ namespace Storage.Net.Net45.Esent
    /// The instance is not thread-safe. You should only use one instance per application, it's cannot be shared
    /// and is very expensive.
    /// </summary>
-   public class EsentTableStorage : ITableStorage
+   public class EsentTableStorage : AsyncTableStorage
    {
       //ISAM - Indexed Sequential Access Method
 
@@ -275,7 +275,7 @@ namespace Storage.Net.Net45.Esent
       /// <summary>
       /// See base
       /// </summary>
-      public void Dispose()
+      public override void Dispose()
       {
          ShutdownDatabase();
       }
@@ -283,12 +283,12 @@ namespace Storage.Net.Net45.Esent
       /// <summary>
       /// See base
       /// </summary>
-      public bool HasOptimisticConcurrency => false;
+      public override bool HasOptimisticConcurrency => false;
 
       /// <summary>
       /// See base
       /// </summary>
-      public void Delete(string tableName)
+      public override void Delete(string tableName)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
 
@@ -305,27 +305,7 @@ namespace Storage.Net.Net45.Esent
       /// <summary>
       /// See base
       /// </summary>
-      public Task DeleteAsync(string tableName)
-      {
-         Delete(tableName);
-
-         return Task.FromResult(true);
-      }
-
-      /// <summary>
-      /// See base
-      /// </summary>
-      public void Delete(string tableName, TableRowId rowId)
-      {
-         if (rowId == null) return;
-
-         Delete(tableName, new[] { rowId });
-      }
-
-      /// <summary>
-      /// See base
-      /// </summary>
-      public void Delete(string tableName, IEnumerable<TableRowId> rowIds)
+      public override void Delete(string tableName, IEnumerable<TableRowId> rowIds)
       {
          if (rowIds == null) return;
 
@@ -344,7 +324,7 @@ namespace Storage.Net.Net45.Esent
       /// <summary>
       /// See base
       /// </summary>
-      public IEnumerable<TableRow> Get(string tableName, string partitionKey)
+      public override IEnumerable<TableRow> Get(string tableName, string partitionKey)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
@@ -355,15 +335,7 @@ namespace Storage.Net.Net45.Esent
       /// <summary>
       /// See base
       /// </summary>
-      public Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey)
-      {
-         return Task.FromResult(Get(tableName, partitionKey));
-      }
-
-      /// <summary>
-      /// See base
-      /// </summary>
-      public TableRow Get(string tableName, string partitionKey, string rowKey)
+      public override TableRow Get(string tableName, string partitionKey, string rowKey)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
@@ -472,18 +444,7 @@ namespace Storage.Net.Net45.Esent
       /// <summary>
       /// See base
       /// </summary>
-      public void Insert(string tableName, TableRow row)
-      {
-         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
-         if (row == null) throw new ArgumentNullException(nameof(row));
-
-         Insert(tableName, new[] { row });
-      }
-
-      /// <summary>
-      /// See base
-      /// </summary>
-      public void Insert(string tableName, IEnumerable<TableRow> rows)
+      public override void Insert(string tableName, IEnumerable<TableRow> rows)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
@@ -533,7 +494,7 @@ namespace Storage.Net.Net45.Esent
       /// <summary>
       /// See base
       /// </summary>
-      public void InsertOrReplace(string tableName, IEnumerable<TableRow> rows)
+      public override void InsertOrReplace(string tableName, IEnumerable<TableRow> rows)
       {
          Insert(tableName, rows);
       }
@@ -541,15 +502,7 @@ namespace Storage.Net.Net45.Esent
       /// <summary>
       /// See base
       /// </summary>
-      public void InsertOrReplace(string tableName, TableRow row)
-      {
-         InsertOrReplace(tableName, new[] { row });
-      }
-
-      /// <summary>
-      /// See base
-      /// </summary>
-      public IEnumerable<string> ListTableNames()
+      public override IEnumerable<string> ListTableNames()
       {
          return Api.GetTableNames(_jetSession, _jetDbId).ToList();
       }
@@ -557,16 +510,7 @@ namespace Storage.Net.Net45.Esent
       /// <summary>
       /// See base
       /// </summary>
-      public Task<IEnumerable<string>> ListTableNamesAsync()
-      {
-         return Task.FromResult(ListTableNames());
-      }
-
-
-      /// <summary>
-      /// See base
-      /// </summary>
-      public void Merge(string tableName, TableRow row)
+      public override void Merge(string tableName, IEnumerable<TableRow> rows)
       {
          throw new NotImplementedException();
       }
@@ -574,23 +518,7 @@ namespace Storage.Net.Net45.Esent
       /// <summary>
       /// See base
       /// </summary>
-      public void Merge(string tableName, IEnumerable<TableRow> rows)
-      {
-         throw new NotImplementedException();
-      }
-
-      /// <summary>
-      /// See base
-      /// </summary>
-      public void Update(string tableName, TableRow row)
-      {
-         throw new NotImplementedException();
-      }
-
-      /// <summary>
-      /// See base
-      /// </summary>
-      public void Update(string tableName, IEnumerable<TableRow> rows)
+      public override void Update(string tableName, IEnumerable<TableRow> rows)
       {
          throw new NotImplementedException();
       }
