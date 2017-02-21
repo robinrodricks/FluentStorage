@@ -108,30 +108,29 @@ namespace Storage.Net.Microsoft.Azure.Table
          return await InternalGetAsync(tableName, partitionKey, null, -1);
       }
 
-
       /// <summary>
       /// Gets the list of rows in a table by partition and row key
       /// </summary>
-      public TableRow Get(string tableName, string partitionKey, string rowKey)
+      public override async Task<TableRow> GetAsync(string tableName, string partitionKey, string rowKey)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
          if (rowKey == null) throw new ArgumentNullException(nameof(rowKey));
 
-         return InternalGet(tableName, partitionKey, rowKey, -1)?.FirstOrDefault();
+         return (await InternalGetAsync(tableName, partitionKey, rowKey, -1))?.FirstOrDefault();
       }
 
       /// <summary>
       /// As per interface
       /// </summary>
-      public IEnumerable<TableRow> Get(string tableName, string partitionKey, string rowKey, int maxRecords)
+      /*public IEnumerable<TableRow> Get(string tableName, string partitionKey, string rowKey, int maxRecords)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
          if (rowKey == null) throw new ArgumentNullException(nameof(rowKey));
 
          return InternalGet(tableName, partitionKey, rowKey, maxRecords);
-      }
+      }*/
 
       private async Task<IEnumerable<TableRow>> InternalGetAsync(string tableName, string partitionKey, string rowKey, int maxRecords)
       {
@@ -182,23 +181,7 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// <summary>
       /// As per interface
       /// </summary>
-      public void Insert(string tableName, IEnumerable<TableRow> rows)
-      {
-         try
-         {
-            InsertAsync(tableName, rows).Wait();
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
-      }
-
-
-      /// <summary>
-      /// As per interface
-      /// </summary>
-      private async Task InsertAsync(string tableName, IEnumerable<TableRow> rows)
+      public override async Task InsertAsync(string tableName, IEnumerable<TableRow> rows)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
@@ -216,36 +199,9 @@ namespace Storage.Net.Microsoft.Azure.Table
       }
 
       /// <summary>
-      /// As per interface
-      /// </summary>
-      public void Insert(string tableName, TableRow row)
-      {
-         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
-         if (row == null) throw new ArgumentNullException(nameof(row));
-
-         Insert(tableName, new[] { row });
-      }
-
-      /// <summary>
       /// See interface
       /// </summary>
-      public void InsertOrReplace(string tableName, IEnumerable<TableRow> rows)
-      {
-         try
-         {
-            InsertOrReplaceAsync(tableName, rows).Wait();
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
-      }
-
-
-      /// <summary>
-      /// See interface
-      /// </summary>
-      private async Task InsertOrReplaceAsync(string tableName, IEnumerable<TableRow> rows)
+      public override async Task InsertOrReplaceAsync(string tableName, IEnumerable<TableRow> rows)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
@@ -263,36 +219,9 @@ namespace Storage.Net.Microsoft.Azure.Table
       }
 
       /// <summary>
-      /// See interface
-      /// </summary>
-      public void InsertOrReplace(string tableName, TableRow row)
-      {
-         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
-         if (row == null) throw new ArgumentNullException(nameof(row));
-
-         InsertOrReplace(tableName, new[] { row });
-      }
-
-      /// <summary>
       /// As per interface
       /// </summary>
-      public void Update(string tableName, IEnumerable<TableRow> rows)
-      {
-         try
-         {
-            UpdateAsync(tableName, rows).Wait();
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
-      }
-
-
-      /// <summary>
-      /// As per interface
-      /// </summary>
-      public async Task UpdateAsync(string tableName, IEnumerable<TableRow> rows)
+      public override async Task UpdateAsync(string tableName, IEnumerable<TableRow> rows)
       {
          await BatchedOperationAsync(tableName, false,
             (b, te) => b.Replace(te),
@@ -302,31 +231,7 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// <summary>
       /// As per interface
       /// </summary>
-      public void Update(string tableName, TableRow row)
-      {
-         Update(tableName, new[] { row });
-      }
-
-      /// <summary>
-      /// As per interface
-      /// </summary>
-      public void Merge(string tableName, IEnumerable<TableRow> rows)
-      {
-         try
-         {
-            MergeAsync(tableName, rows).Wait();
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
-      }
-
-
-      /// <summary>
-      /// As per interface
-      /// </summary>
-      private async Task MergeAsync(string tableName, IEnumerable<TableRow> rows)
+      public override async Task MergeAsync(string tableName, IEnumerable<TableRow> rows)
       {
          await BatchedOperationAsync(tableName, true,
             (b, te) => b.InsertOrMerge(te),
@@ -336,48 +241,13 @@ namespace Storage.Net.Microsoft.Azure.Table
       /// <summary>
       /// As per interface
       /// </summary>
-      public void Merge(string tableName, TableRow row)
-      {
-         Merge(tableName, new[] { row });
-      }
-
-      /// <summary>
-      /// As per interface
-      /// </summary>
-      public void Delete(string tableName, IEnumerable<TableRowId> rowIds)
-      {
-         try
-         {
-            DeleteAsync(tableName, rowIds).Wait();
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
-      }
-
-
-      /// <summary>
-      /// As per interface
-      /// </summary>
-      private async Task DeleteAsync(string tableName, IEnumerable<TableRowId> rowIds)
+      public override async Task DeleteAsync(string tableName, IEnumerable<TableRowId> rowIds)
       {
          if (rowIds == null) return;
 
          await BatchedOperationAsync(tableName, true,
             (b, te) => b.Delete(te),
             rowIds);
-      }
-
-
-      /// <summary>
-      /// As per interface
-      /// </summary>
-      public void Delete(string tableName, TableRowId rowId)
-      {
-         if (rowId == null) return;
-
-         Delete(tableName, new[] { rowId });
       }
 
       private async Task BatchedOperationAsync(string tableName, bool createTable,

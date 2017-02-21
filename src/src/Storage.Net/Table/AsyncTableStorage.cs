@@ -22,105 +22,145 @@ namespace Storage.Net.Table
 
       public void Delete(string tableName)
       {
-         try
-         {
-            DeleteAsync(tableName).Wait();
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
+         CallAsync(() => DeleteAsync(tableName));
       }
 
       public abstract Task DeleteAsync(string tableName);
 
       public void Delete(string tableName, TableRowId rowId)
       {
-         throw new NotImplementedException();
+         CallAsync(() => DeleteAsync(tableName, rowId));
+      }
+
+      public async Task DeleteAsync(string tableName, TableRowId rowId)
+      {
+         await DeleteAsync(tableName, new[] { rowId });
       }
 
       public void Delete(string tableName, IEnumerable<TableRowId> rowIds)
       {
-         throw new NotImplementedException();
+         CallAsync(() => DeleteAsync(tableName, rowIds));
       }
 
-      public void Dispose()
+      public abstract Task DeleteAsync(string tableName, IEnumerable<TableRowId> rowIds);
+
+      public virtual void Dispose()
       {
-         throw new NotImplementedException();
+
       }
 
       public IEnumerable<TableRow> Get(string tableName, string partitionKey)
       {
-         try
-         {
-            return GetAsync(tableName, partitionKey).Result;
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
+         return CallAsync(() => GetAsync(tableName, partitionKey));
       }
 
       public abstract Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey);
 
       public TableRow Get(string tableName, string partitionKey, string rowKey)
       {
-         throw new NotImplementedException();
+         return CallAsync(() => GetAsync(tableName, partitionKey, rowKey));
       }
 
+      public abstract Task<TableRow> GetAsync(string tableName, string partitionKey, string rowKey);
 
       public void Insert(string tableName, TableRow row)
       {
-         throw new NotImplementedException();
+         CallAsync(() => InsertAsync(tableName, row));
+      }
+
+      public async Task InsertAsync(string tableName, TableRow row)
+      {
+         await InsertAsync(tableName, new[] { row });
       }
 
       public void Insert(string tableName, IEnumerable<TableRow> rows)
       {
-         throw new NotImplementedException();
+         CallAsync(() => InsertAsync(tableName, rows));
       }
+
+      public abstract Task InsertAsync(string tableName, IEnumerable<TableRow> rows);
 
       public void InsertOrReplace(string tableName, TableRow row)
       {
-         throw new NotImplementedException();
+         CallAsync(() => InsertOrReplaceAsync(tableName, row));
+      }
+
+      public async Task InsertOrReplaceAsync(string tableName, TableRow row)
+      {
+         await InsertOrReplaceAsync(tableName, new[] { row });
       }
 
       public void InsertOrReplace(string tableName, IEnumerable<TableRow> rows)
       {
-         throw new NotImplementedException();
+         CallAsync(() => InsertOrReplaceAsync(tableName, rows));
       }
+
+      public abstract Task InsertOrReplaceAsync(string tableName, IEnumerable<TableRow> rows);
 
       public IEnumerable<string> ListTableNames()
       {
-         try
-         {
-            return ListTableNamesAsync().Result;
-         }
-         catch(AggregateException ex)
-         {
-            throw ex.InnerException;
-         }
+         return CallAsync(() => ListTableNamesAsync());
       }
 
       public abstract Task<IEnumerable<string>> ListTableNamesAsync();
 
       public void Merge(string tableName, TableRow row)
       {
-         throw new NotImplementedException();
+         CallAsync(() => MergeAsync(tableName, row));
+      }
+
+      public async Task MergeAsync(string tableName, TableRow row)
+      {
+         await MergeAsync(tableName, new[] { row });
       }
 
       public void Merge(string tableName, IEnumerable<TableRow> rows)
       {
-         throw new NotImplementedException();
+         CallAsync(() => MergeAsync(tableName, rows));
       }
+
+      public abstract Task MergeAsync(string tableName, IEnumerable<TableRow> rows);
 
       public void Update(string tableName, TableRow row)
       {
-         throw new NotImplementedException();
+         CallAsync(() => UpdateAsync(tableName, row));
+      }
+
+      public async Task UpdateAsync(string tableName, TableRow row)
+      {
+         await UpdateAsync(tableName, new[] { row });
       }
 
       public void Update(string tableName, IEnumerable<TableRow> rows)
       {
-         throw new NotImplementedException();
+         CallAsync(() => UpdateAsync(tableName, rows));
       }
+
+      public abstract Task UpdateAsync(string tableName, IEnumerable<TableRow> rows);
+
+      private void CallAsync(Func<Task> lambda)
+      {
+         try
+         {
+            lambda().Wait();
+         }
+         catch (AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
+      }
+
+      private T CallAsync<T>(Func<Task<T>> lambda)
+      {
+         try
+         {
+            return lambda().Result;
+         }
+         catch (AggregateException ex)
+         {
+            throw ex.InnerException;
+         }
+      }
+
    }
 }

@@ -76,6 +76,18 @@ namespace Storage.Net.Table
       TableRow Get(string tableName, string partitionKey, string rowKey);
 
       /// <summary>
+      /// Gets a single row by partition key and row key as this uniquely idendifies a row.
+      /// </summary>
+      /// <param name="tableName">Table name, required.</param>
+      /// <param name="partitionKey">Partition key of the table, required.</param>
+      /// <param name="rowKey">Row key, required.</param>
+      /// <returns>
+      /// List of table rows in the table's partition. This method never returns null and if no records
+      /// are found an empty collection is returned.
+      /// </returns>
+      Task<TableRow> GetAsync(string tableName, string partitionKey, string rowKey);
+
+      /// <summary>
       /// Inserts rows in the table.
       /// </summary>
       /// <param name="tableName">Table name, required.</param>
@@ -88,6 +100,18 @@ namespace Storage.Net.Table
       void Insert(string tableName, IEnumerable<TableRow> rows);
 
       /// <summary>
+      /// Inserts rows in the table.
+      /// </summary>
+      /// <param name="tableName">Table name, required.</param>
+      /// <param name="rows">Rows to insert, required. The rows can belong to different partitions.</param>
+      /// <exception cref="StorageException">
+      /// If the row already exists throws this exception with <see cref="ErrorCode.DuplicateKey"/>.
+      /// Note that exception is thrown only for partiton batch. If rows contains more than one partition to insert
+      /// some of them may succeed and some may fail.
+      /// </exception>
+      Task InsertAsync(string tableName, IEnumerable<TableRow> rows);
+
+      /// <summary>
       /// Inserts a single row
       /// </summary>
       /// <param name="tableName">Table name, required.</param>
@@ -96,6 +120,16 @@ namespace Storage.Net.Table
       /// If the row already exists throws this exception with <see cref="ErrorCode.DuplicateKey"/>
       /// </exception>
       void Insert(string tableName, TableRow row);
+
+      /// <summary>
+      /// Inserts a single row
+      /// </summary>
+      /// <param name="tableName">Table name, required.</param>
+      /// <param name="row">Row to insert, required.</param>
+      /// <exception cref="StorageException">
+      /// If the row already exists throws this exception with <see cref="ErrorCode.DuplicateKey"/>
+      /// </exception>
+      Task InsertAsync(string tableName, TableRow row);
 
       /// <summary>
       /// Inserts rows in the table, and if they exist replaces them with a new value.
@@ -108,6 +142,16 @@ namespace Storage.Net.Table
       void InsertOrReplace(string tableName, IEnumerable<TableRow> rows);
 
       /// <summary>
+      /// Inserts rows in the table, and if they exist replaces them with a new value.
+      /// </summary>
+      /// <param name="tableName">Table name, required.</param>
+      /// <param name="rows">Rows to insert, required. The rows can belong to different partitions.</param>
+      /// <exception cref="StorageException">
+      /// If input rows have duplicated keys throws this exception with <see cref="ErrorCode.DuplicateKey"/>
+      /// </exception>
+      Task InsertOrReplaceAsync(string tableName, IEnumerable<TableRow> rows);
+
+      /// <summary>
       /// Inserts a single row, or replaces the value if row already exists.
       /// </summary>
       /// <param name="tableName">Table name, required.</param>
@@ -115,9 +159,21 @@ namespace Storage.Net.Table
       void InsertOrReplace(string tableName, TableRow row);
 
       /// <summary>
+      /// Inserts a single row, or replaces the value if row already exists.
+      /// </summary>
+      /// <param name="tableName">Table name, required.</param>
+      /// <param name="row">Row to insert, required.</param>
+      Task InsertOrReplaceAsync(string tableName, TableRow row);
+
+      /// <summary>
       /// Updates multiple rows. Note that all the rows must belong to the same partition.
       /// </summary>
       void Update(string tableName, IEnumerable<TableRow> rows);
+
+      /// <summary>
+      /// Updates multiple rows. Note that all the rows must belong to the same partition.
+      /// </summary>
+      Task UpdateAsync(string tableName, IEnumerable<TableRow> rows);
 
       /// <summary>
       /// Updates single row
@@ -125,9 +181,19 @@ namespace Storage.Net.Table
       void Update(string tableName, TableRow row);
 
       /// <summary>
+      /// Updates single row
+      /// </summary>
+      Task UpdateAsync(string tableName, TableRow row);
+
+      /// <summary>
       /// Merges multiple rows. Note that all rows must belong to the same partition
       /// </summary>
       void Merge(string tableName, IEnumerable<TableRow> rows);
+
+      /// <summary>
+      /// Merges multiple rows. Note that all rows must belong to the same partition
+      /// </summary>
+      Task MergeAsync(string tableName, IEnumerable<TableRow> rows);
 
       /// <summary>
       /// Merges a single row
@@ -135,13 +201,28 @@ namespace Storage.Net.Table
       void Merge(string tableName, TableRow row);
 
       /// <summary>
+      /// Merges a single row
+      /// </summary>
+      Task MergeAsync(string tableName, TableRow row);
+
+      /// <summary>
       /// Deletes multiple rows
       /// </summary>
       void Delete(string tableName, IEnumerable<TableRowId> rowIds);
 
       /// <summary>
+      /// Deletes multiple rows
+      /// </summary>
+      Task DeleteAsync(string tableName, IEnumerable<TableRowId> rowIds);
+
+      /// <summary>
       /// Deletes a single row
       /// </summary>
       void Delete(string tableName, TableRowId rowId);
+
+      /// <summary>
+      /// Deletes a single row
+      /// </summary>
+      Task DeleteAsync(string tableName, TableRowId rowId);
    }
 }
