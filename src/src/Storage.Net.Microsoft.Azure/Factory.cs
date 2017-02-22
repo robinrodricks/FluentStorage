@@ -32,6 +32,18 @@ namespace Storage.Net
       }
 
       /// <summary>
+      /// Creates an instance of Azure Table Storage using account name and key.
+      /// </summary>
+      /// <param name="factory">Factory reference</param>
+      /// <param name="credential">Credential structure cotnaining account name in username and account key in password.</param>
+      /// <returns></returns>
+      public static ITableStorage AzureTableStorage(this ITableStorageFactory factory,
+         NetworkCredential credential)
+      {
+         return new AzureTableStorage(credential.UserName, credential.Password);
+      }
+
+      /// <summary>
       /// Creates a blob storage implementation based on Microsoft Azure Blob Storage using account name and key.
       /// </summary>
       /// <param name="factory">Reference to factory</param>
