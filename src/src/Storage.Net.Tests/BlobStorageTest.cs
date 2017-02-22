@@ -277,7 +277,19 @@ namespace Storage.Net.Tests.Integration
          Assert.True(files.Length >= 2);
          Assert.Contains("one/two/three.json", files);
          Assert.Contains("two/three/four.json", files);
+      }
 
+      [Theory]
+      [InlineData("the??one")]
+      [InlineData("file*x$")]
+      public void Characters_BadInput_DoesntCrash(string input)
+      {
+         _storage.Delete(input);
+
+         _storage.UploadFromStream(input, "content".ToMemoryStream());
+
+         string listed = _storage.List(input).FirstOrDefault();
+         Assert.NotNull(listed);
       }
 
       [Fact]

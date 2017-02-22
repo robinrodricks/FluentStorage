@@ -233,12 +233,14 @@ namespace Storage.Net.Microsoft.Azure.Blob
 
       private static string ToInternalId(string userId)
       {
-         return userId.UrlEncode();
+         return userId;
+         //return userId.UrlEncode();
       }
 
       private static string ToUserId(string internalId)
       {
-         return internalId.UrlDecode();
+         return internalId;
+         //return internalId.UrlDecode();
       }
 
       private static bool TryHandleStorageException(AzureStorageException ex)
