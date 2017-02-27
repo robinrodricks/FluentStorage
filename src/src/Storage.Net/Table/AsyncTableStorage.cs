@@ -118,24 +118,6 @@ namespace Storage.Net.Table
       /// <summary>
       /// See interface
       /// </summary>
-      public virtual void Insert(string tableName, TableRow row)
-      {
-         if (row == null) throw new ArgumentNullException(nameof(row));
-
-         Insert(tableName, new[] { row });
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
-      public virtual async Task InsertAsync(string tableName, TableRow row)
-      {
-         await InsertAsync(tableName, new[] { row });
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
       public virtual void Insert(string tableName, IEnumerable<TableRow> rows)
       {
          CallAsync(() => InsertAsync(tableName, rows));
@@ -149,22 +131,6 @@ namespace Storage.Net.Table
          Insert(tableName, rows);
 
          return Task.FromResult(true);
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
-      public virtual void InsertOrReplace(string tableName, TableRow row)
-      {
-         InsertOrReplace(tableName, new[] { row });
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
-      public virtual async Task InsertOrReplaceAsync(string tableName, TableRow row)
-      {
-         await InsertOrReplaceAsync(tableName, new[] { row });
       }
 
       /// <summary>
@@ -203,22 +169,6 @@ namespace Storage.Net.Table
       /// <summary>
       /// See interface
       /// </summary>
-      public virtual void Merge(string tableName, TableRow row)
-      {
-         Merge(tableName, new[] { row });
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
-      public virtual async Task MergeAsync(string tableName, TableRow row)
-      {
-         await MergeAsync(tableName, new[] { row });
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
       public virtual void Merge(string tableName, IEnumerable<TableRow> rows)
       {
          CallAsync(() => MergeAsync(tableName, rows));
@@ -231,22 +181,6 @@ namespace Storage.Net.Table
       {
          Merge(tableName, rows);
          return Task.FromResult(true);
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
-      public virtual void Update(string tableName, TableRow row)
-      {
-         CallAsync(() => UpdateAsync(tableName, row));
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
-      public virtual async Task UpdateAsync(string tableName, TableRow row)
-      {
-         await UpdateAsync(tableName, new[] { row });
       }
 
       /// <summary>

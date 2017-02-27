@@ -32,6 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "blob-storage", "blob-storag
 	ProjectSection(SolutionItems) = preProject
 		..\doc\blob-storage\dirtextfile.png = ..\doc\blob-storage\dirtextfile.png
 		..\doc\blob-storage\dirtextfileindir.png = ..\doc\blob-storage\dirtextfileindir.png
+		..\doc\blob-storage\extensions.md = ..\doc\blob-storage\extensions.md
 		..\doc\blob-storage\index.md = ..\doc\blob-storage\index.md
 	EndProjectSection
 EndProject

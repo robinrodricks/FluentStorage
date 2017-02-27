@@ -293,6 +293,39 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public void Extensions_LocalFsUploadDownload_Succeeds()
+      {
+         string id = Generator.RandomString;
+         string localFile = Path.Combine(TestDir.FullName, "blob.txt");
+
+         _storage.UploadFromStream(id, "content".ToMemoryStream());
+
+         _storage.DownloadToFile(id, localFile);
+
+         string lfc = File.ReadAllText(localFile);
+         Assert.Equal("content", lfc);
+
+         _storage.UploadFromFile(id + "1", localFile);
+         _storage.DownloadToFile(id + "1", localFile + "1");
+
+         lfc = File.ReadAllText(localFile + "1");
+         Assert.Equal("content", lfc);
+      }
+
+      [Fact]
+      public void Extensions_StringDownloadUPload_JustWorks()
+      {
+         string id = Generator.RandomString;
+         string text = Generator.RandomString;
+
+         _storage.UploadText(id, text);
+
+         string text2 = _storage.DownloadText(id);
+
+         Assert.Equal(text, text2);
+      }
+
+      [Fact]
       public void Append_KeepAppending_Grows()
       {
          string id = Generator.GetRandomString(10, false);

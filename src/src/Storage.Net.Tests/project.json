@@ -1,15 +1,15 @@
 {
    "version": "1.0.0-*",
 
-    "dependencies": {
-        "NETStandard.Library": "1.6.1",
-        "Storage.Net": "3.0.1",
-        "Storage.Net.Amazon.Aws": "3.0.1",
-        "Storage.Net.Microsoft.Azure": "3.0.1",
-        "Storage.Net.Esent": "1.0.0",
-        "Config.Net": "3.0.1701.3101",
-        "LogMagic": "2.1.0"
-    },
+   "dependencies": {
+      "NETStandard.Library": "1.6.1",
+      "Storage.Net": "3.0.1",
+      "Storage.Net.Amazon.Aws": "3.0.1",
+      "Storage.Net.Microsoft.Azure": "3.0.1",
+      "Storage.Net.Esent": "1.0.0",
+      "LogMagic": "2.1.0",
+      "Config.Net": "3.0.1702.1002"
+   },
 
    "buildOptions": {
       "keyFile": "../../storage.snk",

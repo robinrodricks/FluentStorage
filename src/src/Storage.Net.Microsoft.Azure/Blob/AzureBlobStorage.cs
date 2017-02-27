@@ -37,6 +37,11 @@ namespace Storage.Net.Microsoft.Azure.Blob
       }
 
       /// <summary>
+      /// Returns reference to the native Azure SDK blob container
+      /// </summary>
+      public CloudBlobContainer NativeBlobContainer => _blobContainer;
+
+      /// <summary>
       /// Creates and instance from network credential and container name
       /// </summary>
       /// <param name="credential"></param>

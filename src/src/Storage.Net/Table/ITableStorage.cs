@@ -112,26 +112,6 @@ namespace Storage.Net.Table
       Task InsertAsync(string tableName, IEnumerable<TableRow> rows);
 
       /// <summary>
-      /// Inserts a single row
-      /// </summary>
-      /// <param name="tableName">Table name, required.</param>
-      /// <param name="row">Row to insert, required.</param>
-      /// <exception cref="StorageException">
-      /// If the row already exists throws this exception with <see cref="ErrorCode.DuplicateKey"/>
-      /// </exception>
-      void Insert(string tableName, TableRow row);
-
-      /// <summary>
-      /// Inserts a single row
-      /// </summary>
-      /// <param name="tableName">Table name, required.</param>
-      /// <param name="row">Row to insert, required.</param>
-      /// <exception cref="StorageException">
-      /// If the row already exists throws this exception with <see cref="ErrorCode.DuplicateKey"/>
-      /// </exception>
-      Task InsertAsync(string tableName, TableRow row);
-
-      /// <summary>
       /// Inserts rows in the table, and if they exist replaces them with a new value.
       /// </summary>
       /// <param name="tableName">Table name, required.</param>
@@ -152,20 +132,6 @@ namespace Storage.Net.Table
       Task InsertOrReplaceAsync(string tableName, IEnumerable<TableRow> rows);
 
       /// <summary>
-      /// Inserts a single row, or replaces the value if row already exists.
-      /// </summary>
-      /// <param name="tableName">Table name, required.</param>
-      /// <param name="row">Row to insert, required.</param>
-      void InsertOrReplace(string tableName, TableRow row);
-
-      /// <summary>
-      /// Inserts a single row, or replaces the value if row already exists.
-      /// </summary>
-      /// <param name="tableName">Table name, required.</param>
-      /// <param name="row">Row to insert, required.</param>
-      Task InsertOrReplaceAsync(string tableName, TableRow row);
-
-      /// <summary>
       /// Updates multiple rows. Note that all the rows must belong to the same partition.
       /// </summary>
       void Update(string tableName, IEnumerable<TableRow> rows);
@@ -174,16 +140,6 @@ namespace Storage.Net.Table
       /// Updates multiple rows. Note that all the rows must belong to the same partition.
       /// </summary>
       Task UpdateAsync(string tableName, IEnumerable<TableRow> rows);
-
-      /// <summary>
-      /// Updates single row
-      /// </summary>
-      void Update(string tableName, TableRow row);
-
-      /// <summary>
-      /// Updates single row
-      /// </summary>
-      Task UpdateAsync(string tableName, TableRow row);
 
       /// <summary>
       /// Merges multiple rows. Note that all rows must belong to the same partition
@@ -196,16 +152,6 @@ namespace Storage.Net.Table
       Task MergeAsync(string tableName, IEnumerable<TableRow> rows);
 
       /// <summary>
-      /// Merges a single row
-      /// </summary>
-      void Merge(string tableName, TableRow row);
-
-      /// <summary>
-      /// Merges a single row
-      /// </summary>
-      Task MergeAsync(string tableName, TableRow row);
-
-      /// <summary>
       /// Deletes multiple rows
       /// </summary>
       void Delete(string tableName, IEnumerable<TableRowId> rowIds);
@@ -214,15 +160,5 @@ namespace Storage.Net.Table
       /// Deletes multiple rows
       /// </summary>
       Task DeleteAsync(string tableName, IEnumerable<TableRowId> rowIds);
-
-      /// <summary>
-      /// Deletes a single row
-      /// </summary>
-      void Delete(string tableName, TableRowId rowId);
-
-      /// <summary>
-      /// Deletes a single row
-      /// </summary>
-      Task DeleteAsync(string tableName, TableRowId rowId);
    }
 }
