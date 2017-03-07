@@ -116,8 +116,11 @@ namespace Storage.Net.Aws.Blob
          {
             using (GetObjectResponse obj = await GetObjectAsync(id))
             {
+               //ETag contains actual MD5 hash, not sure why!
+
                return new BlobMeta(
-                  obj.ContentLength);
+                  obj.ContentLength,
+                  obj.ETag.Trim('\"'));  
             }
          }
          catch (StorageException ex) when (ex.ErrorCode == ErrorCode.NotFound)

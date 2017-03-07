@@ -147,5 +147,41 @@ namespace Storage.Net.Blob
 
          return Encoding.UTF8.GetString(ms.ToArray());
       }
+
+      /// <summary>
+      /// Copies blob to another storage
+      /// </summary>
+      /// <param name="blobStorage">Source storage</param>
+      /// <param name="blobId">Blob ID to copy</param>
+      /// <param name="targetStorage">Target storage</param>
+      /// <param name="newId">Optional, when specified uses this id in the target storage. If null uses the original ID.</param>
+      public static void CopyTo(this IBlobStorage blobStorage, string blobId, IBlobStorage targetStorage, string newId)
+      {
+         Stream src = blobStorage.OpenStreamToRead(blobId);
+         if (src == null) throw new StorageException(ErrorCode.NotFound, null);
+
+         using (src)
+         {
+            targetStorage.UploadFromStream(newId ?? blobId, src);
+         }
+      }
+
+      /// <summary>
+      /// Copies blob to another storage
+      /// </summary>
+      /// <param name="blobStorage">Source storage</param>
+      /// <param name="blobId">Blob ID to copy</param>
+      /// <param name="targetStorage">Target storage</param>
+      /// <param name="newId">Optional, when specified uses this id in the target storage. If null uses the original ID.</param>
+      public static async Task CopyToAsync(this IBlobStorage blobStorage, string blobId, IBlobStorage targetStorage, string newId)
+      {
+         Stream src = await blobStorage.OpenStreamToReadAsync(blobId);
+         if (src == null) throw new StorageException(ErrorCode.NotFound, null);
+
+         using (src)
+         {
+            await targetStorage.UploadFromStreamAsync(newId ?? blobId, src);
+         }
+      }
    }
 }

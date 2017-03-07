@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetBox.Model;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -192,8 +193,15 @@ namespace Storage.Net.Blob.Files
 
          var fi = new FileInfo(path);
 
+         string md5;
+         using (Stream fs = File.OpenRead(fi.FullName))
+         {
+            md5 = fs.GetHash(HashType.Md5);
+         }
+
          return new BlobMeta(
-            fi.Length);
+            fi.Length,
+            md5);
       }
 
       private string GetFilePath(string id)

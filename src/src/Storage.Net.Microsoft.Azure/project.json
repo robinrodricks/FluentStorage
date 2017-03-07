@@ -21,10 +21,10 @@
         "xmlDoc": true
     },
 
-    "dependencies": {
-        "netbox": "1.0.1702.2701",
-        "Storage.Net": "3.0.1"
-    },
+  "dependencies": {
+    "netbox": "1.0.1703.701",
+    "Storage.Net": "3.0.1"
+  },
 
     "frameworks": {
         "net45": {

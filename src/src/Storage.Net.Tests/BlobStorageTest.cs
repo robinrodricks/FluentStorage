@@ -10,6 +10,7 @@ using Storage.Net.Aws.Blob;
 using Storage.Net.Blob;
 using Storage.Net.Blob.Files;
 using Storage.Net.Microsoft.Azure.Blob;
+using NetBox.Model;
 
 namespace Storage.Net.Tests.Integration
 {
@@ -324,6 +325,37 @@ namespace Storage.Net.Tests.Integration
          string text2 = _storage.DownloadText(id);
 
          Assert.Equal(text, text2);
+      }
+
+      [Fact]
+      public void Extensions_CopyTo_JustWorks()
+      {
+         string sourceId = Generator.GetRandomString(10, false);
+         string targetId = Generator.GetRandomString(10, false);
+         string text = Generator.RandomString;
+
+         _storage.UploadText(sourceId, text);
+         Assert.False(_storage.Exists(targetId));
+
+         _storage.CopyTo(sourceId, _storage, targetId);
+
+         Assert.True(_storage.Exists(targetId));
+         Assert.Equal(text, _storage.DownloadText(targetId));
+         
+      }
+
+      [Fact]
+      public void GetMeta_RequiredProperties_ReturnsCorrect()
+      {
+         string id = Generator.GetRandomString(10, false);
+         string text = Generator.RandomString;
+
+         _storage.UploadText(id, text);
+
+         BlobMeta meta = _storage.GetMeta(id);
+
+         Assert.Equal(Encoding.UTF8.GetByteCount(text), meta.Size);
+         Assert.Equal(text.GetHash(HashType.Md5), meta.MD5);
       }
 
       [Fact]

@@ -9,6 +9,7 @@ using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using System.Threading.Tasks;
+using NetBox.Model;
 
 namespace Storage.Net.Microsoft.Azure.Blob
 {
@@ -232,8 +233,12 @@ namespace Storage.Net.Microsoft.Azure.Blob
 
          await blob.FetchAttributesAsync();
 
+         //ContentMD5 is base64-encoded hash, whereas we work with HEX encoded ones
+         string md5 = blob.Properties.ContentMD5.Base64DecodeAsBytes().ToHexString();
+
          return new BlobMeta(
-            blob.Properties.Length);
+            blob.Properties.Length,
+            md5);
       }
 
       private static string ToInternalId(string userId)

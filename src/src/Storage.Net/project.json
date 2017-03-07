@@ -22,10 +22,10 @@
    },
 
 
-    "dependencies": {
-        "netbox": "1.0.1702.2701",
-        "NETStandard.Library": "1.6.1"
-    },
+  "dependencies": {
+    "netbox": "1.0.1703.701",
+    "NETStandard.Library": "1.6.1"
+  },
 
    "frameworks": {
       "netstandard1.6": {
