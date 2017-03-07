@@ -10,7 +10,10 @@
       /// </summary>
       public const char PathSeparator = '/';
 
-      private static string PathStrSeparator = new string(PathSeparator, 1);
+      /// <summary>
+      /// Character used to split paths 
+      /// </summary>
+      public static string PathStrSeparator = new string(PathSeparator, 1);
 
       /// <summary>
       /// Combines parts of path

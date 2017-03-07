@@ -44,7 +44,11 @@ namespace Storage.Net.Blob.Files
       {
          string name = fi.FullName.Substring(_directory.FullName.Length + 1);
 
-         return name.Replace(Path.DirectorySeparatorChar, StoragePath.PathSeparator);
+         name = name.Replace(Path.DirectorySeparatorChar, StoragePath.PathSeparator);
+
+         string[] parts = name.Split(StoragePath.PathSeparator);
+
+         return string.Join(StoragePath.PathStrSeparator, parts.Select(DecodePathPart));
       }
 
       /// <summary>
@@ -197,8 +201,8 @@ namespace Storage.Net.Blob.Files
          GenericValidation.CheckBlobId(id);
 
          //id can contain path separators
-         string[] parts = id.Split(StoragePath.PathSeparator);
-         string name = parts[parts.Length - 1].SanitizePath();
+         string[] parts = id.Split(StoragePath.PathSeparator).Select(EncodePathPart).ToArray();
+         string name = parts[parts.Length - 1];
          DirectoryInfo dir;
          if(parts.Length == 1)
          {
@@ -214,7 +218,7 @@ namespace Storage.Net.Blob.Files
             if (!dir.Exists) dir.Create();
          }
 
-         return Path.Combine(dir.FullName, name.SanitizePath());
+         return Path.Combine(dir.FullName, name);
       }
 
       private Stream CreateStream(string id, bool overwrite = true)
@@ -235,6 +239,16 @@ namespace Storage.Net.Blob.Files
          if(!File.Exists(path)) return null;
 
          return File.OpenRead(path);
+      }
+
+      private static string EncodePathPart(string path)
+      {
+         return path.UrlEncode();
+      }
+
+      private static string DecodePathPart(string path)
+      {
+         return path.UrlDecode();
       }
    }
 }
