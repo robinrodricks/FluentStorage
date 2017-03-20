@@ -40,11 +40,11 @@ namespace Storage.Net
       /// <param name="factory"></param>
       /// <param name="receiver">Receiver</param>
       /// <returns>Publisher</returns>
-      public static IMessagePublisher InMemory(this IMessagingFactory factory, out IMessageReceiver receiver)
+      /*public static IMessagePublisher InMemory(this IMessagingFactory factory, out IMessageReceiver receiver)
       {
          var inmem = new InMemoryMessagePublisherReceiver();
          receiver = inmem;
          return inmem;
-      }
+      }*/
    }
 }

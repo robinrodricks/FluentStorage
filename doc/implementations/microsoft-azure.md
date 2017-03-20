@@ -2,10 +2,6 @@
 
 Microsoft Azure implementations reside in a separate package hosted on [NuGet](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure/). Follow the link for installation instructions. The package implements all three aspects of storage - blobs, tables and queues.
 
-> Current implementation only supports .NET 4.5 (Windows) and .NET Standard 1.6 with "portable-net451+win8" target. This is due to limitations in client library for .NET Core from Microsoft.
-
-> Note that only Azure Storage functionality is supported in .NET Core because there is no impelmentation of underlying Service Bus libraries for .NET Core. .NET 4.5 version supports everything.
-
 ## Blobs
 
 Blobs are interfacing with the official [Blob Storage](https://azure.microsoft.com/en-gb/services/storage/blobs/) and implement a good subset of functionality from the rich Blob Storage ecosystem in Azure.
@@ -43,5 +39,35 @@ Alternatively, you can construct the blob storage client from the SAS signature 
 > todo
 
 ## Messaging
+
+There are a few options in Microsoft Azure in terms of messaging.
+
+### Azure Storage Queues
+
+Azure Storage has built-in support for [queues](https://docs.microsoft.com/en-us/azure/storage/storage-dotnet-how-to-use-queues). Although it's primitive and not exactly performant it's a basic and the cheapest option to work with.
+
+To create a queue publisher:
+
+```csharp
+IMessagePublisherpublisher = StorageFactory.Messages.AzureStorageQueuePublisher("storage_name", "storage_key", "queue_name");
+```
+
+This publisher is attached to the queue **queue_name** which will be created if it doesnt exist.
+
+To create a receiver:
+
+```csharp
+IMessageReceiver receiver = StorageFactory.Messages.AzureStorageQueueReceiver("storage_name", "storage_key", "queue_name", "invisibility_timeout");
+``` 
+
+This receiver will be attached to **queue_name** queue. **invisibility_timeout** specifies for how long the message will be invisible to other receivers after it's received from the queue. If you don't confirm the message receive operation, message will appear on the queue again.
+
+### Azure Service Bus
+
+This functionality is only available to `.NET 4.5.1` framework users due to limited support in .NET SDK.
+
+> todo
+
+### Azure Event Hub
 
 > todo

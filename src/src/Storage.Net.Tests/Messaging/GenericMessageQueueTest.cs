@@ -34,10 +34,10 @@ namespace Storage.Net.Tests.Integration.Messaging
       public AzureEventHubMessageQeueueTest() : base("azure-eventhub") { }
    }
 
-   public class InMemoryMessageQueueTest : GenericMessageQueueTest
+   /*public class InMemoryMessageQueueTest : GenericMessageQueueTest
    {
       public InMemoryMessageQueueTest() : base("inmemory") { }
-   }
+   }*/
 
    /*public class DiskMessageQeueuTest : GenericMessageQueueTest
    {
@@ -96,9 +96,9 @@ namespace Storage.Net.Tests.Integration.Messaging
                   TestSettings.Instance.EventHubConnectionString,
                   TestSettings.Instance.EventHubPath);
                break;
-            case "inmemory":
+            /*case "inmemory":
                _publisher = StorageFactory.Messages.InMemory(out _receiver);
-               break;
+               break;*/
             /*case "disk":
                var disk = new DiskMessagePublisherReceiver(TestDir);
                _publisher = disk;

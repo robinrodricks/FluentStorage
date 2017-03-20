@@ -5,13 +5,14 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
 {
    /// <summary>
    /// Implements message receiver on Azure Service Bus Queues
    /// </summary>
-   public class AzureServiceBusQueueReceiver : IMessageReceiver
+   class AzureServiceBusQueueReceiver : AsyncMessageReceiver
    {
       private static readonly TimeSpan AutoRenewTimeout = TimeSpan.FromMinutes(1);
 
@@ -37,19 +38,9 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       /// <summary>
       /// Tries to receive the message from queue client by calling .Receive explicitly.
       /// </summary>
-      public QueueMessage ReceiveMessage()
+      public override async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
       {
-         BrokeredMessage bm = _client.Receive(TimeSpan.FromMilliseconds(1));
-         if(bm == null) return null;
-         return ProcessAndConvert(bm);
-      }
-
-      /// <summary>
-      /// Tries to receive the message from queue client by calling .Receive explicitly.
-      /// </summary>
-      public IEnumerable<QueueMessage> ReceiveMessages(int count)
-      {
-         IEnumerable<BrokeredMessage> batch = _client.ReceiveBatch(count, TimeSpan.FromMilliseconds(1));
+         IEnumerable<BrokeredMessage> batch = await _client.ReceiveBatchAsync(count, TimeSpan.FromMilliseconds(1));
          if(batch == null) return null;
 
          return batch.Select(ProcessAndConvert).ToList();
@@ -58,14 +49,14 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       /// <summary>
       /// Calls .DeadLetter explicitly
       /// </summary>
-      public void DeadLetter(QueueMessage message, string reason, string errorDescription)
+      public override async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
       {
          if (!_peekLock) return;
 
          BrokeredMessage bm;
          if (!_messageIdToBrokeredMessage.TryRemove(message.Id, out bm)) return;
 
-         _client.DeadLetter(bm.LockToken, reason, errorDescription);
+         await _client.DeadLetterAsync(bm.LockToken, reason, errorDescription);
       }
 
       private QueueMessage ProcessAndConvert(BrokeredMessage bm)
@@ -79,7 +70,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       /// Call at the end when done with the message.
       /// </summary>
       /// <param name="message"></param>
-      public void ConfirmMessage(QueueMessage message)
+      public override async Task ConfirmMessageAsync(QueueMessage message)
       {
          if(!_peekLock) return;
 
@@ -87,14 +78,14 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
          //delete the message and get the deleted element, very nice method!
          if(!_messageIdToBrokeredMessage.TryRemove(message.Id, out bm)) return;
 
-         bm.Complete();
+         await bm.CompleteAsync();
       }
 
       /// <summary>
       /// Starts message pump with AutoComplete = false, 1 minute session renewal and 1 concurrent call.
       /// </summary>
       /// <param name="onMessage"></param>
-      public void StartMessagePump(Action<QueueMessage> onMessage)
+      public override void StartMessagePump(Action<QueueMessage> onMessage)
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
          if (_onMessageAction != null) throw new ArgumentException("message pump already started", nameof(onMessage));
@@ -121,7 +112,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       /// <summary>
       /// Stops message pump if started
       /// </summary>
-      public void Dispose()
+      public override void Dispose()
       {
          _client.Close();  //this also stops the message pump
       }

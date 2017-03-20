@@ -6,13 +6,14 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
 {
    /// <summary>
    /// Subscribes to messages in a Service Bus Topic. This version subscribes to ALL messages.
    /// </summary>
-   public class AzureServiceBusTopicReceiver : IMessageReceiver
+   class AzureServiceBusTopicReceiver : AsyncMessageReceiver
    {
       private readonly NamespaceManager _nsMgr;
       private readonly SubscriptionClient _client;
@@ -61,7 +62,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       /// Calls .Complete on the message if this subscription is in PeekLock mode, otherwise the call is ignored
       /// </summary>
       /// <param name="message"></param>
-      public void ConfirmMessage(QueueMessage message)
+      public override async Task ConfirmMessageAsync(QueueMessage message)
       {
          if(!_peekLock) return;
 
@@ -69,13 +70,13 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
          //delete the message and get the deleted element, very nice method!
          if(!_messageIdToBrokeredMessage.TryRemove(message.Id, out bm)) return;
 
-         bm.Complete();
+         await bm.CompleteAsync();
       }
 
       /// <summary>
       /// Not implemented
       /// </summary>
-      public void StartMessagePump(Action<QueueMessage> onMessage)
+      public override void StartMessagePump(Action<QueueMessage> onMessage)
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
          if (_onMessageAction != null) throw new ArgumentException("message pump already started", nameof(onMessage));
@@ -100,28 +101,11 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       }
 
       /// <summary>
-      /// Nothing to dispose
-      /// </summary>
-      public void Dispose()
-      {
-      }
-
-      /// <summary>
       /// As per interface
       /// </summary>
-      public QueueMessage ReceiveMessage()
+      public override async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
       {
-         BrokeredMessage bm = _client.Receive(TimeSpan.FromMilliseconds(1));
-         if(bm == null) return null;
-         return ProcessAndConvert(bm);
-      }
-
-      /// <summary>
-      /// As per interface
-      /// </summary>
-      public IEnumerable<QueueMessage> ReceiveMessages(int count)
-      {
-         IEnumerable<BrokeredMessage> batch = _client.ReceiveBatch(count, TimeSpan.FromMilliseconds(1));
+         IEnumerable<BrokeredMessage> batch = await _client.ReceiveBatchAsync(count, TimeSpan.FromMilliseconds(1));
          if(batch == null) return null;
          return batch.Select(ProcessAndConvert).ToList();
       }
@@ -136,7 +120,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       /// <summary>
       /// Calls .DeadLetter explicitly
       /// </summary>
-      public void DeadLetter(QueueMessage message, string readon, string errorDescription)
+      public override async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
       {
          if (!_peekLock) return;
 
@@ -144,7 +128,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
          //delete the message and get the deleted element, very nice method!
          if (!_messageIdToBrokeredMessage.TryRemove(message.Id, out bm)) return;
 
-         _client.DeadLetter(bm.LockToken, readon, errorDescription);
+         await _client.DeadLetterAsync(bm.LockToken, reason, errorDescription);
       }
    }
 }

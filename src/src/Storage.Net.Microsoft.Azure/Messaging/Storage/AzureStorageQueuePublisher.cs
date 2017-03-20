@@ -11,7 +11,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
    /// <summary>
    /// Azure Storage queue publisher
    /// </summary>
-   public class AzureStorageQueuePublisher : AsyncMessagePublisher
+   class AzureStorageQueuePublisher : AsyncMessagePublisher
    {
       private readonly CloudQueue _queue;
 

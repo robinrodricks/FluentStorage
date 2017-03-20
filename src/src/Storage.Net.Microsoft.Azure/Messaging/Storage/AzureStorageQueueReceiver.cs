@@ -13,7 +13,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
    /// <summary>
    /// Queue receiver based on Azure Storage Queues
    /// </summary>
-   public class AzureStorageQueueReceiver : IMessageReceiver
+   class AzureStorageQueueReceiver : AsyncMessageReceiver
    {
       private const int PollingBatchSize = 5;
       private readonly CloudQueueClient _client;
@@ -87,17 +87,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
       /// Deletes the message from the queue
       /// </summary>
       /// <param name="message"></param>
-      public void ConfirmMessage(QueueMessage message)
-      {
-         ConfirmMessageAsync(message).Wait();
-      }
-
-
-      /// <summary>
-      /// Deletes the message from the queue
-      /// </summary>
-      /// <param name="message"></param>
-      private async Task ConfirmMessageAsync(QueueMessage message)
+      public override async Task ConfirmMessageAsync(QueueMessage message)
       {
          string id, popReceipt;
          Converter.SplitId(message.Id, out id, out popReceipt);
@@ -109,16 +99,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
       /// Moves message to a dead letter queue which has the same name as original queue prefixed with "-deadletter". This is done because 
       /// Azure Storage queues do not support deadlettering directly.
       /// </summary>
-      public void DeadLetter(QueueMessage message, string reason, string errorDescription)
-      {
-         DeadLetterAsync(message, reason, errorDescription).Wait();
-      }
-
-      /// <summary>
-      /// Moves message to a dead letter queue which has the same name as original queue prefixed with "-deadletter". This is done because 
-      /// Azure Storage queues do not support deadlettering directly.
-      /// </summary>
-      public async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
+      public override async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
       {
          var dead = (QueueMessage)message.Clone();
          dead.Properties["deadLetterReason"] = reason;
@@ -134,7 +115,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
       /// <summary>
       /// Due to the fact storage queues don't support notifications this method starts an internal thread to poll for messages.
       /// </summary>
-      public void StartMessagePump(Action<QueueMessage> onMessage)
+      public override void StartMessagePump(Action<QueueMessage> onMessage)
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
          if (_pollingThread != null) throw new ArgumentException("polling already started", nameof(onMessage));
@@ -176,7 +157,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
       /// <summary>
       /// Stops message pump if any.
       /// </summary>
-      public void Dispose()
+      public override void Dispose()
       {
          if (!_disposed)
          {
@@ -186,38 +167,9 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
       }
 
       /// <summary>
-      /// Calls .GetMessage on storage queue
-      /// </summary>
-      public QueueMessage ReceiveMessage()
-      {
-         return ReceiveMessageAsync().Result;
-      }
-
-
-      /// <summary>
-      /// Calls .GetMessage on storage queue
-      /// </summary>
-      private async Task<QueueMessage> ReceiveMessageAsync()
-      {
-         CloudQueueMessage message = await _queue.GetMessageAsync(_messageVisibilityTimeout, null, null);
-         if(message == null) return null;
-
-         return Converter.ToQueueMessage(message);
-      }
-
-      /// <summary>
       /// Calls .GetMessages on storage queue
       /// </summary>
-      public IEnumerable<QueueMessage> ReceiveMessages(int count)
-      {
-         return ReceiveMessagesAsync(count).Result;
-      }
-
-
-      /// <summary>
-      /// Calls .GetMessages on storage queue
-      /// </summary>
-      private async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
+      public override async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
       {
          IEnumerable<CloudQueueMessage> batch = await _queue.GetMessagesAsync(count, _messageVisibilityTimeout, null, null);
          if(batch == null) return null;
