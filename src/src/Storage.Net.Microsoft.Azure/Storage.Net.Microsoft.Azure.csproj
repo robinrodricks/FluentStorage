@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
     <PackageReference Include="Microsoft.Azure.EventHubs" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Azure.EventHubs.Processor" Version="1.0.0" />
     <PackageReference Include="WindowsAzure.Storage" Version="8.0.1" />
   </ItemGroup>
   <ItemGroup>

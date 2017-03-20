@@ -25,7 +25,6 @@ namespace Storage.Net.Microsoft.Azure.Messaging.EventHub
          };
 
          _client = EventHubClient.CreateFromConnectionString(csb.ToString());
-
       }
 
       public override async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
