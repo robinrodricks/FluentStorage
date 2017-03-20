@@ -10,6 +10,8 @@ $Version = "3.5.0-alpha-4"
 $SlnPath = "src\storage.sln"
 $IconUrl = "http://i.isolineltd.com/nuget/storage.png"
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
+$Authors = "Ivan Gavryliuk"
+$ProjectUrl = "https://github.com/aloneguid/storage"
 
 function Set-VstsBuildNumber($BuildNumber)
 {
@@ -32,7 +34,8 @@ function Update-ProjectVersion([string]$Path, [string]$Version)
    $pg.VersionPrefix = $Version
    $pg.PackageIconUrl = $IconUrl
    $pg.Copyright = $Copyright
-   
+  # $pg.Authors = $Authors   
+   $pg.PackageProjectUrl = $ProjectUrl
 
 
    $xml.Save($Path)
