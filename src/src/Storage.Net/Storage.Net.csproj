@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
     <AssemblyTitle>Storage.Net</AssemblyTitle>
-    <VersionPrefix>3.5.0-alpha-3</VersionPrefix>
+    <VersionPrefix>3.5.0-alpha-4</VersionPrefix>
     <Authors>Ivan Gavryliuk</Authors>
     <TargetFrameworks>netstandard1.6;net451</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

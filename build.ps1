@@ -6,8 +6,10 @@ param(
    $NuGetApiKey
 )
 
-$Version = "3.5.0-alpha-3"
+$Version = "3.5.0-alpha-4"
 $SlnPath = "src\storage.sln"
+$IconUrl = "http://i.isolineltd.com/nuget/storage.png"
+$Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
 
 function Set-VstsBuildNumber($BuildNumber)
 {
@@ -20,12 +22,18 @@ function Update-ProjectVersion([string]$Path, [string]$Version)
 
    if($xml.Project.PropertyGroup.Count -eq $null)
    {
-      $xml.Project.PropertyGroup.VersionPrefix = $Version
+      $pg = $xml.Project.PropertyGroup
    }
    else
    {
-      $xml.Project.PropertyGroup[0].VersionPrefix = $Version
+      $xml.Project.PropertyGroup[0]
    }
+
+   $pg.VersionPrefix = $Version
+   $pg.PackageIconUrl = $IconUrl
+   $pg.Copyright = $Copyright
+   
+
 
    $xml.Save($Path)
 }

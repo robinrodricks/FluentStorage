@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Copyright>Copyright (c) 2015-2016 by Ivan Gavryliuk</Copyright>
     <AssemblyTitle>Storage.Net.Amazon.Aws</AssemblyTitle>
-    <VersionPrefix>3.5.0-alpha-3</VersionPrefix>
+    <VersionPrefix>3.5.0-alpha-4</VersionPrefix>
     <TargetFramework>net451</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Storage.Net.Amazon.Aws</AssemblyName>

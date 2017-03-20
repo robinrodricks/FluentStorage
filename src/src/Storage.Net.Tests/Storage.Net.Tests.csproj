@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net451</TargetFramework>
-    <VersionPrefix>3.5.0-alpha-3</VersionPrefix>
+    <VersionPrefix>3.5.0-alpha-4</VersionPrefix>
     <AssemblyName>Storage.Net.Tests</AssemblyName>
     <AssemblyOriginatorKeyFile>../../storage.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
