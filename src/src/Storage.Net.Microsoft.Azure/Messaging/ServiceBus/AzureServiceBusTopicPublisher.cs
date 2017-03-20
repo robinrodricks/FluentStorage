@@ -14,7 +14,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
    /// for messages not to be lost. Subscriptions represent <see cref="AzureServiceBusTopicReceiver"/>
    /// in this library
    /// </summary>
-   public class AzureServiceBusTopicPublisher : IMessagePublisher
+   public class AzureServiceBusTopicPublisher : AsyncMessagePublisher
    {
       private NamespaceManager _nsMgr;
       private readonly string _connectionString;
@@ -39,28 +39,11 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       /// <summary>
       /// Sends a <see cref="BrokeredMessage"/> with passed content
       /// </summary>
-      public void PutMessages(IEnumerable<QueueMessage> messages)
-      {
-         if(messages == null) return;
-         IEnumerable<BrokeredMessage> bms = messages.Select(Converter.ToBrokeredMessage);
-         _client.SendBatch(bms);
-      }
-
-      /// <summary>
-      /// Sends a <see cref="BrokeredMessage"/> with passed content
-      /// </summary>
-      public async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
+      public override async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
       {
          if (messages == null) return;
          IEnumerable<BrokeredMessage> bms = messages.Select(Converter.ToBrokeredMessage);
          await _client.SendBatchAsync(bms);
-      }
-
-      /// <summary>
-      /// Doesn't do anything
-      /// </summary>
-      public void Dispose()
-      {
       }
    }
 }

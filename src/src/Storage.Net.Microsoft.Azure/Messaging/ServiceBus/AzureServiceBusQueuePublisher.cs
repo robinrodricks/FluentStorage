@@ -12,7 +12,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
    /// <summary>
    /// Implements Azure Service Bus Queue
    /// </summary>
-   public class AzureServiceBusQueuePublisher : IMessagePublisher
+   public class AzureServiceBusQueuePublisher : AsyncMessagePublisher
    {
       private readonly NamespaceManager _ns;
       private readonly string _queueName;
@@ -54,29 +54,11 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       /// <summary>
       /// Puts message to the queue with default options
       /// </summary>
-      public void PutMessages(IEnumerable<QueueMessage> messages)
-      {
-         if(messages == null) return;
-         IEnumerable<BrokeredMessage> bms = messages.Select(Converter.ToBrokeredMessage);
-         _client.SendBatch(bms);
-      }
-
-      /// <summary>
-      /// Puts message to the queue with default options
-      /// </summary>
-      public async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
+      public override async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
       {
          if (messages == null) return;
          IEnumerable<BrokeredMessage> bms = messages.Select(Converter.ToBrokeredMessage);
          await _client.SendBatchAsync(bms);
-      }
-
-
-      /// <summary>
-      /// Nothing to dispose
-      /// </summary>
-      public void Dispose()
-      {
       }
    }
 }
