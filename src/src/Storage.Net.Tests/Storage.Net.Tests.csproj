@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net45</TargetFramework>
+    <VersionPrefix>3.5.0-alpha-1</VersionPrefix>
     <AssemblyName>Storage.Net.Tests</AssemblyName>
     <AssemblyOriginatorKeyFile>../../storage.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
@@ -12,19 +12,16 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
     <ProjectReference Include="..\Storage.Net.Amazon.Aws\Storage.Net.Amazon.Aws.csproj" />
     <ProjectReference Include="..\Storage.Net.Microsoft.Azure\Storage.Net.Microsoft.Azure.csproj" />
     <ProjectReference Include="..\Storage.Net.Esent\Storage.Net.Esent.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="LogMagic" Version="2.1.0" />
     <PackageReference Include="Config.Net" Version="3.0.1702.1002" />
   </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <PackageReference Include="xunit" Version="2.2.0-beta5-build3474" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0-beta5-build1225" />
@@ -33,9 +30,7 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
-
 </Project>
