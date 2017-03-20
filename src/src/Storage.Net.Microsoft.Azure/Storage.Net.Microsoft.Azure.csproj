@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Copyright>Copyright (c) 2015-2016 by Ivan Gavryliuk</Copyright>
+    <AssemblyTitle>Storage.Net.Microsoft.Azure</AssemblyTitle>
+    <VersionPrefix>3.0.1</VersionPrefix>
+    <Authors>Ivan Gavryliuk</Authors>
+    <TargetFrameworks>net45;netstandard1.6</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Storage.Net.Microsoft.Azure</AssemblyName>
+    <AssemblyOriginatorKeyFile>../../storage.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>Storage.Net.Microsoft.Azure</PackageId>
+    <PackageIconUrl>http://images.gavryli.uk/nuget/storage.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);dnxcore50;portable-net451+win8</PackageTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="netbox" Version="1.0.1703.701" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <PackageReference Include="WindowsAzure.ServiceBus" Version="3.4.5" />
+    <PackageReference Include="WindowsAzure.Storage" Version="8.0.1" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <DefineConstants>$(DefineConstants);NETFULL</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <PackageReference Include="WindowsAzure.Storage" Version="8.0.1" />
+  </ItemGroup>
+
+</Project>

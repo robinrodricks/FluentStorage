@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Copyright>Copyright (c) 2015-2016 by Ivan Gavryliuk</Copyright>
+    <AssemblyTitle>Storage.Net.Amazon.Aws</AssemblyTitle>
+    <VersionPrefix>3.0.1</VersionPrefix>
+    <TargetFramework>net45</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Storage.Net.Amazon.Aws</AssemblyName>
+    <AssemblyOriginatorKeyFile>../../storage.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>Storage.Net.Amazon.Aws</PackageId>
+    <PackageIconUrl>https://alonestore.blob.core.windows.net/nuget/storage.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
+    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <PackageReference Include="AWSSDK.Core" Version="3.3.5" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.3" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Copyright>Copyright (c) 2015-2016 by Ivan Gavryliuk</Copyright>
+    <AssemblyTitle>Storage.Net.Esent</AssemblyTitle>
+    <Authors>Ivan Gavryliuk</Authors>
+    <TargetFramework>net45</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Storage.Net.Esent</AssemblyName>
+    <AssemblyOriginatorKeyFile>../../storage.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>Storage.Net.Esent</PackageId>
+    <PackageIconUrl>http://images.gavryli.uk/nuget/storage.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <PackageReference Include="ManagedEsent" Version="1.9.4" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>
