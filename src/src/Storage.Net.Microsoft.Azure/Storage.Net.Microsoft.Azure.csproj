@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Copyright>Copyright (c) 2015-2016 by Ivan Gavryliuk</Copyright>
+    <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
     <AssemblyTitle>Storage.Net.Microsoft.Azure</AssemblyTitle>
     <VersionPrefix>3.5.0-alpha-4</VersionPrefix>
     <Authors>Ivan Gavryliuk</Authors>

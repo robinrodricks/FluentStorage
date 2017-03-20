@@ -26,7 +26,7 @@ function Update-ProjectVersion([string]$Path, [string]$Version)
    }
    else
    {
-      $xml.Project.PropertyGroup[0]
+      $pg = $xml.Project.PropertyGroup[0]
    }
 
    $pg.VersionPrefix = $Version
@@ -56,7 +56,7 @@ if($Publish -and (-not $NuGetApiKey))
 }
 
 # Update versioning information
-Get-ChildItem *.csproj -Recurse | % {
+Get-ChildItem *.csproj -Recurse | Where-Object {-not($_.Name -like "*test*")} | % {
    $path = $_.FullName
    Write-Host "setting version of $path to $Version"
    Update-ProjectVersion $path $Version
