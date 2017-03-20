@@ -29,6 +29,11 @@ namespace Storage.Net.Tests.Integration.Messaging
       public AzureServiceBusQueueMessageQeueueTest() : base("azure-servicebus-queue") { }
    }
 
+   public class AzureEventHubMessageQeueueTest : GenericMessageQueueTest
+   {
+      public AzureEventHubMessageQeueueTest() : base("azure-eventhub") { }
+   }
+
    public class InMemoryMessageQueueTest : GenericMessageQueueTest
    {
       public InMemoryMessageQueueTest() : base("inmemory") { }
@@ -86,6 +91,11 @@ namespace Storage.Net.Tests.Integration.Messaging
                   TestSettings.Instance.ServiceBusConnectionString,
                   "testqueue");
                break;
+            case "azure-eventhub":
+               _publisher = StorageFactory.Messages.AzureEventHubPublisher(
+                  TestSettings.Instance.EventHubConnectionString,
+                  TestSettings.Instance.EventHubPath);
+               break;
             case "inmemory":
                _publisher = StorageFactory.Messages.InMemory(out _receiver);
                break;
@@ -97,13 +107,16 @@ namespace Storage.Net.Tests.Integration.Messaging
          }
 
          //delete any messages already in queue
-         QueueMessage qm;
-         while((qm = _receiver.ReceiveMessage()) != null)
+         if (_receiver != null)
          {
-            _receiver.ConfirmMessage(qm);
-         }
+            QueueMessage qm;
+            while ((qm = _receiver.ReceiveMessage()) != null)
+            {
+               _receiver.ConfirmMessage(qm);
+            }
 
-         _messagesPumped = 0;
+            _messagesPumped = 0;
+         }
       }
 
 
@@ -118,7 +131,9 @@ namespace Storage.Net.Tests.Integration.Messaging
       [Fact]
       public void SendMessage_OneMessage_DoesntCrash()
       {
-         _publisher.PutMessage(new QueueMessage("test content at " + DateTime.UtcNow));
+         var messages = Enumerable.Range(0, 1000).Select(i => new QueueMessage("content " + i));
+
+         _publisher.PutMessages(messages);
       }
 
       [Fact]

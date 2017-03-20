@@ -9,6 +9,7 @@ using Storage.Net.Microsoft.Azure.Messaging.Storage;
 using Storage.Net.Microsoft.Azure.Table;
 using Storage.Net.Table;
 using System.Net;
+using Storage.Net.Microsoft.Azure.Messaging.EventHub;
 
 namespace Storage.Net
 {
@@ -183,6 +184,18 @@ namespace Storage.Net
          return new AzureServiceBusTopicReceiver(connectionString, topicName, subscriptionName, subscriptionSqlFilter, peekLock);
       }
 #endif
+
+      /// <summary>
+      /// Creates Azure Event Hub publisher
+      /// </summary>
+      /// <param name="factory">Factory reference</param>
+      /// <param name="connectionString">Connection string</param>
+      /// <param name="hubPath">Hub path (name)</param>
+      /// <returns>Message publisher</returns>
+      public static IMessagePublisher AzureEventHubPublisher(this IMessagingFactory factory, string connectionString, string hubPath)
+      {
+         return new AzureEventHubPublisher(connectionString, hubPath);
+      }
 
    }
 }

@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Copyright>Copyright (c) 2015-2016 by Ivan Gavryliuk</Copyright>
     <AssemblyTitle>Storage.Net.Esent</AssemblyTitle>
     <Authors>Ivan Gavryliuk</Authors>
-    <TargetFramework>net45</TargetFramework>
-    <VersionPrefix>3.5.0-alpha-2</VersionPrefix>
+    <TargetFramework>net451</TargetFramework>
+    <VersionPrefix>3.5.0-alpha-3</VersionPrefix>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Storage.Net.Esent</AssemblyName>
     <AssemblyOriginatorKeyFile>../../storage.snk</AssemblyOriginatorKeyFile>
@@ -20,7 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <PackageReference Include="ManagedEsent" Version="1.9.4" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />

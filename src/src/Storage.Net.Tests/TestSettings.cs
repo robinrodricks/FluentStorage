@@ -16,6 +16,10 @@ namespace Storage.Net.Tests
 
       public readonly Option<string> ServiceBusTopicName = new Option<string>("Azure.ServiceBus.TopicName", "testtopiclocal");
 
+      public readonly Option<string> EventHubConnectionString = new Option<string>("Azure.EventHub.ConnectionString", null);
+
+      public readonly Option<string> EventHubPath = new Option<string>("Azure.EventHub.Path", null);
+
       #endregion
 
       #region [ Amazon Web Services ]
