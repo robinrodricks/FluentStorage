@@ -6,7 +6,7 @@ param(
    $NuGetApiKey
 )
 
-$Version = "3.5.0-alpha-1"
+$Version = "3.5.0-alpha-2"
 $SlnPath = "src\storage.sln"
 
 function Set-VstsBuildNumber($BuildNumber)

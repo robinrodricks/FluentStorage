@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using NetBox;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Messaging
 {
@@ -23,15 +24,6 @@ namespace Storage.Net.Messaging
       private bool _pumpRunning;
 
       /// <summary>
-      /// Puts the message in the inmemory queue
-      /// </summary>
-      public void PutMessage(QueueMessage message)
-      {
-         if(message == null) return;
-         _queue.Enqueue(message);
-      }
-
-      /// <summary>
       /// Puts the messages in the inmemory queue
       /// </summary>
       public void PutMessages(IEnumerable<QueueMessage> messages)
@@ -42,6 +34,22 @@ namespace Storage.Net.Messaging
             var stampedMessage = RecreateWithId(message);
             _queue.Enqueue(stampedMessage);
          }
+      }
+
+      /// <summary>
+      /// Puts the messages in the inmemory queue
+      /// </summary>
+      public Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
+      {
+         if (messages == null) return Task.FromResult(true);
+
+         foreach (QueueMessage message in messages)
+         {
+            var stampedMessage = RecreateWithId(message);
+            _queue.Enqueue(stampedMessage);
+         }
+
+         return Task.FromResult(true);
       }
 
       private QueueMessage RecreateWithId(QueueMessage message)

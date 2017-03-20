@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Messaging
 {
@@ -9,14 +10,15 @@ namespace Storage.Net.Messaging
    public interface IMessagePublisher : IDisposable
    {
       /// <summary>
-      /// Puts new message to the back of the qeuue
+      /// Puts a new batch of messages to the back of the queue as quick and efficient as possible for
+      /// a given queue implementation.
       /// </summary>
-      void PutMessage(QueueMessage message);
+      void PutMessages(IEnumerable<QueueMessage> messages);
 
       /// <summary>
       /// Puts a new batch of messages to the back of the queue as quick and efficient as possible for
       /// a given queue implementation.
       /// </summary>
-      void PutMessages(IEnumerable<QueueMessage> messages);
+      Task PutMessagesAsync(IEnumerable<QueueMessage> messages);
    }
 }

@@ -4,13 +4,14 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Queue;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Microsoft.Azure.Messaging.Storage
 {
    /// <summary>
    /// Azure Storage queue publisher
    /// </summary>
-   public class AzureStorageQueuePublisher : IMessagePublisher
+   public class AzureStorageQueuePublisher : AsyncMessagePublisher
    {
       private readonly CloudQueue _queue;
 
@@ -33,33 +34,17 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
       }
 
       /// <summary>
-      /// Pushes a new message to storage queue
-      /// </summary>
-      public void PutMessage(QueueMessage message)
-      {
-         if(message == null) return;
-         CloudQueueMessage nativeMessage = Converter.ToCloudQueueMessage(message);
-         _queue.AddMessageAsync(nativeMessage).Wait();
-      }
-
-      /// <summary>
       /// Pushes new messages to storage queue. Due to the fact storage queues don't support batched pushes
       /// this method makes a call per message.
       /// </summary>
-      public void PutMessages(IEnumerable<QueueMessage> messages)
+      public override async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
       {
-         if(messages == null) return;
-         foreach(QueueMessage message in messages)
+         if (messages == null) return;
+         foreach (QueueMessage message in messages)
          {
-            PutMessage(message);
+            CloudQueueMessage nativeMessage = Converter.ToCloudQueueMessage(message);
+            await _queue.AddMessageAsync(nativeMessage);
          }
-      }
-
-      /// <summary>
-      /// Nothing to dispose
-      /// </summary>
-      public void Dispose()
-      {
       }
    }
 }
