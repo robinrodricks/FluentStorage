@@ -2,9 +2,8 @@
   <PropertyGroup>
     <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
     <AssemblyTitle>Storage.Net.Esent</AssemblyTitle>
-    <Authors>Ivan Gavryliuk</Authors>
+    <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
     <TargetFramework>net451</TargetFramework>
-    <VersionPrefix>3.5.0</VersionPrefix>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Storage.Net.Esent</AssemblyName>
     <AssemblyOriginatorKeyFile>../../storage.snk</AssemblyOriginatorKeyFile>
@@ -16,6 +15,12 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Version>3.5.1.0</Version>
+    <FileVersion>3.5.1.0</FileVersion>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />

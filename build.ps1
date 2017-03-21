@@ -6,19 +6,27 @@ param(
    $NuGetApiKey
 )
 
-$Version = "3.5.0"
+$VersionPrefix = "3"
+$VersionSuffix = "5.1.0"
+$Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
+$PackageIconUrl = "http://i.isolineltd.com/nuget/storage.png"
+$PackageProjectUrl = "https://github.com/aloneguid/storage"
+$RepositoryUrl = "https://github.com/aloneguid/storage"
+$Authors = "Ivan Gavryliuk (@aloneguid)"
+$PackageLicenseUrl = "https://github.com/aloneguid/storage/blob/master/LICENSE"
+$RepositoryType = "GitHub"
+
 $SlnPath = "src\storage.sln"
-#$IconUrl = "http://i.isolineltd.com/nuget/storage.png"
-#$Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
-#$Authors = "Ivan Gavryliuk"
-#$ProjectUrl = "https://github.com/aloneguid/storage"
+$AssemblyVersion = "$VersionPrefix.0.0.0"
+$PackageVersion = "$VersionPrefix.$VersionSuffix"
+Write-Host "version: $PackageVersion, assembly version: $AssemblyVersion"
 
 function Set-VstsBuildNumber($BuildNumber)
 {
    Write-Verbose -Verbose "##vso[build.updatebuildnumber]$BuildNumber"
 }
 
-function Update-ProjectVersion([string]$Path, [string]$Version)
+function Update-ProjectVersion([string]$Path)
 {
    $xml = [xml](Get-Content $Path)
 
@@ -31,11 +39,16 @@ function Update-ProjectVersion([string]$Path, [string]$Version)
       $pg = $xml.Project.PropertyGroup[0]
    }
 
-   $pg.VersionPrefix = $Version
-   #$pg.PackageIconUrl = $IconUrl
-   #$pg.Copyright = $Copyright
-   #$pg.Authors = $Authors   
-   #$pg.PackageProjectUrl = $ProjectUrl
+   $pg.Version = $PackageVersion
+   $pg.FileVersion = $PackageVersion
+   $pg.AssemblyVersion = $AssemblyVersion
+   $pg.Copyright = $Copyright
+   $pg.PackageIconUrl = $PackageIconUrl
+   $pg.PackageProjectUrl = $PackageProjectUrl
+   $pg.RepositoryUrl = $RepositoryUrl
+   $pg.Authors = $Authors
+   $pg.PackageLicenseUrl = $PackageLicenseUrl
+   $pg.RepositoryType = $RepositoryType
 
    $xml.Save($Path)
 }
@@ -60,8 +73,8 @@ if($Publish -and (-not $NuGetApiKey))
 # Update versioning information
 Get-ChildItem *.csproj -Recurse | Where-Object {-not($_.Name -like "*test*")} | % {
    $path = $_.FullName
-   Write-Host "setting version of $path to $Version"
-   Update-ProjectVersion $path $Version
+   Write-Host "setting version of $path"
+   Update-ProjectVersion $path
 }
 Set-VstsBuildNumber $Version
 
@@ -69,7 +82,7 @@ Set-VstsBuildNumber $Version
 Exec "dotnet restore $SlnPath"
 
 # Build solution
-Get-ChildItem *.nupkg -Recurse | Remove-Item
+Get-ChildItem *.nupkg -Recurse | Remove-Item -Verbose
 Exec "dotnet build $SlnPath -c release"
 
 # Run the tests
@@ -82,6 +95,7 @@ if($Publish.IsPresent)
 
    Get-ChildItem *.nupkg -Recurse | % {
       $path = $_.FullName
+      Write-Host "publishing from $path"
 
       Exec "nuget push $path -Source https://www.nuget.org/api/v2/package -ApiKey $NuGetApiKey"
    }
