@@ -6,7 +6,7 @@ param(
    $NuGetApiKey
 )
 
-$Version = "3.5.0-alpha-4"
+$Version = "3.5.0"
 $SlnPath = "src\storage.sln"
 #$IconUrl = "http://i.isolineltd.com/nuget/storage.png"
 #$Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"

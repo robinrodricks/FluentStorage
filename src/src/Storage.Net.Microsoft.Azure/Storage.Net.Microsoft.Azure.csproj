@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
     <AssemblyTitle>Storage.Net.Microsoft.Azure</AssemblyTitle>
-    <VersionPrefix>3.5.0-alpha-4</VersionPrefix>
+    <VersionPrefix>3.5.0</VersionPrefix>
     <Authors>Ivan Gavryliuk</Authors>
     <TargetFrameworks>net451;netstandard1.6</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -26,7 +26,7 @@
     <PackageReference Include="WindowsAzure.Storage" Version="8.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="netbox" Version="1.1.1" />
+    <PackageReference Include="netbox" Version="1.1.2" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <PackageReference Include="WindowsAzure.ServiceBus" Version="3.4.5" />

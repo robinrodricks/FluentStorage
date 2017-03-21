@@ -4,7 +4,7 @@
     <AssemblyTitle>Storage.Net.Esent</AssemblyTitle>
     <Authors>Ivan Gavryliuk</Authors>
     <TargetFramework>net451</TargetFramework>
-    <VersionPrefix>3.5.0-alpha-4</VersionPrefix>
+    <VersionPrefix>3.5.0</VersionPrefix>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Storage.Net.Esent</AssemblyName>
     <AssemblyOriginatorKeyFile>../../storage.snk</AssemblyOriginatorKeyFile>

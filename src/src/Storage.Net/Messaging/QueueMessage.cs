@@ -51,6 +51,17 @@ namespace Storage.Net.Messaging
 
       }
 
+      /// <summary>
+      /// Creates a new queue message from a text string
+      /// </summary>
+      /// <param name="text">Text to set as message content</param>
+      /// <returns>New queue message</returns>
+      public static QueueMessage FromText(string text)
+      {
+         if (text == null) throw new ArgumentNullException(nameof(text));
+
+         return new QueueMessage(text);
+      }
 
       /// <summary>
       /// Message ID

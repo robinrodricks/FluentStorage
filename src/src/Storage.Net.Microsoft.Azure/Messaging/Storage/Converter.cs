@@ -29,7 +29,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
          {
             Properties = message.Properties.Select(p => new JsonProp { Name = p.Key, Value = p.Value }).ToArray()
          };
-         byte[] propBytes = Encoding.UTF8.GetBytes(clazz.ToCompressedJsonString());
+         byte[] propBytes = Encoding.UTF8.GetBytes(clazz.ToJsonString(true));
 
          CloudQueueMessage result;
          using (var ms = new MemoryStream())
