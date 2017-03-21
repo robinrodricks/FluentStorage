@@ -7,7 +7,7 @@ param(
 )
 
 $VersionPrefix = "3"
-$VersionSuffix = "5.1.0"
+$VersionSuffix = "5.2.0"
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
 $PackageIconUrl = "http://i.isolineltd.com/nuget/storage.png"
 $PackageProjectUrl = "https://github.com/aloneguid/storage"

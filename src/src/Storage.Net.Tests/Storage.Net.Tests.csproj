@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net451</TargetFramework>
     <VersionPrefix>3.5.0-alpha-4</VersionPrefix>
@@ -19,8 +19,8 @@
     <ProjectReference Include="..\Storage.Net.Esent\Storage.Net.Esent.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="LogMagic" Version="2.1.0" />
-    <PackageReference Include="Config.Net" Version="3.0.1702.1002" />
+    <PackageReference Include="LogMagic" Version="2.2.5" />
+    <PackageReference Include="Config.Net" Version="3.1.1" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <PackageReference Include="xunit" Version="2.2.0-beta5-build3474" />
