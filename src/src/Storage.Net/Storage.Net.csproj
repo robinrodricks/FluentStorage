@@ -20,8 +20,8 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <Version>3.5.1.0</Version>
-    <FileVersion>3.5.1.0</FileVersion>
+    <Version>3.5.2.0</Version>
+    <FileVersion>3.5.2.0</FileVersion>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
     <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>

@@ -16,8 +16,8 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>3.5.1.0</Version>
-    <FileVersion>3.5.1.0</FileVersion>
+    <Version>3.5.2.0</Version>
+    <FileVersion>3.5.2.0</FileVersion>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
     <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
     <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
