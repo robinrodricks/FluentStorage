@@ -104,7 +104,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
          return firstBytes.SequenceEqual(CustomFlagBytes);
       }
 
-      private static string CreateId(CloudQueueMessage message)
+      internal static string CreateId(CloudQueueMessage message)
       {
          if(string.IsNullOrEmpty(message.PopReceipt)) return message.Id;
 

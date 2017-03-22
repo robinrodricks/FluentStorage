@@ -66,7 +66,7 @@ namespace Storage.Net.Messaging
       /// <summary>
       /// Message ID
       /// </summary>
-      public string Id { get; private set; }
+      public string Id { get; set; }
 
       /// <summary>
       /// Gets the count of how many time this message was dequeued

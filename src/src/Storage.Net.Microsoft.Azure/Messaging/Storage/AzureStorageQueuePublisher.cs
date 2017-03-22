@@ -44,6 +44,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
          {
             CloudQueueMessage nativeMessage = Converter.ToCloudQueueMessage(message);
             await _queue.AddMessageAsync(nativeMessage);
+            message.Id = Converter.CreateId(nativeMessage);
          }
       }
    }

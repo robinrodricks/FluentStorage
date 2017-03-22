@@ -131,9 +131,12 @@ namespace Storage.Net.Tests.Integration.Messaging
       [Fact]
       public void SendMessage_OneMessage_DoesntCrash()
       {
-         var messages = Enumerable.Range(0, 1000).Select(i => new QueueMessage("content " + i));
+         //var messages = Enumerable.Range(0, 1000).Select(i => new QueueMessage("content " + i));
 
-         _publisher.PutMessages(messages);
+         //_publisher.PutMessages(messages);
+
+         var qm = QueueMessage.FromText("test");
+         _publisher.PutMessage(qm);
       }
 
       [Fact]
