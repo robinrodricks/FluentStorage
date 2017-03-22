@@ -66,7 +66,7 @@ function Exec($Command)
 # General validation
 if($Publish -and (-not $NuGetApiKey))
 {
-   Write-Error "Please specify nuget key to publish"
+   Write-Error "Please specify nuget key to publish"por
    exit 1
 }
 

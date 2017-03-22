@@ -1,4 +1,5 @@
 ﻿using Config.Net;
+using System.Net;
 
 namespace Storage.Net.Tests
 {
@@ -19,6 +20,10 @@ namespace Storage.Net.Tests
       public readonly Option<string> EventHubConnectionString = new Option<string>("Azure.EventHub.ConnectionString", null);
 
       public readonly Option<string> EventHubPath = new Option<string>("Azure.EventHub.Path", null);
+
+      public readonly Option<NetworkCredential> AzureDataLakeCredential = new Option<NetworkCredential>("Azure.DataLake.Store.Credential", null);
+
+      public readonly Option<string> AzureDataLakeSubscriptionId = new Option<string>("Azure.DataLake.SubscriptionId", null);
 
       #endregion
 
