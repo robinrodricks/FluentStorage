@@ -6,12 +6,12 @@ param(
    $NuGetApiKey
 )
 
-$vt = @(
-   ("Storage.Net.Microsoft.Azure.DataLake.Store.csproj", "1.0.0.0")
-)
+#$preview = "-alpha-1"
+$gv = "3.5.4"
+$vt = @{
+   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "1.0.0"
+}
 
-$VersionPrefix = "3"
-$VersionSuffix = "5.4.0"
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
 $PackageIconUrl = "http://i.isolineltd.com/nuget/storage.png"
 $PackageProjectUrl = "https://github.com/aloneguid/storage"
@@ -21,18 +21,18 @@ $PackageLicenseUrl = "https://github.com/aloneguid/storage/blob/master/LICENSE"
 $RepositoryType = "GitHub"
 
 $SlnPath = "src\storage.sln"
-$AssemblyVersion = "$VersionPrefix.0.0.0"
-$PackageVersion = "$VersionPrefix.$VersionSuffix"
-Write-Host "version: $PackageVersion, assembly version: $AssemblyVersion"
 
 function Set-VstsBuildNumber($BuildNumber)
 {
    Write-Verbose -Verbose "##vso[build.updatebuildnumber]$BuildNumber"
 }
 
-function Update-ProjectVersion([string]$Path, [string]$Version)
+function Update-ProjectVersion($File)
 {
-   $xml = [xml](Get-Content $Path)
+   $v = $vt.($File.Name)
+   if($v -eq $null) { $v = $gv }
+
+   $xml = [xml](Get-Content $File.FullName)
 
    if($xml.Project.PropertyGroup.Count -eq $null)
    {
@@ -43,22 +43,16 @@ function Update-ProjectVersion([string]$Path, [string]$Version)
       $pg = $xml.Project.PropertyGroup[0]
    }
 
-   if($Version)
-   {
-      $parts = $Version -split "\."
-      $fv = $Version
-      $av = $parts[0] + ".0.0.0"
+   $parts = $v -split "\."
+   $fv = $v + ".0"
+   $av = $parts[0] + ".0.0.0"
+   $pv = $parts[0] + ".0.0" + $preview
 
-      $pg.Version = $fv
-      $pg.FileVersion = $fv
-      $pg.AssemblyVersion = $av
-   }
-   else
-   {
-      $pg.Version = $PackageVersion
-      $pg.FileVersion = $PackageVersion
-      $pg.AssemblyVersion = $AssemblyVersion
-   }
+   $pg.Version = $pv
+   $pg.FileVersion = $fv
+   $pg.AssemblyVersion = $av
+
+   Write-Host "$($File.Name) => fv: $fv, av: $av, pkg: $pv"
 
    $pg.Copyright = $Copyright
    $pg.PackageIconUrl = $PackageIconUrl
@@ -68,7 +62,7 @@ function Update-ProjectVersion([string]$Path, [string]$Version)
    $pg.PackageLicenseUrl = $PackageLicenseUrl
    $pg.RepositoryType = $RepositoryType
 
-   $xml.Save($Path)
+   $xml.Save($File.FullName)
 }
 
 function Exec($Command)
@@ -90,12 +84,7 @@ if($Publish -and (-not $NuGetApiKey))
 
 # Update versioning information
 Get-ChildItem *.csproj -Recurse | Where-Object {-not($_.Name -like "*test*")} | % {
-   $path = $_.FullName
-
-   $v = $vt.($_.Name)
-
-   Write-Host "setting version of $path"
-   Update-ProjectVersion $path $v
+   Update-ProjectVersion $_
 }
 Set-VstsBuildNumber $Version
 
