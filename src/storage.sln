@@ -49,7 +49,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "messaging", "messaging", "{
 		..\doc\messaging\index.md = ..\doc\messaging\index.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Net.Microsoft.Azure.DataLake.Store", "Storage.Net.Microsoft.Azure.DataLake.Store\Storage.Net.Microsoft.Azure.DataLake.Store.csproj", "{B7EE17F7-280C-44A2-AC64-F145B15A49D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Microsoft.Azure.DataLake.Store", "src\Storage.Net.Microsoft.Azure.DataLake.Store\Storage.Net.Microsoft.Azure.DataLake.Store.csproj", "{83A83347-10F3-40C3-8ED8-87B536DAA912}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,10 +77,10 @@ Global
 		{B075B1BE-8A7C-4070-AF62-EE2EA8AF5DA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B075B1BE-8A7C-4070-AF62-EE2EA8AF5DA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B075B1BE-8A7C-4070-AF62-EE2EA8AF5DA1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B7EE17F7-280C-44A2-AC64-F145B15A49D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B7EE17F7-280C-44A2-AC64-F145B15A49D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B7EE17F7-280C-44A2-AC64-F145B15A49D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B7EE17F7-280C-44A2-AC64-F145B15A49D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83A83347-10F3-40C3-8ED8-87B536DAA912}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83A83347-10F3-40C3-8ED8-87B536DAA912}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83A83347-10F3-40C3-8ED8-87B536DAA912}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83A83347-10F3-40C3-8ED8-87B536DAA912}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -95,6 +95,6 @@ Global
 		{C4B94858-F935-471F-A59B-7E9F1446AFA8} = {59E9D41F-BCD2-4A64-B62F-515B78986B63}
 		{B075B1BE-8A7C-4070-AF62-EE2EA8AF5DA1} = {59E9D41F-BCD2-4A64-B62F-515B78986B63}
 		{1405C9FB-11AD-4779-9DF6-320958EE579F} = {9305459F-A911-49A1-ABA1-2BBAEC42338B}
-		{B7EE17F7-280C-44A2-AC64-F145B15A49D3} = {59E9D41F-BCD2-4A64-B62F-515B78986B63}
+		{83A83347-10F3-40C3-8ED8-87B536DAA912} = {59E9D41F-BCD2-4A64-B62F-515B78986B63}
 	EndGlobalSection
 EndGlobal

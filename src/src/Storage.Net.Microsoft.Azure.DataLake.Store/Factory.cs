@@ -1,5 +1,7 @@
 ﻿using Storage.Net.Blob;
 using Storage.Net.Microsoft.Azure.DataLake.Store.Blob;
+using System;
+using System.Net;
 
 namespace Storage.Net
 {
@@ -9,19 +11,18 @@ namespace Storage.Net
    public static class Factory
    {
       public static IBlobStorage AzureDataLakeStoreByClientSecret(this IBlobStorageFactory factory,
-         string domain,
-         string clientId,
-         string clientSecret)
+         string accountName,
+         NetworkCredential credential)
       {
-         return new DataLakeStoreBlobStorage();
+         return DataLakeStoreBlobStorage.CreateByClientSecret(null, accountName, credential);
       }
 
-      public static IBlobStorage AzureDataLakeStoreByClientSecret(this IBlobStorageFactory factory,
+      /*public static IBlobStorage AzureDataLakeStoreByClientSecret(this IBlobStorageFactory factory,
          string domain,
          string clientId,
          string clientSecret)
       {
-         return new DataLakeStoreBlobStorage();
-      }
+         //return new DataLakeStoreBlobStorage();
+      }*/
    }
 }

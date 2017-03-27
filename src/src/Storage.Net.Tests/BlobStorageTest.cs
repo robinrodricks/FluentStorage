@@ -21,6 +21,11 @@ namespace Storage.Net.Tests.Integration
       public AzureBlobStorageTest() : base("azure") { }
    }
 
+   public class AzureDataLakeBlobStorageTest : BlobStorageTest
+   {
+      public AzureDataLakeBlobStorageTest() : base("azure-datalakestore") { }
+   }
+
    public class DiskDirectoryBlobStorageTest : BlobStorageTest
    {
       public DiskDirectoryBlobStorageTest() : base("disk-directory") { }
@@ -49,6 +54,11 @@ namespace Storage.Net.Tests.Integration
                   TestSettings.Instance.AzureStorageName,
                   TestSettings.Instance.AzureStorageKey,
                   "blobstoragetest");
+               break;
+            case "azure-datalakestore":
+               _storage = StorageFactory.Blobs.AzureDataLakeStoreByClientSecret(
+                  TestSettings.Instance.AzureDataLakeStoreAccountName,
+                  TestSettings.Instance.AzureDataLakeCredential);
                break;
             case "disk-directory":
                _storage = new DirectoryFilesBlobStorage(TestDir);

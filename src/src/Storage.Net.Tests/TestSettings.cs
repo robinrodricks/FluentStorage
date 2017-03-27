@@ -23,6 +23,8 @@ namespace Storage.Net.Tests
 
       public readonly Option<NetworkCredential> AzureDataLakeCredential = new Option<NetworkCredential>("Azure.DataLake.Store.Credential", null);
 
+      public readonly Option<string> AzureDataLakeStoreAccountName = new Option<string>("Azure.DataLake.Store.AccountName", null);
+
       public readonly Option<string> AzureDataLakeSubscriptionId = new Option<string>("Azure.DataLake.SubscriptionId", null);
 
       #endregion

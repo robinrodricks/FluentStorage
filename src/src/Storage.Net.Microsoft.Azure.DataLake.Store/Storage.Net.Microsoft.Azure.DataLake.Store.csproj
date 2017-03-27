@@ -15,10 +15,15 @@
     <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Management.DataLake.Store" Version="1.0.4" />
+    <PackageReference Include="Microsoft.Azure.Management.DataLake.Store" Version="2.1.0-preview" />
     <PackageReference Include="Microsoft.Rest.ClientRuntime.Azure.Authentication" Version="2.2.12" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\Storage.Net\Storage.Net.csproj" />
+    <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net451'">
+    <PackageReference Include="Microsoft.Azure.Management.DataLake.StoreUploader">
+      <Version>1.0.1-preview</Version>
+    </PackageReference>
   </ItemGroup>
 </Project>
