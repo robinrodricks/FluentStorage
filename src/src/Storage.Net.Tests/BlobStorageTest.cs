@@ -76,7 +76,7 @@ namespace Storage.Net.Tests.Integration
       private string GetRandomStreamId(string prefix = null)
       {
          string id = Guid.NewGuid().ToString();
-         if (prefix != null) id = prefix + id;
+         if (prefix != null) id = prefix + "/" + id;
 
          using (Stream s = "kjhlkhlkhlkhlkh".ToMemoryStream())
          {

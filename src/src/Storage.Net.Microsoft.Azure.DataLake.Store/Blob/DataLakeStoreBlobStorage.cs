@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using Microsoft.Azure.Management.DataLake.Store.Models;
 using NetBox.IO;
 using Microsoft.Rest.Azure;
+using System.Linq;
+using System.Collections.Generics;
 
 namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 {
@@ -142,11 +144,55 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          return new BlobMeta(fsr.FileStatus.Length.Value, null);
       }
 
-      public override Task<IEnumerable<string>> ListAsync(string prefix)
+      public override async Task<IEnumerable<string>> ListAsync(string prefix)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
-         throw new NotImplementedException();
+         var client = await GetFsClient();
+
+         var files = new List<string>();
+
+         await ListByPrefixIntoContainer(client, prefix ?? "/", files);
+
+         return files.Select(f => f.TrimStart('/'));
+      }
+
+      private async Task ListByPrefixIntoContainer(DataLakeStoreFileSystemManagementClient client, string prefix, List<string> files)
+      {
+         if (prefix == null)
+         {
+            prefix = "/";
+         }
+         else if(!prefix.StartsWith("/"))
+         {
+            prefix = "/" + prefix;
+         }
+
+         try
+         {
+            FileStatusesResult statuses = await client.FileSystem.ListFileStatusAsync(_accountName, prefix);
+
+            files.AddRange(statuses.FileStatuses.FileStatus
+               .Where(fs => fs.Type == FileType.FILE)
+               .Select(f => prefix + f.PathSuffix));
+
+            List<string> directories = statuses.FileStatuses.FileStatus
+               .Where(fs => fs.Type == FileType.DIRECTORY)
+               .Select(fs => prefix + fs.PathSuffix + "/")
+               .ToList();
+
+            if (directories.Count > 0)
+            {
+               foreach (string dirPath in directories)
+               {
+                  await ListByPrefixIntoContainer(client, dirPath, files);
+               }
+            }
+         }
+         catch(AdlsErrorException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
+         {
+
+         }
       }
 
       public override async Task UploadFromStreamAsync(string id, Stream sourceStream)

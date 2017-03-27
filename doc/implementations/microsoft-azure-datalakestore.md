@@ -44,6 +44,7 @@ see appendix below on how to obtain this information.
 
 - Uploading a file always overwrites existing file if it exists, otherwise a new file is created. This still takes one network call.
 - Appending to a file checks if a file exists first, so this operation results in two network calls.
+- List operation returns all files in all subfolders recursively when you pass `null` as an arugument. Passing folder path lists all files recursively in that subfolder. There is no way to enumerate folders within a folder or only files within a folder at the moment.
 
 
 ## Appendix. Creating a Service Principal
