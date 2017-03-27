@@ -20,14 +20,14 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <Version>3.0.0</Version>
+    <Version>3.5.4</Version>
     <FileVersion>3.5.4.0</FileVersion>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
     <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>
     <Description>Storage.Net abstracts storage implementation like blobs, tables and messages from the .NET Application Developer. It's aimed to provide a generic interface regardless on which storage provider you are using. It also provides both synchronous and asynchronous alternatives of all methods and implements it to the best effort possible. Supports .NET 4.5.1 and .NET Standard 1.6.</Description>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="netbox" Version="1.1.4" />
+    <PackageReference Include="netbox" Version="1.2.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
     <PackageReference Include="System.Threading.Thread" Version="4.3.0" />

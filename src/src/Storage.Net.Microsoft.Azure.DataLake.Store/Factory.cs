@@ -14,7 +14,7 @@ namespace Storage.Net
          string accountName,
          NetworkCredential credential)
       {
-         return DataLakeStoreBlobStorage.CreateByClientSecret(null, accountName, credential);
+         return DataLakeStoreBlobStorage.CreateByClientSecret(accountName, credential);
       }
 
       /*public static IBlobStorage AzureDataLakeStoreByClientSecret(this IBlobStorageFactory factory,

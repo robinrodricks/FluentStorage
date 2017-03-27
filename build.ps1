@@ -9,7 +9,9 @@ param(
 #$preview = "-alpha-1"
 $gv = "3.5.4"
 $vt = @{
-   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "1.0.0"
+   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "1.0.0-alpha-1";
+   "Storage.Net.Amazon.Aws" = "3.5.4";
+   "Storage.Net.Microsoft.Azure" = "3.5.4";
 }
 
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
@@ -43,10 +45,9 @@ function Update-ProjectVersion($File)
       $pg = $xml.Project.PropertyGroup[0]
    }
 
-   $parts = $v -split "\."
-   $fv = $v + ".0"
-   $av = $parts[0] + ".0.0.0"
-   $pv = $parts[0] + ".0.0" + $preview
+   $fv = "{0}.{1}.{2}.0" -f $parts[0], $parts[1], $parts[2]
+   $av = "{0}.0.0.0" -f $parts[0]
+   $pv = $v
 
    $pg.Version = $pv
    $pg.FileVersion = $fv

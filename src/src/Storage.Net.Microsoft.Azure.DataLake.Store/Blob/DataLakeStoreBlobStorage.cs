@@ -8,12 +8,13 @@ using Microsoft.Rest;
 using System.Net;
 using Microsoft.Azure.Management.DataLake.Store;
 using System.Collections.Generic;
+using Microsoft.Azure.Management.DataLake.Store.Models;
+using NetBox.IO;
 
 namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 {
    class DataLakeStoreBlobStorage : AsyncBlobStorage
    {
-      private readonly string _subscriptionId;
       private readonly string _accountName;
       private readonly string _domain;
       private readonly string _clientId;
@@ -23,33 +24,53 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
       //some info on how to use sdk here: https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-get-started-net-sdk
 
-      private DataLakeStoreBlobStorage(string subscriptionId, string accountName, string domain, string clientId, string clientSecret, string clientCert)
+      private DataLakeStoreBlobStorage(string accountName, string domain, string clientId, string clientSecret, string clientCert)
       {
-         _subscriptionId = subscriptionId;
-         _accountName = accountName;
-         _domain = domain;
+         _accountName = accountName ?? throw new ArgumentNullException(nameof(accountName));
+
+         _domain = domain ?? throw new ArgumentNullException(nameof(domain));
          _clientId = clientId;
          _clientSecret = clientSecret;
       }
 
-      public static DataLakeStoreBlobStorage CreateByClientSecret(string subscriptionId, string accountName, NetworkCredential credential)
+      public static DataLakeStoreBlobStorage CreateByClientSecret(string accountName, NetworkCredential credential)
       {
-         return new DataLakeStoreBlobStorage(subscriptionId, accountName, credential.Domain, credential.UserName, credential.Password, null);
+         if (credential == null) throw new ArgumentNullException(nameof(credential));
+
+         return new DataLakeStoreBlobStorage(accountName, credential.Domain, credential.UserName, credential.Password, null);
       }
 
-      public override Task AppendFromStreamAsync(string id, Stream chunkStream)
+      public override async Task AppendFromStreamAsync(string id, Stream chunkStream)
       {
          GenericValidation.CheckBlobId(id);
          if (chunkStream == null) throw new ArgumentNullException(nameof(chunkStream));
 
-         throw new NotImplementedException();
+         var client = await GetFsClient();
+
+         if (await ExistsAsync(id))
+         {
+            await client.FileSystem.AppendAsync(_accountName, id, new NonCloseableStream(chunkStream));
+         }
+         else
+         {
+            await UploadFromStreamAsync(id, chunkStream);
+         }
       }
 
-      public override Task DeleteAsync(string id)
+      public override async Task DeleteAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
-         throw new NotImplementedException();
+         var client = await GetFsClient();
+
+         try
+         {
+            await client.FileSystem.DeleteAsync(_accountName, id);
+         }
+         catch(Exception ex)
+         {
+            throw;
+         }
       }
 
       public override async Task DownloadToStreamAsync(string id, Stream targetStream)
@@ -65,18 +86,36 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          }
       }
 
-      public override Task<bool> ExistsAsync(string id)
+      public override async Task<bool> ExistsAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
-         throw new NotImplementedException();
+         var client = await GetFsClient();
+
+         try
+         {
+            await client.FileSystem.GetFileStatusAsync(_accountName, id);
+
+            return true;
+         }
+         catch(AdlsErrorException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
+         {
+            return false;
+         }
       }
 
-      public override Task<BlobMeta> GetMetaAsync(string id)
+      public override async Task<BlobMeta> GetMetaAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
-         throw new NotImplementedException();
+         var client = await GetFsClient();
+
+         //ContentSummaryResult csr = await client.FileSystem.GetContentSummaryAsync(_accountName, id);
+         //csr.ContentSummary.
+         FileStatusResult fsr = await client.FileSystem.GetFileStatusAsync(_accountName, id);
+         //fsr.FileStatus.
+
+         return new BlobMeta(fsr.FileStatus.Length.Value, null);
       }
 
       public override Task<IEnumerable<string>> ListAsync(string prefix)
@@ -100,7 +139,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
          var client = await GetFsClient();
 
-         await client.FileSystem.CreateAsync(_accountName, id, sourceStream, true);
+         await client.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(sourceStream), true);
       }
 
       private async Task<DataLakeStoreFileSystemManagementClient> GetFsClient()
@@ -109,9 +148,9 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
          ServiceClientCredentials creds = await GetCreds();
 
-         var fsClient = new DataLakeStoreFileSystemManagementClient(creds);
+         _fsClient = new DataLakeStoreFileSystemManagementClient(creds);
 
-         return fsClient;
+         return _fsClient;
       }
 
       private async Task<ServiceClientCredentials> GetCreds()

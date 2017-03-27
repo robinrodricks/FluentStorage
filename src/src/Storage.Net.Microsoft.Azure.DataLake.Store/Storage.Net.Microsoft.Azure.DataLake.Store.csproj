@@ -5,8 +5,8 @@
     <SignAssembly>true</SignAssembly>
     <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <Version>1.0.0</Version>
-    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.0-alpha-1</Version>
+    <FileVersion>1.0.0-alpha-1.0</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
@@ -17,6 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Management.DataLake.Store" Version="2.1.0-preview" />
     <PackageReference Include="Microsoft.Rest.ClientRuntime.Azure.Authentication" Version="2.2.12" />
+    <PackageReference Include="NetBox" Version="1.2.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
