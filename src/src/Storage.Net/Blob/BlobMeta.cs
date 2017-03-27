@@ -22,7 +22,8 @@
       public long Size { get; }
 
       /// <summary>
-      /// MD5 content hash of the blob
+      /// MD5 content hash of the blob. Note that this property can be null if underlying storage has
+      /// no information about the hash.
       /// </summary>
       public string MD5 { get; }
    }

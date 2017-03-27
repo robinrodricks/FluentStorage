@@ -365,7 +365,10 @@ namespace Storage.Net.Tests.Integration
          BlobMeta meta = _storage.GetMeta(id);
 
          Assert.Equal(Encoding.UTF8.GetByteCount(text), meta.Size);
-         Assert.Equal(text.GetHash(HashType.Md5), meta.MD5);
+         if (meta.MD5 != null)
+         {
+            Assert.Equal(text.GetHash(HashType.Md5), meta.MD5);
+         }
       }
 
       [Fact]
