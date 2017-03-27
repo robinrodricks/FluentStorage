@@ -10,6 +10,7 @@ using Microsoft.Azure.Management.DataLake.Store;
 using System.Collections.Generic;
 using Microsoft.Azure.Management.DataLake.Store.Models;
 using NetBox.IO;
+using Microsoft.Rest.Azure;
 
 namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 {
@@ -80,9 +81,16 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
          var client = await GetFsClient();
 
-         using (Stream s = await client.FileSystem.OpenAsync(_accountName, id))
+         try
          {
-            await s.CopyToAsync(targetStream);
+            using (Stream s = await client.FileSystem.OpenAsync(_accountName, id))
+            {
+               await s.CopyToAsync(targetStream);
+            }
+         }
+         catch(CloudException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
+         {
+            throw new StorageException(ErrorCode.NotFound, ex);
          }
       }
 
