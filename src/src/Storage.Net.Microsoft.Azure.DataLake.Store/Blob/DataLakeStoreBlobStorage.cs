@@ -39,16 +39,24 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
       public override Task AppendFromStreamAsync(string id, Stream chunkStream)
       {
+         GenericValidation.CheckBlobId(id);
+         if (chunkStream == null) throw new ArgumentNullException(nameof(chunkStream));
+
          throw new NotImplementedException();
       }
 
       public override Task DeleteAsync(string id)
       {
+         GenericValidation.CheckBlobId(id);
+
          throw new NotImplementedException();
       }
 
       public override async Task DownloadToStreamAsync(string id, Stream targetStream)
       {
+         GenericValidation.CheckBlobId(id);
+         if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
+
          var client = await GetFsClient();
 
          using (Stream s = await client.FileSystem.OpenAsync(_accountName, id))
@@ -59,26 +67,37 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
       public override Task<bool> ExistsAsync(string id)
       {
+         GenericValidation.CheckBlobId(id);
+
          throw new NotImplementedException();
       }
 
       public override Task<BlobMeta> GetMetaAsync(string id)
       {
+         GenericValidation.CheckBlobId(id);
+
          throw new NotImplementedException();
       }
 
       public override Task<IEnumerable<string>> ListAsync(string prefix)
       {
+         GenericValidation.CheckBlobPrefix(prefix);
+
          throw new NotImplementedException();
       }
 
       public override Task<Stream> OpenStreamToReadAsync(string id)
       {
+         GenericValidation.CheckBlobId(id);
+
          throw new NotImplementedException();
       }
 
       public override async Task UploadFromStreamAsync(string id, Stream sourceStream)
       {
+         GenericValidation.CheckBlobId(id);
+         if (sourceStream == null) throw new ArgumentNullException(nameof(sourceStream));
+
          var client = await GetFsClient();
 
          await client.FileSystem.CreateAsync(_accountName, id, sourceStream, true);
