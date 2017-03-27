@@ -6,6 +6,10 @@ param(
    $NuGetApiKey
 )
 
+$vt = @(
+   ("Storage.Net.Microsoft.Azure.DataLake.Store.csproj", "1.0.0.0")
+)
+
 $VersionPrefix = "3"
 $VersionSuffix = "5.4.0"
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
@@ -26,7 +30,7 @@ function Set-VstsBuildNumber($BuildNumber)
    Write-Verbose -Verbose "##vso[build.updatebuildnumber]$BuildNumber"
 }
 
-function Update-ProjectVersion([string]$Path)
+function Update-ProjectVersion([string]$Path, [string]$Version)
 {
    $xml = [xml](Get-Content $Path)
 
@@ -39,9 +43,23 @@ function Update-ProjectVersion([string]$Path)
       $pg = $xml.Project.PropertyGroup[0]
    }
 
-   $pg.Version = $PackageVersion
-   $pg.FileVersion = $PackageVersion
-   $pg.AssemblyVersion = $AssemblyVersion
+   if($Version)
+   {
+      $parts = $Version -split "\."
+      $fv = $Version
+      $av = $parts[0] + ".0.0.0"
+
+      $pg.Version = $fv
+      $pg.FileVersion = $fv
+      $pg.AssemblyVersion = $av
+   }
+   else
+   {
+      $pg.Version = $PackageVersion
+      $pg.FileVersion = $PackageVersion
+      $pg.AssemblyVersion = $AssemblyVersion
+   }
+
    $pg.Copyright = $Copyright
    $pg.PackageIconUrl = $PackageIconUrl
    $pg.PackageProjectUrl = $PackageProjectUrl
@@ -73,8 +91,11 @@ if($Publish -and (-not $NuGetApiKey))
 # Update versioning information
 Get-ChildItem *.csproj -Recurse | Where-Object {-not($_.Name -like "*test*")} | % {
    $path = $_.FullName
+
+   $v = $vt.($_.Name)
+
    Write-Host "setting version of $path"
-   Update-ProjectVersion $path
+   Update-ProjectVersion $path $v
 }
 Set-VstsBuildNumber $Version
 
