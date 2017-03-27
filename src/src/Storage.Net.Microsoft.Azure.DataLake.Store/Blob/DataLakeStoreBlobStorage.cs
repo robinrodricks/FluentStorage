@@ -94,6 +94,22 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          }
       }
 
+      public override async Task<Stream> OpenStreamToReadAsync(string id)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         var client = await GetFsClient();
+
+         try
+         {
+            return await client.FileSystem.OpenAsync(_accountName, id);
+         }
+         catch (CloudException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
+         {
+            throw new StorageException(ErrorCode.NotFound, ex);
+         }
+      }
+
       public override async Task<bool> ExistsAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
@@ -129,13 +145,6 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       public override Task<IEnumerable<string>> ListAsync(string prefix)
       {
          GenericValidation.CheckBlobPrefix(prefix);
-
-         throw new NotImplementedException();
-      }
-
-      public override Task<Stream> OpenStreamToReadAsync(string id)
-      {
-         GenericValidation.CheckBlobId(id);
 
          throw new NotImplementedException();
       }
