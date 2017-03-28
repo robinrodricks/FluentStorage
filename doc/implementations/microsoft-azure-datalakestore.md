@@ -4,6 +4,8 @@ Microsoft Azure implementations reside in a separate package hosted on [NuGet](h
 
 This package tries to abstract access to [Azure Data Lake Store](https://azure.microsoft.com/en-gb/services/data-lake-store/) and making them available as `IBlobStorage`.
 
+The official Data Lake Store SDK is still in preview, therefore this package is also marked as a preview version.
+
 ## Using
 
 > WARNING!!! `Microsoft.Azure.Management.DataLake.Store` has a dependency on `Newtonsoft.Json v6` therefore you may need to add this to app.config:

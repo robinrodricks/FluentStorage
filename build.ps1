@@ -68,13 +68,17 @@ function Update-ProjectVersion($File)
    $xml.Save($File.FullName)
 }
 
-function Exec($Command)
+function Exec($Command, [switch]$ContinueOnError)
 {
    Invoke-Expression $Command
    if($LASTEXITCODE -ne 0)
    {
       Write-Error "command failed (error code: $LASTEXITCODE)"
-      exit 1
+
+      if(-not $ContinueOnError.IsPresent)
+      {
+         exit 1
+      }
    }
 }
 
@@ -110,7 +114,7 @@ if($Publish.IsPresent)
       $path = $_.FullName
       Write-Host "publishing from $path"
 
-      Exec "nuget push $path -Source https://www.nuget.org/api/v2/package -ApiKey $NuGetApiKey"
+      Exec "nuget push $path -Source https://www.nuget.org/api/v2/package -ApiKey $NuGetApiKey" -ContinueOnError
    }
 }
 
