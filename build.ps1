@@ -6,7 +6,6 @@ param(
    $NuGetApiKey
 )
 
-#$preview = "-alpha-1"
 $gv = "3.5.4"
 $vt = @{
    "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "1.0.0-alpha-1";
@@ -45,7 +44,10 @@ function Update-ProjectVersion($File)
       $pg = $xml.Project.PropertyGroup[0]
    }
 
-   $fv = "{0}.{1}.{2}.0" -f $parts[0], $parts[1], $parts[2]
+   $parts = $v -split "\."
+   $bv = $parts[2]
+   if($bv.Contains("-")) { $bv = $bv.Substring(0, $bv.IndexOf("-"))}
+   $fv = "{0}.{1}.{2}.0" -f $parts[0], $parts[1], $bv
    $av = "{0}.0.0.0" -f $parts[0]
    $pv = $v
 
@@ -87,7 +89,7 @@ if($Publish -and (-not $NuGetApiKey))
 Get-ChildItem *.csproj -Recurse | Where-Object {-not($_.Name -like "*test*")} | % {
    Update-ProjectVersion $_
 }
-Set-VstsBuildNumber $Version
+Set-VstsBuildNumber $gv
 
 # Restore packages
 Exec "dotnet restore $SlnPath"

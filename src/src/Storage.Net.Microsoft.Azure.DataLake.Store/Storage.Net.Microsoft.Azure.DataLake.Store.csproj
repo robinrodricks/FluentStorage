@@ -5,8 +5,8 @@
     <SignAssembly>true</SignAssembly>
     <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <Version>1.0.0-alpha-1</Version>
-    <FileVersion>1.0.0-alpha-1.0</FileVersion>
+    <Version>1.2.3-alpha-1</Version>
+    <FileVersion>1.2.3.0</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
