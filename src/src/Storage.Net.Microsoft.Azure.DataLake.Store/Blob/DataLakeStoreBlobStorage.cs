@@ -16,7 +16,7 @@ using System.Collections.Generics;
 
 namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 {
-   class DataLakeStoreBlobStorage : AsyncBlobStorage
+   public class DataLakeStoreBlobStorage : AsyncBlobStorage
    {
       private readonly string _accountName;
       private readonly string _domain;
@@ -35,6 +35,19 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          _clientId = clientId;
          _clientSecret = clientSecret;
       }
+
+      /// <summary>
+      /// Returns the actual credential object used to authenticate to ADLS. Note that this will only be populated
+      /// once you make at least one successful call.
+      /// </summary>
+      public ServiceClientCredentials Credentials => _credential;
+
+      /// <summary>
+      /// Returns the actual file system management object. Note that this will only be populated once you make at least one
+      /// successful call.
+      /// </summary>
+      public DataLakeStoreFileSystemManagementClient FsClient => _fsClient;
+
 
       public static DataLakeStoreBlobStorage CreateByClientSecret(string accountName, NetworkCredential credential)
       {

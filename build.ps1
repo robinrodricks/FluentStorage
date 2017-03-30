@@ -8,7 +8,7 @@ param(
 
 $gv = "3.5.4"
 $vt = @{
-   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "1.0.0-alpha-1";
+   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "1.0.0-alpha-3";
    "Storage.Net.Amazon.Aws" = "3.5.4";
    "Storage.Net.Microsoft.Azure" = "3.5.4";
 }
