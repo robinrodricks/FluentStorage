@@ -6,11 +6,11 @@ param(
    $NuGetApiKey
 )
 
-$gv = "3.5.4"
+$gv = "3.5.5"
 $vt = @{
    "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "1.0.0-alpha-3";
-   "Storage.Net.Amazon.Aws" = "3.5.4";
-   "Storage.Net.Microsoft.Azure" = "3.5.4";
+   "Storage.Net.Amazon.Aws.csproj" = "3.5.4";
+   "Storage.Net.Microsoft.Azure.csproj" = "3.5.5-alpha-1";
 }
 
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
@@ -85,7 +85,7 @@ function Exec($Command, [switch]$ContinueOnError)
 # General validation
 if($Publish -and (-not $NuGetApiKey))
 {
-   Write-Error "Please specify nuget key to publish"por
+   Write-Error "Please specify nuget key to publish"
    exit 1
 }
 

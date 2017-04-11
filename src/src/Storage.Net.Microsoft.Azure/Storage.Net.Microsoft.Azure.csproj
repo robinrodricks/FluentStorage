@@ -17,8 +17,8 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>3.5.4</Version>
-    <FileVersion>3.5.4.0</FileVersion>
+    <Version>3.5.5-alpha-1</Version>
+    <FileVersion>3.5.5.0</FileVersion>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
     <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>

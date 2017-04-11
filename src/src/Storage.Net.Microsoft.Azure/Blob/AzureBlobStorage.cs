@@ -208,7 +208,17 @@ namespace Storage.Net.Microsoft.Azure.Blob
          id = ToInternalId(id);
 
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
-         return await blob.OpenReadAsync();
+
+         try
+         {
+            return await blob.OpenReadAsync();
+         }
+         catch(AzureStorageException ex)
+         {
+            if (!TryHandleStorageException(ex)) throw;
+         }
+
+         throw new Exception("must not be here");
       }
 
       /// <summary>

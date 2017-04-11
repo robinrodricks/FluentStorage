@@ -24,7 +24,7 @@ namespace Storage.Net.Messaging
       /// <returns>The message or null if there are no messages available in the queue.</returns>
       public static QueueMessage ReceiveMessage(this IMessageReceiver receiver)
       {
-         return receiver.ReceiveMessages(1).FirstOrDefault();
+         return receiver.ReceiveMessages(1)?.FirstOrDefault();
       }
 
       /// <summary>
@@ -33,7 +33,7 @@ namespace Storage.Net.Messaging
       /// <returns>The message or null if there are no messages available in the queue.</returns>
       public static async Task<QueueMessage> ReceiveMessageAsync(this IMessageReceiver receiver)
       {
-         return (await receiver.ReceiveMessagesAsync(1)).FirstOrDefault();
+         return (await receiver.ReceiveMessagesAsync(1))?.FirstOrDefault();
       }
 
    }

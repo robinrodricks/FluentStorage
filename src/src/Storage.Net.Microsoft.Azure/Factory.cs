@@ -10,6 +10,7 @@ using Storage.Net.Microsoft.Azure.Table;
 using Storage.Net.Table;
 using System.Net;
 using Storage.Net.Microsoft.Azure.Messaging.EventHub;
+using System.Collections.Generic;
 
 namespace Storage.Net
 {
@@ -197,5 +198,24 @@ namespace Storage.Net
          return new AzureEventHubPublisher(connectionString, hubPath);
       }
 
+      /// <summary>
+      /// Creates Azure Event Hub receiver
+      /// </summary>
+      /// <param name="factory">Factory reference</param>
+      /// <param name="connectionString"></param>
+      /// <param name="hubPath"></param>
+      /// <param name="partitionIds"></param>
+      /// <param name="consumerGroupName"></param>
+      /// <param name="stateStorage"></param>
+      /// <returns></returns>
+      public static IMessageReceiver AzureEventHubReceiver(this IMessagingFactory factory,
+         string connectionString, string hubPath,
+         IEnumerable<string> partitionIds = null,
+         string consumerGroupName = null,
+         IBlobStorage stateStorage = null
+         )
+      {
+         return new AzureEventHubReceiver(connectionString, hubPath, partitionIds, consumerGroupName, stateStorage);
+      }
    }
 }

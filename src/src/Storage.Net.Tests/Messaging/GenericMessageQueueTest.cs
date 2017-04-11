@@ -92,6 +92,15 @@ namespace Storage.Net.Tests.Integration.Messaging
                   "testqueue");
                break;
             case "azure-eventhub":
+               _receiver = StorageFactory.Messages.AzureEventHubReceiver(
+                  TestSettings.Instance.EventHubConnectionString,
+                  TestSettings.Instance.EventHubPath,
+                  null,
+                  null,
+                  StorageFactory.Blobs.AzureBlobStorage(
+                     TestSettings.Instance.AzureStorageName,
+                     TestSettings.Instance.AzureStorageKey,
+                     "integration-hub"));
                _publisher = StorageFactory.Messages.AzureEventHubPublisher(
                   TestSettings.Instance.EventHubConnectionString,
                   TestSettings.Instance.EventHubPath);
@@ -216,19 +225,32 @@ namespace Storage.Net.Tests.Integration.Messaging
       }
 
       [Fact]
+      public void CleanQueue_SendMessage_ReceiveAndConfirm()
+      {
+         string content = Generator.RandomString;
+         var msg = new QueueMessage(content);
+         _publisher.PutMessage(msg);
+
+         QueueMessage rmsg = _receiver.ReceiveMessage();
+
+         _receiver.ConfirmMessage(rmsg);
+         _receiver.ConfirmMessage(new QueueMessage(rmsg.Id, string.Empty));
+
+
+      }
+
+      [Fact]
       public void MessagePump_AddFewMessages_CanReceiveOneAndPumpClearsThemAll()
       {
-         for (int i = 0; i < 10; i++)
+         /*for (int i = 0; i < 10; i++)
          {
             var qm = new QueueMessage(nameof(MessagePump_AddFewMessages_CanReceiveOneAndPumpClearsThemAll) + "#" + i);
             _publisher.PutMessage(qm);
-         }
-
-         Assert.NotNull(_receiver.ReceiveMessage());
+         }*/
 
          _receiver.StartMessagePump(OnMessage);
 
-         Thread.Sleep(TimeSpan.FromSeconds(10));
+         Thread.Sleep(TimeSpan.FromHours(11));
 
          Assert.True(_messagesPumped >= 9);
       }

@@ -45,7 +45,20 @@ namespace Storage.Net.Messaging
          return Task.FromResult(ReceiveMessages(count));
       }
 
-      public abstract void StartMessagePump(Action<QueueMessage> onMessage);
+      public virtual void StartMessagePump(Action<QueueMessage> onMessage)
+      {
+         CallAsync(() => StartMessagePumpAsync((qm) =>
+         {
+            onMessage(qm);
+            return Task.FromResult(true);
+         }));
+      }
+
+      public virtual Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessageAsync)
+      {
+         StartMessagePump((qm) => onMessageAsync(qm));
+         return Task.FromResult(true);
+      }
 
       private void CallAsync(Func<Task> lambda)
       {
