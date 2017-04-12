@@ -129,7 +129,7 @@ namespace Storage.Net.Tests.Integration
 
          using (var s = new MemoryStream())
          {
-            _storage.DownloadToStream(id, s);
+            _storage.DownloadToStream("/" + id, s);
             contentRead = Encoding.UTF8.GetString(s.ToArray());
          }
 

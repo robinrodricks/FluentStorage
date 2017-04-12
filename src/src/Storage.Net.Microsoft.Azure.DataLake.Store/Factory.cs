@@ -10,6 +10,13 @@ namespace Storage.Net
    /// </summary>
    public static class Factory
    {
+      /// <summary>
+      /// Creates and instance of Azure Data Lake Store client
+      /// </summary>
+      /// <param name="factory">Factory reference</param>
+      /// <param name="accountName">Data Lake account name</param>
+      /// <param name="credential">Credential object where username is Principal ID and password is Principal Secret</param>
+      /// <returns></returns>
       public static IBlobStorage AzureDataLakeStoreByClientSecret(this IBlobStorageFactory factory,
          string accountName,
          NetworkCredential credential)
@@ -17,12 +24,26 @@ namespace Storage.Net
          return DataLakeStoreBlobStorage.CreateByClientSecret(accountName, credential);
       }
 
-      /*public static IBlobStorage AzureDataLakeStoreByClientSecret(this IBlobStorageFactory factory,
-         string domain,
-         string clientId,
-         string clientSecret)
+      /// <summary>
+      /// Creates and instance of Azure Data Lake Store client
+      /// </summary>
+      /// <param name="factory">Factory reference</param>
+      /// <param name="accountName">Data Lake account name</param>
+      /// <param name="principalId">Principal ID</param>
+      /// <param name="principalSecret">Principal Secret</param>
+      /// <returns></returns>
+      public static IBlobStorage AzureDataLakeStoreByClientSecret(this IBlobStorageFactory factory,
+         string accountName,
+         string principalId,
+         string principalSecret)
       {
-         //return new DataLakeStoreBlobStorage();
-      }*/
+         if (principalId == null)
+            throw new ArgumentNullException(nameof(principalId));
+
+         if (principalSecret == null)
+            throw new ArgumentNullException(nameof(principalSecret));
+
+         return DataLakeStoreBlobStorage.CreateByClientSecret(accountName, new NetworkCredential(principalId, principalSecret));
+      }
    }
 }
