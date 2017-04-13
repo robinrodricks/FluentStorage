@@ -53,6 +53,15 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          if (credential == null) throw new ArgumentNullException(nameof(credential));
 
+         if (string.IsNullOrEmpty(credential.Domain))
+            throw new ArgumentException("Tenant ID (Domain in NetworkCredential) part is required");
+
+         if (string.IsNullOrEmpty(credential.UserName))
+            throw new ArgumentException("Principal ID (Username in NetworkCredential) part is required");
+
+         if (string.IsNullOrEmpty(credential.Password))
+            throw new ArgumentException("Principal Secret (Password in NetworkCredential) part is required");
+
          return new DataLakeStoreBlobStorage(accountName, credential.Domain, credential.UserName, credential.Password, null);
       }
 
