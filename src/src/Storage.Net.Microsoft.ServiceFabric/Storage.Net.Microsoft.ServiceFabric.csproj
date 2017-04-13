@@ -8,7 +8,7 @@
     <PackageIconUrl>http://i.isolineltd.com/nuget/storage.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
     <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
-    <Version>1.0.0-alpha-1</Version>
+    <Version>1.0.0-alpha-2</Version>
     <FileVersion>1.0.0.0</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -20,9 +20,9 @@
     <Folder Include="Messaging\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric.Data" Version="2.5.216" />
+    <PackageReference Include="Microsoft.ServiceFabric.Data" Version="2.4.164" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\Storage.Net\Storage.Net.csproj" />
+    <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
   </ItemGroup>
 </Project>

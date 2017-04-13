@@ -15,8 +15,8 @@ This framework supports `.NET 4.5.1` and `.NET Standard 1.6`, however not all of
 Storage.Net defines three different storage types:
 
 - [**Blob Storage**](doc/blob-storage/index.md) is used to store arbitrary files of any size.
-- **Table Storage** is a simplistic way to store non-relational tabular data.
-- **Messaging** is an asynchronous mechanism to send simple messages between disconnected system.
+- [**Table Storage**](doc/table-storage/index.md) is a simplistic way to store non-relational tabular data.
+- [**Messaging**](doc/messaging/index.md) is an asynchronous mechanism to send simple messages between disconnected systems.
 
 ## Implementations
 
