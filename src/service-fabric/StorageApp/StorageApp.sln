@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{A07B5EB6-E848-4116-A8D0-A826331D98C6}") = "StorageApp", "StorageApp\StorageApp.sfproj", "{DEAC8FA5-03AD-42FB-9016-5AA42B0DF2F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stateful1", "Stateful1\Stateful1.csproj", "{2BF98B95-3CC8-4EEA-9125-71A8850BBA6D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net", "..\..\src\Storage.Net\Storage.Net.csproj", "{6AF6FAC2-D0B1-4E76-B1C6-233328C6A981}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{EC587FA6-87E4-4112-B274-E5262765C22C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Microsoft.ServiceFabric", "..\..\src\Storage.Net.Microsoft.ServiceFabric\Storage.Net.Microsoft.ServiceFabric.csproj", "{FCA5D413-9751-4984-9455-FFC10C6C8151}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DEAC8FA5-03AD-42FB-9016-5AA42B0DF2F5}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{DEAC8FA5-03AD-42FB-9016-5AA42B0DF2F5}.Debug|x64.ActiveCfg = Debug|x64
+		{DEAC8FA5-03AD-42FB-9016-5AA42B0DF2F5}.Debug|x64.Build.0 = Debug|x64
+		{DEAC8FA5-03AD-42FB-9016-5AA42B0DF2F5}.Debug|x64.Deploy.0 = Debug|x64
+		{DEAC8FA5-03AD-42FB-9016-5AA42B0DF2F5}.Release|Any CPU.ActiveCfg = Release|x64
+		{DEAC8FA5-03AD-42FB-9016-5AA42B0DF2F5}.Release|x64.ActiveCfg = Release|x64
+		{DEAC8FA5-03AD-42FB-9016-5AA42B0DF2F5}.Release|x64.Build.0 = Release|x64
+		{DEAC8FA5-03AD-42FB-9016-5AA42B0DF2F5}.Release|x64.Deploy.0 = Release|x64
+		{2BF98B95-3CC8-4EEA-9125-71A8850BBA6D}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{2BF98B95-3CC8-4EEA-9125-71A8850BBA6D}.Debug|x64.ActiveCfg = Debug|x64
+		{2BF98B95-3CC8-4EEA-9125-71A8850BBA6D}.Debug|x64.Build.0 = Debug|x64
+		{2BF98B95-3CC8-4EEA-9125-71A8850BBA6D}.Release|Any CPU.ActiveCfg = Release|x64
+		{2BF98B95-3CC8-4EEA-9125-71A8850BBA6D}.Release|x64.ActiveCfg = Release|x64
+		{2BF98B95-3CC8-4EEA-9125-71A8850BBA6D}.Release|x64.Build.0 = Release|x64
+		{6AF6FAC2-D0B1-4E76-B1C6-233328C6A981}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AF6FAC2-D0B1-4E76-B1C6-233328C6A981}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AF6FAC2-D0B1-4E76-B1C6-233328C6A981}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6AF6FAC2-D0B1-4E76-B1C6-233328C6A981}.Debug|x64.Build.0 = Debug|Any CPU
+		{6AF6FAC2-D0B1-4E76-B1C6-233328C6A981}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AF6FAC2-D0B1-4E76-B1C6-233328C6A981}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AF6FAC2-D0B1-4E76-B1C6-233328C6A981}.Release|x64.ActiveCfg = Release|Any CPU
+		{6AF6FAC2-D0B1-4E76-B1C6-233328C6A981}.Release|x64.Build.0 = Release|Any CPU
+		{FCA5D413-9751-4984-9455-FFC10C6C8151}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCA5D413-9751-4984-9455-FFC10C6C8151}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCA5D413-9751-4984-9455-FFC10C6C8151}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FCA5D413-9751-4984-9455-FFC10C6C8151}.Debug|x64.Build.0 = Debug|Any CPU
+		{FCA5D413-9751-4984-9455-FFC10C6C8151}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCA5D413-9751-4984-9455-FFC10C6C8151}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCA5D413-9751-4984-9455-FFC10C6C8151}.Release|x64.ActiveCfg = Release|Any CPU
+		{FCA5D413-9751-4984-9455-FFC10C6C8151}.Release|x64.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6AF6FAC2-D0B1-4E76-B1C6-233328C6A981} = {EC587FA6-87E4-4112-B274-E5262765C22C}
+		{FCA5D413-9751-4984-9455-FFC10C6C8151} = {EC587FA6-87E4-4112-B274-E5262765C22C}
+	EndGlobalSection
+EndGlobal
