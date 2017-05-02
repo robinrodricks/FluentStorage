@@ -20,9 +20,27 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          _collectionName = collectionName ?? throw new ArgumentNullException(nameof(collectionName));
       }
 
-      public override Task AppendFromStreamAsync(string id, Stream chunkStream)
+      public override async Task AppendFromStreamAsync(string id, Stream chunkStream)
       {
-         return base.AppendFromStreamAsync(id, chunkStream);
+         using (var tx = await OpenCollection())
+         {
+            //create a new byte array with
+            byte[] extra = chunkStream.ToByteArray();
+            ConditionalValue<byte[]> value = await tx.Collection.TryGetValueAsync(tx.Tx, id);
+            int oldLength = value.HasValue ? value.Value.Length : 0;
+            byte[] newData = new byte[oldLength + extra.Length];
+            if(value.HasValue)
+            {
+               Array.Copy(value.Value, newData, oldLength);
+            }
+            Array.Copy(extra, 0, newData, oldLength, extra.Length);
+
+            //put new array into the key
+            await tx.Collection.AddOrUpdateAsync(tx.Tx, id, extra, (k, v) => extra);
+
+            //commit the transaction
+            await tx.CommitAsync();
+         }
       }
 
       public override async Task DeleteAsync(string id)
@@ -58,9 +76,16 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          }
       }
 
-      public override Task<BlobMeta> GetMetaAsync(string id)
+      public override async Task<BlobMeta> GetMetaAsync(string id)
       {
-         return base.GetMetaAsync(id);
+         using (var tx = await OpenCollection())
+         {
+            ConditionalValue<byte[]> value = await tx.Collection.TryGetValueAsync(tx.Tx, id);
+
+            if (!value.HasValue) return null;
+
+            return new BlobMeta(value.Value.Length, null);
+         }
       }
 
       public override async Task<IEnumerable<string>> ListAsync(string prefix)
