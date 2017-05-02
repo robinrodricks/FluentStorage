@@ -55,7 +55,12 @@ namespace Stateful1
 
             await _publisher.PutMessagesAsync(new[] { QueueMessage.FromText("content at " + DateTime.UtcNow) });
 
-            await _blobs.UploadTextAsync("one", "test text");
+            qm = await _receiver.ReceiveMessagesAsync(100);
+
+            await _blobs.UploadTextAsync("one", "test text 1");
+            await _blobs.UploadTextAsync("two", "test text 2");
+
+            IEnumerable<string> keys = await _blobs.ListAsync(null);
 
             string textBack = await _blobs.DownloadTextAsync("one");
             textBack = await _blobs.DownloadTextAsync("two");

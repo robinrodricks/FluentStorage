@@ -1,12 +1,11 @@
 ﻿using Microsoft.ServiceFabric.Data;
+using Microsoft.ServiceFabric.Data.Collections;
 using Storage.Net.Blob;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using Microsoft.ServiceFabric.Data.Collections;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Microsoft.ServiceFabric.Blob
 {
@@ -23,8 +22,6 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
       public override Task AppendFromStreamAsync(string id, Stream chunkStream)
       {
-
-
          return base.AppendFromStreamAsync(id, chunkStream);
       }
 
@@ -38,9 +35,12 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          return base.DownloadToStreamAsync(id, targetStream);
       }
 
-      public override Task<bool> ExistsAsync(string id)
+      public override async Task<bool> ExistsAsync(string id)
       {
-         return base.ExistsAsync(id);
+         using (var tx = await OpenCollection())
+         {
+            return await tx.Collection.ContainsKeyAsync(tx.Tx, id);
+         }
       }
 
       public override Task<BlobMeta> GetMetaAsync(string id)
@@ -48,18 +48,36 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          return base.GetMetaAsync(id);
       }
 
-      public override Task<IEnumerable<string>> ListAsync(string prefix)
+      public override async Task<IEnumerable<string>> ListAsync(string prefix)
       {
-         return base.ListAsync(prefix);
+         var result = new List<string>();
+
+         using (var tx = await OpenCollection())
+         {
+            IAsyncEnumerable<KeyValuePair<string, byte[]>> enumerable =
+               await tx.Collection.CreateEnumerableAsync(tx.Tx);
+
+            IAsyncEnumerator<KeyValuePair<string, byte[]>> enumerator = enumerable.GetAsyncEnumerator();
+
+            while(await enumerator.MoveNextAsync(CancellationToken.None))
+            {
+               KeyValuePair<string, byte[]> current = enumerator.Current;
+
+               if(prefix == null || current.Key.StartsWith(prefix))
+               {
+                  result.Add(current.Key);
+               }
+            }
+         }
+
+         return result;
       }
 
       public override async Task<Stream> OpenStreamToReadAsync(string id)
       {
-         var collection = await _stateManager.GetOrAddAsync<IReliableDictionary<string, byte[]>>(_collectionName);
-
-         using (var tx = new FabricTransactionManager(_stateManager))
+         using (var tx = await OpenCollection())
          {
-            ConditionalValue<byte[]> value = await collection.TryGetValueAsync(tx.Tx, id);
+            ConditionalValue<byte[]> value = await tx.Collection.TryGetValueAsync(tx.Tx, id);
 
             if (!value.HasValue) throw new StorageException(ErrorCode.NotFound, null);
 
@@ -69,16 +87,21 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
       public override async Task UploadFromStreamAsync(string id, Stream sourceStream)
       {
-         var collection = await _stateManager.GetOrAddAsync<IReliableDictionary<string, byte[]>>(_collectionName);
-
          byte[] value = sourceStream.ToByteArray();
 
-         using (var tx = new FabricTransactionManager(_stateManager))
+         using (var tx = await OpenCollection())
          {
-            await collection.AddOrUpdateAsync(tx.Tx, id, value, (k, v) => value);
+            await tx.Collection.AddOrUpdateAsync(tx.Tx, id, value, (k, v) => value);
 
             await tx.CommitAsync();
          }
+      }
+
+      private async Task<FabricTransactionManager<IReliableDictionary<string, byte[]>>> OpenCollection()
+      {
+         var collection = await _stateManager.GetOrAddAsync<IReliableDictionary<string, byte[]>>(_collectionName);
+
+         return new FabricTransactionManager<IReliableDictionary<string, byte[]>>(_stateManager, collection);
       }
    }
 }

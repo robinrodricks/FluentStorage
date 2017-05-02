@@ -24,7 +24,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
       {
          var collection = await _stateManager.GetOrAddAsync<IReliableQueue<byte[]>>(_queueName);
 
-         using (var tx = new FabricTransactionManager(_stateManager))
+         using (var tx = new FabricTransactionManager<string>(_stateManager, null))
          {
             foreach (QueueMessage message in messages)
             {

@@ -4,34 +4,36 @@ using System.Threading.Tasks;
 
 namespace Storage.Net.Microsoft.ServiceFabric
 {
-   class FabricTransactionManager : ITransactionManager
+   class FabricTransactionManager<TCollection> : ITransactionManager
    {
       private readonly IReliableStateManager _stateManager;
-      private readonly ITransaction _tx;
       private bool _commited;
 
-      public FabricTransactionManager(IReliableStateManager stateManager)
+      public FabricTransactionManager(IReliableStateManager stateManager, TCollection collection)
       {
          _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
-         _tx = _stateManager.CreateTransaction();
+         Tx = _stateManager.CreateTransaction();
+         Collection = collection;
       }
 
       public Task CommitAsync()
       {
          _commited = true;
-         return _tx.CommitAsync();
+         return Tx.CommitAsync();
       }
 
-      public ITransaction Tx => _tx;
+      public ITransaction Tx { get; }
+
+      public TCollection Collection { get; }
 
       public void Dispose()
       {
          if(!_commited)
          {
-            _tx.Abort();
+            Tx.Abort();
          }
 
-         _tx.Dispose();
+         Tx.Dispose();
       }
    }
 }
