@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net451</TargetFramework>
     <RepositoryType>GitHub</RepositoryType>
@@ -8,7 +8,7 @@
     <PackageIconUrl>http://i.isolineltd.com/nuget/storage.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
     <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
-    <Version>1.0.0-alpha-2</Version>
+    <Version>1.0.0</Version>
     <FileVersion>1.0.0.0</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
