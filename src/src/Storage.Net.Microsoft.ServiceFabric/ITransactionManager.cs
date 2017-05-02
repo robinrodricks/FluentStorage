@@ -12,6 +12,6 @@ namespace Storage.Net
       /// Commits the transaction
       /// </summary>
       /// <returns></returns>
-      Task Commit();
+      Task CommitAsync();
    }
 }

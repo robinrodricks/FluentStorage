@@ -77,7 +77,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          {
             await collection.AddOrUpdateAsync(tx.Tx, id, value, (k, v) => value);
 
-            await tx.Commit();
+            await tx.CommitAsync();
          }
       }
    }

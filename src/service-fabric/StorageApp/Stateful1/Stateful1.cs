@@ -9,6 +9,7 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using Storage.Net;
 using Storage.Net.Blob;
+using Storage.Net.Messaging;
 
 namespace Stateful1
 {
@@ -18,11 +19,15 @@ namespace Stateful1
    internal sealed class Stateful1 : StatefulService
    {
       private readonly IBlobStorage _blobs;
+      private readonly IMessagePublisher _publisher;
+      private readonly IMessageReceiver _receiver;
 
       public Stateful1(StatefulServiceContext context)
           : base(context)
       {
          _blobs = StorageFactory.Blobs.AzureServiceFabricReliableStorage(this.StateManager, "c1");
+         _publisher = StorageFactory.Messages.AzureServiceFabricReliableQueuePublisher(this.StateManager);
+         _receiver = StorageFactory.Messages.AzureServiceFabricReliableQueueReceiver(this.StateManager);
       }
 
       /// <summary>
@@ -44,11 +49,12 @@ namespace Stateful1
       /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service replica.</param>
       protected override async Task RunAsync(CancellationToken cancellationToken)
       {
-         // TODO: Replace the following sample code with your own logic 
-         //       or remove this RunAsync override if it's not needed in your service.
-
          try
          {
+            IEnumerable<QueueMessage> qm = await _receiver.ReceiveMessagesAsync(100);
+
+            await _publisher.PutMessagesAsync(new[] { QueueMessage.FromText("content at " + DateTime.UtcNow) });
+
             await _blobs.UploadTextAsync("one", "test text");
 
             string textBack = await _blobs.DownloadTextAsync("one");

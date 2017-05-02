@@ -16,7 +16,7 @@ namespace Storage.Net.Microsoft.ServiceFabric
          _tx = _stateManager.CreateTransaction();
       }
 
-      public Task Commit()
+      public Task CommitAsync()
       {
          _commited = true;
          return _tx.CommitAsync();
@@ -30,6 +30,8 @@ namespace Storage.Net.Microsoft.ServiceFabric
          {
             _tx.Abort();
          }
+
+         _tx.Dispose();
       }
    }
 }
