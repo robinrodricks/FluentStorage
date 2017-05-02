@@ -25,14 +25,29 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          return base.AppendFromStreamAsync(id, chunkStream);
       }
 
-      public override Task DeleteAsync(string id)
+      public override async Task DeleteAsync(string id)
       {
-         return base.DeleteAsync(id);
+         using (var tx = await OpenCollection())
+         {
+            await tx.Collection.TryRemoveAsync(tx.Tx, id);
+
+            await tx.CommitAsync();
+         }
       }
 
-      public override Task DownloadToStreamAsync(string id, Stream targetStream)
+      public override async Task DownloadToStreamAsync(string id, Stream targetStream)
       {
-         return base.DownloadToStreamAsync(id, targetStream);
+         using (var tx = await OpenCollection())
+         {
+            ConditionalValue<byte[]> value = await tx.Collection.TryGetValueAsync(tx.Tx, id);
+
+            if (!value.HasValue) throw new StorageException(ErrorCode.NotFound, null);
+
+            using (var source = new MemoryStream(value.Value))
+            {
+               await source.CopyToAsync(targetStream);
+            }
+         }
       }
 
       public override async Task<bool> ExistsAsync(string id)
@@ -57,15 +72,16 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
             IAsyncEnumerable<KeyValuePair<string, byte[]>> enumerable =
                await tx.Collection.CreateEnumerableAsync(tx.Tx);
 
-            IAsyncEnumerator<KeyValuePair<string, byte[]>> enumerator = enumerable.GetAsyncEnumerator();
-
-            while(await enumerator.MoveNextAsync(CancellationToken.None))
+            using (IAsyncEnumerator<KeyValuePair<string, byte[]>> enumerator = enumerable.GetAsyncEnumerator())
             {
-               KeyValuePair<string, byte[]> current = enumerator.Current;
-
-               if(prefix == null || current.Key.StartsWith(prefix))
+               while (await enumerator.MoveNextAsync(CancellationToken.None))
                {
-                  result.Add(current.Key);
+                  KeyValuePair<string, byte[]> current = enumerator.Current;
+
+                  if (prefix == null || current.Key.StartsWith(prefix))
+                  {
+                     result.Add(current.Key);
+                  }
                }
             }
          }
