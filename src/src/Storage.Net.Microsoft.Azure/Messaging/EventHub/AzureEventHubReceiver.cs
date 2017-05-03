@@ -9,10 +9,10 @@ using System.Threading;
 
 namespace Storage.Net.Microsoft.Azure.Messaging.EventHub
 {
-   //todo: default implementation requires blob storage for checkpoints and leases, i'm not even sure what that is
-   //but i don't want an extra dependency
-
-   class AzureEventHubReceiver : AsyncMessageReceiver
+   /// <summary>
+   /// Microsoft Azure Event Hub receiver
+   /// </summary>
+   public class AzureEventHubReceiver : AsyncMessageReceiver
    {
       private readonly EventHubClient _hubClient;
       private readonly HashSet<string> _partitionIds;
@@ -22,6 +22,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.EventHub
       private const int MaxMessageCount = 10;
       private static readonly TimeSpan WaitTime = TimeSpan.FromMinutes(1);
       private readonly List<PartitionReceiver> _partitonReceivers = new List<PartitionReceiver>();
+      private bool _isReady;
 
       /// <summary>
       /// Creates an instance of EventHub receiver
@@ -50,8 +51,26 @@ namespace Storage.Net.Microsoft.Azure.Messaging.EventHub
          if (partitionIds != null) _partitionIds.AddRange(_partitionIds);
          _consumerGroupName = consumerGroupName;
          _state = new EventHubStateAdapter(stateStorage);
+      }
 
-         CreateReceivers().Wait();
+      /// <summary>
+      /// Gets the IDs of event hub partitions
+      /// </summary>
+      /// <returns></returns>
+      public async Task<IEnumerable<string>> GetPartitionIds()
+      {
+         EventHubRuntimeInformation info = await _hubClient.GetRuntimeInformationAsync();
+
+         return info.PartitionIds;
+      }
+
+      private async Task CheckReady()
+      {
+         if (_isReady) return;
+
+         await CreateReceivers();
+
+         _isReady = true;
       }
 
       private async Task CreateReceivers()
@@ -100,11 +119,13 @@ namespace Storage.Net.Microsoft.Azure.Messaging.EventHub
          return Task.FromResult<IEnumerable<QueueMessage>>(null);
       }
 
-      public override async Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessage)
+      public override async Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessageAsync)
       {
+         await CheckReady();
+
          foreach(PartitionReceiver receiver in _partitonReceivers)
          {
-            Task pump = ReceiverPump(receiver, onMessage);
+            Task pump = ReceiverPump(receiver, onMessageAsync);
          }
       }
 
@@ -150,6 +171,9 @@ namespace Storage.Net.Microsoft.Azure.Messaging.EventHub
          }
       }
 
+      /// <summary>
+      /// Cancels message pump and closes the client
+      /// </summary>
       public override void Dispose()
       {
          _tokenSource.Cancel();
