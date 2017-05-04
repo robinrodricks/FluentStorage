@@ -404,5 +404,24 @@ namespace Storage.Net.Tests.Integration
             //AWS doesnt' support appends!
          }
       }
+
+      class TestDocument
+      {
+         public string M { get; set; }
+      }
+
+      [Fact]
+      public void Objects_Add_Retreives()
+      {
+         var td = new TestDocument() { M = "string" };
+
+         string id = Generator.GetRandomString(10, false);
+
+         _storage.Upload(id, td);
+
+         TestDocument td2 = _storage.Download<TestDocument>(id);
+
+         Assert.Equal("string", td2.M);
+      }
    }
 }

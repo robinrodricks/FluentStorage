@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -229,6 +230,92 @@ namespace Storage.Net.Blob
          using (src)
          {
             await targetStorage.UploadFromStreamAsync(newId ?? blobId, src);
+         }
+      }
+
+      /// <summary>
+      /// Downloads blob and tried to deserialize it to an object instance. If the blob doesn't exist or can't be
+      /// deserialized returns a default value
+      /// </summary>
+      /// <typeparam name="T">Object type</typeparam>
+      /// <param name="blobStorage">Storage reference</param>
+      /// <param name="id">Blob ID.</param>
+      /// <returns>Deserialized object or null</returns>
+      public static T Download<T>(this IBlobStorage blobStorage, string id) where T : new()
+      {
+         string json;
+
+         try
+         {
+            json = blobStorage.DownloadText(id);
+         }
+         catch(StorageException ex) when (ex.ErrorCode == ErrorCode.NotFound)
+         {
+            return default(T);
+         }
+
+         return json.AsJsonObject<T>();
+      }
+
+      /// <summary>
+      /// Downloads blob and tried to deserialize it to an object instance. If the blob doesn't exist or can't be
+      /// deserialized returns a default value
+      /// </summary>
+      /// <typeparam name="T">Object type</typeparam>
+      /// <param name="blobStorage">Storage reference</param>
+      /// <param name="id">Blob ID.</param>
+      /// <returns>Deserialized object or null</returns>
+      public async static Task<T> DownloadAsync<T>(this IBlobStorage blobStorage, string id) where T : new()
+      {
+         string json;
+
+         try
+         {
+            json = await blobStorage.DownloadTextAsync(id);
+         }
+         catch (StorageException ex) when (ex.ErrorCode == ErrorCode.NotFound)
+         {
+            return default(T);
+         }
+
+         return json.AsJsonObject<T>();
+      }
+
+      /// <summary>
+      /// Uploads object instance as a blob by serializing it
+      /// </summary>
+      /// <typeparam name="T">Object type</typeparam>
+      /// <param name="blobStorage">Storage reference</param>
+      /// <param name="id">Blob ID</param>
+      /// <param name="instance">Object instance. If this parameter is null the blob is deleted if it exists</param>
+      public static void Upload<T>(this IBlobStorage blobStorage, string id, T instance) where T : new()
+      {
+         if(EqualityComparer<T>.Default.Equals(instance, default(T)))
+         {
+            blobStorage.Delete(id);
+         }
+         else
+         {
+            blobStorage.UploadText(id, instance.ToJsonString());
+         }
+      }
+
+      /// <summary>
+      /// Uploads object instance as a blob by serializing it
+      /// </summary>
+      /// <typeparam name="T">Object type</typeparam>
+      /// <param name="blobStorage">Storage reference</param>
+      /// <param name="id">Blob ID</param>
+      /// <param name="instance">Object instance. If this parameter is null the blob is deleted if it exists</param>
+      public static async Task UploadAsync<T>(this IBlobStorage blobStorage, string id, T instance) where T : new()
+      {
+         if (EqualityComparer<T>.Default.Equals(instance, default(T)))
+         {
+            await blobStorage.DeleteAsync(id);
+         }
+         else
+         {
+            await blobStorage.UploadTextAsync(id, instance.ToJsonString());
          }
       }
    }
