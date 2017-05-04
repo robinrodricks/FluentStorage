@@ -121,46 +121,6 @@ namespace Storage.Net.Blob.Files
       }
 
       /// <summary>
-      /// Reads blob from file and writes to the target stream
-      /// </summary>
-      public override void DownloadToStream(string id, Stream targetStream)
-      {
-         GenericValidation.CheckBlobId(id);
-         if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
-
-         using(Stream source = OpenStream(id))
-         {
-            if(source == null)
-            {
-               throw new StorageException(ErrorCode.NotFound, null);
-            }
-
-            source.CopyTo(targetStream);
-            targetStream.Flush();
-         }
-      }
-
-      /// <summary>
-      /// Reads blob from file and writes to the target stream
-      /// </summary>
-      public override async Task DownloadToStreamAsync(string id, Stream targetStream)
-      {
-         GenericValidation.CheckBlobId(id);
-         if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
-
-         using (Stream source = OpenStream(id))
-         {
-            if (source == null)
-            {
-               throw new StorageException(ErrorCode.NotFound, null);
-            }
-
-            await source.CopyToAsync(targetStream);
-            await targetStream.FlushAsync();
-         }
-      }
-
-      /// <summary>
       /// Opens the blob as a readable stream
       /// </summary>
       public override Stream OpenStreamToRead(string id)

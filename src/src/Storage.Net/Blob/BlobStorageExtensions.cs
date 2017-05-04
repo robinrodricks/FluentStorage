@@ -10,6 +10,54 @@ namespace Storage.Net.Blob
    /// </summary>
    public static class BlobStorageExtensions
    {
+
+      /// <summary>
+      /// Downloads blob to a stream
+      /// </summary>
+      /// <param name="storage"></param>
+      /// <param name="id">Blob ID, required</param>
+      /// <param name="targetStream">Target stream to copy to, required</param>
+      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      /// <exception cref="StorageException">Thrown when blob does not exist, error code set to <see cref="ErrorCode.NotFound"/></exception>
+      public static void DownloadToStream(this IBlobStorage storage, string id, Stream targetStream)
+      {
+         if (targetStream == null)
+            throw new ArgumentNullException(nameof(targetStream));
+
+         Stream src = storage.OpenStreamToRead(id);
+         if (src == null) throw new StorageException(ErrorCode.NotFound, null);
+
+         using (src)
+         {
+            src.CopyTo(targetStream);
+         }
+      }
+
+      /// <summary>
+      /// Downloads blob to a stream
+      /// </summary>
+      /// <param name="storage"></param>
+      /// <param name="id">Blob ID, required</param>
+      /// <param name="targetStream">Target stream to copy to, required</param>
+      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      /// <exception cref="StorageException">Thrown when blob does not exist, error code set to <see cref="ErrorCode.NotFound"/></exception>
+      public static async Task DownloadToStreamAsync(this IBlobStorage storage, string id, Stream targetStream)
+      {
+         if (targetStream == null)
+            throw new ArgumentNullException(nameof(targetStream));
+
+         Stream src = await storage.OpenStreamToReadAsync(id);
+         if (src == null) throw new StorageException(ErrorCode.NotFound, null);
+
+         using (src)
+         {
+            await src.CopyToAsync(targetStream);
+         }
+      }
+
+
       /// <summary>
       /// Downloads a blob to the local filesystem.
       /// </summary>

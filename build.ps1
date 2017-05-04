@@ -8,11 +8,11 @@ param(
 
 $gv = "3.5.5"
 $vt = @{
-   "Storage.Net.csproj" = "3.5.6";
-   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "1.0.0-alpha-6";
-   "Storage.Net.Amazon.Aws.csproj" = "3.5.4";
-   "Storage.Net.Microsoft.Azure.csproj" = "3.6.1";
-   "Storage.Net.Microsoft.ServiceFabric.csproj" = "1.0.0";
+   "Storage.Net.csproj" = "3.6.0";
+   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "1.0.0-alpha-7";
+   "Storage.Net.Amazon.Aws.csproj" = "3.5.5";
+   "Storage.Net.Microsoft.Azure.csproj" = "3.6.2";
+   "Storage.Net.Microsoft.ServiceFabric.csproj" = "1.0.1";
 }
 
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"

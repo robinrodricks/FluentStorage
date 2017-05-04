@@ -36,6 +36,11 @@ namespace Storage.Net.Tests.Integration
       public AwsS3BlobStorageTest() : base("aws-s3") { }
    }
 
+   public class InMemboryBlobStorageTest : BlobStorageTest
+   {
+      public InMemboryBlobStorageTest() : base("inmemory") { }
+   }
+
    #endregion
 
    public abstract class BlobStorageTest : AbstractTestFixture
@@ -69,6 +74,9 @@ namespace Storage.Net.Tests.Integration
                   TestSettings.Instance.AwsAccessKeyId,
                   TestSettings.Instance.AwsSecretAccessKey,
                   TestSettings.Instance.AwsTestBucketName);
+               break;
+            case "inmemory":
+               _storage = StorageFactory.Blobs.InMemory();
                break;
          }
       }
@@ -129,7 +137,7 @@ namespace Storage.Net.Tests.Integration
 
          using (var s = new MemoryStream())
          {
-            _storage.DownloadToStream("/" + id, s);
+            _storage.DownloadToStream(id, s);
             contentRead = Encoding.UTF8.GetString(s.ToArray());
          }
 

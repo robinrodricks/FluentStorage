@@ -70,20 +70,6 @@ namespace Storage.Net.Aws.Blob
       }
 
       /// <summary>
-      /// Downloads object to the stream
-      /// </summary>
-      public override async Task DownloadToStreamAsync(string id, Stream targetStream)
-      {
-         GenericValidation.CheckBlobId(id);
-         if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
-
-         using (GetObjectResponse response = await GetObjectAsync(id))
-         {
-            await response.ResponseStream.CopyToAsync(targetStream);
-         }
-      }
-
-      /// <summary>
       /// Checks if the object exists by trying to fetch the details
       /// </summary>
       public override async Task<bool> ExistsAsync(string id)

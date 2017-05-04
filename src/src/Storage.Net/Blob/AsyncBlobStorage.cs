@@ -54,23 +54,6 @@ namespace Storage.Net.Blob
       /// <summary>
       /// See interface
       /// </summary>
-      public virtual void DownloadToStream(string id, Stream targetStream)
-      {
-         CallAsync(() => DownloadToStreamAsync(id, targetStream));
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
-      public virtual Task DownloadToStreamAsync(string id, Stream targetStream)
-      {
-         DownloadToStream(id, targetStream);
-         return Task.FromResult(true);
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
       public virtual bool Exists(string id)
       {
          return CallAsync(() => ExistsAsync(id));

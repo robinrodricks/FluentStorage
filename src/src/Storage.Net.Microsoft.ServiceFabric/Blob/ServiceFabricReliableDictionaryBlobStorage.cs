@@ -53,21 +53,6 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          }
       }
 
-      public override async Task DownloadToStreamAsync(string id, Stream targetStream)
-      {
-         using (var tx = await OpenCollection())
-         {
-            ConditionalValue<byte[]> value = await tx.Collection.TryGetValueAsync(tx.Tx, id);
-
-            if (!value.HasValue) throw new StorageException(ErrorCode.NotFound, null);
-
-            using (var source = new MemoryStream(value.Value))
-            {
-               await source.CopyToAsync(targetStream);
-            }
-         }
-      }
-
       public override async Task<bool> ExistsAsync(string id)
       {
          using (var tx = await OpenCollection())

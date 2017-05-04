@@ -35,6 +35,17 @@ namespace Storage.Net
       }
 
       /// <summary>
+      /// Creates an instance of blob storage which stores everyting in memory. Useful for testing purposes only or if blobs don't
+      /// take much space.
+      /// </summary>
+      /// <param name="factory">Factory reference</param>
+      /// <returns>In-memory blob storage instance</returns>
+      public static IBlobStorage InMemory(this IBlobStorageFactory factory)
+      {
+         return new InMemoryBlobStorage();
+      }
+
+      /// <summary>
       /// Creates a pair of inmemory publisher and receiver using the same block of memory
       /// </summary>
       /// <param name="factory"></param>

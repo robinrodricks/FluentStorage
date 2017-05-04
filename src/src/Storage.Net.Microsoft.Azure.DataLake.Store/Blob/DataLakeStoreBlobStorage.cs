@@ -98,26 +98,6 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          }
       }
 
-      public override async Task DownloadToStreamAsync(string id, Stream targetStream)
-      {
-         GenericValidation.CheckBlobId(id);
-         if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
-
-         var client = await GetFsClient();
-
-         try
-         {
-            using (Stream s = await client.FileSystem.OpenAsync(_accountName, id))
-            {
-               await s.CopyToAsync(targetStream);
-            }
-         }
-         catch(CloudException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
-         {
-            throw new StorageException(ErrorCode.NotFound, ex);
-         }
-      }
-
       public override async Task<Stream> OpenStreamToReadAsync(string id)
       {
          GenericValidation.CheckBlobId(id);

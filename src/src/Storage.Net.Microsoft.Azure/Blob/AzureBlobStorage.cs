@@ -176,27 +176,6 @@ namespace Storage.Net.Microsoft.Azure.Blob
       }
 
       /// <summary>
-      /// Downloads to stream
-      /// </summary>
-      public override async Task DownloadToStreamAsync(string id, Stream targetStream)
-      {
-         GenericValidation.CheckBlobId(id);
-         if (targetStream == null) throw new ArgumentNullException(nameof(targetStream));
-         id = ToInternalId(id);
-
-         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
-
-         try
-         {
-            await blob.DownloadToStreamAsync(targetStream);
-         }
-         catch(AzureStorageException ex)
-         {
-            if(!TryHandleStorageException(ex)) throw;
-         }
-      }
-
-      /// <summary>
       /// Opens stream to read
       /// </summary>
       /// <param name="id"></param>
