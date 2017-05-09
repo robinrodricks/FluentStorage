@@ -48,12 +48,13 @@ namespace Storage.Net.Tests.Integration
                Path.Combine(TestDir.FullName, "test.edb"));
          }
 
-         _tableName = "TableStorageTest" + Guid.NewGuid().ToString().Replace("-", "");
+         //_tableName = "TableStorageTest" + Guid.NewGuid().ToString().Replace("-", "");
+         _tableName = "TableStorageTest";
       }
 
       public override void Dispose()
       {
-         _tables.Delete(_tableName);
+         //_tables.Delete(_tableName);
 
          _tables.Dispose();
 
@@ -244,6 +245,18 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public void Insert_DifferentTypes_ReadsBack()
+      {
+         var row = new TableRow("pk", "rk");
+         row["str"] = new TableCell("some string", CellType.String);
+         row["int"] = new TableCell("4", CellType.Int);
+         row["bytes"] = new byte[] { 0x1, 0x2 };
+         row["date"] = DateTime.UtcNow;
+
+         _tables.Insert(_tableName, row);
+      }
+
+      [Fact]
       public void Insert_TwoRows_DoesntFail()
       {
          var row1 = new TableRow("part1", "k1");
@@ -366,7 +379,7 @@ namespace Storage.Net.Tests.Integration
          IEnumerable<TableRow> rows = _tables.Get(_tableName, "pk");
 
          Assert.NotNull(rows);
-         Assert.True(rows.Count() == 0);
+         Assert.True(!rows.Any());
       }
 
       [Fact]

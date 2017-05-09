@@ -91,6 +91,69 @@ namespace Storage.Net.Table
       }
 
       /// <summary>
+      /// Attempts to convert to double data type, and if not successful returns 0
+      /// </summary>
+      /// <param name="cell"></param>
+      public static implicit operator double(TableCell cell)
+      {
+         if (cell == null) return default(double);
+
+         double.TryParse(cell.RawValue, out double result);
+         return result;
+      }
+
+      /// <summary>
+      /// Constructs from double data type
+      /// </summary>
+      /// <param name="d"></param>
+      public static implicit operator TableCell(double d)
+      {
+         return new TableCell(d.ToString(), CellType.Double);
+      }
+
+      /// <summary>
+      /// Attempts to convert to Guid data type, and if not successful returns default Guid
+      /// </summary>
+      /// <param name="cell"></param>
+      public static implicit operator Guid(TableCell cell)
+      {
+         if (cell == null) return default(Guid);
+
+         Guid.TryParse(cell.RawValue, out Guid result);
+         return result;
+      }
+
+      /// <summary>
+      /// Constructs from byte[] data type
+      /// </summary>
+      /// <param name="d"></param>
+      public static implicit operator TableCell(byte[] bytes)
+      {
+         return new TableCell(bytes == null ? null : Convert.ToBase64String(bytes), CellType.ByteArray);
+      }
+
+      /// <summary>
+      /// Attempts to convert to byte[] data type, and if not successful returns null
+      /// </summary>
+      /// <param name="cell"></param>
+      public static implicit operator byte[](TableCell cell)
+      {
+         if (cell == null || cell.RawValue == null) return null;
+
+         return cell.RawValue.Base64DecodeAsBytes();
+      }
+
+
+      /// <summary>
+      /// Constructs from Guid data type
+      /// </summary>
+      /// <param name="g"></param>
+      public static implicit operator TableCell(Guid g)
+      {
+         return new TableCell(g.ToString(), CellType.Guid);
+      }
+
+      /// <summary>
       /// Attempts to convert to DateTime, and if not successful fails miserably
       /// </summary>
       /// <param name="cell"></param>

@@ -21,6 +21,11 @@
       Long,
 
       /// <summary>
+      /// Double
+      /// </summary>
+      Double,
+
+      /// <summary>
       /// DateTime
       /// </summary>
       DateTime,
@@ -33,6 +38,16 @@
       /// <summary>
       /// Enumeration
       /// </summary>
-      Enum
+      Enum,
+
+      /// <summary>
+      /// Guid
+      /// </summary>
+      Guid,
+
+      /// <summary>
+      /// Array of bytes
+      /// </summary>
+      ByteArray
    }
 }

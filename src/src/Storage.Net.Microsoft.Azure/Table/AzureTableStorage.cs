@@ -402,7 +402,38 @@ namespace Storage.Net.Microsoft.Azure.Table
             var dic = new Dictionary<string, EntityProperty>();
             foreach (KeyValuePair<string, TableCell> cell in _row)
             {
-               dic[cell.Key] = EntityProperty.GeneratePropertyForString(cell.Value);
+               EntityProperty ep;
+
+               switch(cell.Value.DataType)
+               {
+                  case CellType.Boolean:
+                     ep = EntityProperty.GeneratePropertyForBool(cell.Value);
+                     break;
+                  case CellType.DateTime:
+                     ep = EntityProperty.GeneratePropertyForDateTimeOffset((DateTime)cell.Value);
+                     break;
+                  case CellType.Int:
+                     ep = EntityProperty.GeneratePropertyForInt(cell.Value);
+                     break;
+                  case CellType.Long:
+                     ep = EntityProperty.GeneratePropertyForLong(cell.Value);
+                     break;
+                  case CellType.Double:
+                     ep = EntityProperty.GeneratePropertyForDouble(cell.Value);
+                     break;
+                  case CellType.Guid:
+                     ep = EntityProperty.GeneratePropertyForGuid(cell.Value);
+                     break;
+                  case CellType.ByteArray:
+                     ep = EntityProperty.GeneratePropertyForByteArray(cell.Value);
+                     break;
+                  case CellType.Enum:
+                  default:
+                     ep = EntityProperty.GeneratePropertyForString(cell.Value);
+                     break;
+               }
+
+               dic[cell.Key] = ep;
             }
             return dic;
          }
