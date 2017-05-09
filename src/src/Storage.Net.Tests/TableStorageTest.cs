@@ -257,6 +257,32 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public void Insert_Entities_ReadsBack()
+      {
+         var e = new TestEntity
+         {
+            PartitionKey = "pk",
+            RowKey = "rke",
+
+            M1 = "a string",
+            Date = DateTime.UtcNow
+         };
+
+         _tables.Insert(_tableName, new[] { e });
+      }
+
+      class TestEntity
+      {
+         public string PartitionKey { get; set; }
+
+         public string RowKey { get; set; }
+
+         public string M1 { get; set; }
+
+         public DateTime Date { get; set; }
+      }
+
+      [Fact]
       public void Insert_TwoRows_DoesntFail()
       {
          var row1 = new TableRow("part1", "k1");

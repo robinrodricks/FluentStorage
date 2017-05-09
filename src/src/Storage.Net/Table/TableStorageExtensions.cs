@@ -7,6 +7,8 @@ namespace Storage.Net.Table
    /// </summary>
    public static class TableStorageExtensions
    {
+      private static readonly EntityConverter converter = new EntityConverter();
+
       /// <summary>
       /// Inserts a single row
       /// </summary>
@@ -18,9 +20,9 @@ namespace Storage.Net.Table
       /// </exception>
       public static void Insert(this ITableStorage storage, string tableName, TableRow row)
       {
-         //if (row == null) return;
+         if (row == null) return;
 
-         storage.Insert(tableName, row == null ? null : new[] { row });
+         storage.Insert(tableName, new[] { row });
       }
 
       /// <summary>
@@ -37,6 +39,13 @@ namespace Storage.Net.Table
          if (row == null) return;
 
          await storage.InsertAsync(tableName, new[] { row });
+      }
+
+      public static void Insert<T>(this ITableStorage storage, string tableName, T[] entities)
+      {
+         TableRow[] rows = converter.Convert(entities);
+
+         storage.Insert(tableName, rows);
       }
 
       /// <summary>
