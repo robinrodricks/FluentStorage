@@ -221,7 +221,7 @@ namespace Storage.Net.Table
       }
 
       /// <summary>
-      /// 
+      /// Returns string representation
       /// </summary>
       /// <returns></returns>
       public override string ToString()

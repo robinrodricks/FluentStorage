@@ -126,7 +126,7 @@ namespace Storage.Net.Table
       /// <summary>
       /// Constructs from byte[] data type
       /// </summary>
-      /// <param name="d"></param>
+      /// <param name="bytes"></param>
       public static implicit operator TableCell(byte[] bytes)
       {
          return new TableCell(bytes == null ? null : Convert.ToBase64String(bytes), CellType.ByteArray);

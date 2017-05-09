@@ -88,14 +88,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
          var client = await GetFsClient();
 
-         try
-         {
-            await client.FileSystem.DeleteAsync(_accountName, id);
-         }
-         catch(Exception ex)
-         {
-            throw;
-         }
+         await client.FileSystem.DeleteAsync(_accountName, id);
       }
 
       public override async Task<Stream> OpenStreamToReadAsync(string id)

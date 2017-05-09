@@ -8,11 +8,21 @@ namespace Storage.Net.Messaging
    /// </summary>
    public static class MessagingExtensions
    {
+      /// <summary>
+      /// Puts a single message into the queue
+      /// </summary>
+      /// <param name="publisher">Publisher reference</param>
+      /// <param name="message">Message to put</param>
       public static void PutMessage(this IMessagePublisher publisher, QueueMessage message)
       {
          publisher.PutMessages(new[] { message });
       }
 
+      /// <summary>
+      /// Puts a single message into the queue
+      /// </summary>
+      /// <param name="publisher">Publisher reference</param>
+      /// <param name="message">Message to put</param>
       public static async Task PutMessageAsync(this IMessagePublisher publisher, QueueMessage message)
       {
          await publisher.PutMessagesAsync(new[] { message });

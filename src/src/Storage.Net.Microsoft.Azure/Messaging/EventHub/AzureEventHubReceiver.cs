@@ -92,33 +92,52 @@ namespace Storage.Net.Microsoft.Azure.Messaging.EventHub
          }
       }
 
+
+      /// <summary>
+      /// See interface
+      /// </summary>
       public override Task ConfirmMessageAsync(QueueMessage message)
       {
          //nothing to confirm
          return Task.FromResult(true);
       }
 
+      /// <summary>
+      /// See interface
+      /// </summary>
       public override void ConfirmMessage(QueueMessage message)
       {
          //nothing to confirm
       }
 
+      /// <summary>
+      /// See interface
+      /// </summary>
       public override Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
       {
          //no dead letter queue in EH
          return Task.FromResult(true);
       }
 
+      /// <summary>
+      /// See interface
+      /// </summary>
       public override void DeadLetter(QueueMessage message, string reason, string errorDescription)
       {
          //no dead letter queue in EH
       }
 
+      /// <summary>
+      /// See interface
+      /// </summary>
       public override Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
       {
          return Task.FromResult<IEnumerable<QueueMessage>>(null);
       }
 
+      /// <summary>
+      /// See interface
+      /// </summary>
       public override async Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessageAsync)
       {
          await CheckReady();

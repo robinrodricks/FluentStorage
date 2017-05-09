@@ -35,7 +35,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
       /// <param name="queueName">Queue name</param>
       /// <param name="messageVisibilityTimeout">
       /// Timeout value passed in GetMessage call in the Storage Queue. The value indicates how long the message
-      /// will be hidden before it reappears in the queue. Therefore you must call <see cref="ConfirmMessage(QueueMessage)"/>
+      /// will be hidden before it reappears in the queue. Therefore you must call <see cref="ConfirmMessageAsync(QueueMessage)"/>
       /// to complete and delete it.
       /// </param>
       public AzureStorageQueueReceiver(string accountName, string storageKey, string queueName,
@@ -53,7 +53,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.Storage
       /// <param name="queueName">Queue name</param>
       /// <param name="messageVisibilityTimeout">
       /// Timeout value passed in GetMessage call in the Storage Queue. The value indicates how long the message
-      /// will be hidden before it reappears in the queue. Therefore you must call <see cref="ConfirmMessage(QueueMessage)"/>
+      /// will be hidden before it reappears in the queue. Therefore you must call <see cref="ConfirmMessageAsync(QueueMessage)"/>
       /// to complete and delete it.
       /// </param>
       /// <param name="messagePumpPollingTimeout">

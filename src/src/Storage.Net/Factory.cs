@@ -44,18 +44,5 @@ namespace Storage.Net
       {
          return new InMemoryBlobStorage();
       }
-
-      /// <summary>
-      /// Creates a pair of inmemory publisher and receiver using the same block of memory
-      /// </summary>
-      /// <param name="factory"></param>
-      /// <param name="receiver">Receiver</param>
-      /// <returns>Publisher</returns>
-      /*public static IMessagePublisher InMemory(this IMessagingFactory factory, out IMessageReceiver receiver)
-      {
-         var inmem = new InMemoryMessagePublisherReceiver();
-         receiver = inmem;
-         return inmem;
-      }*/
    }
 }
