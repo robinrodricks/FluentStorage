@@ -41,11 +41,40 @@ namespace Storage.Net.Table
          await storage.InsertAsync(tableName, new[] { row });
       }
 
+      /// <summary>
+      /// Extension method to use entities instead of TableRows
+      /// </summary>
       public static void Insert<T>(this ITableStorage storage, string tableName, T[] entities)
       {
          TableRow[] rows = converter.Convert(entities);
 
          storage.Insert(tableName, rows);
+      }
+
+      /// <summary>
+      /// Extension method to use entities instead of TableRows
+      /// </summary>
+      public static async Task InsertAsync<T>(this ITableStorage storage, string tableName, T[] entities)
+      {
+         TableRow[] rows = converter.Convert(entities);
+
+         await storage.InsertAsync(tableName, rows);
+      }
+
+      /// <summary>
+      /// Extension method to use entities instead of TableRows
+      /// </summary>
+      public static void Insert<T>(this ITableStorage storage, string tableName, T entity)
+      {
+         Insert(storage, tableName, new[] { entity });
+      }
+
+      /// <summary>
+      /// Extension method to use entities instead of TableRows
+      /// </summary>
+      public static async Task InsertAsync<T>(this ITableStorage storage, string tableName, T entity)
+      {
+         await InsertAsync(storage, tableName, new[] { entity });
       }
 
       /// <summary>
