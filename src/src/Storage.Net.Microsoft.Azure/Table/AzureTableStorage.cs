@@ -456,7 +456,33 @@ namespace Storage.Net.Microsoft.Azure.Table
          result.Id.LastModified = az.Timestamp;
          foreach (KeyValuePair<string, EntityProperty> pair in az.Properties)
          {
-            result[pair.Key] = pair.Value.StringValue;
+            switch(pair.Value.PropertyType)
+            {
+               case EdmType.Boolean:
+                  result[pair.Key] = pair.Value.BooleanValue;
+                  break;
+               case EdmType.DateTime:
+                  result[pair.Key] = pair.Value.DateTime;
+                  break;
+               case EdmType.Int32:
+                  result[pair.Key] = pair.Value.Int32Value;
+                  break;
+               case EdmType.Int64:
+                  result[pair.Key] = pair.Value.Int64Value;
+                  break;
+               case EdmType.Double:
+                  result[pair.Key] = pair.Value.DoubleValue;
+                  break;
+               case EdmType.Guid:
+                  result[pair.Key] = pair.Value.GuidValue;
+                  break;
+               case EdmType.Binary:
+                  result[pair.Key] = pair.Value.BinaryValue;
+                  break;
+               default:
+                  result[pair.Key] = pair.Value.StringValue;
+                  break;
+            }
          }
          return result;
       }

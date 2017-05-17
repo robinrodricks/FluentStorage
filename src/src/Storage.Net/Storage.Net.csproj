@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
     <AssemblyTitle>Storage.Net</AssemblyTitle>
@@ -20,8 +20,8 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <Version>3.6.1</Version>
-    <FileVersion>3.6.1.0</FileVersion>
+    <Version>3.8.0</Version>
+    <FileVersion>3.8.0.0</FileVersion>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
     <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>
     <Description>Storage.Net abstracts storage implementation like blobs, tables and messages from the .NET Application Developer. It's aimed to provide a generic interface regardless on which storage provider you are using. It also provides both synchronous and asynchronous alternatives of all methods and implements it to the best effort possible. Supports .NET 4.5.1 and .NET Standard 1.6.</Description>

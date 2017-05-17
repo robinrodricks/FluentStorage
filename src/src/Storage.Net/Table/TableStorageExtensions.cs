@@ -181,5 +181,14 @@ namespace Storage.Net.Table
          await storage.DeleteAsync(tableName, new[] { rowId });
       }
 
+      public static T Get<T>(this ITableStorage storage, string tableName, string partitionKey, string rowKey) where T : class, new()
+      {
+         TableRow row = storage.Get(tableName, partitionKey, rowKey);
+
+         if (row == null) return null;
+
+         return converter.Convert<T>(row);
+      }
+
    }
 }

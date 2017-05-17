@@ -48,13 +48,13 @@ namespace Storage.Net.Tests.Integration
                Path.Combine(TestDir.FullName, "test.edb"));
          }
 
-         //_tableName = "TableStorageTest" + Guid.NewGuid().ToString().Replace("-", "");
-         _tableName = "TableStorageTest";
+         _tableName = "TableStorageTest" + Guid.NewGuid().ToString().Replace("-", "");
+         //_tableName = "TableStorageTest";
       }
 
       public override void Dispose()
       {
-         //_tables.Delete(_tableName);
+         _tables.Delete(_tableName);
 
          _tables.Dispose();
 
@@ -269,6 +269,9 @@ namespace Storage.Net.Tests.Integration
          };
 
          _tables.Insert(_tableName, new[] { e });
+
+
+         TestEntity fetched = _tables.Get<TestEntity>(_tableName, "pk", "rke");
       }
 
       class TestEntity

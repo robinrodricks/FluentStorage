@@ -8,8 +8,8 @@
     <PackageIconUrl>http://i.isolineltd.com/nuget/storage.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
     <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
-    <Version>1.0.1</Version>
-    <FileVersion>1.0.1.0</FileVersion>
+    <Version>1.0.2</Version>
+    <FileVersion>1.0.2.0</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Description>Provides Storage.Net integration with Azure Service Fabric. This library implements Reliable Storage as Blobs and Messages.</Description>

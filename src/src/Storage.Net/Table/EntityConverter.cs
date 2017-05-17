@@ -12,6 +12,21 @@ namespace Storage.Net.Table
       private const string PartitionKeyPropName = "PartitionKey";
       private const string RowKeyPropName = "RowKey";
 
+      public T Convert<T>(TableRow row) where T: class, new()
+      {
+         var data = new Dictionary<string, object>();
+         data[PartitionKeyPropName] = row.PartitionKey;
+         data[RowKeyPropName] = row.RowKey;
+         foreach(KeyValuePair<string, TableCell> cell in row)
+         {
+            data[cell.Key] = cell.Value.RawValue;
+         }
+
+         object result = _serializer.Deserialize(typeof(T), data);
+
+         return result as T;
+      }
+
       public TableRow[] Convert<T>(T[] entities)
       {
          List<Dictionary<string, object>> dics =
