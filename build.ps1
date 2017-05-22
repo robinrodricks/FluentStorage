@@ -12,7 +12,7 @@ $vt = @{
    "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "1.0.0-alpha-8";
    "Storage.Net.Amazon.Aws.csproj" = "3.5.6";
    "Storage.Net.Microsoft.Azure.csproj" = "3.7.1";
-   "Storage.Net.Microsoft.ServiceFabric.csproj" = "1.0.2";
+   "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204";
 }
 
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
