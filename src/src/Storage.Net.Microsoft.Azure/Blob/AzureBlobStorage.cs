@@ -43,6 +43,48 @@ namespace Storage.Net.Microsoft.Azure.Blob
       public CloudBlobContainer NativeBlobContainer => _blobContainer;
 
       /// <summary>
+      /// Get native Azure blob absolute URI by blob ID
+      /// </summary>
+      /// <param name="id">Blob ID</param>
+      /// <returns>URI of the blob or null if blob doesn't exist</returns>
+      public async Task<Uri> GetNativeBlobUriAsync(string id)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         id = ToInternalId(id);
+
+         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
+
+         bool exists = await blob.ExistsAsync();
+         if (!exists) return null;
+
+         return blob.Uri;
+      }
+
+      /// <summary>
+      /// Gets native Azure Blob absolute URI by blob ID and shared access policy
+      /// </summary>
+      /// <param name="id">Blob ID</param>
+      /// <param name="policy">SAS policy</param>
+      /// <returns>Blob URI with SAS policy, or null if blob doesn't exist</returns>
+      public async Task<Uri> GetNativeSasUri(string id, SharedAccessBlobPolicy policy)
+      {
+         GenericValidation.CheckBlobId(id);
+         if (policy == null) throw new ArgumentNullException(nameof(policy));
+
+         id = ToInternalId(id);
+
+         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
+
+         bool exists = await blob.ExistsAsync();
+         if (!exists) return null;
+
+         string sas = blob.GetSharedAccessSignature(policy);
+
+         return new Uri(blob.Uri.ToString() + sas);
+      }
+
+      /// <summary>
       /// Creates and instance from network credential and container name
       /// </summary>
       /// <param name="credential"></param>
