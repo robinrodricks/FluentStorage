@@ -17,10 +17,11 @@ namespace Storage.Net.Microsoft.Azure.Messaging.EventHub
          return ev;
       }
 
-      public static QueueMessage ToQueueMessage(EventData ed)
+      public static QueueMessage ToQueueMessage(EventData ed, string partitionId)
       {
          var r = new QueueMessage(ed.Body.Array);
          r.Properties.AddRange(ed.Properties.ToDictionary(kv => kv.Key, kv => kv.Value?.ToString()));
+         r.Properties.Add("x-eventhub-partitionid", partitionId);
          return r;
       }
    }

@@ -160,7 +160,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.EventHub
 
                foreach(EventData ed in events)
                {
-                  QueueMessage qm = Converter.ToQueueMessage(ed);
+                  QueueMessage qm = Converter.ToQueueMessage(ed, receiver.PartitionId);
 
                   await onMessage(qm);
 
