@@ -67,63 +67,27 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Writes blob to file
       /// </summary>
-      public override void UploadFromStream(string id, Stream sourceStream)
+      public override Stream OpenWrite(string id)
       {
          GenericValidation.CheckBlobId(id);
-         if(sourceStream == null) throw new ArgumentNullException(nameof(sourceStream));
 
-         using(Stream target = CreateStream(id))
-         {
-            sourceStream.CopyTo(target);
-         }
-      }
-
-      /// <summary>
-      /// Writes blob to file
-      /// </summary>
-      public override async Task UploadFromStreamAsync(string id, Stream sourceStream)
-      {
-         GenericValidation.CheckBlobId(id);
-         if (sourceStream == null) throw new ArgumentNullException(nameof(sourceStream));
-
-         using (Stream target = CreateStream(id))
-         {
-            await sourceStream.CopyToAsync(target);
-         }
+         return CreateStream(id);
       }
 
       /// <summary>
       /// Append chunk to file
       /// </summary>
-      public override void AppendFromStream(string id, Stream chunkStream)
+      public override Stream OpenAppend(string id)
       {
          GenericValidation.CheckBlobId(id);
-         if (chunkStream == null) throw new ArgumentNullException(nameof(chunkStream));
 
-         using (Stream target = CreateStream(id, false))
-         {
-            chunkStream.CopyTo(target);
-         }
-      }
-
-      /// <summary>
-      /// Append chunk to file
-      /// </summary>
-      public override async Task AppendFromStreamAsync(string id, Stream chunkStream)
-      {
-         GenericValidation.CheckBlobId(id);
-         if (chunkStream == null) throw new ArgumentNullException(nameof(chunkStream));
-
-         using (Stream target = CreateStream(id, false))
-         {
-            await chunkStream.CopyToAsync(target);
-         }
+         return CreateStream(id, false);
       }
 
       /// <summary>
       /// Opens the blob as a readable stream
       /// </summary>
-      public override Stream OpenStreamToRead(string id)
+      public override Stream OpenRead(string id)
       {
          GenericValidation.CheckBlobId(id);
 

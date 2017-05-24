@@ -99,8 +99,10 @@ namespace Storage.Net.Tests.Integration
       {
          int count = _tables.ListTableNames().Count();
 
-         var row1 = new TableRow("part1", "k1");
-         row1["col1"] = "value1";
+         var row1 = new TableRow("part1", "k1")
+         {
+            ["col1"] = "value1"
+         };
          _tables.Insert(_tableName, new[] {row1});
 
          var names = _tables.ListTableNames().ToList();
@@ -112,11 +114,14 @@ namespace Storage.Net.Tests.Integration
       [Fact]
       public void DeleteRows_AddTwoRows_DeletedDisappears()
       {
-         var row1 = new TableRow("part1", "1");
-         row1["col1"] = "value1";
-         var row2 = new TableRow("part1", "2");
-         row2["col1"] = "value2";
-
+         var row1 = new TableRow("part1", "1")
+         {
+            ["col1"] = "value1"
+         };
+         var row2 = new TableRow("part1", "2")
+         {
+            ["col1"] = "value2"
+         };
          _tables.Insert(_tableName, new[] {row1, row2});
          _tables.Delete(_tableName, new[] {new TableRowId("part1", "2")});
          var rows = _tables.Get(_tableName, "part1");
@@ -148,8 +153,10 @@ namespace Storage.Net.Tests.Integration
          if (!_tables.HasOptimisticConcurrency) return;
 
          //insert one row
-         var row = new TableRow("pk", "rk");
-         row["c"] = "1";
+         var row = new TableRow("pk", "rk")
+         {
+            ["c"] = "1"
+         };
          _tables.Insert(_tableName, row);
          Assert.NotNull(row.Id.ConcurrencyKey);
 
@@ -167,14 +174,18 @@ namespace Storage.Net.Tests.Integration
          if (!_tables.HasOptimisticConcurrency) return;
 
          //insert one row
-         var row = new TableRow("pk", "rk");
-         row["c"] = "1";
+         var row = new TableRow("pk", "rk")
+         {
+            ["c"] = "1"
+         };
          _tables.Insert(_tableName, row);
          Assert.NotNull(row.Id.ConcurrencyKey);
 
          //update with a new value
-         var row1 = new TableRow("pk", "rk");
-         row1["c"] = "2";
+         var row1 = new TableRow("pk", "rk")
+         {
+            ["c"] = "2"
+         };
          _tables.Merge(_tableName, row1);
          Assert.NotNull(row1.Id.ConcurrencyKey);
          Assert.NotEqual(row.Id.ConcurrencyKey, row1.Id.ConcurrencyKey);
@@ -193,7 +204,7 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void insert_MultipleRowsNullTable_ArgumentNullException()
+      public void Insert_MultipleRowsNullTable_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() =>
          {
@@ -222,14 +233,16 @@ namespace Storage.Net.Tests.Integration
       [Fact]
       public void Insert_VariableRows_StillReads()
       {
-         var row1 = new TableRow("pk", "rk1");
-         row1["col1"] = "val1";
-         row1["col2"] = "val2";
-
-         var row2 = new TableRow("pk", "rk2");
-         row2["col2"] = "val2";
-         row2["col3"] = "val3";
-
+         var row1 = new TableRow("pk", "rk1")
+         {
+            ["col1"] = "val1",
+            ["col2"] = "val2"
+         };
+         var row2 = new TableRow("pk", "rk2")
+         {
+            ["col2"] = "val2",
+            ["col3"] = "val3"
+         };
          _tables.Insert(_tableName, new[] {row1, row2});
 
          TableRow row11 = _tables.Get(_tableName, "pk", "rk1");
@@ -247,12 +260,13 @@ namespace Storage.Net.Tests.Integration
       [Fact]
       public void Insert_DifferentTypes_ReadsBack()
       {
-         var row = new TableRow("pk", "rk");
-         row["str"] = new TableCell("some string", CellType.String);
-         row["int"] = new TableCell("4", CellType.Int);
-         row["bytes"] = new byte[] { 0x1, 0x2 };
-         row["date"] = DateTime.UtcNow;
-
+         var row = new TableRow("pk", "rk")
+         {
+            ["str"] = new TableCell("some string", CellType.String),
+            ["int"] = new TableCell("4", CellType.Int),
+            ["bytes"] = new byte[] { 0x1, 0x2 },
+            ["date"] = DateTime.UtcNow
+         };
          _tables.Insert(_tableName, row);
       }
 
@@ -288,12 +302,14 @@ namespace Storage.Net.Tests.Integration
       [Fact]
       public void Insert_TwoRows_DoesntFail()
       {
-         var row1 = new TableRow("part1", "k1");
-         row1["col1"] = "value1";
-
-         var row2 = new TableRow("part2", "1");
-         row2["col1"] = "value2";
-
+         var row1 = new TableRow("part1", "k1")
+         {
+            ["col1"] = "value1"
+         };
+         var row2 = new TableRow("part2", "1")
+         {
+            ["col1"] = "value2"
+         };
          _tables.Insert(_tableName, new[] { row1, row2 });
       }
 
@@ -429,11 +445,14 @@ namespace Storage.Net.Tests.Integration
       [Fact]
       public void Get_AddTwoRows_ReturnsTheOne()
       {
-         var row1 = new TableRow("part1", "1");
-         row1["col1"] = "value1";
-         var row2 = new TableRow("part1", "2");
-         row2["col1"] = "value2";
-
+         var row1 = new TableRow("part1", "1")
+         {
+            ["col1"] = "value1"
+         };
+         var row2 = new TableRow("part1", "2")
+         {
+            ["col1"] = "value2"
+         };
          _tables.Insert(_tableName, new[] { row1, row2 });
 
          TableRow theOne = _tables.Get(_tableName, "part1", "2");

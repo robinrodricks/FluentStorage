@@ -26,7 +26,7 @@ namespace Storage.Net.Blob
          if (targetStream == null)
             throw new ArgumentNullException(nameof(targetStream));
 
-         Stream src = storage.OpenStreamToRead(id);
+         Stream src = storage.OpenRead(id);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
 
          using (src)
@@ -49,7 +49,7 @@ namespace Storage.Net.Blob
          if (targetStream == null)
             throw new ArgumentNullException(nameof(targetStream));
 
-         Stream src = await storage.OpenStreamToReadAsync(id);
+         Stream src = await storage.OpenReadAsync(id);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
 
          using (src)
@@ -67,7 +67,7 @@ namespace Storage.Net.Blob
       /// <param name="filePath">Full path to the local file to be downloaded to. If the file exists it will be recreated wtih blob data.</param>
       public static void DownloadToFile(this IBlobStorage storage, string id, string filePath)
       {
-         Stream src = storage.OpenStreamToRead(id);
+         Stream src = storage.OpenRead(id);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
 
          using (src)
@@ -88,7 +88,7 @@ namespace Storage.Net.Blob
       /// <param name="filePath">Full path to the local file to be downloaded to. If the file exists it will be recreated wtih blob data.</param>
       public static async Task DownloadToFileAsync(this IBlobStorage storage, string id, string filePath)
       {
-         Stream src = storage.OpenStreamToRead(id);
+         Stream src = storage.OpenRead(id);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
 
          using (src)
@@ -111,7 +111,10 @@ namespace Storage.Net.Blob
       {
          using (Stream src = File.OpenRead(filePath))
          {
-            blobStorage.UploadFromStream(id, src);
+            using (Stream dest = blobStorage.OpenWrite(id))
+            {
+               src.CopyTo(dest);
+            }
          }
       }
 
@@ -125,7 +128,10 @@ namespace Storage.Net.Blob
       {
          using (Stream src = File.OpenRead(filePath))
          {
-            await blobStorage.UploadFromStreamAsync(id, src);
+            using (Stream dest = await blobStorage.OpenWriteAsync(id))
+            {
+               await src.CopyToAsync(dest);
+            }
          }
       }
 
@@ -139,7 +145,10 @@ namespace Storage.Net.Blob
       {
          using (Stream s = text.ToMemoryStream())
          {
-            blobStorage.UploadFromStream(id, s);
+            using (Stream dest = blobStorage.OpenWrite(id))
+            {
+               s.CopyTo(dest);
+            }
          }
       }
 
@@ -153,7 +162,10 @@ namespace Storage.Net.Blob
       {
          using (Stream s = text.ToMemoryStream())
          {
-            await blobStorage.UploadFromStreamAsync(id, s);
+            using (Stream dest = await blobStorage.OpenWriteAsync(id))
+            {
+               await s.CopyToAsync(dest);
+            }
          }
       }
 
@@ -165,7 +177,7 @@ namespace Storage.Net.Blob
       /// <returns>Text representation of the blob</returns>
       public static string DownloadText(this IBlobStorage blobStorage, string id)
       {
-         Stream src = blobStorage.OpenStreamToRead(id);
+         Stream src = blobStorage.OpenRead(id);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
 
          var ms = new MemoryStream();
@@ -185,7 +197,7 @@ namespace Storage.Net.Blob
       /// <returns>Text representation of the blob</returns>
       public static async Task<string> DownloadTextAsync(this IBlobStorage blobStorage, string id)
       {
-         Stream src = blobStorage.OpenStreamToRead(id);
+         Stream src = blobStorage.OpenRead(id);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
 
          var ms = new MemoryStream();
@@ -198,6 +210,34 @@ namespace Storage.Net.Blob
       }
 
       /// <summary>
+      /// Takes an input stream and appends it to the end of the blob
+      /// </summary>
+      /// <param name="blobStorage">Blob stgorage reference</param>
+      /// <param name="id">Blob ID to append to</param>
+      /// <param name="chunkStream">Input stream to read and append to blob</param>
+      public static void AppendStream(this IBlobStorage blobStorage, string id, Stream chunkStream)
+      {
+         using (Stream dest = blobStorage.OpenAppend(id))
+         {
+            chunkStream.CopyTo(dest);
+         }
+      }
+
+      /// <summary>
+      /// Takes an input stream and appends it to the end of the blob
+      /// </summary>
+      /// <param name="blobStorage">Blob stgorage reference</param>
+      /// <param name="id">Blob ID to append to</param>
+      /// <param name="chunkStream">Input stream to read and append to blob</param>
+      public static async Task AppendStreamAsync(this IBlobStorage blobStorage, string id, Stream chunkStream)
+      {
+         using (Stream dest = await blobStorage.OpenAppendAsync(id))
+         {
+            await chunkStream.CopyToAsync(dest);
+         }
+      }
+
+      /// <summary>
       /// Copies blob to another storage
       /// </summary>
       /// <param name="blobStorage">Source storage</param>
@@ -206,12 +246,15 @@ namespace Storage.Net.Blob
       /// <param name="newId">Optional, when specified uses this id in the target storage. If null uses the original ID.</param>
       public static void CopyTo(this IBlobStorage blobStorage, string blobId, IBlobStorage targetStorage, string newId)
       {
-         Stream src = blobStorage.OpenStreamToRead(blobId);
+         Stream src = blobStorage.OpenRead(blobId);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
 
          using (src)
          {
-            targetStorage.UploadFromStream(newId ?? blobId, src);
+            using (Stream dest = targetStorage.OpenWrite(newId ?? blobId))
+            {
+               src.CopyTo(dest);
+            }
          }
       }
 
@@ -224,12 +267,15 @@ namespace Storage.Net.Blob
       /// <param name="newId">Optional, when specified uses this id in the target storage. If null uses the original ID.</param>
       public static async Task CopyToAsync(this IBlobStorage blobStorage, string blobId, IBlobStorage targetStorage, string newId)
       {
-         Stream src = await blobStorage.OpenStreamToReadAsync(blobId);
+         Stream src = await blobStorage.OpenReadAsync(blobId);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
 
          using (src)
          {
-            await targetStorage.UploadFromStreamAsync(newId ?? blobId, src);
+            using (Stream dest = await targetStorage.OpenWriteAsync(newId ?? blobId))
+            {
+               await src.CopyToAsync(dest);
+            }
          }
       }
 
@@ -318,5 +364,38 @@ namespace Storage.Net.Blob
             await blobStorage.UploadTextAsync(id, instance.ToJsonString());
          }
       }
+
+      /// <summary>
+      /// Upload blob from the passed stream
+      /// </summary>
+      /// <param name="blobStorage">Blob storage reference</param>
+      /// <param name="id">Blob ID</param>
+      /// <param name="s">Input stream</param>
+      public static void UploadFromStream(this IBlobStorage blobStorage, string id, Stream s)
+      {
+         if (s == null) throw new ArgumentNullException(nameof(s));
+
+         using (Stream dest = blobStorage.OpenWrite(id))
+         {
+            s.CopyTo(dest);
+         }
+      }
+
+      /// <summary>
+      /// Upload blob from the passed stream
+      /// </summary>
+      /// <param name="blobStorage">Blob storage reference</param>
+      /// <param name="id">Blob ID</param>
+      /// <param name="s">Input stream</param>
+      public static async Task UploadFromStreamAsync(this IBlobStorage blobStorage, string id, Stream s)
+      {
+         if (s == null) throw new ArgumentNullException(nameof(s));
+
+         using (Stream dest = await blobStorage.OpenWriteAsync(id))
+         {
+            await s.CopyToAsync(dest);
+         }
+      }
+
    }
 }

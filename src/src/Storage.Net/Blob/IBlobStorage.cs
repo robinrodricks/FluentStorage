@@ -43,59 +43,6 @@ namespace Storage.Net.Blob
       Task DeleteAsync(string id);
 
       /// <summary>
-      /// Uploads a new blob. When a blob with identical name already exists overwrites it.
-      /// </summary>
-      /// <param name="id">Blob ID, required.</param>
-      /// <param name="sourceStream">Source stream to copy from.</param>
-      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
-      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      void UploadFromStream(string id, Stream sourceStream);
-
-      /// <summary>
-      /// Uploads a new blob. When a blob with identical name already exists overwrites it.
-      /// </summary>
-      /// <param name="id">Blob ID, required.</param>
-      /// <param name="sourceStream">Source stream to copy from.</param>
-      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
-      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task UploadFromStreamAsync(string id, Stream sourceStream);
-
-      /// <summary>
-      /// Appends a blob of data to the end of the blob.
-      /// </summary>
-      /// <param name="id">Blob ID. If blob doesn't exist it will be created.</param>
-      /// <param name="chunkStream">Block data</param>
-      void AppendFromStream(string id, Stream chunkStream);
-
-      /// <summary>
-      /// Appends a blob of data to the end of the blob.
-      /// </summary>
-      /// <param name="id">Blob ID. If blob doesn't exist it will be created.</param>
-      /// <param name="chunkStream">Block data</param>
-      Task AppendFromStreamAsync(string id, Stream chunkStream);
-
-      /// <summary>
-      /// Opens the stream asynchronously to read on demand.
-      /// </summary>
-      /// <param name="id">Blob ID, required</param>
-      /// <returns>Stream in an open state, or null if blob doesn't exist by this ID. It is your responsibility to close and dispose this
-      /// stream after use.</returns>
-      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
-      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Stream OpenStreamToRead(string id);
-
-      /// <summary>
-      /// Opens the stream asynchronously to read on demand.
-      /// </summary>
-      /// <param name="id">Blob ID, required</param>
-      /// <returns>Stream in an open state, or null if blob doesn't exist by this ID. It is your responsibility to close and dispose this
-      /// stream after use.</returns>
-      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
-      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task<Stream> OpenStreamToReadAsync(string id);
-
-
-      /// <summary>
       /// Checks if a blob exists
       /// </summary>
       /// <param name="id">Blob ID, required</param>
@@ -123,5 +70,64 @@ namespace Storage.Net.Blob
       /// <returns>Blob metadata or null if blob doesn't exist</returns>
       Task<BlobMeta> GetMetaAsync(string id);
 
+      /// <summary>
+      /// Creates a new blob and returns a writeable stream to it. If the blob already exists it will be
+      /// overwritten.
+      /// </summary>
+      /// <param name="id">Blob ID</param>
+      /// <returns>Writeable stream</returns>
+      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      Stream OpenWrite(string id);
+
+      /// <summary>
+      /// Creates a new blob and returns a writeable stream to it. If the blob already exists it will be
+      /// overwritten.
+      /// </summary>
+      /// <param name="id">Blob ID</param>
+      /// <returns>Writeable stream</returns>
+      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      Task<Stream> OpenWriteAsync(string id);
+
+      /// <summary>
+      /// Opens or creates a new blob for append operations. If the blob doesn't exist it will be created first.
+      /// overwritten.
+      /// </summary>
+      /// <param name="id">Blob ID</param>
+      /// <returns>Writeable stream</returns>
+      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      Stream OpenAppend(string id);
+
+      /// <summary>
+      /// Opens or creates a new blob for append operations. If the blob doesn't exist it will be created first.
+      /// overwritten.
+      /// </summary>
+      /// <param name="id">Blob ID</param>
+      /// <returns>Writeable stream</returns>
+      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      Task<Stream> OpenAppendAsync(string id);
+
+      /// <summary>
+      /// Opens the blob stream to read.
+      /// </summary>
+      /// <param name="id">Blob ID, required</param>
+      /// <returns>Stream in an open state, or null if blob doesn't exist by this ID. It is your responsibility to close and dispose this
+      /// stream after use.</returns>
+      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      Stream OpenRead(string id);
+
+      /// <summary>
+      /// Opens the blob stream to read.
+      /// </summary>
+      /// <param name="id">Blob ID, required</param>
+      /// <returns>Stream in an open state, or null if blob doesn't exist by this ID. It is your responsibility to close and dispose this
+      /// stream after use.</returns>
+      /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      Task<Stream> OpenReadAsync(string id);
    }
 }

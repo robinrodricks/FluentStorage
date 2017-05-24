@@ -14,10 +14,12 @@ namespace Storage.Net.Table
 
       public T Convert<T>(TableRow row) where T: class, new()
       {
-         var data = new Dictionary<string, object>();
-         data[PartitionKeyPropName] = row.PartitionKey;
-         data[RowKeyPropName] = row.RowKey;
-         foreach(KeyValuePair<string, TableCell> cell in row)
+         var data = new Dictionary<string, object>
+         {
+            [PartitionKeyPropName] = row.PartitionKey,
+            [RowKeyPropName] = row.RowKey
+         };
+         foreach (KeyValuePair<string, TableCell> cell in row)
          {
             data[cell.Key] = cell.Value.RawValue;
          }

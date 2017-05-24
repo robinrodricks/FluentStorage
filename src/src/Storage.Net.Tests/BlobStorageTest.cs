@@ -127,19 +127,11 @@ namespace Storage.Net.Tests.Integration
       public void Upload_New_CanDownload()
       {
          string content = Generator.GetRandomString(10000, false);
-         string contentRead;
          string id = Guid.NewGuid().ToString();
 
-         using(var ms = content.ToMemoryStream())
-         {
-            _storage.UploadFromStream(id, ms);
-         }
+         _storage.UploadText(id, content);
 
-         using (var s = new MemoryStream())
-         {
-            _storage.DownloadToStream(id, s);
-            contentRead = Encoding.UTF8.GetString(s.ToArray());
-         }
+         string contentRead = _storage.DownloadText(id);
 
          Assert.Equal(content, contentRead);
       }
@@ -172,13 +164,13 @@ namespace Storage.Net.Tests.Integration
       [Fact]
       public void OpenStream_NullId_ConsistentException()
       {
-         Assert.Throws<ArgumentNullException>(() => _storage.OpenStreamToRead(null));
+         Assert.Throws<ArgumentNullException>(() => _storage.OpenRead(null));
       }
 
       [Fact]
       public void OpenStream_LargeId_ConsistentException()
       {
-         Assert.Throws<ArgumentException>(() => _storage.OpenStreamToRead(Generator.GetRandomString(500, false)));
+         Assert.Throws<ArgumentException>(() => _storage.OpenRead(Generator.GetRandomString(500, false)));
       }
 
       [Fact]
@@ -186,7 +178,7 @@ namespace Storage.Net.Tests.Integration
       {
          string id = GetRandomStreamId();
 
-         using (Stream s = _storage.OpenStreamToRead(id))
+         using (Stream s = _storage.OpenRead(id))
          {
             var ms = new MemoryStream();
             s.CopyTo(ms);
@@ -288,8 +280,8 @@ namespace Storage.Net.Tests.Integration
       [Fact]
       public void Folders_SaveToSubfolders_FilesListed()
       {
-         _storage.UploadFromStream("one/two/three.json", "{}".ToMemoryStream());
-         _storage.UploadFromStream("two/three/four.json", "{p:1}".ToMemoryStream());
+         _storage.UploadText("one/two/three.json", "{}");
+         _storage.UploadText("two/three/four.json", "{p:1}");
 
          string[] files = _storage.List(null).ToArray();
 
@@ -389,13 +381,13 @@ namespace Storage.Net.Tests.Integration
          try
          {
             var ms = Generator.RandomString.ToMemoryStream();
-            _storage.AppendFromStream(id, ms);
+            _storage.AppendStream(id, ms);
 
             var meta = _storage.GetMeta(id);
             Assert.Equal(ms.Length, meta.Size);
 
             var ms1 = Generator.RandomString.ToMemoryStream();
-            _storage.AppendFromStream(id, ms1);
+            _storage.AppendStream(id, ms1);
             meta = _storage.GetMeta(id);
             Assert.Equal(ms.Length + ms1.Length, meta.Size);
          }

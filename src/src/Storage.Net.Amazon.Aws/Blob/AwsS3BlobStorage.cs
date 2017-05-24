@@ -34,14 +34,11 @@ namespace Storage.Net.Aws.Blob
       {
          if(accessKeyId == null) throw new ArgumentNullException(nameof(accessKeyId));
          if(secretAccessKey == null) throw new ArgumentNullException(nameof(secretAccessKey));
-         if(bucketName == null) throw new ArgumentNullException(nameof(bucketName));
-
          _client = new AmazonS3Client(new BasicAWSCredentials(accessKeyId, secretAccessKey), RegionEndpoint.EUWest1);
          _fileTransferUtility = new TransferUtility(_client);
-         _bucketName = bucketName;
+         _bucketName = bucketName ?? throw new ArgumentNullException(nameof(bucketName));
 
          Initialise();
-
       }
 
       private void Initialise()
@@ -137,7 +134,7 @@ namespace Storage.Net.Aws.Blob
       /// </summary>
       /// <param name="id"></param>
       /// <returns></returns>
-      public override async Task<Stream> OpenStreamToReadAsync(string id)
+      public override async Task<Stream> OpenReadAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -150,13 +147,15 @@ namespace Storage.Net.Aws.Blob
       /// </summary>
       /// <param name="id">Unique resource ID</param>
       /// <param name="sourceStream">Stream to upload</param>
-      public override async Task UploadFromStreamAsync(string id, Stream sourceStream)
+      public override async Task<Stream> OpenWriteAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
+         throw new NotImplementedException();
+
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
 
-         await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, id);
+         //await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, id);
       }
 
       /// <summary>
@@ -164,7 +163,7 @@ namespace Storage.Net.Aws.Blob
       /// </summary>
       /// <param name="id"></param>
       /// <param name="chunkStream"></param>
-      public override Task AppendFromStreamAsync(string id, Stream chunkStream)
+      public override Stream OpenAppend(string id)
       {
          throw new NotSupportedException();
       }

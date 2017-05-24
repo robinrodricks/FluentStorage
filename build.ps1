@@ -6,7 +6,7 @@ param(
    $NuGetApiKey
 )
 
-$gv = "3.5.5"
+$gv = "3.6.0"
 $vt = @{
    "Storage.Net.csproj" = "3.8.0";
    "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "1.0.0-alpha-8";

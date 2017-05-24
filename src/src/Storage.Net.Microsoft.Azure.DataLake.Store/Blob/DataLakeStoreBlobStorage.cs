@@ -65,20 +65,20 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          return new DataLakeStoreBlobStorage(accountName, credential.Domain, credential.UserName, credential.Password, null);
       }
 
-      public override async Task AppendFromStreamAsync(string id, Stream chunkStream)
+      public override async Task<Stream> OpenAppendAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
-         if (chunkStream == null) throw new ArgumentNullException(nameof(chunkStream));
 
          var client = await GetFsClient();
 
          if (await ExistsAsync(id))
          {
-            await client.FileSystem.AppendAsync(_accountName, id, new NonCloseableStream(chunkStream));
+            //await client.FileSystem.AppendAsync(_accountName, id, new NonCloseableStream(chunkStream));
+            throw new NotImplementedException();
          }
          else
          {
-            await UploadFromStreamAsync(id, chunkStream);
+            return await OpenWriteAsync(id);
          }
       }
 
@@ -91,7 +91,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          await client.FileSystem.DeleteAsync(_accountName, id);
       }
 
-      public override async Task<Stream> OpenStreamToReadAsync(string id)
+      public override async Task<Stream> OpenReadAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -190,14 +190,18 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          }
       }
 
-      public override async Task UploadFromStreamAsync(string id, Stream sourceStream)
+      public override async Task<Stream> OpenWriteAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
-         if (sourceStream == null) throw new ArgumentNullException(nameof(sourceStream));
 
          var client = await GetFsClient();
 
-         await client.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(sourceStream), true);
+         return ReaderWriterStream.Pump(async (s) =>
+         {
+            await client.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(s), true);
+         });
+
+         //await client.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(sourceStream), true);
       }
 
       private async Task<DataLakeStoreFileSystemManagementClient> GetFsClient()

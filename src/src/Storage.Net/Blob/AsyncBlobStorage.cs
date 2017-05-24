@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 
 namespace Storage.Net.Blob
@@ -10,23 +11,6 @@ namespace Storage.Net.Blob
    /// </summary>
    public abstract class AsyncBlobStorage : IBlobStorage
    {
-      /// <summary>
-      /// See interface
-      /// </summary>
-      public virtual void AppendFromStream(string id, Stream chunkStream)
-      {
-         CallAsync(() => AppendFromStreamAsync(id, chunkStream));
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
-      public virtual Task AppendFromStreamAsync(string id, Stream chunkStream)
-      {
-         AppendFromStream(id, chunkStream);
-         return Task.FromResult(true);
-      }
-
       /// <summary>
       /// See interface
       /// </summary>
@@ -102,34 +86,49 @@ namespace Storage.Net.Blob
       /// <summary>
       /// See interface
       /// </summary>
-      public virtual Stream OpenStreamToRead(string id)
+      public virtual Stream OpenRead(string id)
       {
-         return CallAsync(() => OpenStreamToReadAsync(id));
+         return CallAsync(() => OpenReadAsync(id));
       }
 
       /// <summary>
       /// See interface
       /// </summary>
-      public virtual Task<Stream> OpenStreamToReadAsync(string id)
+      public virtual Task<Stream> OpenReadAsync(string id)
       {
-         return Task.FromResult(OpenStreamToRead(id));
+         return Task.FromResult(OpenRead(id));
       }
 
       /// <summary>
       /// See interface
       /// </summary>
-      public virtual void UploadFromStream(string id, Stream sourceStream)
+      public virtual Stream OpenWrite(string id)
       {
-         CallAsync(() => UploadFromStreamAsync(id, sourceStream));
+         return CallAsync(() => OpenWriteAsync(id));
       }
 
       /// <summary>
       /// See interface
       /// </summary>
-      public virtual Task UploadFromStreamAsync(string id, Stream sourceStream)
+      public virtual Task<Stream> OpenWriteAsync(string id)
       {
-         UploadFromStream(id, sourceStream);
-         return Task.FromResult(true);
+         return Task.FromResult(OpenWrite(id));
+      }
+
+      /// <summary>
+      /// See interface
+      /// </summary>
+      public virtual Stream OpenAppend(string id)
+      {
+         return CallAsync(() => OpenAppendAsync(id));
+      }
+
+      /// <summary>
+      /// See interface
+      /// </summary>
+      public virtual Task<Stream> OpenAppendAsync(string id)
+      {
+         return Task.FromResult(OpenAppend(id));
       }
 
       private void CallAsync(Func<Task> lambda)
@@ -140,7 +139,8 @@ namespace Storage.Net.Blob
          }
          catch (AggregateException ex)
          {
-            throw ex.InnerException;
+            ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            //throw ex.InnerException;
          }
       }
 
@@ -152,7 +152,9 @@ namespace Storage.Net.Blob
          }
          catch (AggregateException ex)
          {
-            throw ex.InnerException;
+            ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            return default(T);
+            //throw ex.InnerException;
          }
       }
    }

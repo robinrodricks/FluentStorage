@@ -103,8 +103,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
          if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
          ValidateContainerName(containerName);
 
-         CloudStorageAccount account;
-         if(!CloudStorageAccount.TryParse(connectionString, out account))
+         if (!CloudStorageAccount.TryParse(connectionString, out CloudStorageAccount account))
          {
             throw new ArgumentException("could not parse provided connection string");
          }
@@ -192,29 +191,27 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// <summary>
       /// Uploads from stream
       /// </summary>
-      public override async Task UploadFromStreamAsync(string id, Stream sourceStream)
+      public override async Task<Stream> OpenWriteAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
-         if (sourceStream == null) throw new ArgumentNullException(nameof(sourceStream));
          id = ToInternalId(id);
 
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
-         await blob.UploadFromStreamAsync(sourceStream);
+         return await blob.OpenWriteAsync();
       }
 
       /// <summary>
       /// Appends to the append blob.
       /// </summary>
-      public override async Task AppendFromStreamAsync(string id, Stream chunkStream)
+      public override async Task<Stream> OpenAppendAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
-         if (chunkStream == null) throw new ArgumentNullException(nameof(chunkStream));
          id = ToInternalId(id);
 
          CloudAppendBlob cab = _blobContainer.GetAppendBlobReference(id);
-         if (!cab.ExistsAsync().Result) await cab.CreateOrReplaceAsync();
+         if (!(await cab.ExistsAsync())) await cab.CreateOrReplaceAsync();
 
-         await cab.AppendBlockAsync(chunkStream);
+         return await cab.OpenWriteAsync(false);
       }
 
       /// <summary>
@@ -222,7 +219,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// </summary>
       /// <param name="id"></param>
       /// <returns></returns>
-      public override async Task<Stream> OpenStreamToReadAsync(string id)
+      public override async Task<Stream> OpenReadAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -287,13 +284,11 @@ namespace Storage.Net.Microsoft.Azure.Blob
       private static bool TryHandleStorageException(AzureStorageException ex)
       {
 #if NETFULL
-         WebException wex = ex.InnerException as WebException;
-         if(wex != null)
+         if (ex.InnerException is WebException wex)
          {
-            var response = wex.Response as HttpWebResponse;
-            if(response != null)
+            if (wex.Response is HttpWebResponse response)
             {
-               if(response.StatusCode == HttpStatusCode.NotFound)
+               if (response.StatusCode == HttpStatusCode.NotFound)
                {
                   throw new StorageException(ErrorCode.NotFound, ex);
                }

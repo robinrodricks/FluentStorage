@@ -32,9 +32,7 @@ namespace Storage.Net.Table.Files
       /// <exception cref="ArgumentNullException"></exception>
       public CsvFileTableStorage(DirectoryInfo rootDir)
       {
-         if(rootDir == null) throw new ArgumentNullException(nameof(rootDir));
-
-         _rootDir = rootDir;
+         _rootDir = rootDir ?? throw new ArgumentNullException(nameof(rootDir));
          _rootDirPath = rootDir.FullName;
       }
 
@@ -104,8 +102,7 @@ namespace Storage.Net.Table.Files
 
             if(rowKey != null)
             {
-               TableRow row;
-               if(rows.TryGetValue(rowKey, out row))
+               if (rows.TryGetValue(rowKey, out TableRow row))
                {
                   result.Add(row);
                   break;
@@ -238,14 +235,13 @@ namespace Storage.Net.Table.Files
       {
          foreach(TableRow row in rows)
          {
-            TableRow prow;
-            if(!data.TryGetValue(row.RowKey, out prow))
+            if (!data.TryGetValue(row.RowKey, out TableRow prow))
             {
                data[row.RowKey] = row;
             }
             else
             {
-               foreach(KeyValuePair<string, TableCell> line in row)
+               foreach (KeyValuePair<string, TableCell> line in row)
                {
                   prow[line.Key] = line.Value;
                }
@@ -351,8 +347,7 @@ namespace Storage.Net.Table.Files
          for(int i = 1; i < allColumnNames.Length; i++)
          {
             string name = allColumnNames[i];
-            TableCell cell;
-            if(row.TryGetValue(name, out cell))
+            if (row.TryGetValue(name, out TableCell cell))
             {
                writeableRow[i] = cell.RawValue;
             }
