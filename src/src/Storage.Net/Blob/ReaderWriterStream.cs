@@ -19,10 +19,19 @@ namespace Storage.Net.Blob
 
          Task.Factory.StartNew(async () =>
          {
-            await fn(s);
-
-            //that's when the reader is done
-            s.MarkFinished();
+            try
+            {
+               await fn(s);
+            }
+            catch (Exception ex)
+            {
+               Console.WriteLine(ex);
+            }
+            finally
+            {
+               //that's when the reader is done
+               s.MarkFinished();
+            }
          });
 
          return s;
@@ -61,6 +70,7 @@ namespace Storage.Net.Blob
             if (!_hasMoreWrites) return 0;
 
             _moreDataEvent.Wait();
+            _moreDataEvent.Reset();
          }
 
          if (_buffer.Count == 0) return 0;
@@ -71,6 +81,7 @@ namespace Storage.Net.Blob
          {
             b[i] = _buffer.Dequeue();
          }
+         Array.Copy(b, 0, buffer, offset, maxCount);
 
          return maxCount;
       }
