@@ -20,13 +20,23 @@ namespace Storage.Net.Blob
          Task.Factory.StartNew(async () =>
          {
             await fn(s);
+
+            //that's when the reader is done
+            s.MarkFinished();
          });
 
          return s;
       }
 
+      internal void MarkFinished()
+      {
+         _readerFinishedEvent.Set();
+      }
+
       private readonly Queue<byte> _buffer = new Queue<byte>();
-      private readonly ManualResetEventSlim _availEvent = new ManualResetEventSlim(false);
+      private readonly ManualResetEventSlim _moreDataEvent = new ManualResetEventSlim(false);
+      private readonly ManualResetEventSlim _readerFinishedEvent = new ManualResetEventSlim(false);
+      private bool _hasMoreWrites = true;
 
       public override bool CanRead => true;
 
@@ -48,7 +58,9 @@ namespace Storage.Net.Blob
 
          if (_buffer.Count == 0)
          {
-            _availEvent.Wait();
+            if (!_hasMoreWrites) return 0;
+
+            _moreDataEvent.Wait();
          }
 
          if (_buffer.Count == 0) return 0;
@@ -74,7 +86,10 @@ namespace Storage.Net.Blob
 
       protected override void Dispose(bool disposing)
       {
-         base.Dispose(disposing);
+         //called by a writer stream
+         _hasMoreWrites = false;
+
+         _readerFinishedEvent.Wait();
       }
 
       public override void Flush()
