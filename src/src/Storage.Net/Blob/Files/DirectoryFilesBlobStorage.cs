@@ -70,6 +70,7 @@ namespace Storage.Net.Blob.Files
       public override void Write(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckSourceStream(sourceStream);
 
          using (Stream dest = CreateStream(id))
          {
@@ -83,6 +84,7 @@ namespace Storage.Net.Blob.Files
       public override void Append(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckSourceStream(sourceStream);
 
          using (Stream dest = CreateStream(id, false))
          {

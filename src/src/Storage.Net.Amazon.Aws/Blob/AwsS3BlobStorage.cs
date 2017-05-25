@@ -147,22 +147,26 @@ namespace Storage.Net.Aws.Blob
       /// </summary>
       /// <param name="id">Unique resource ID</param>
       /// <param name="sourceStream">Stream to upload</param>
-      public override async Task WriteAsync(string id, Stream chunkStream)
+      public override async Task WriteAsync(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckSourceStream(sourceStream);
 
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
 
-         await _fileTransferUtility.UploadAsync(chunkStream, _bucketName, id);
+         await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, id);
       }
 
       /// <summary>
       /// Simulates append operation in a very inefficient way as AWS doesn't support appending to blobs. Avoid at all costs!
       /// </summary>
       /// <param name="id"></param>
-      /// <param name="chunkStream"></param>
-      public override void Append(string id, Stream chunkStream)
+      /// <param name="sourceStream"></param>
+      public override void Append(string id, Stream sourceStream)
       {
+         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckSourceStream(sourceStream);
+
          throw new NotSupportedException();
       }
 

@@ -193,6 +193,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
       public override async Task WriteAsync(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckSourceStream(sourceStream);
          id = ToInternalId(id);
 
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
@@ -205,6 +206,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
       public override async Task AppendAsync(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckSourceStream(sourceStream);
          id = ToInternalId(id);
 
          CloudAppendBlob cab = _blobContainer.GetAppendBlobReference(id);

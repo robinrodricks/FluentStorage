@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Storage.Net
 {
@@ -35,6 +36,21 @@ namespace Storage.Net
          if (id.Length > MaxBlobIdLength)
             throw new ArgumentException(string.Format(Exceptions.BlobId_TooLong, MaxBlobIdLength),
                nameof(id));
+      }
+
+      public static void CheckSourceStream(Stream inputStream)
+      {
+         if (inputStream == null) throw new ArgumentNullException(nameof(inputStream));
+
+         try
+         {
+            var l = inputStream.Length;
+         }
+         catch(NotSupportedException ex)
+         {
+            throw new ArgumentException("stream must support getting a length", nameof(inputStream), ex);
+         }
+
       }
    }
 }
