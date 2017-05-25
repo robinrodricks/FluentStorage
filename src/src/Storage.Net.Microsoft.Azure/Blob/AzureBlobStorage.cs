@@ -9,7 +9,6 @@ using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using System.Threading.Tasks;
-using NetBox.Model;
 
 namespace Storage.Net.Microsoft.Azure.Blob
 {
