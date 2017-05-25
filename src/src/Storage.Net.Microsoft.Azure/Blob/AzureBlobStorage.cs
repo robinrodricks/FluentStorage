@@ -191,19 +191,19 @@ namespace Storage.Net.Microsoft.Azure.Blob
       /// <summary>
       /// Uploads from stream
       /// </summary>
-      public override async Task<Stream> OpenWriteAsync(string id)
+      public override async Task WriteAsync(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
          id = ToInternalId(id);
 
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
-         return await blob.OpenWriteAsync();
+         await blob.UploadFromStreamAsync(sourceStream);
       }
 
       /// <summary>
       /// Appends to the append blob.
       /// </summary>
-      public override async Task<Stream> OpenAppendAsync(string id)
+      public override async Task AppendAsync(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
          id = ToInternalId(id);
@@ -211,7 +211,7 @@ namespace Storage.Net.Microsoft.Azure.Blob
          CloudAppendBlob cab = _blobContainer.GetAppendBlobReference(id);
          if (!(await cab.ExistsAsync())) await cab.CreateOrReplaceAsync();
 
-         return await cab.OpenWriteAsync(false);
+         await cab.AppendFromStreamAsync(sourceStream);
       }
 
       /// <summary>

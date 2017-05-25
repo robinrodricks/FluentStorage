@@ -67,21 +67,27 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Writes blob to file
       /// </summary>
-      public override Stream OpenWrite(string id)
+      public override void Write(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
 
-         return CreateStream(id);
+         using (Stream dest = CreateStream(id))
+         {
+            sourceStream.CopyTo(dest);
+         }
       }
 
       /// <summary>
       /// Append chunk to file
       /// </summary>
-      public override Stream OpenAppend(string id)
+      public override void Append(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
 
-         return CreateStream(id, false);
+         using (Stream dest = CreateStream(id, false))
+         {
+            sourceStream.CopyTo(dest);
+         }
       }
 
       /// <summary>

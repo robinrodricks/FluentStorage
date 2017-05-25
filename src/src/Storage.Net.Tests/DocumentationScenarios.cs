@@ -26,9 +26,9 @@ namespace Storage.Net.Tests
             TestSettings.Instance.AwsSecretAccessKey,
             TestSettings.Instance.AwsTestBucketName);
 
-         storage.UploadFromStream("folder1/file1", Generator.RandomString.ToMemoryStream());
-         storage.UploadFromStream("folder1/file2", Generator.RandomString.ToMemoryStream());
-         storage.UploadFromStream("folder2/file1", Generator.RandomString.ToMemoryStream());
+         storage.Write("folder1/file1", Generator.RandomString.ToMemoryStream());
+         storage.Write("folder1/file2", Generator.RandomString.ToMemoryStream());
+         storage.Write("folder2/file1", Generator.RandomString.ToMemoryStream());
 
          string[] folderBlobs =storage.List("folder1").ToArray();
       }
@@ -42,14 +42,14 @@ namespace Storage.Net.Tests
          string content = "test content";
          using (var s = new MemoryStream(Encoding.UTF8.GetBytes(content)))
          {
-            storage.UploadFromStream("text.txt", s);
+            storage.Write("text.txt", s);
          }
 
          using (var s = new MemoryStream(Encoding.UTF8.GetBytes(content)))
          {
             string subfolderBlobId = StoragePath.Combine("level 0", "level 1", "in the folder.log");
 
-            storage.UploadFromStream(subfolderBlobId, s);
+            storage.Write(subfolderBlobId, s);
          }
       }
 
@@ -65,13 +65,13 @@ namespace Storage.Net.Tests
          string content = "test content";
          using (var s = new MemoryStream(Encoding.UTF8.GetBytes(content)))
          {
-            storage.UploadFromStream("someid", s);
+            storage.Write("someid", s);
          }
 
          //read back
          using (var s = new MemoryStream())
          {
-            storage.DownloadToStream("someid", s);
+            storage.ReadToStream("someid", s);
 
             //content is now "test content"
             content = Encoding.UTF8.GetString(s.ToArray());

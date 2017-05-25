@@ -22,24 +22,21 @@ namespace Storage.Net.Blob
             try
             {
                await fn(s);
+               s.MarkFinished(null);
             }
             catch (Exception ex)
             {
                //todo: this has to be thrown back to _writer_
-               Console.WriteLine(ex);
-            }
-            finally
-            {
-               //that's when the reader is done
-               s.MarkFinished();
+               s.MarkFinished(ex);
             }
          });
 
          return s;
       }
 
-      internal void MarkFinished()
+      internal void MarkFinished(Exception ex)
       {
+         _readerError = ex;
          _readerFinishedEvent.Set();
       }
 
@@ -47,6 +44,7 @@ namespace Storage.Net.Blob
       private readonly ManualResetEventSlim _moreDataEvent = new ManualResetEventSlim(false);
       private readonly ManualResetEventSlim _readerFinishedEvent = new ManualResetEventSlim(false);
       private bool _hasMoreWrites = true;
+      private Exception _readerError;
 
       public override int Read(byte[] buffer, int offset, int count)
       {
@@ -75,6 +73,8 @@ namespace Storage.Net.Blob
 
       public override void Write(byte[] buffer, int offset, int count)
       {
+         if (_readerError != null) throw _readerError;
+
          //push to queue
          for(int i = offset; i < offset + count; i++)
          {
@@ -86,8 +86,9 @@ namespace Storage.Net.Blob
       {
          //called by a writer stream
          _hasMoreWrites = false;
-
          _readerFinishedEvent.Wait();
+
+         if (_readerError != null) throw _readerError;
       }
 
       public override void Flush()

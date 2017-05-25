@@ -29,7 +29,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.EventHub
 
          try
          {
-            state = await _blobStorage.DownloadTextAsync(GetBlobName(partitionId));
+            state = await _blobStorage.ReadTextAsync(GetBlobName(partitionId));
          }
          catch(StorageException ex) when (ex.ErrorCode == ErrorCode.NotFound)
          {
@@ -64,7 +64,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.EventHub
                CreatedAt = DateTime.UtcNow
             };
 
-            await _blobStorage.UploadTextAsync(GetBlobName(partitionId), state.ToJsonString());
+            await _blobStorage.WriteTextAsync(GetBlobName(partitionId), state.ToJsonString());
          }
       }
 

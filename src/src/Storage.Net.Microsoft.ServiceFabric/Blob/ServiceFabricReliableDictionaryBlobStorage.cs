@@ -20,14 +20,12 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          _collectionName = collectionName ?? throw new ArgumentNullException(nameof(collectionName));
       }
 
-      public override async Task<Stream> OpenAppendAsync(string id)
+      public override async Task AppendAsync(string id, Stream sourceStream)
       {
-         throw new NotImplementedException();
-
-         /*using (var tx = await OpenCollection())
+         using (var tx = await OpenCollection())
          {
             //create a new byte array with
-            byte[] extra = chunkStream.ToByteArray();
+            byte[] extra = sourceStream.ToByteArray();
             ConditionalValue<byte[]> value = await tx.Collection.TryGetValueAsync(tx.Tx, id);
             int oldLength = value.HasValue ? value.Value.Length : 0;
             byte[] newData = new byte[oldLength + extra.Length];
@@ -42,7 +40,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
             //commit the transaction
             await tx.CommitAsync();
-         }*/
+         }
       }
 
       public override async Task DeleteAsync(string id)
@@ -113,18 +111,18 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          }
       }
 
-      public override async Task<Stream> OpenWriteAsync(string id)
+      public override async Task WriteAsync(string id, Stream sourceStream)
       {
          throw new NotImplementedException();
 
-         /*byte[] value = sourceStream.ToByteArray();
+         byte[] value = sourceStream.ToByteArray();
 
          using (var tx = await OpenCollection())
          {
             await tx.Collection.AddOrUpdateAsync(tx.Tx, id, value, (k, v) => value);
 
             await tx.CommitAsync();
-         }*/
+         }
       }
 
       private async Task<FabricTransactionManager<IReliableDictionary<string, byte[]>>> OpenCollection()

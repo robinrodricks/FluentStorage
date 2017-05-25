@@ -88,7 +88,7 @@ namespace Storage.Net.Tests.Integration
 
          using (Stream s = "kjhlkhlkhlkhlkh".ToMemoryStream())
          {
-            _storage.UploadFromStream(id, s);
+            _storage.Write(id, s);
          }
 
          return id;
@@ -129,9 +129,9 @@ namespace Storage.Net.Tests.Integration
          string content = Generator.GetRandomString(10000, false);
          string id = Guid.NewGuid().ToString();
 
-         _storage.UploadText(id, content);
+         _storage.WriteText(id, content);
 
-         string contentRead = _storage.DownloadText(id);
+         string contentRead = _storage.ReadText(id);
 
          Assert.Equal(content, contentRead);
       }
@@ -141,7 +141,7 @@ namespace Storage.Net.Tests.Integration
       {
          using (var ms = new MemoryStream(Generator.GetRandomBytes(10, 11)))
          {
-            Assert.Throws<ArgumentNullException>(() => _storage.UploadFromStream(null, ms));
+            Assert.Throws<ArgumentNullException>(() => _storage.Write(null, ms));
          }
       }
 
@@ -151,14 +151,14 @@ namespace Storage.Net.Tests.Integration
          using (var ms = new MemoryStream(Generator.GetRandomBytes(10, 11)))
          {
             string id = Generator.GetRandomString(100000, false);
-            Assert.Throws<ArgumentException>(() => _storage.UploadFromStream(id, ms));
+            Assert.Throws<ArgumentException>(() => _storage.Write(id, ms));
          }
       }
 
       [Fact]
       public void Upload_NullStream_ConsistentException()
       {
-         Assert.Throws<ArgumentNullException>(() => _storage.UploadFromStream(Generator.GetRandomString(5, false), null));
+         Assert.Throws<ArgumentNullException>(() => _storage.Write(Generator.GetRandomString(5, false), null));
       }
 
       [Fact]
@@ -192,7 +192,7 @@ namespace Storage.Net.Tests.Integration
       {
          var ms = new MemoryStream();
 
-         Assert.Throws<ArgumentNullException>(() => _storage.DownloadToStream(null, ms));
+         Assert.Throws<ArgumentNullException>(() => _storage.ReadToStream(null, ms));
       }
 
       [Fact]
@@ -200,13 +200,13 @@ namespace Storage.Net.Tests.Integration
       {
          var ms = new MemoryStream();
 
-         Assert.Throws<ArgumentException>(() => _storage.DownloadToStream(Generator.GetRandomString(100, false), ms));
+         Assert.Throws<ArgumentException>(() => _storage.ReadToStream(Generator.GetRandomString(100, false), ms));
       }
 
       [Fact]
       public void Download_ToNullStream_ConsistentException()
       {
-         Assert.Throws<ArgumentNullException>(() => _storage.DownloadToStream("1", null));
+         Assert.Throws<ArgumentNullException>(() => _storage.ReadToStream("1", null));
       }
 
 
@@ -219,7 +219,7 @@ namespace Storage.Net.Tests.Integration
          {
             try
             {
-               _storage.DownloadToStream(id, ms);
+               _storage.ReadToStream(id, ms);
 
                Assert.True(false, "the call must fail");
             }
@@ -262,7 +262,7 @@ namespace Storage.Net.Tests.Integration
          _storage.Delete(id);
 
          var ms = new MemoryStream();
-         Assert.Throws<StorageException>(() => _storage.DownloadToStream(id, ms));
+         Assert.Throws<StorageException>(() => _storage.ReadToStream(id, ms));
       }
 
       [Fact]
@@ -280,8 +280,8 @@ namespace Storage.Net.Tests.Integration
       [Fact]
       public void Folders_SaveToSubfolders_FilesListed()
       {
-         _storage.UploadText("one/two/three.json", "{}");
-         _storage.UploadText("two/three/four.json", "{p:1}");
+         _storage.WriteText("one/two/three.json", "{}");
+         _storage.WriteText("two/three/four.json", "{p:1}");
 
          string[] files = _storage.List(null).ToArray();
 
@@ -298,7 +298,7 @@ namespace Storage.Net.Tests.Integration
       {
          _storage.Delete(input);
 
-         _storage.UploadFromStream(input, "content".ToMemoryStream());
+         _storage.Write(input, "content".ToMemoryStream());
 
          string listed = _storage.List(input).FirstOrDefault();
          Assert.NotNull(listed);
@@ -310,15 +310,15 @@ namespace Storage.Net.Tests.Integration
          string id = Generator.RandomString;
          string localFile = Path.Combine(TestDir.FullName, "blob.txt");
 
-         _storage.UploadFromStream(id, "content".ToMemoryStream());
+         _storage.Write(id, "content".ToMemoryStream());
 
-         _storage.DownloadToFile(id, localFile);
+         _storage.ReadToFile(id, localFile);
 
          string lfc = File.ReadAllText(localFile);
          Assert.Equal("content", lfc);
 
-         _storage.UploadFromFile(id + "1", localFile);
-         _storage.DownloadToFile(id + "1", localFile + "1");
+         _storage.WriteFile(id + "1", localFile);
+         _storage.ReadToFile(id + "1", localFile + "1");
 
          lfc = File.ReadAllText(localFile + "1");
          Assert.Equal("content", lfc);
@@ -330,9 +330,9 @@ namespace Storage.Net.Tests.Integration
          string id = Generator.RandomString;
          string text = Generator.RandomString;
 
-         _storage.UploadText(id, text);
+         _storage.WriteText(id, text);
 
-         string text2 = _storage.DownloadText(id);
+         string text2 = _storage.ReadText(id);
 
          Assert.Equal(text, text2);
       }
@@ -344,13 +344,13 @@ namespace Storage.Net.Tests.Integration
          string targetId = Generator.GetRandomString(10, false);
          string text = Generator.RandomString;
 
-         _storage.UploadText(sourceId, text);
+         _storage.WriteText(sourceId, text);
          Assert.False(_storage.Exists(targetId));
 
          _storage.CopyTo(sourceId, _storage, targetId);
 
          Assert.True(_storage.Exists(targetId));
-         Assert.Equal(text, _storage.DownloadText(targetId));
+         Assert.Equal(text, _storage.ReadText(targetId));
          
       }
 
@@ -360,7 +360,7 @@ namespace Storage.Net.Tests.Integration
          string id = Generator.GetRandomString(10, false);
          string text = Generator.RandomString;
 
-         _storage.UploadText(id, text);
+         _storage.WriteText(id, text);
 
          BlobMeta meta = _storage.GetMeta(id);
 
@@ -381,13 +381,13 @@ namespace Storage.Net.Tests.Integration
          try
          {
             var ms = Generator.RandomString.ToMemoryStream();
-            _storage.AppendStream(id, ms);
+            _storage.Append(id, ms);
 
             var meta = _storage.GetMeta(id);
             Assert.Equal(ms.Length, meta.Size);
 
             var ms1 = Generator.RandomString.ToMemoryStream();
-            _storage.AppendStream(id, ms1);
+            _storage.Append(id, ms1);
             meta = _storage.GetMeta(id);
             Assert.Equal(ms.Length + ms1.Length, meta.Size);
          }
@@ -409,9 +409,9 @@ namespace Storage.Net.Tests.Integration
 
          string id = Generator.GetRandomString(10, false);
 
-         _storage.Upload(id, td);
+         _storage.Write(id, td);
 
-         TestDocument td2 = _storage.Download<TestDocument>(id);
+         TestDocument td2 = _storage.Read<TestDocument>(id);
 
          Assert.Equal("string", td2.M);
       }

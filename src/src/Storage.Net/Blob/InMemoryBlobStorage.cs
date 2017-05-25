@@ -11,19 +11,21 @@ namespace Storage.Net.Blob
    {
       private readonly Dictionary<string, MemoryStream> _idToData = new Dictionary<string, MemoryStream>();
 
-      public override Stream OpenAppend(string id)
+      public override void Append(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
 
          if(!Exists(id))
          {
-            return OpenWrite(id);
+            Write(id, sourceStream);
          }
          else
          {
             MemoryStream ms = _idToData[id];
-            ms.Seek(0, SeekOrigin.End);
-            return new NonCloseableStream(ms);
+
+            byte[] part1 = ms.ToArray();
+            byte[] part2 = sourceStream.ToByteArray();
+            _idToData[id] = new MemoryStream(part1.Concat(part2).ToArray());
          }
       }
 
@@ -37,13 +39,12 @@ namespace Storage.Net.Blob
          return new NonCloseableStream(ms);
       }
 
-      public override Stream OpenWrite(string id)
+      public override void Write(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
 
-         var ms = new MemoryStream();
+         var ms = new MemoryStream(sourceStream.ToByteArray());
          _idToData[id] = ms;
-         return new NonCloseableStream(ms);
       }
 
       public override void Delete(string id)

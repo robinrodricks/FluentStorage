@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 
 namespace Storage.Net.Blob
@@ -16,7 +14,7 @@ namespace Storage.Net.Blob
       /// </summary>
       public virtual void Delete(string id)
       {
-         CallAsync(() => DeleteAsync(id));
+         G.CallAsync(() => DeleteAsync(id));
       }
 
       /// <summary>
@@ -40,7 +38,7 @@ namespace Storage.Net.Blob
       /// </summary>
       public virtual bool Exists(string id)
       {
-         return CallAsync(() => ExistsAsync(id));
+         return G.CallAsync(() => ExistsAsync(id));
       }
 
       /// <summary>
@@ -56,7 +54,7 @@ namespace Storage.Net.Blob
       /// </summary>
       public virtual BlobMeta GetMeta(string id)
       {
-         return CallAsync(() => GetMetaAsync(id));
+         return G.CallAsync(() => GetMetaAsync(id));
       }
 
       /// <summary>
@@ -72,7 +70,7 @@ namespace Storage.Net.Blob
       /// </summary>
       public virtual IEnumerable<string> List(string prefix)
       {
-         return CallAsync(() => ListAsync(prefix));
+         return G.CallAsync(() => ListAsync(prefix));
       }
 
       /// <summary>
@@ -88,7 +86,7 @@ namespace Storage.Net.Blob
       /// </summary>
       public virtual Stream OpenRead(string id)
       {
-         return CallAsync(() => OpenReadAsync(id));
+         return G.CallAsync(() => OpenReadAsync(id));
       }
 
       /// <summary>
@@ -102,60 +100,37 @@ namespace Storage.Net.Blob
       /// <summary>
       /// See interface
       /// </summary>
-      public virtual Stream OpenWrite(string id)
+      public virtual void Write(string id, Stream sourceStream)
       {
-         return CallAsync(() => OpenWriteAsync(id));
+         G.CallAsync(() => WriteAsync(id, sourceStream));
       }
 
       /// <summary>
       /// See interface
       /// </summary>
-      public virtual Task<Stream> OpenWriteAsync(string id)
+      public virtual Task WriteAsync(string id, Stream sourceStream)
       {
-         return Task.FromResult(OpenWrite(id));
+         Write(id, sourceStream);
+         return Task.FromResult(true);
       }
 
       /// <summary>
       /// See interface
       /// </summary>
-      public virtual Stream OpenAppend(string id)
+      public virtual void Append(string id, Stream sourceStream)
       {
-         return CallAsync(() => OpenAppendAsync(id));
+         G.CallAsync(() => AppendAsync(id, sourceStream));
       }
 
       /// <summary>
       /// See interface
       /// </summary>
-      public virtual Task<Stream> OpenAppendAsync(string id)
+      public virtual Task AppendAsync(string id, Stream sourceStream)
       {
-         return Task.FromResult(OpenAppend(id));
+         Append(id, sourceStream);
+
+         return Task.FromResult(true);
       }
 
-      private void CallAsync(Func<Task> lambda)
-      {
-         try
-         {
-            Task.Run(lambda).Wait();
-         }
-         catch (AggregateException ex)
-         {
-            ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-            //throw ex.InnerException;
-         }
-      }
-
-      private T CallAsync<T>(Func<Task<T>> lambda)
-      {
-         try
-         {
-            return Task.Run(lambda).Result;
-         }
-         catch (AggregateException ex)
-         {
-            ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-            return default(T);
-            //throw ex.InnerException;
-         }
-      }
    }
 }

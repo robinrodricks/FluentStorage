@@ -175,19 +175,16 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          }
       }
 
-      public override async Task<Stream> OpenWriteAsync(string id)
+      public override async Task WriteAsync(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
 
          var client = await GetFsClient();
 
-         return ReaderWriterStream.Create(async (s) =>
-         {
-            await client.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(s), true);
-         });
+         await client.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(sourceStream), true);
       }
 
-      public override async Task<Stream> OpenAppendAsync(string id)
+      public override async Task AppendAsync(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -195,16 +192,11 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
          if (await ExistsAsync(id))
          {
-            return ReaderWriterStream.Create(async (s) =>
-            {
-               await client.FileSystem.AppendAsync(_accountName, id, new NonCloseableStream(s));
-            });
-
-            throw new NotImplementedException();
+            await client.FileSystem.AppendAsync(_accountName, id, new NonCloseableStream(sourceStream));
          }
          else
          {
-            return await OpenWriteAsync(id);
+            await WriteAsync(id, sourceStream);
          }
       }
 

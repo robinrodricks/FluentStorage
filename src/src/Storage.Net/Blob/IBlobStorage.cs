@@ -75,20 +75,22 @@ namespace Storage.Net.Blob
       /// overwritten.
       /// </summary>
       /// <param name="id">Blob ID</param>
+      /// <param name="sourceStream">Source stream, must be readable and support Length</param>
       /// <returns>Writeable stream</returns>
       /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Stream OpenWrite(string id);
+      void Write(string id, Stream sourceStream);
 
       /// <summary>
       /// Creates a new blob and returns a writeable stream to it. If the blob already exists it will be
       /// overwritten.
       /// </summary>
       /// <param name="id">Blob ID</param>
+      /// <param name="sourceStream">Source stream, must be readable and support Length</param>
       /// <returns>Writeable stream</returns>
       /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task<Stream> OpenWriteAsync(string id);
+      Task WriteAsync(string id, Stream sourceStream);
 
       /// <summary>
       /// Opens or creates a new blob for append operations. If the blob doesn't exist it will be created first.
@@ -98,7 +100,7 @@ namespace Storage.Net.Blob
       /// <returns>Writeable stream</returns>
       /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Stream OpenAppend(string id);
+      void Append(string id, Stream sourceStream);
 
       /// <summary>
       /// Opens or creates a new blob for append operations. If the blob doesn't exist it will be created first.
@@ -108,7 +110,7 @@ namespace Storage.Net.Blob
       /// <returns>Writeable stream</returns>
       /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task<Stream> OpenAppendAsync(string id);
+      Task AppendAsync(string id, Stream sourceStream);
 
       /// <summary>
       /// Opens the blob stream to read.

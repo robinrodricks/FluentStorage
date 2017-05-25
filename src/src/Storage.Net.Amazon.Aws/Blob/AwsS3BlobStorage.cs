@@ -147,16 +147,13 @@ namespace Storage.Net.Aws.Blob
       /// </summary>
       /// <param name="id">Unique resource ID</param>
       /// <param name="sourceStream">Stream to upload</param>
-      public override async Task<Stream> OpenWriteAsync(string id)
+      public override async Task WriteAsync(string id, Stream chunkStream)
       {
          GenericValidation.CheckBlobId(id);
 
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
 
-         return ReaderWriterStream.Create(async (s) =>
-         {
-            await _fileTransferUtility.UploadAsync(s, _bucketName, id);
-         });
+         await _fileTransferUtility.UploadAsync(chunkStream, _bucketName, id);
       }
 
       /// <summary>
@@ -164,7 +161,7 @@ namespace Storage.Net.Aws.Blob
       /// </summary>
       /// <param name="id"></param>
       /// <param name="chunkStream"></param>
-      public override Stream OpenAppend(string id)
+      public override void Append(string id, Stream chunkStream)
       {
          throw new NotSupportedException();
       }
