@@ -17,10 +17,11 @@ namespace Storage.Net.Tests.Integration
       public AzureTableStorageTest() : base("azure") { }
    }
 
-   public class EsentTableStorageTest : TableStorageTest
+   //bored of maintaining ESENT tests when I don't really use ESENT anymore for a long time
+   /*public class EsentTableStorageTest : TableStorageTest
    {
       public EsentTableStorageTest() : base("esent") { }
-   }
+   }*/
 
    public abstract class TableStorageTest : AbstractTestFixture
    {
