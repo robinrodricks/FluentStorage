@@ -284,8 +284,25 @@ namespace Storage.Net.Tests.Integration
 
          _tables.Insert(_tableName, new[] { e });
 
-
          TestEntity fetched = _tables.Get<TestEntity>(_tableName, "pk", "rke");
+      }
+
+      [Fact]
+      public void Dates_are_travelled_in_correct_timezone()
+      {
+         DateTime date = DateTime.UtcNow;
+
+         var i = new TableRow("pk", "rk")
+         {
+            ["date"] = date
+         };
+
+         _tables.Insert(_tableName, i);
+
+         TableRow o = _tables.Get(_tableName, "pk", "rk");
+         DateTime date2 = o["date"];
+
+         Assert.Equal(date, date2);
       }
 
       class TestEntity

@@ -161,7 +161,7 @@ namespace Storage.Net.Table
       {
          if(cell == null) return default(DateTime);
 
-         return new DateTime(long.Parse(cell.RawValue));
+         return new DateTime(long.Parse(cell.RawValue), DateTimeKind.Utc);
       }
 
       /// <summary>

@@ -410,7 +410,7 @@ namespace Storage.Net.Microsoft.Azure.Table
                      ep = EntityProperty.GeneratePropertyForBool(cell.Value);
                      break;
                   case CellType.DateTime:
-                     ep = EntityProperty.GeneratePropertyForDateTimeOffset((DateTime)cell.Value);
+                     ep = EntityProperty.GeneratePropertyForDateTimeOffset(((DateTime)cell.Value).ToUniversalTime());
                      break;
                   case CellType.Int:
                      ep = EntityProperty.GeneratePropertyForInt(cell.Value);
@@ -462,7 +462,7 @@ namespace Storage.Net.Microsoft.Azure.Table
                   result[pair.Key] = pair.Value.BooleanValue;
                   break;
                case EdmType.DateTime:
-                  result[pair.Key] = pair.Value.DateTime;
+                  result[pair.Key] = pair.Value.DateTime.Value.ToUniversalTime();
                   break;
                case EdmType.Int32:
                   result[pair.Key] = pair.Value.Int32Value;
