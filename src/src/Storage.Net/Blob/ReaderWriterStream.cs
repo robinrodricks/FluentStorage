@@ -8,12 +8,12 @@ namespace Storage.Net.Blob
 {
    public class ReaderWriterStream : Stream
    {
-      public ReaderWriterStream()
+      private ReaderWriterStream()
       {
 
       }
 
-      public static Stream Pump(Func<Stream, Task> fn)
+      public static Stream Create(Func<Stream, Task> fn)
       {
          var s = new ReaderWriterStream();
 
@@ -25,6 +25,7 @@ namespace Storage.Net.Blob
             }
             catch (Exception ex)
             {
+               //todo: this has to be thrown back to _writer_
                Console.WriteLine(ex);
             }
             finally
@@ -47,29 +48,15 @@ namespace Storage.Net.Blob
       private readonly ManualResetEventSlim _readerFinishedEvent = new ManualResetEventSlim(false);
       private bool _hasMoreWrites = true;
 
-      public override bool CanRead => true;
-
-      public override bool CanSeek => false;
-
-      public override bool CanWrite => true;
-
-      public override long Length => throw new NotSupportedException();
-
-      public override long Position
-      {
-         get => throw new NotSupportedException();
-         set => throw new NotSupportedException();
-      }
-
       public override int Read(byte[] buffer, int offset, int count)
       {
          //read as much as I can
 
-         if (_buffer.Count == 0)
+         while(_buffer.Count == 0)
          {
             if (!_hasMoreWrites) return 0;
 
-            _moreDataEvent.Wait();
+            _moreDataEvent.Wait(TimeSpan.FromSeconds(1));
             _moreDataEvent.Reset();
          }
 
@@ -107,6 +94,22 @@ namespace Storage.Net.Blob
       {
       }
 
+      #region [ Unused ]
+
+      public override bool CanRead => true;
+
+      public override bool CanSeek => false;
+
+      public override bool CanWrite => true;
+
+      public override long Length => throw new NotSupportedException();
+
+      public override long Position
+      {
+         get => throw new NotSupportedException();
+         set => throw new NotSupportedException();
+      }
+
       public override long Seek(long offset, SeekOrigin origin)
       {
          throw new NotSupportedException();
@@ -117,6 +120,6 @@ namespace Storage.Net.Blob
          throw new NotSupportedException();
       }
 
-
+      #endregion
    }
 }

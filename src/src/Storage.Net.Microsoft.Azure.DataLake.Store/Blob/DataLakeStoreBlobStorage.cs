@@ -65,23 +65,6 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          return new DataLakeStoreBlobStorage(accountName, credential.Domain, credential.UserName, credential.Password, null);
       }
 
-      public override async Task<Stream> OpenAppendAsync(string id)
-      {
-         GenericValidation.CheckBlobId(id);
-
-         var client = await GetFsClient();
-
-         if (await ExistsAsync(id))
-         {
-            //await client.FileSystem.AppendAsync(_accountName, id, new NonCloseableStream(chunkStream));
-            throw new NotImplementedException();
-         }
-         else
-         {
-            return await OpenWriteAsync(id);
-         }
-      }
-
       public override async Task DeleteAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
@@ -154,6 +137,8 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
       private async Task ListByPrefixIntoContainer(DataLakeStoreFileSystemManagementClient client, string prefix, List<string> files)
       {
+         //todo: not sure whether this should list just top level files or not, but then what to do with folders?
+
          if (prefix == null)
          {
             prefix = "/";
@@ -196,12 +181,31 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
          var client = await GetFsClient();
 
-         return ReaderWriterStream.Pump(async (s) =>
+         return ReaderWriterStream.Create(async (s) =>
          {
             await client.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(s), true);
          });
+      }
 
-         //await client.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(sourceStream), true);
+      public override async Task<Stream> OpenAppendAsync(string id)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         var client = await GetFsClient();
+
+         if (await ExistsAsync(id))
+         {
+            return ReaderWriterStream.Create(async (s) =>
+            {
+               await client.FileSystem.AppendAsync(_accountName, id, new NonCloseableStream(s));
+            });
+
+            throw new NotImplementedException();
+         }
+         else
+         {
+            return await OpenWriteAsync(id);
+         }
       }
 
       private async Task<DataLakeStoreFileSystemManagementClient> GetFsClient()
