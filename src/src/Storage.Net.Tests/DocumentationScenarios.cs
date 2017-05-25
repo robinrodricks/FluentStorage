@@ -11,7 +11,7 @@ namespace Storage.Net.Tests
 {
    public class DocumentationScenarios
    {
-      [Fact]
+      //[Fact]
       public void Run()
       {
          //Blobs_save_file_to_azure_storage_and_read_it_later();

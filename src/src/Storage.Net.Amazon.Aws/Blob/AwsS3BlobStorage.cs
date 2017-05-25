@@ -151,11 +151,12 @@ namespace Storage.Net.Aws.Blob
       {
          GenericValidation.CheckBlobId(id);
 
-         throw new NotImplementedException();
-
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
 
-         //await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, id);
+         return ReaderWriterStream.Create(async (s) =>
+         {
+            await _fileTransferUtility.UploadAsync(s, _bucketName, id);
+         });
       }
 
       /// <summary>
