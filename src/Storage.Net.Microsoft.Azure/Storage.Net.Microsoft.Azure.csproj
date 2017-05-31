@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
+    <AssemblyTitle>Storage.Net.Microsoft.Azure</AssemblyTitle>
+    <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
+    <TargetFrameworks>net451;netstandard1.6</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Storage.Net.Microsoft.Azure</AssemblyName>
+    <AssemblyOriginatorKeyFile>../storage.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>Storage.Net.Microsoft.Azure</PackageId>
+    <PackageIconUrl>http://i.isolineltd.com/nuget/storage.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);dnxcore50;portable-net451+win8</PackageTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>3.7.4</Version>
+    <FileVersion>3.7.4.0</FileVersion>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <Description>Extension to Storage.Net providing integration with Microsoft Azure for Azure Storage blobs, messages, queues, azure service bus queues and topics, event hub and more. See project page for more details.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
+    <PackageReference Include="Microsoft.Azure.EventHubs" Version="1.0.1" />
+    <PackageReference Include="Microsoft.Azure.EventHubs.Processor" Version="1.0.1" />
+    <PackageReference Include="WindowsAzure.Storage" Version="8.1.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="netbox" Version="1.4.1" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+    <PackageReference Include="WindowsAzure.ServiceBus" Version="3.4.5" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net451' ">
+    <DefineConstants>$(DefineConstants);NETFULL</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
+  </PropertyGroup>
+</Project>

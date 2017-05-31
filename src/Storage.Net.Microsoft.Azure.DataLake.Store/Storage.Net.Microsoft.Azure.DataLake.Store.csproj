@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.6;net451</TargetFrameworks>
+    <AssemblyOriginatorKeyFile>../storage.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <Version>1.0.0-alpha-8</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>
+    <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
+    <PackageIconUrl>http://i.isolineltd.com/nuget/storage.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
+    <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Description>Provides Azure Data Lake Store integration for Storage.Net library</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Management.DataLake.Store" Version="2.1.1-preview" />
+    <PackageReference Include="Microsoft.Rest.ClientRuntime.Azure.Authentication" Version="2.2.12" />
+    <PackageReference Include="NetBox" Version="1.4.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net451</TargetFramework>
+    <RepositoryType>GitHub</RepositoryType>
+    <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
+    <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>
+    <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
+    <PackageIconUrl>http://i.isolineltd.com/nuget/storage.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
+    <Version>2.6.204</Version>
+    <FileVersion>2.6.204.0</FileVersion>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Description>Provides Storage.Net integration with Azure Service Fabric. This library implements Reliable Storage as Blobs and Messages.</Description>
+    <AssemblyOriginatorKeyFile>../storage.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ServiceFabric.Data" Version="2.6.204" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
+  </ItemGroup>
+</Project>
