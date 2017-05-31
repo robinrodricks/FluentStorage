@@ -1,5 +1,4 @@
-﻿#if NETFULL
-using Microsoft.ServiceBus.Messaging;
+﻿using Microsoft.Azure.ServiceBus;
 using Storage.Net.Messaging;
 using System;
 using System.Collections.Concurrent;
@@ -118,4 +117,3 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       }
    }
 }
-#endif
