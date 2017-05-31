@@ -6,19 +6,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
+namespace Storage.Net.Microsoft.Azure.ServiceBus
 {
    /// <summary>
    /// Implements message receiver on Azure Service Bus Queues
    /// </summary>
    class AzureServiceBusQueueReceiver : AsyncMessageReceiver
    {
+      //https://github.com/Azure/azure-service-bus/blob/master/samples/DotNet/Microsoft.Azure.ServiceBus/ReceiveSample/readme.md
+
       private static readonly TimeSpan AutoRenewTimeout = TimeSpan.FromMinutes(1);
 
       private readonly QueueClient _client;
       private readonly bool _peekLock;
-      private readonly ConcurrentDictionary<string, BrokeredMessage> _messageIdToBrokeredMessage = new ConcurrentDictionary<string, BrokeredMessage>();
-      private Action<QueueMessage> _onMessageAction;
+      private readonly ConcurrentDictionary<string, Message> _messageIdToBrokeredMessage = new ConcurrentDictionary<string, Message>();
 
       /// <summary>
       /// Creates an instance of Azure Service Bus receiver with connection
@@ -28,9 +29,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       /// <param name="peekLock">When true listens in PeekLock mode, otherwise ReceiveAndDelete</param>
       public AzureServiceBusQueueReceiver(string connectionString, string queueName, bool peekLock = true)
       {
-         _client = QueueClient.CreateFromConnectionString(connectionString, queueName,
-            peekLock ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete);
-
+         _client = new QueueClient(connectionString, queueName, peekLock ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete);
          _peekLock = peekLock;
       }
 
@@ -39,10 +38,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       /// </summary>
       public override async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
       {
-         IEnumerable<BrokeredMessage> batch = await _client.ReceiveBatchAsync(count, TimeSpan.FromMilliseconds(1));
-         if(batch == null) return null;
-
-         return batch.Select(ProcessAndConvert).ToList();
+         throw new NotSupportedException();
       }
 
       /// <summary>
@@ -51,6 +47,7 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       public override async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
       {
          if (!_peekLock) return;
+
 
          BrokeredMessage bm;
          if (!_messageIdToBrokeredMessage.TryRemove(message.Id, out bm)) return;
@@ -84,36 +81,32 @@ namespace Storage.Net.Microsoft.Azure.Messaging.ServiceBus
       /// Starts message pump with AutoComplete = false, 1 minute session renewal and 1 concurrent call.
       /// </summary>
       /// <param name="onMessage"></param>
-      public override void StartMessagePump(Action<QueueMessage> onMessage)
+      public override async Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessage)
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
-         if (_onMessageAction != null) throw new ArgumentException("message pump already started", nameof(onMessage));
 
-         _onMessageAction = onMessage;
-
-         var options = new OnMessageOptions
+         var options = new MessageHandlerOptions
          {
             AutoComplete = false,
-            AutoRenewTimeout = TimeSpan.FromMinutes(1),
+            MaxAutoRenewDuration = TimeSpan.FromMinutes(1),
             MaxConcurrentCalls = 1
          };
 
-         _client.OnMessage(OnMessage, options);
+         _client.RegisterMessageHandler(
+            async (message, token) =>
+            {
+               QueueMessage qm = Converter.ToQueueMessage(message);
+               await onMessage(qm);
+            },
+            options);
       }
-
-      private void OnMessage(BrokeredMessage bm)
-      {
-         QueueMessage qm = ProcessAndConvert(bm);
-
-         _onMessageAction?.Invoke(qm);
-      } 
 
       /// <summary>
       /// Stops message pump if started
       /// </summary>
       public override void Dispose()
       {
-         _client.Close();  //this also stops the message pump
+         _client.CloseAsync().Wait();  //this also stops the message pump
       }
    }
 }
