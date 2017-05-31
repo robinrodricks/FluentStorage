@@ -3,7 +3,7 @@ using Storage.Net.Messaging;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Storage.Net.Microsoft.Azure.Messaging.EventHub
+namespace Storage.Net.Microsoft.Azure.EventHub
 {
    static class Converter
    {

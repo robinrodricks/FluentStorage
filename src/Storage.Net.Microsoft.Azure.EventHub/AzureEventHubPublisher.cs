@@ -5,7 +5,7 @@ using Storage.Net.Messaging;
 using Microsoft.Azure.EventHubs;
 using System;
 
-namespace Storage.Net.Microsoft.Azure.Messaging.EventHub
+namespace Storage.Net.Microsoft.Azure.EventHub
 {
    /// <summary>
    /// Publishes messages to Azure Event Hub

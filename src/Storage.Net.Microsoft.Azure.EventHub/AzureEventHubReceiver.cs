@@ -7,7 +7,7 @@ using System.Collections.Generics;
 using Storage.Net.Blob;
 using System.Threading;
 
-namespace Storage.Net.Microsoft.Azure.Messaging.EventHub
+namespace Storage.Net.Microsoft.Azure.EventHub
 {
    /// <summary>
    /// Microsoft Azure Event Hub receiver

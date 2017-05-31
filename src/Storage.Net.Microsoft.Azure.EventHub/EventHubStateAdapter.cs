@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Storage.Net.Microsoft.Azure.Messaging.EventHub
+namespace Storage.Net.Microsoft.Azure.EventHub
 {
    class EventHubStateAdapter
    {
