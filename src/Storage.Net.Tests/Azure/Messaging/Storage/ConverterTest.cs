@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Xunit;
-using Storage.Net.Microsoft.Azure.Messaging.Storage;
 using Storage.Net.Messaging;
+using Storage.Net.Microsoft.Azure.Storage.Messaging;
 
 namespace Storage.Net.Tests.Azure.Messaging.Storage
 {

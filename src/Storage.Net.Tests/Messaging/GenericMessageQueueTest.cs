@@ -2,7 +2,6 @@
 using Config.Net;
 using Xunit;
 using Storage.Net.Microsoft.Azure.Messaging.ServiceBus;
-using Storage.Net.Microsoft.Azure.Messaging.Storage;
 using Storage.Net.Messaging;
 using System;
 using System.Collections.Generic;

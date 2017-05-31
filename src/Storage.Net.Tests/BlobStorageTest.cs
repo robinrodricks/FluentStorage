@@ -9,8 +9,8 @@ using Xunit;
 using Storage.Net.Aws.Blob;
 using Storage.Net.Blob;
 using Storage.Net.Blob.Files;
-using Storage.Net.Microsoft.Azure.Blob;
 using NetBox.Model;
+using Storage.Net.Microsoft.Azure.Storage.Blob;
 
 namespace Storage.Net.Tests.Integration
 {

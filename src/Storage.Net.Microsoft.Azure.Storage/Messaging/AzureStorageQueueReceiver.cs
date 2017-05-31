@@ -89,9 +89,8 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// <param name="message"></param>
       public override async Task ConfirmMessageAsync(QueueMessage message)
       {
-         string id, popReceipt;
-         Converter.SplitId(message.Id, out id, out popReceipt);
-         if(popReceipt == null) throw new ArgumentException("cannot delete message by short id", id);
+         Converter.SplitId(message.Id, out string id, out string popReceipt);
+         if (popReceipt == null) throw new ArgumentException("cannot delete message by short id", id);
          await _queue.DeleteMessageAsync(id, popReceipt);
       }
 
