@@ -1,12 +1,5 @@
-﻿using System;
-using Storage.Net.Blob;
-using Storage.Net.Messaging;
-#if NETFULL
-using Storage.Net.Microsoft.Azure.Messaging.ServiceBus;
-#endif
-using Storage.Net.Table;
-using System.Net;
-using System.Collections.Generic;
+﻿using Storage.Net.Messaging;
+using Storage.Net.Microsoft.Azure.ServiceBus;
 
 namespace Storage.Net
 {
@@ -16,7 +9,6 @@ namespace Storage.Net
    public static class Factory
    {
 
-#if NETFULL
       /// <summary>
       /// Creates a new instance of Azure Service Bus Queue by connection string and queue name
       /// </summary>
@@ -27,7 +19,7 @@ namespace Storage.Net
          string connectionString,
          string queueName)
       {
-         return new AzureServiceBusQueuePublisher(connectionString, queueName);
+         return new AzureServiceBusQueuePublisher(connectionString, queueName, true);
       }
 
       /// <summary>
@@ -74,6 +66,5 @@ namespace Storage.Net
       {
          return new AzureServiceBusTopicReceiver(connectionString, topicName, subscriptionName, subscriptionSqlFilter, peekLock);
       }
-#endif
    }
 }
