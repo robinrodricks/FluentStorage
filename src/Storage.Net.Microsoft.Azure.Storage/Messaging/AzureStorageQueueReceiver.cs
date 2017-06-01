@@ -135,7 +135,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
             {
                hadSome = false;
 
-               IEnumerable<QueueMessage> messages = ReceiveMessages(PollingBatchSize);
+               IEnumerable<QueueMessage> messages = ReceiveMessagesAsync(PollingBatchSize).Result;
                if(messages != null)
                {
                   foreach(QueueMessage qm in messages)
@@ -168,7 +168,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// <summary>
       /// Calls .GetMessages on storage queue
       /// </summary>
-      public override async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
+      private async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
       {
          IEnumerable<CloudQueueMessage> batch = await _queue.GetMessagesAsync(count, _messageVisibilityTimeout, null, null);
          if(batch == null) return null;

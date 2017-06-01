@@ -53,22 +53,6 @@ namespace Storage.Net.Messaging
       /// <summary>
       /// Redirects to async version
       /// </summary>
-      public virtual IEnumerable<QueueMessage> ReceiveMessages(int count)
-      {
-         return CallAsync(() => ReceiveMessagesAsync(count));
-      }
-
-      /// <summary>
-      /// Redirects to blocking version
-      /// </summary>
-      public virtual Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
-      {
-         return Task.FromResult(ReceiveMessages(count));
-      }
-
-      /// <summary>
-      /// Redirects to async version
-      /// </summary>
       public virtual void StartMessagePump(Action<QueueMessage> onMessage)
       {
          CallAsync(() => StartMessagePumpAsync((qm) =>

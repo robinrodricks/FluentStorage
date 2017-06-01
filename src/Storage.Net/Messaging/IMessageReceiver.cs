@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Storage.Net.Messaging
@@ -9,20 +8,6 @@ namespace Storage.Net.Messaging
    /// </summary>
    public interface IMessageReceiver : IDisposable
    {
-      /// <summary>
-      /// Gets a batch of message from the queue, if available
-      /// </summary>
-      /// <param name="count">Number of messages to fetch</param>
-      /// <returns>Batch of messages, or null if no messages are in the queue</returns>
-      IEnumerable<QueueMessage> ReceiveMessages(int count);
-
-      /// <summary>
-      /// Gets a batch of message from the queue, if available
-      /// </summary>
-      /// <param name="count">Number of messages to fetch</param>
-      /// <returns>Batch of messages, or null if no messages are in the queue</returns>
-      Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count);
-
       /// <summary>
       /// Confirmation call that the message was acknowledged and processed by the receiver.
       /// Client must call this when message processing has succeeded, otherwise the message will reappear,
@@ -50,15 +35,13 @@ namespace Storage.Net.Messaging
       Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription);
 
       /// <summary>
-      /// Starts automatic message pumping trying to use native features as much as possible. In most cases it is more efficient than calling
-      /// <see cref="ReceiveMessages"/> in a loop in your application. Message pump stops when you dispose the instance.
+      /// Starts automatic message pumping trying to use native features as much as possible. Message pump stops when you dispose the instance.
       /// Disposing the instance will also stop message pump for you.
       /// </summary>
       void StartMessagePump(Action<QueueMessage> onMessage);
 
       /// <summary>
-      /// Starts automatic message pumping trying to use native features as much as possible. In most cases it is more efficient than calling
-      /// <see cref="ReceiveMessages"/> in a loop in your application. Message pump stops when you dispose the instance.
+      /// Starts automatic message pumping trying to use native features as much as possible. Message pump stops when you dispose the instance.
       /// Disposing the instance will also stop message pump for you.
       /// </summary>
       Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessageAsync);

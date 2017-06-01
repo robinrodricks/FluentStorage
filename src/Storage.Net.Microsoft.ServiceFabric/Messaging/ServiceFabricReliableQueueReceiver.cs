@@ -18,7 +18,22 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
          _queueName = queueName ?? throw new ArgumentNullException(nameof(queueName));
       }
 
-      public override async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
+      public override Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessageAsync)
+      {
+         throw new NotImplementedException();
+      }
+
+      public override Task ConfirmMessageAsync(QueueMessage message)
+      {
+         throw new NotSupportedException();
+      }
+
+      public override Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
+      {
+         throw new NotSupportedException();
+      }
+
+      private async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
       {
          var collection = await _stateManager.GetOrAddAsync<IReliableQueue<byte[]>>(_queueName);
          var result = new List<QueueMessage>();

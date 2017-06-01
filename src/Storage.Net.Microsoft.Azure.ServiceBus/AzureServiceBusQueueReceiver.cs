@@ -2,8 +2,6 @@
 using Storage.Net.Messaging;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Storage.Net.Microsoft.Azure.ServiceBus
@@ -34,28 +32,18 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       }
 
       /// <summary>
-      /// Tries to receive the message from queue client by calling .Receive explicitly.
-      /// </summary>
-      public override async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
-      {
-         throw new NotSupportedException();
-      }
-
-      /// <summary>
       /// Calls .DeadLetter explicitly
       /// </summary>
       public override async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
       {
          if (!_peekLock) return;
 
+         if (!_messageIdToBrokeredMessage.TryRemove(message.Id, out Message bm)) return;
 
-         BrokeredMessage bm;
-         if (!_messageIdToBrokeredMessage.TryRemove(message.Id, out bm)) return;
-
-         await _client.DeadLetterAsync(bm.LockToken, reason, errorDescription);
+         await _client.DeadLetterAsync(bm.MessageId);
       }
 
-      private QueueMessage ProcessAndConvert(BrokeredMessage bm)
+      private QueueMessage ProcessAndConvert(Message bm)
       {
          QueueMessage qm = Converter.ToQueueMessage(bm);
          if(_peekLock) _messageIdToBrokeredMessage[qm.Id] = bm;
@@ -70,18 +58,17 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       {
          if(!_peekLock) return;
 
-         BrokeredMessage bm;
          //delete the message and get the deleted element, very nice method!
-         if(!_messageIdToBrokeredMessage.TryRemove(message.Id, out bm)) return;
+         if (!_messageIdToBrokeredMessage.TryRemove(message.Id, out Message bm)) return;
 
-         await bm.CompleteAsync();
+         await _client.CompleteAsync(bm.MessageId);
       }
 
       /// <summary>
       /// Starts message pump with AutoComplete = false, 1 minute session renewal and 1 concurrent call.
       /// </summary>
       /// <param name="onMessage"></param>
-      public override async Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessage)
+      public override Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessage)
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
 
@@ -99,6 +86,8 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
                await onMessage(qm);
             },
             options);
+
+         return Task.FromResult(true);
       }
 
       /// <summary>

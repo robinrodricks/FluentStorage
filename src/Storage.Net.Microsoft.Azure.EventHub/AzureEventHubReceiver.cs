@@ -130,14 +130,6 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <summary>
       /// See interface
       /// </summary>
-      public override IEnumerable<QueueMessage> ReceiveMessages(int count)
-      {
-         throw new NotSupportedException("receiving messages is not supported directly on EventHub, use message pumping");
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
       public override async Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessageAsync)
       {
          await CheckReady();
