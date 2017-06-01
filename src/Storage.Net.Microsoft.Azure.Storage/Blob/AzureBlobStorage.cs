@@ -284,18 +284,10 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
       private static bool TryHandleStorageException(AzureStorageException ex)
       {
-#if NETFULL
-         if (ex.InnerException is WebException wex)
+         if(ex.RequestInformation?.HttpStatusCode == 404)
          {
-            if (wex.Response is HttpWebResponse response)
-            {
-               if (response.StatusCode == HttpStatusCode.NotFound)
-               {
-                  throw new StorageException(ErrorCode.NotFound, ex);
-               }
-            }
+            throw new StorageException(ErrorCode.NotFound, ex);
          }
-#endif
 
          return false;
       }
