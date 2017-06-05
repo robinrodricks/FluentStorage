@@ -113,8 +113,6 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
       public override async Task WriteAsync(string id, Stream sourceStream)
       {
-         throw new NotImplementedException();
-
          byte[] value = sourceStream.ToByteArray();
 
          using (var tx = await OpenCollection())

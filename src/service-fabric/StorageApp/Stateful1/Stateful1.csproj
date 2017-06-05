@@ -86,12 +86,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Storage.Net.Microsoft.ServiceFabric\Storage.Net.Microsoft.ServiceFabric.csproj">
-      <Project>{fca5d413-9751-4984-9455-ffc10c6c8151}</Project>
+    <ProjectReference Include="..\..\..\Storage.Net.Microsoft.ServiceFabric\Storage.Net.Microsoft.ServiceFabric.csproj">
+      <Project>{017314cc-9fc9-4437-8976-cbe99e6fe313}</Project>
       <Name>Storage.Net.Microsoft.ServiceFabric</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Storage.Net\Storage.Net.csproj">
-      <Project>{6af6fac2-d0b1-4e76-b1c6-233328c6a981}</Project>
+    <ProjectReference Include="..\..\..\Storage.Net\Storage.Net.csproj">
+      <Project>{15712767-6901-44cc-b466-5f50a26ef54f}</Project>
       <Name>Storage.Net</Name>
     </ProjectReference>
   </ItemGroup>

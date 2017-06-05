@@ -51,19 +51,19 @@ namespace Stateful1
       {
          try
          {
-            IEnumerable<QueueMessage> qm = await _receiver.ReceiveMessagesAsync(100);
+            //IEnumerable<QueueMessage> qm = await _receiver.ReceiveMessagesAsync(100);
 
             await _publisher.PutMessagesAsync(new[] { QueueMessage.FromText("content at " + DateTime.UtcNow) });
 
-            qm = await _receiver.ReceiveMessagesAsync(100);
+            //qm = await _receiver.ReceiveMessagesAsync(100);
 
-            await _blobs.UploadTextAsync("one", "test text 1");
-            await _blobs.UploadTextAsync("two", "test text 2");
+            await _blobs.WriteTextAsync("one", "test text 1");
+            await _blobs.WriteTextAsync("two", "test text 2");
 
             IEnumerable<string> keys = await _blobs.ListAsync(null);
 
-            string textBack = await _blobs.DownloadTextAsync("one");
-            textBack = await _blobs.DownloadTextAsync("two");
+            string textBack = await _blobs.ReadTextAsync("one");
+            textBack = await _blobs.ReadTextAsync("two");
          }
          catch(Exception ex)
          {

@@ -1,11 +1,9 @@
-﻿using NetBox;
-using Xunit;
+﻿using Xunit;
 using Storage.Net.Messaging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using LogMagic;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
@@ -15,11 +13,6 @@ namespace Storage.Net.Tests.Integration.Messaging
    {
       public AzureStorageQueueMessageQueueTest() : base("azure-storage-queue") { }
    }
-
-   /*public class AzureServiceBusTopicMessageQeueueTest : GenericMessageQueueTest
-   {
-      public AzureServiceBusTopicMessageQeueueTest() : base("azure-servicebus-topic") { }
-   }*/
 
    public class AzureServiceBusQueueMessageQeueueTest : GenericMessageQueueTest
    {
@@ -31,16 +24,6 @@ namespace Storage.Net.Tests.Integration.Messaging
       public AzureEventHubMessageQeueueTest() : base("azure-eventhub") { }
    }
 
-   /*public class InMemoryMessageQueueTest : GenericMessageQueueTest
-   {
-      public InMemoryMessageQueueTest() : base("inmemory") { }
-   }*/
-
-   /*public class DiskMessageQeueuTest : GenericMessageQueueTest
-   {
-      public DiskMessageQeueuTest() : base("disk") { }
-   }*/
-
    #endregion
 
    public abstract class GenericMessageQueueTest : AbstractTestFixture
@@ -50,6 +33,7 @@ namespace Storage.Net.Tests.Integration.Messaging
       private IMessagePublisher _publisher;
       private IMessageReceiver _receiver;
       private int _messagesPumped;
+      private readonly List<QueueMessage> _receivedMessages = new List<QueueMessage>();
 
       protected GenericMessageQueueTest(string name)
       {
@@ -68,17 +52,6 @@ namespace Storage.Net.Tests.Integration.Messaging
                   TestSettings.Instance.ServiceBusQueueName,
                   TimeSpan.FromMinutes(1));
                break;
-            /*case "azure-servicebus-topic":
-               _receiver = StorageFactory.Messages.AzureServiceBusTopicReceiver(
-                  TestSettings.Instance.ServiceBusConnectionString,
-                  TestSettings.Instance.ServiceBusTopicName,
-                  "AllMessages",
-                  null,
-                  true);
-               _publisher = StorageFactory.Messages.AzureServiceBusTopicPublisher(
-                  TestSettings.Instance.ServiceBusConnectionString,
-                  TestSettings.Instance.ServiceBusTopicName);
-               break;*/
             case "azure-servicebus-queue":
                _receiver = StorageFactory.Messages.AzureServiceBusQueueReceiver(
                   TestSettings.Instance.ServiceBusConnectionString,
@@ -102,29 +75,16 @@ namespace Storage.Net.Tests.Integration.Messaging
                   TestSettings.Instance.EventHubConnectionString,
                   TestSettings.Instance.EventHubPath);
                break;
-            /*case "inmemory":
-               _publisher = StorageFactory.Messages.InMemory(out _receiver);
-               break;*/
-            /*case "disk":
-               var disk = new DiskMessagePublisherReceiver(TestDir);
-               _publisher = disk;
-               _receiver = disk;
-               break;*/
          }
 
-         //delete any messages already in queue
-         /*if (_receiver != null)
-         {
-            QueueMessage qm;
-            while ((qm = _receiver.ReceiveMessage()) != null)
-            {
-               _receiver.ConfirmMessage(qm);
-            }
-
-            _messagesPumped = 0;
-         }*/
+         //start the pump
+         _receiver.StartMessagePumpAsync(ReceiverPump);
       }
 
+      private async Task ReceiverPump(QueueMessage message)
+      {
+         _receivedMessages.Add(message);
+      }
 
       public override void Dispose()
       {
