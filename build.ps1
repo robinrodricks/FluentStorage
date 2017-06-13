@@ -8,10 +8,12 @@ param(
 
 $gv = "4.0.0-alpha-1"
 $vt = @{
-   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "1.0.0";
-   "Storage.Net.Microsoft.Azure.csproj" = "3.7.4";
-   "Storage.Net.Microsoft.Azure.Storage.csproj" = "1.0.0";
+   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "1.0.0-alpha-9";
+   "Storage.Net.Microsoft.Azure.EventHub.csproj" = "1.0.0-alpha-1";
+   "Storage.Net.Microsoft.Azure.ServiceBus.csproj" = "1.0.0-alpha-1";
+   "Storage.Net.Microsoft.Azure.Storage.csproj" = "1.0.0-alpha-1";
    "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204";
+   "Storage.Net.Amazon.Aws" = "4.0.0-alpha-1"
 }
 
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
