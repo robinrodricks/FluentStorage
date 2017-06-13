@@ -4,6 +4,8 @@ using System;
 using LogMagic;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NetBox;
+using System.Linq;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
@@ -32,7 +34,6 @@ namespace Storage.Net.Tests.Integration.Messaging
       private readonly string _name;
       private IMessagePublisher _publisher;
       private IMessageReceiver _receiver;
-      private int _messagesPumped;
       private readonly List<QueueMessage> _receivedMessages = new List<QueueMessage>();
 
       protected GenericMessageQueueTest(string name)
@@ -50,7 +51,8 @@ namespace Storage.Net.Tests.Integration.Messaging
                   TestSettings.Instance.AzureStorageName,
                   TestSettings.Instance.AzureStorageKey,
                   TestSettings.Instance.ServiceBusQueueName,
-                  TimeSpan.FromMinutes(1));
+                  TimeSpan.FromMinutes(1),
+                  TimeSpan.FromMilliseconds(500));
                break;
             case "azure-servicebus-queue":
                _receiver = StorageFactory.Messages.AzureServiceBusQueueReceiver(
@@ -84,6 +86,23 @@ namespace Storage.Net.Tests.Integration.Messaging
       private async Task ReceiverPump(QueueMessage message)
       {
          _receivedMessages.Add(message);
+         await _receiver.ConfirmMessageAsync(message);
+      }
+
+      private async Task<QueueMessage> WaitMessage()
+      {
+         //wait for receiver to stabilize
+
+         int prevCount;
+
+         do
+         {
+            prevCount = _receivedMessages.Count;
+            await Task.Delay(TimeSpan.FromSeconds(1));
+         }
+         while (prevCount != _receivedMessages.Count);
+
+         return _receivedMessages.LastOrDefault();
       }
 
       public override void Dispose()
@@ -97,16 +116,12 @@ namespace Storage.Net.Tests.Integration.Messaging
       [Fact]
       public void SendMessage_OneMessage_DoesntCrash()
       {
-         //var messages = Enumerable.Range(0, 1000).Select(i => new QueueMessage("content " + i));
-
-         //_publisher.PutMessages(messages);
-
          var qm = QueueMessage.FromText("test");
          _publisher.PutMessage(qm);
       }
 
-      /*[Fact]
-      public void SendMessage_SendAFew_ReceivesAsBatch()
+      [Fact]
+      public async Task SendMessage_SendAFew_Receives()
       {
          for(int i = 0; i < 2; i++)
          {
@@ -114,19 +129,9 @@ namespace Storage.Net.Tests.Integration.Messaging
          }
 
          //there is a delay between messages sent and received on subscription, so sleep for a bit
-
-         List<QueueMessage> batch = null;
-
-         for (int i = 0; i < 50; i++)
-         {
-            batch = _receiver.ReceiveMessages(10).ToList();
-            if (batch != null && batch.Count > 0) break;
-            Thread.Sleep(TimeSpan.FromSeconds(1));
-         }
-
-         Assert.NotNull(batch);
-         Assert.True(batch.Count > 0);
-      }*/
+         await WaitMessage();
+         Assert.True(_receivedMessages.Count > 0);
+      }
 
       [Fact]
       public void SendMessage_ExtraProperties_DoesntCrash()
@@ -137,83 +142,59 @@ namespace Storage.Net.Tests.Integration.Messaging
          _publisher.PutMessage(msg);
       }
 
-      /*[Fact]
-      public void SendMessage_SimpleOne_Received()
+      [Fact]
+      public async Task SendMessage_SimpleOne_Received()
       {
          string content = Generator.RandomString;
 
-         _publisher.PutMessage(new QueueMessage(content));
+         await _publisher.PutMessageAsync(new QueueMessage(content));
 
-         QueueMessage received = null;
-
-         for (int i = 0; i < 5; i++)
-         {
-            received = _receiver.ReceiveMessage();
-            if (received != null) break;
-            Thread.Sleep(TimeSpan.FromSeconds(2));
-         }
+         QueueMessage received = await WaitMessage();
 
          Assert.NotNull(received);
          Assert.Equal(content, received.StringContent);
-      }*/
+      }
 
-      /*[Fact]
-      public void SendMessage_WithProperties_Received()
+      [Fact]
+      public async Task SendMessage_WithProperties_Received()
       {
          string content = Generator.RandomString;
 
          var msg = new QueueMessage(content);
          msg.Properties["one"] = "v1";
 
-         _publisher.PutMessage(msg);
+         await _publisher.PutMessageAsync(msg);
 
-         QueueMessage received = null;
-
-         for (int i = 0; i < 10; i++)
-         {
-            received = _receiver.ReceiveMessage();
-            if (received != null) break;
-            Thread.Sleep(TimeSpan.FromSeconds(2));
-         }
+         QueueMessage received = await WaitMessage();
 
          Assert.NotNull(received);
          Assert.Equal(content, received.StringContent);
          Assert.Equal("v1", received.Properties["one"]);
-      }*/
+      }
 
-      /*[Fact]
-      public void CleanQueue_SendMessage_ReceiveAndConfirm()
+      [Fact]
+      public async Task CleanQueue_SendMessage_ReceiveAndConfirm()
       {
          string content = Generator.RandomString;
          var msg = new QueueMessage(content);
-         _publisher.PutMessage(msg);
+         await _publisher.PutMessageAsync(msg);
 
-         QueueMessage rmsg = _receiver.ReceiveMessage();
+         QueueMessage rmsg = await WaitMessage();
          Assert.NotNull(rmsg);
+      }
 
-         _receiver.ConfirmMessage(rmsg);
-         _receiver.ConfirmMessage(new QueueMessage(rmsg.Id, string.Empty));
-      }*/
-
-      /*[Fact]
-      public void MessagePump_AddFewMessages_CanReceiveOneAndPumpClearsThemAll()
+      [Fact]
+      public async Task MessagePump_AddFewMessages_CanReceiveOneAndPumpClearsThemAll()
       {
          for (int i = 0; i < 10; i++)
          {
             var qm = new QueueMessage(nameof(MessagePump_AddFewMessages_CanReceiveOneAndPumpClearsThemAll) + "#" + i);
-            _publisher.PutMessage(qm);
+            await _publisher.PutMessageAsync(qm);
          }
 
-         _receiver.StartMessagePump(OnMessage);
+         await WaitMessage();
 
-         Thread.Sleep(TimeSpan.FromHours(11));
-
-         Assert.True(_messagesPumped >= 9);
-      }*/
-
-      private void OnMessage(QueueMessage qm)
-      {
-         _messagesPumped++;
+         Assert.True(_receivedMessages.Count >= 9, _receivedMessages.Count.ToString());
       }
    }
 }

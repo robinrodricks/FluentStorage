@@ -15,17 +15,16 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
    /// </summary>
    class AzureStorageQueueReceiver : AsyncMessageReceiver
    {
-      private const int PollingBatchSize = 5;
+      private const int PollingBatchSize = 1;
       private readonly CloudQueueClient _client;
       private readonly string _queueName;
       private readonly CloudQueue _queue;
       private CloudQueue _deadLetterQueue;
       private readonly TimeSpan _messageVisibilityTimeout;
       private readonly TimeSpan _messagePumpPollingTimeout;
-      private Thread _pollingThread;
       private bool _disposed;
-      private Action<QueueMessage> _onMessageAction;
-      private readonly object _createLock = new object();
+      private Task _pollingTask;
+      private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
       /// <summary>
       /// Creates an instance of Azure Storage Queue receiver 
@@ -57,7 +56,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// to complete and delete it.
       /// </param>
       /// <param name="messagePumpPollingTimeout">
-      /// Used in conjunction with <see cref="StartMessagePump(Action{QueueMessage})"/> and indicates how often message pump will ping for new
+      /// Used in conjunction with <see cref="StartMessagePumpAsync(Func{QueueMessage, Task})"/> and indicates how often message pump will ping for new
       /// messages in the queue.
       /// </param>
       public AzureStorageQueueReceiver(string accountName, string storageKey, string queueName,
@@ -111,46 +110,38 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
          await ConfirmMessageAsync(message);
       }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
       /// <summary>
       /// Due to the fact storage queues don't support notifications this method starts an internal thread to poll for messages.
       /// </summary>
-      public override void StartMessagePump(Action<QueueMessage> onMessage)
+      public override async Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessage)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
-         if (_pollingThread != null) throw new ArgumentException("polling already started", nameof(onMessage));
+         if (_pollingTask != null) throw new ArgumentException("polling already started", nameof(onMessage));
 
-         _onMessageAction = onMessage;
-         _pollingThread = new Thread(PollingThread) { IsBackground = true };
-         _pollingThread.Start();
+         _pollingTask = PollTasks(onMessage, _cts.Token);
       }
 
-      private void PollingThread()
+      private async Task PollTasks(Func<QueueMessage, Task> callback, CancellationToken ct)
       {
-         while (!_disposed)
+         if (ct.IsCancellationRequested) return;
+
+         IEnumerable<QueueMessage> messages = await ReceiveMessagesAsync(PollingBatchSize);
+         while(messages != null)
          {
-            //remember if there were messages in current loop and fetch more immediately instead of waiting for another poll
-            bool hadSome = true;
-
-            while (hadSome)
+            foreach(QueueMessage msg in messages)
             {
-               hadSome = false;
-
-               IEnumerable<QueueMessage> messages = ReceiveMessagesAsync(PollingBatchSize).Result;
-               if(messages != null)
-               {
-                  foreach(QueueMessage qm in messages)
-                  {
-                     hadSome = true;
-                     _onMessageAction(qm);
-                  }
-               }
+               await callback(msg);
             }
-            
 
-            Thread.Sleep(_messagePumpPollingTimeout);
-
-            //todo: think of smart polling, regular intervals are too expensive
+            messages = await ReceiveMessagesAsync(PollingBatchSize);
          }
+
+         await Task.Delay(_messagePumpPollingTimeout, ct).ContinueWith(async (t) =>
+         {
+            await PollTasks(callback, ct);
+         });
       }
 
       /// <summary>
@@ -161,7 +152,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
          if (!_disposed)
          {
             _disposed = true;
-            _pollingThread = null;
+            _cts.Cancel();
          }
       }
 

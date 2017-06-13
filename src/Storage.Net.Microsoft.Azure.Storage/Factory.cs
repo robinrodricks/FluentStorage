@@ -120,5 +120,26 @@ namespace Storage.Net
       {
          return new AzureStorageQueueReceiver(accountName, storageKey, queueName, messageVisibilityTimeout);
       }
+      /// <summary>
+      /// Creates an instance of a receiver from Azure Storage Queues
+      /// </summary>
+      /// <param name="factory">Factory reference</param>
+      /// <param name="accountName">Account name</param>
+      /// <param name="storageKey">Storage key</param>
+      /// <param name="queueName">Queue name</param>
+      /// <param name="messageVisibilityTimeout">Message visibility timeout</param>
+      /// <param name="messagePollingInterval">Storage Queues do not support listening therefore internally we poll for new messages. This parameters
+      /// indicates how often this happens</param>
+      /// <returns>Generic message receiver interface</returns>
+      public static IMessageReceiver AzureStorageQueueReceiver(this IMessagingFactory factory,
+         string accountName,
+         string storageKey,
+         string queueName,
+         TimeSpan messageVisibilityTimeout,
+         TimeSpan messagePollingInterval)
+      {
+         return new AzureStorageQueueReceiver(accountName, storageKey, queueName, messageVisibilityTimeout, messagePollingInterval);
+      }
+
    }
 }
