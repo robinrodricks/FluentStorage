@@ -8,7 +8,7 @@ namespace Storage.Net
    /// </summary>
    public static class GenericValidation
    {
-      private const int MaxBlobIdLength = 50;
+      private const int MaxBlobIdPartLength = 50;
       private const int MaxBlobPrefixLength = 50;
 
       /// <summary>
@@ -19,10 +19,15 @@ namespace Storage.Net
       {
          if (prefix == null) return;
 
-         if (prefix.Length > MaxBlobPrefixLength)
-            throw new ArgumentException(
-               string.Format(Exceptions.BlobPrefix_TooLong, MaxBlobPrefixLength),
-               nameof(prefix));
+         string[] parts = prefix.Split('/');
+
+         foreach (string part in parts)
+         {
+            if (part.Length > MaxBlobPrefixLength)
+               throw new ArgumentException(
+                  string.Format(Exceptions.BlobPrefix_TooLong, MaxBlobPrefixLength),
+                  nameof(prefix));
+         }
       }
 
       /// <summary>
@@ -33,9 +38,14 @@ namespace Storage.Net
       {
          if (id == null) throw new ArgumentNullException(nameof(id));
 
-         if (id.Length > MaxBlobIdLength)
-            throw new ArgumentException(string.Format(Exceptions.BlobId_TooLong, MaxBlobIdLength),
-               nameof(id));
+         string[] parts = id.Split('/');
+
+         foreach (string part in parts)
+         {
+            if (part.Length > MaxBlobIdPartLength)
+               throw new ArgumentException(string.Format(Exceptions.BlobId_TooLong, MaxBlobIdPartLength),
+                  nameof(id));
+         }
       }
 
       public static void CheckSourceStream(Stream inputStream)
