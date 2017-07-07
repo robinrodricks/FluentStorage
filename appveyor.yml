@@ -1,0 +1,15 @@
+version: 4.0.0-alpha-{build}
+image: Visual Studio 2017
+configuration: Release
+platform: Any CPU
+before_build:
+- ps: .\appveyor.ps1
+build:
+  project: src/storage.sln
+  verbosity: minimal
+test: off
+artifacts:
+- path: src/**/*.nupkg
+deploy:
+- provider: Environment
+  name: aloneguid NuGet
