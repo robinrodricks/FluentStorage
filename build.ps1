@@ -12,7 +12,7 @@ $vt = @{
    "Storage.Net.Microsoft.Azure.EventHub.csproj" = "1.0.0-alpha-1";
    "Storage.Net.Microsoft.Azure.ServiceBus.csproj" = "1.0.0-alpha-1";
    "Storage.Net.Microsoft.Azure.Storage.csproj" = "1.0.0-alpha-1";
-   "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204";
+   "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204.1";
    "Storage.Net.Amazon.Aws" = "4.0.0-alpha-1"
 }
 

@@ -32,7 +32,7 @@ All contributions of any size and areas are welcome, being it coding, testing, d
 
 Storage.Net tries to enforce idential behavior on all implementaions of storage interfaces to the smallest details possible and you will find a lot of test specifications which will help you to add another provider.
 
-The solution itself is currently coded in **Visual Studio 2015** (Community Edition is enough) but we are planning to migrate this to the new msbuild project system in the nearest future (when VS 2017 and .NET Core toolkit becomes stable).
+The solution is created in Visual Studio 2017 (Community Edition).
 
 ### Documentation
 
