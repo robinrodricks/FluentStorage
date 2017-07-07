@@ -88,7 +88,7 @@ namespace Storage.Net.Blob
       /// <param name="filePath">Full path to the local file to be downloaded to. If the file exists it will be recreated wtih blob data.</param>
       public static async Task ReadToFileAsync(this IBlobStorage storage, string id, string filePath)
       {
-         Stream src = storage.OpenRead(id);
+         Stream src = await storage.OpenReadAsync(id);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
 
          using (src)
@@ -185,7 +185,7 @@ namespace Storage.Net.Blob
       /// <returns>Text representation of the blob</returns>
       public static async Task<string> ReadTextAsync(this IBlobStorage blobStorage, string id)
       {
-         Stream src = blobStorage.OpenRead(id);
+         Stream src = await blobStorage.OpenReadAsync(id);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
 
          var ms = new MemoryStream();
