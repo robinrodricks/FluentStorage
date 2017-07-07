@@ -1,4 +1,4 @@
-version: 4.0.0-alpha-{build}
+version: 4.0.{build}
 image: Visual Studio 2017
 configuration: Release
 platform: Any CPU

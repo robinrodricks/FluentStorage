@@ -1,7 +1,7 @@
 $gv = $env:APPVEYOR_BUILD_VERSION
 if($gv -eq $null)
 {
-   $gv = "4.0.0-alpha-1"
+   $gv = "4.0.0"
 }
 
 $bn = $env:APPVEYOR_BUILD_NUMBER
@@ -11,12 +11,12 @@ if($bn -eq $null)
 }
 
 $vt = @{
-   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "1.0.0-alpha-$bn";
-   "Storage.Net.Microsoft.Azure.EventHub.csproj" = "1.0.0-alpha-$bn";
-   "Storage.Net.Microsoft.Azure.ServiceBus.csproj" = "1.0.0-alpha-$bn";
-   "Storage.Net.Microsoft.Azure.Storage.csproj" = "1.0.0-alpha-$bn";
+   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "1.0.$bn";
+   "Storage.Net.Microsoft.Azure.EventHub.csproj" = "1.0.$bn";
+   "Storage.Net.Microsoft.Azure.ServiceBus.csproj" = "1.0.$bn";
+   "Storage.Net.Microsoft.Azure.Storage.csproj" = "1.0.$bn";
    "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204.$bn";
-   "Storage.Net.Amazon.Aws" = "4.0.0-alpha-$bn"
+   "Storage.Net.Amazon.Aws" = "4.0.$bn"
 }
 
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
