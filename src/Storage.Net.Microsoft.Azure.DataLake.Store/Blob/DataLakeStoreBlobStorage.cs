@@ -12,7 +12,6 @@ using Microsoft.Azure.Management.DataLake.Store.Models;
 using NetBox.IO;
 using Microsoft.Rest.Azure;
 using System.Linq;
-using System.Collections.Generics;
 
 namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 {
