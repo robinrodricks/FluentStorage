@@ -3,7 +3,6 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Azure.EventHubs;
-using System.Collections.Generics;
 using Storage.Net.Blob;
 using System.Threading;
 
