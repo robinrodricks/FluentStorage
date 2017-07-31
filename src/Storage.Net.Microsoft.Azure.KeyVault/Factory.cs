@@ -7,12 +7,27 @@ namespace Storage.Net
 {
    public static class Factory
    {
+      /// <summary>
+      /// Azure Key Vault secrets.
+      /// </summary>
+      /// <param name="factory">The factory.</param>
+      /// <param name="vaultUri">The vault URI.</param>
+      /// <param name="azureAadClientId">The azure aad client identifier.</param>
+      /// <param name="azureAadClientSecret">The azure aad client secret.</param>
+      /// <returns></returns>
       public static IBlobStorage AzureKeyVault(this IBlobStorageFactory factory,
          Uri vaultUri, string azureAadClientId, string azureAadClientSecret)
       {
          return new AzureKeyVaultBlobStorage(vaultUri, azureAadClientId, azureAadClientSecret);
       }
 
+      /// <summary>
+      /// Azure Key Vault secrets.
+      /// </summary>
+      /// <param name="factory">The factory.</param>
+      /// <param name="vaultUri">The vault URI.</param>
+      /// <param name="cred">The cred.</param>
+      /// <returns></returns>
       public static IBlobStorage AzureKeyVault(this IBlobStorageFactory factory,
          Uri vaultUri, NetworkCredential cred)
       {

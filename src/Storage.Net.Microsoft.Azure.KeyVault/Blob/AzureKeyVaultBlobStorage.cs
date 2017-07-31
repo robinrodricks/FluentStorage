@@ -8,10 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Microsoft.Azure.KeyVault.Models;
+using Microsoft.Rest.Azure;
+using NetBox.Model;
 
 namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 {
-   class AzureKeyVaultBlobStorage : IBlobStorage
+   class AzureKeyVaultBlobStorage : AsyncBlobStorage
    {
       private KeyVaultClient _vaultClient;
       private ClientCredential _credential;
@@ -28,79 +31,68 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
       #region [ IBlobStorage ]
 
-      public void Append(string id, Stream sourceStream)
+      public override async Task<IEnumerable<string>> ListAsync(string prefix)
       {
-         throw new NotImplementedException();
+         var secretNames = new List<string>();
+         IPage<SecretItem> page = await _vaultClient.GetSecretsAsync(_vaultUri);
+
+         do
+         {
+            foreach(SecretItem item in page)
+            {
+               secretNames.Add(item.Id);
+            }
+         }
+         while ((page = await _vaultClient.GetSecretsNextAsync(page.NextPageLink)) != null);
+
+         if (prefix == null) return secretNames;
+
+         return secretNames.Where(n => n.StartsWith(prefix));
       }
 
-      public Task AppendAsync(string id, Stream sourceStream)
+      public override async Task WriteAsync(string id, Stream sourceStream)
       {
-         throw new NotImplementedException();
+         string value = Encoding.UTF8.GetString(sourceStream.ToByteArray());
+
+         await _vaultClient.SetSecretAsync(_vaultUri, id, value);
       }
 
-      public void Delete(string id)
+      public override async Task<Stream> OpenReadAsync(string id)
       {
-         throw new NotImplementedException();
+         SecretBundle secret = await _vaultClient.GetSecretAsync(id);
+
+         string value = secret.Value;
+
+         return value.ToMemoryStream();
       }
 
-      public Task DeleteAsync(string id)
+      public override async Task DeleteAsync(string id)
       {
-         throw new NotImplementedException();
+         await _vaultClient.DeleteSecretAsync(_vaultUri, id);
       }
 
-      public void Dispose()
+      public override async Task AppendAsync(string id, Stream sourceStream)
       {
-         throw new NotImplementedException();
+         SecretBundle secret = await _vaultClient.GetSecretAsync(id);
+         string value = secret.Value;
+         value += Encoding.UTF8.GetString(sourceStream.ToByteArray());
+
+         await _vaultClient.SetSecretAsync(_vaultUri, id, value);
       }
 
-      public bool Exists(string id)
+      public override async Task<bool> ExistsAsync(string id)
       {
-         throw new NotImplementedException();
+         SecretBundle secret = await _vaultClient.GetSecretAsync(id);
+
+         return secret != null;
       }
 
-      public Task<bool> ExistsAsync(string id)
+      public override async Task<BlobMeta> GetMetaAsync(string id)
       {
-         throw new NotImplementedException();
-      }
+         SecretBundle secret = await _vaultClient.GetSecretAsync(id);
+         byte[] data = Encoding.UTF8.GetBytes(secret.Value);
 
-      public BlobMeta GetMeta(string id)
-      {
-         throw new NotImplementedException();
-      }
-
-      public Task<BlobMeta> GetMetaAsync(string id)
-      {
-         throw new NotImplementedException();
-      }
-
-      public IEnumerable<string> List(string prefix)
-      {
-         throw new NotImplementedException();
-      }
-
-      public Task<IEnumerable<string>> ListAsync(string prefix)
-      {
-         throw new NotImplementedException();
-      }
-
-      public Stream OpenRead(string id)
-      {
-         throw new NotImplementedException();
-      }
-
-      public Task<Stream> OpenReadAsync(string id)
-      {
-         throw new NotImplementedException();
-      }
-
-      public void Write(string id, Stream sourceStream)
-      {
-         throw new NotImplementedException();
-      }
-
-      public Task WriteAsync(string id, Stream sourceStream)
-      {
-         throw new NotImplementedException();
+         return new BlobMeta(data.Length, secret.Value.GetHash(HashType.Md5));
       }
 
       #endregion

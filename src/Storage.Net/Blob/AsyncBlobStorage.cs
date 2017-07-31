@@ -7,19 +7,23 @@ namespace Storage.Net.Blob
    /// <summary>
    /// Blob storage abstraction that virtualizes sync/async operations and tries to autogenerate the missing ones
    /// </summary>
+   /// <seealso cref="Storage.Net.Blob.IBlobStorage" />
    public abstract class AsyncBlobStorage : IBlobStorage
    {
       /// <summary>
-      /// See interface
+      /// Deletes a blob by id
       /// </summary>
+      /// <param name="id">Blob ID, required.</param>
       public virtual void Delete(string id)
       {
          G.CallAsync(() => DeleteAsync(id));
       }
 
       /// <summary>
-      /// See interface
+      /// Deletes a blob by id
       /// </summary>
+      /// <param name="id">Blob ID, required.</param>
+      /// <returns></returns>
       public virtual Task DeleteAsync(string id)
       {
          Delete(id);
