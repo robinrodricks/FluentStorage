@@ -1,4 +1,5 @@
 ﻿using Config.Net;
+using System;
 using System.Net;
 
 namespace Storage.Net.Tests
@@ -26,6 +27,10 @@ namespace Storage.Net.Tests
       public readonly Option<string> AzureDataLakeStoreAccountName = new Option<string>("Azure.DataLake.Store.AccountName", null);
 
       public readonly Option<string> AzureDataLakeSubscriptionId = new Option<string>("Azure.DataLake.SubscriptionId", null);
+
+      public readonly Option<Uri> KeyVaultUri = new Option<Uri>("Azure.KeyVault.Uri", null);
+
+      public readonly Option<NetworkCredential> KeyVaultCreds = new Option<NetworkCredential>("Azure.KeyVault.Creds", null);
 
       #endregion
 

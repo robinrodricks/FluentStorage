@@ -41,6 +41,12 @@ namespace Storage.Net.Tests.Integration
       public InMemboryBlobStorageTest() : base("inmemory") { }
    }
 
+   public class AzureKeyVaultBlobStorageTest : BlobStorageTest
+   {
+      public AzureKeyVaultBlobStorageTest() : base("azurekeyvault") { }
+   }
+
+
    #endregion
 
    public abstract class BlobStorageTest : AbstractTestFixture
@@ -77,6 +83,11 @@ namespace Storage.Net.Tests.Integration
                break;
             case "inmemory":
                _storage = StorageFactory.Blobs.InMemory();
+               break;
+            case "azurekeyvault":
+               _storage = StorageFactory.Blobs.AzureKeyVault(
+                  TestSettings.Instance.KeyVaultUri,
+                  TestSettings.Instance.KeyVaultCreds);
                break;
          }
       }
