@@ -32,6 +32,8 @@ $SlnPath = "src\storage.sln"
 
 function Update-ProjectVersion($File)
 {
+   Write-Host "processing $File ..."
+
    $v = $vt.($File.Name)
    if($v -eq $null) { $v = $gv }
 
@@ -52,6 +54,8 @@ function Update-ProjectVersion($File)
    $fv = "{0}.{1}.{2}.0" -f $parts[0], $parts[1], $bv
    $av = "{0}.0.0.0" -f $parts[0]
    $pv = $v
+
+   #Write-Host "current settings - v: $($pg.Version), fv: $($pg.FileVersion), av: $($pg.AssemblyVersion)"
 
    $pg.Version = $pv
    $pg.FileVersion = $fv
