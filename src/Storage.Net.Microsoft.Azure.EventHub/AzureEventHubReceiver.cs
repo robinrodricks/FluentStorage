@@ -19,7 +19,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       private readonly EventHubStateAdapter _state;
       private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
       private const int MaxMessageCount = 10;
-      private static readonly TimeSpan WaitTime = TimeSpan.FromMinutes(1);
+      private static readonly TimeSpan WaitTime = TimeSpan.FromSeconds(1);
       private readonly List<PartitionReceiver> _partitonReceivers = new List<PartitionReceiver>();
       private bool _isReady;
 
