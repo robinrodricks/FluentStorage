@@ -108,7 +108,7 @@ namespace Storage.Net.Tests.Integration
       [Fact]
       public void List_All_DoesntCrash()
       {
-         List<string> allBlobNames = _storage.List(null).ToList();
+         List<BlobItem> allBlobNames = _storage.List(null, null, true).ToList();
       }
 
       [Fact]
@@ -294,7 +294,7 @@ namespace Storage.Net.Tests.Integration
          _storage.WriteText("one/two/three.json", "{}");
          _storage.WriteText("two/three/four.json", "{p:1}");
 
-         string[] files = _storage.List(null).ToArray();
+         BlobItem[] files = _storage.List(null, null, true).ToArray();
 
          Assert.True(files.Length >= 2);
          Assert.Contains("one/two/three.json", files);

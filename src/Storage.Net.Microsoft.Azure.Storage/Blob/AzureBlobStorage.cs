@@ -151,11 +151,11 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       /// <summary>
       /// Gets all the blob names, then filters by prefix optionally
       /// </summary>
-      public override async Task<IEnumerable<string>> ListAsync(string prefix)
+      public override async Task<IEnumerable<BlobItem>> ListAsync(string folderPath, string prefix, bool recurse)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
-         var result = new List<string>();
+         var result = new List<BlobItem>();
 
          BlobContinuationToken token = null;
 
@@ -165,7 +165,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
             foreach (CloudBlockBlob blob in segment.Results.OfType<CloudBlockBlob>())
             {
-               result.Add(ToUserId(blob.Name));
+               result.Add(new BlobItem(ToUserId(blob.Name)));
             }
 
          }

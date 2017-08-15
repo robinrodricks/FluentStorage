@@ -18,7 +18,7 @@ namespace Storage.Net.Blob
       /// Cannot be longer than 50 characters.</param>
       /// <param name="recurse">When true returns files recursively</param>
       /// <returns>List of blob IDs</returns>
-      IEnumerable<BlobItem> List(string folderPath, string prefix, bool recurse);
+      IEnumerable<BlobItem> List(string folderPath = null, string prefix = null, bool recurse = false);
 
       /// <summary>
       /// Returns the list of available blobs
@@ -28,7 +28,7 @@ namespace Storage.Net.Blob
       /// Cannot be longer than 50 characters.</param>
       /// <param name="recurse">When true returns files recursively</param>
       /// <returns>List of blob IDs</returns>
-      Task<IEnumerable<BlobItem>> ListAsync(string folderPath, string prefix, bool recurse);
+      Task<IEnumerable<BlobItem>> ListAsync(string folderPath = null, string prefix = null, bool recurse = false);
 
       /// <summary>
       /// Deletes a blob by id

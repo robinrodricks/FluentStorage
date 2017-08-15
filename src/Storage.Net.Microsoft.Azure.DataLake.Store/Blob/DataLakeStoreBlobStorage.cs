@@ -121,13 +121,13 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          return new BlobMeta(fsr.FileStatus.Length.Value, null);
       }
 
-      public override async Task<IEnumerable<string>> ListAsync(string prefix)
+      public override async Task<IEnumerable<BlobItem>> ListAsync(string folderPath, string prefix, bool recurse)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
          var client = await GetFsClient();
 
-         var files = new List<string>();
+         var files = new List<BlobItem>();
 
          await ListByPrefixIntoContainer(client, prefix ?? "/", files);
 

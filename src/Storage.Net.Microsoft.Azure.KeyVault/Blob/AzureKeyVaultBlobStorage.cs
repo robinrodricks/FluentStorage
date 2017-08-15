@@ -31,25 +31,25 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
       #region [ IBlobStorage ]
 
-      public override async Task<IEnumerable<string>> ListAsync(string prefix)
+      public override async Task<IEnumerable<BlobItem>> ListAsync(string folderPath, string prefix, bool recurse)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
-         var secretNames = new List<string>();
+         var secretNames = new List<BlobItem>();
          IPage<SecretItem> page = await _vaultClient.GetSecretsAsync(_vaultUri);
 
          do
          {
             foreach(SecretItem item in page)
             {
-               secretNames.Add(item.Id);
+               secretNames.Add(new BlobItem(item.Id));
             }
          }
          while (page.NextPageLink != null && (page = await _vaultClient.GetSecretsNextAsync(page.NextPageLink)) != null);
 
          if (prefix == null) return secretNames;
 
-         return secretNames.Where(n => n.StartsWith(prefix));
+         return secretNames.Where(n => n.Id.StartsWith(prefix));
       }
 
       public override async Task WriteAsync(string id, Stream sourceStream)
