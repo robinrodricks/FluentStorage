@@ -72,17 +72,17 @@ namespace Storage.Net.Blob
       /// <summary>
       /// See interface
       /// </summary>
-      public virtual IEnumerable<string> List(string prefix)
+      public virtual IEnumerable<BlobItem> List(string folderPath, string prefix, bool recurse)
       {
-         return G.CallAsync(() => ListAsync(prefix));
+         return G.CallAsync(() => ListAsync(folderPath, prefix, recurse));
       }
 
       /// <summary>
       /// See interface
       /// </summary>
-      public virtual Task<IEnumerable<string>> ListAsync(string prefix)
+      public virtual Task<IEnumerable<BlobItem>> ListAsync(string folderPath, string prefix, bool recurse)
       {
-         return Task.FromResult(List(prefix));
+         return Task.FromResult(List(folderPath, prefix, recurse));
       }
 
       /// <summary>

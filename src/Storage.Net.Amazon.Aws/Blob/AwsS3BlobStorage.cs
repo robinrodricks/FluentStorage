@@ -115,7 +115,7 @@ namespace Storage.Net.Aws.Blob
       /// <summary>
       /// Lists all buckets, optionaly filtering by prefix. Prefix filtering happens on client side.
       /// </summary>
-      public override async Task<IEnumerable<string>> ListAsync(string prefix)
+      public override async Task<IEnumerable<BlobItem>> ListAsync(string folderPath, string prefix, bool recurse)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
@@ -125,7 +125,7 @@ namespace Storage.Net.Aws.Blob
             Prefix = prefix ?? null
          });
 
-         return response.S3Objects.Select(s3Obj => s3Obj.Key);
+         return response.S3Objects.Select(s3Obj => new BlobItem(s3Obj.Key));
       }
 
       /// <summary>

@@ -27,18 +27,23 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Returns the list of blob names in this storage, optionally filtered by prefix
       /// </summary>
-      public override IEnumerable<string> List(string prefix)
+      public override IEnumerable<BlobItem> List(string folderPath, string prefix, bool recurse)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
          if(!_directory.Exists) return null;
 
-         string[] allIds = _directory.GetFiles("*", SearchOption.AllDirectories).Select(ToId).ToArray();
+         string path = GetFolder(folderPath, false);
+         if (path == null) return null;
 
-         if (string.IsNullOrEmpty(prefix)) return allIds;
+         string[] fileIds = Directory.GetFiles(
+            path,
+            string.IsNullOrEmpty(prefix)
+               ? "*"
+               : prefix + "*",
+            recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
-         string wildcard = prefix + "*";
-         return allIds.Where(id => id.MatchesWildcard(wildcard));
+         throw new NotImplementedException();
       }
 
       private string ToId(FileInfo fi)
@@ -136,10 +141,33 @@ namespace Storage.Net.Blob.Files
             md5);
       }
 
-      private string GetFilePath(string id)
+      private string GetFolder(string folderPath, bool createIfNotExists)
       {
-         GenericValidation.CheckBlobId(id);
+         string[] parts = folderPath.Split(StoragePath.PathSeparator).Select(EncodePathPart).ToArray();
+         string fullPath = _directory.FullName;
 
+         foreach (string part in parts)
+         {
+            fullPath = Path.Combine(fullPath, part);
+         }
+
+         if (!Directory.Exists(fullPath))
+         {
+            if (createIfNotExists)
+            {
+               Directory.CreateDirectory(fullPath);
+            }
+            else
+            {
+               return null;
+            }
+         }
+
+         return fullPath;
+      }
+
+      private string GetFilePath(string id, bool createIfNotExists = true)
+      {
          //id can contain path separators
          string[] parts = id.Split(StoragePath.PathSeparator).Select(EncodePathPart).ToArray();
          string name = parts[parts.Length - 1];

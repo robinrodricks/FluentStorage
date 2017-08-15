@@ -13,18 +13,22 @@ namespace Storage.Net.Blob
       /// <summary>
       /// Returns the list of available blobs
       /// </summary>
+      /// <param name="folderPath">Path to the folder. When null works with a root folder.</param>
       /// <param name="prefix">Blob prefix to filter by. When null returns all blobs.
       /// Cannot be longer than 50 characters.</param>
+      /// <param name="recurse">When true returns files recursively</param>
       /// <returns>List of blob IDs</returns>
-      IEnumerable<string> List(string prefix);
+      IEnumerable<BlobItem> List(string folderPath, string prefix, bool recurse);
 
       /// <summary>
       /// Returns the list of available blobs
       /// </summary>
+      /// <param name="folderPath">Path to the folder. When null works with a root folder.</param>
       /// <param name="prefix">Blob prefix to filter by. When null returns all blobs.
       /// Cannot be longer than 50 characters.</param>
+      /// <param name="recurse">When true returns files recursively</param>
       /// <returns>List of blob IDs</returns>
-      Task<IEnumerable<string>> ListAsync(string prefix);
+      Task<IEnumerable<BlobItem>> ListAsync(string folderPath, string prefix, bool recurse);
 
       /// <summary>
       /// Deletes a blob by id

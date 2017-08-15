@@ -72,13 +72,15 @@ namespace Storage.Net.Blob
          return new BlobMeta(ms.Length, ms.GetHash(HashType.Md5));
       }
 
-      public override IEnumerable<string> List(string prefix)
+      public override IEnumerable<BlobItem> List(string folderPath, string prefix, bool recurse)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
-         if (prefix == null) return _idToData.Keys.ToList();
+         throw new NotImplementedException();
 
-         return _idToData.Keys.Where(k => k.StartsWith(prefix)).ToList();
+         //if (prefix == null) return _idToData.Keys.ToList();
+
+         //return _idToData.Keys.Where(k => k.StartsWith(prefix)).ToList();
       }
 
    }
