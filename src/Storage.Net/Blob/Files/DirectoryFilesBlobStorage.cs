@@ -34,7 +34,7 @@ namespace Storage.Net.Blob.Files
          if(!_directory.Exists) return null;
 
          string path = GetFolder(folderPath, false);
-         if (path == null) return null;
+         if (path == null) return Enumerable.Empty<BlobItem>();
 
          string[] fileIds = Directory.GetFiles(
             path,
@@ -43,7 +43,17 @@ namespace Storage.Net.Blob.Files
                : prefix + "*",
             recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
-         throw new NotImplementedException();
+         string[] directoryIds = Directory.GetDirectories(
+               path,
+               string.IsNullOrEmpty(prefix)
+                  ? "*"
+                  : prefix + "*",
+               recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+
+         var result = new List<BlobItem>();
+         result.AddRange(directoryIds.Select(id => ToBlobItem(id, BlobItemKind.Folder)));
+         result.AddRange(fileIds.Select(id => ToBlobItem(id, BlobItemKind.File)));
+         return result;
       }
 
       private string ToId(FileInfo fi)
@@ -55,6 +65,19 @@ namespace Storage.Net.Blob.Files
          string[] parts = name.Split(StoragePath.PathSeparator);
 
          return string.Join(StoragePath.PathStrSeparator, parts.Select(DecodePathPart));
+      }
+
+      private BlobItem ToBlobItem(string fullPath, BlobItemKind kind)
+      {
+         string id = Path.GetFileName(fullPath);
+
+         fullPath = fullPath.Substring(_directory.FullName.Length);
+         fullPath = fullPath.Trim(Path.DirectorySeparatorChar);
+         fullPath = fullPath.Substring(0, id.Length);
+         fullPath = fullPath.Trim(StoragePath.PathSeparator);
+         fullPath = StoragePath.PathStrSeparator + fullPath;
+
+         return new BlobItem(fullPath, id, kind);
       }
 
       /// <summary>
@@ -143,6 +166,8 @@ namespace Storage.Net.Blob.Files
 
       private string GetFolder(string folderPath, bool createIfNotExists)
       {
+         if (folderPath == null) return _directory.FullName;
+
          string[] parts = folderPath.Split(StoragePath.PathSeparator).Select(EncodePathPart).ToArray();
          string fullPath = _directory.FullName;
 

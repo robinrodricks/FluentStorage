@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using NetBox;
-using Config.Net;
 using Xunit;
 using Storage.Net.Aws.Blob;
 using Storage.Net.Blob;
@@ -114,20 +113,18 @@ namespace Storage.Net.Tests.Integration
       [Fact]
       public void List_ByPrefix_Filtered()
       {
-         int countBefore1 = _storage.List("pref1").ToList().Count;
-         int countBefore2 = _storage.List("pref2").ToList().Count;
+         int countBefore1 = _storage.List(null, "pref1").ToList().Count;
+         int countBefore2 = _storage.List(null, "pref2").ToList().Count;
 
          string blob1 = GetRandomStreamId("pref1");
          string blob2 = GetRandomStreamId("pref1");
          string blob3 = GetRandomStreamId("pref2");
 
-         throw new NotImplementedException();
+         List<BlobItem> pref1 = _storage.List(null, "pref1").ToList();
+         List<BlobItem> pref2 = _storage.List(null, "pref2").ToList();
 
-         //List<string> pref1 = _storage.List("pref1").ToList();
-         //List<string> pref2 = _storage.List("pref2").ToList();
-
-         //Assert.Equal(2 + countBefore1, pref1.Count);
-         //Assert.Equal(1 + countBefore2, pref2.Count);
+         Assert.Equal(2 + countBefore1, pref1.Count);
+         Assert.Equal(1 + countBefore2, pref2.Count);
       }
 
       [Fact]

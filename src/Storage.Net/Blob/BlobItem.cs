@@ -32,5 +32,19 @@ namespace Storage.Net.Blob
          FolderPath = "/";
          Kind = BlobItemKind.File;
       }
+
+      public BlobItem(string folderPath, string id, BlobItemKind kind)
+      {
+         Id = id ?? throw new ArgumentNullException(nameof(id));
+         FolderPath = folderPath;
+         Kind = kind;
+      }
+
+      public override string ToString()
+      {
+         string k = Kind == BlobItemKind.File ? "file" : "folder";
+         
+         return $"{k}: {Id}@{FolderPath}";
+      }
    }
 }
