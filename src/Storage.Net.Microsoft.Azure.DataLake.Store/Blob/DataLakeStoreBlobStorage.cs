@@ -129,16 +129,19 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
          var files = new List<BlobItem>();
 
-         await ListByPrefixIntoContainer(client, prefix ?? "/", files);
+         await ListByPrefixIntoContainer(client, prefix ?? "/", files, recurse);
 
-         return files.Select(f => f.TrimStart('/'));
+         //return files.Select(f => f.TrimStart('/'));
+         throw new NotImplementedException();
       }
 
-      private async Task ListByPrefixIntoContainer(DataLakeStoreFileSystemManagementClient client, string prefix, List<string> files)
+      private async Task ListByPrefixIntoContainer(DataLakeStoreFileSystemManagementClient client, string prefix, List<BlobItem> files, bool recurse)
       {
          //todo: not sure whether this should list just top level files or not, but then what to do with folders?
 
-         if (prefix == null)
+         throw new NotImplementedException();
+
+         /*if (prefix == null)
          {
             prefix = "/";
          }
@@ -171,7 +174,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          catch(AdlsErrorException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
          {
 
-         }
+         }*/
       }
 
       public override async Task WriteAsync(string id, Stream sourceStream)

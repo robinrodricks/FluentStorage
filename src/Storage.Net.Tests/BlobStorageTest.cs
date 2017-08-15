@@ -121,11 +121,13 @@ namespace Storage.Net.Tests.Integration
          string blob2 = GetRandomStreamId("pref1");
          string blob3 = GetRandomStreamId("pref2");
 
-         List<string> pref1 = _storage.List("pref1").ToList();
-         List<string> pref2 = _storage.List("pref2").ToList();
+         throw new NotImplementedException();
 
-         Assert.Equal(2 + countBefore1, pref1.Count);
-         Assert.Equal(1 + countBefore2, pref2.Count);
+         //List<string> pref1 = _storage.List("pref1").ToList();
+         //List<string> pref2 = _storage.List("pref2").ToList();
+
+         //Assert.Equal(2 + countBefore1, pref1.Count);
+         //Assert.Equal(1 + countBefore2, pref2.Count);
       }
 
       [Fact]
@@ -296,9 +298,10 @@ namespace Storage.Net.Tests.Integration
 
          BlobItem[] files = _storage.List(null, null, true).ToArray();
 
-         Assert.True(files.Length >= 2);
-         Assert.Contains("one/two/three.json", files);
-         Assert.Contains("two/three/four.json", files);
+         throw new NotImplementedException();
+         //Assert.True(files.Length >= 2);
+         //Assert.Contains("one/two/three.json", files);
+         //Assert.Contains("two/three/four.json", files);
       }
 
       //bad input does crash blob storages, they are still not equal in that sense
