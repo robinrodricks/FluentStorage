@@ -132,6 +132,21 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public void List_FilesInFolder_Recursive()
+      {
+         string id1 = Generator.RandomString;
+         string id2 = StoragePath.Combine(Generator.RandomString, Generator.RandomString);
+         string id3 = StoragePath.Combine(Generator.RandomString, Generator.RandomString, Generator.RandomString);
+
+         _storage.WriteText(id1, Generator.RandomString);
+         _storage.WriteText(id2, Generator.RandomString);
+         _storage.WriteText(id3, Generator.RandomString);
+
+         var items = _storage.List(null, null, true);
+      }
+
+
+      [Fact]
       public void List_VeryLongPrefix_NoResultsNoCrash()
       {
          Assert.Throws<ArgumentException>(() => _storage.List(Generator.GetRandomString(100000, false)));

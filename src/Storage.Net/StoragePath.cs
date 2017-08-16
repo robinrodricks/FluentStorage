@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Storage.Net
@@ -28,9 +29,21 @@ namespace Storage.Net
       /// </summary>
       /// <param name="parts"></param>
       /// <returns></returns>
+      public static string Combine(IEnumerable<string> parts)
+      {
+         if (parts == null) return Normalize(null);
+
+         return Normalize(string.Join(PathStrSeparator, parts.Where(p => p != null).Select(p => NormalizePart(p))));
+      }
+
+      /// <summary>
+      /// Combines parts of path
+      /// </summary>
+      /// <param name="parts"></param>
+      /// <returns></returns>
       public static string Combine(params string[] parts)
       {
-         return Normalize(string.Join(PathStrSeparator, parts.Select(p => NormalizePart(p))));
+         return Combine((IEnumerable<string>)parts);
       }
 
       /// <summary>
@@ -40,7 +53,7 @@ namespace Storage.Net
       /// <returns></returns>
       public static string Normalize(string path)
       {
-         if (path == null) return null;
+         if (path == null) return PathSeparatorString;
 
          return PathSeparatorString + path.Trim(PathSeparator);
       }

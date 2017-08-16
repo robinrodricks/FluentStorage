@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Storage.Net.Blob
 {
@@ -21,6 +22,19 @@ namespace Storage.Net.Blob
       /// Gets the id of this blob, uniqueue within the folder
       /// </summary>
       public string Id { get; private set; }
+
+      public BlobId(string fullId, BlobItemKind kind)
+      {
+         string path = StoragePath.Normalize(fullId);
+         string[] parts = StoragePath.GetParts(path);
+
+         Id = parts.Last();
+         FolderPath = parts.Length > 1
+            ? StoragePath.Combine(parts.Skip(1))
+            : StoragePath.PathStrSeparator;
+
+         Kind = kind;
+      }
 
       public BlobId(string folderPath, string id, BlobItemKind kind)
       {

@@ -51,8 +51,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       {
          GenericValidation.CheckBlobId(id);
 
-         id = ToInternalId(id);
-
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
 
          bool exists = await blob.ExistsAsync();
@@ -71,8 +69,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       {
          GenericValidation.CheckBlobId(id);
          if (policy == null) throw new ArgumentNullException(nameof(policy));
-
-         id = ToInternalId(id);
 
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
 
@@ -154,27 +150,73 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       /// </summary>
       protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobPrefix(prefix);
+         return await ListFolder(
+            StoragePath.Combine(folderPath),
+            prefix,
+            recurse,
+            cancellationToken); 
+      }
+
+      private async Task<IEnumerable<BlobId>> ListFolder(string path, string prefix, bool recurse, CancellationToken cancellationToken)
+      {
+         //todo: need to start off CloudBlobDirectory.ListBlobs, but for this the directory need to be found first
 
          var result = new List<BlobId>();
 
          BlobContinuationToken token = null;
 
+         //blob path cannot start with '/'
+         string listPrefix = StoragePath.Combine(path, prefix).Trim(StoragePath.PathSeparator);
+         if (prefix != null) listPrefix = StoragePath.Combine(listPrefix, prefix);
+
          do
          {
-            BlobResultSegment segment = await _blobContainer.ListBlobsSegmentedAsync(prefix, true, BlobListingDetails.None, null, token, null, null);
+            BlobResultSegment segment = await _blobContainer.ListBlobsSegmentedAsync(
+               listPrefix,
+               false,
+               BlobListingDetails.None,
+               null,
+               token,
+               null,
+               null,
+               cancellationToken);
 
-            foreach (CloudBlockBlob blob in segment.Results.OfType<CloudBlockBlob>())
+            foreach (IListBlobItem blob in segment.Results)
             {
-               result.Add(new BlobId(null, ToUserId(blob.Name), BlobItemKind.File));
+               BlobId id;
+
+               if (blob is CloudBlockBlob blockBlob)
+                  id = new BlobId(blockBlob.Name, BlobItemKind.File);
+               else if (blob is CloudAppendBlob appendBlob)
+                  id = new BlobId(appendBlob.Name, BlobItemKind.File);
+               else if (blob is CloudBlobDirectory dirBlob)
+                  id = new BlobId(dirBlob.Prefix, BlobItemKind.Folder);
+               else
+                  throw new InvalidOperationException($"unknown item type {blob.GetType()}");
+
+               result.Add(id);
             }
 
          }
          while (token != null);
 
+         if(recurse)
+         {
+            List<BlobId> folderIds = result.Where(r => r.Kind == BlobItemKind.Folder).ToList();
+            foreach(BlobId folderId in folderIds)
+            {
+               IEnumerable<BlobId> children = await ListFolder(
+                  StoragePath.Combine(path, folderId.Id),
+                  prefix,
+                  recurse,
+                  cancellationToken);
+
+               result.AddRange(children);
+            }
+         }
+
          return result;
       }
-
 
       /// <summary>
       /// Deletes blob remotely
@@ -182,8 +224,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       public override async Task DeleteAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
-
-         id = ToInternalId(id);
 
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
          await blob.DeleteIfExistsAsync();
@@ -196,9 +236,8 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       {
          GenericValidation.CheckBlobId(id);
          GenericValidation.CheckSourceStream(sourceStream);
-         id = ToInternalId(id);
 
-         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
+         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(ToPath(id));
          await blob.UploadFromStreamAsync(sourceStream);
       }
 
@@ -209,7 +248,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       {
          GenericValidation.CheckBlobId(id);
          GenericValidation.CheckSourceStream(sourceStream);
-         id = ToInternalId(id);
 
          CloudAppendBlob cab = _blobContainer.GetAppendBlobReference(id);
          if (!(await cab.ExistsAsync())) await cab.CreateOrReplaceAsync();
@@ -225,8 +263,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       public override async Task<Stream> OpenReadAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
-
-         id = ToInternalId(id);
 
          CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
 
@@ -248,7 +284,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       public override async Task<bool> ExistsAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
-         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(ToInternalId(id));
+         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
          return await blob.ExistsAsync();
       }
 
@@ -272,18 +308,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             md5);
       }
 
-      private static string ToInternalId(string userId)
-      {
-         return userId;
-         //return userId.UrlEncode();
-      }
-
-      private static string ToUserId(string internalId)
-      {
-         return internalId;
-         //return internalId.UrlDecode();
-      }
-
       private static bool TryHandleStorageException(AzureStorageException ex)
       {
          if(ex.RequestInformation?.HttpStatusCode == 404)
@@ -292,6 +316,13 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          }
 
          return false;
+      }
+
+      private static string ToPath(string path)
+      {
+         if (path == null) return null;
+
+         return path.Trim(StoragePath.PathSeparator);
       }
    }
 }
