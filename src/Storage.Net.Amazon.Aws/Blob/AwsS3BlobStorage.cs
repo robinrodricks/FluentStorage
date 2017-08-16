@@ -10,6 +10,7 @@ using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using NetBox;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Storage.Net.Aws.Blob
 {
@@ -59,7 +60,7 @@ namespace Storage.Net.Aws.Blob
       /// <summary>
       /// Lists all buckets, optionaly filtering by prefix. Prefix filtering happens on client side.
       /// </summary>
-      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse)
+      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 

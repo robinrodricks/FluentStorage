@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Storage.Net.Blob
@@ -8,21 +9,21 @@ namespace Storage.Net.Blob
    /// <summary>
    /// Blob storage abstraction that virtualizes sync/async operations and tries to autogenerate the missing ones
    /// </summary>
-   /// <seealso cref="Storage.Net.Blob.IBlobStorage" />
+   /// <seealso cref="IBlobStorage" />
    public abstract class AsyncBlobStorage : IBlobStorage
    {
       /// <summary>
       /// See interface
       /// </summary>
-      public async Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse)
+      public async Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobPrefix(prefix);
          string[] path = StoragePath.GetParts(folderPath);
 
-         return await ListAsync(path, prefix, recurse);
+         return await ListAsync(path, prefix, recurse, cancellationToken);
       }
 
-      protected abstract Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse);
+      protected abstract Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse, CancellationToken cancellationToken);
 
       /// <summary>
       /// Deletes a blob by id

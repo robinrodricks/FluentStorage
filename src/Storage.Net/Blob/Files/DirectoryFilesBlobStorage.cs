@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Storage.Net.Blob.Files
 {
@@ -27,7 +28,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Returns the list of blob names in this storage, optionally filtered by prefix
       /// </summary>
-      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] path, string prefix, bool recurse)
+      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] path, string prefix, bool recurse, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Storage.Net.Blob
@@ -17,8 +18,9 @@ namespace Storage.Net.Blob
       /// <param name="prefix">Blob prefix to filter by. When null returns all blobs.
       /// Cannot be longer than 50 characters.</param>
       /// <param name="recurse">When true returns files recursively</param>
+      /// <param name="cancellationToken"></param>
       /// <returns>List of blob IDs</returns>
-      Task<IEnumerable<BlobId>> ListAsync(string folderPath = null, string prefix = null, bool recurse = false);
+      Task<IEnumerable<BlobId>> ListAsync(string folderPath = null, string prefix = null, bool recurse = false, CancellationToken cancellationToken = default(CancellationToken));
 
       /// <summary>
       /// Deletes a blob by id

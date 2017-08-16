@@ -5,6 +5,7 @@ using NetBox.Model;
 using System.Linq;
 using NetBox.IO;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Storage.Net.Blob
 {
@@ -12,7 +13,7 @@ namespace Storage.Net.Blob
    {
       private readonly Dictionary<string, MemoryStream> _idToData = new Dictionary<string, MemoryStream>();
 
-      protected override Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse)
+      protected override Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
          throw new NotImplementedException();
       }

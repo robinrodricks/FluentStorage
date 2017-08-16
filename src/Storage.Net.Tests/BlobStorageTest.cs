@@ -124,7 +124,11 @@ namespace Storage.Net.Tests.Integration
       [Fact]
       public void List_FilesInFolder_NonRecursive()
       {
+         string id = Generator.RandomString;
 
+         _storage.WriteText(id, Generator.RandomString);
+
+         var items = _storage.List(null, null, true);
       }
 
       [Fact]

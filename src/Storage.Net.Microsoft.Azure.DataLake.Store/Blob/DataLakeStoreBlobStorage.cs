@@ -12,6 +12,7 @@ using Microsoft.Azure.Management.DataLake.Store.Models;
 using NetBox.IO;
 using Microsoft.Rest.Azure;
 using System.Linq;
+using System.Threading;
 
 namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 {
@@ -64,7 +65,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          return new DataLakeStoreBlobStorage(accountName, credential.Domain, credential.UserName, credential.Password, null);
       }
 
-      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse)
+      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 

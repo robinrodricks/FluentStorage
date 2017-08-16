@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Rest.Azure;
 using NetBox.Model;
+using System.Threading;
 
 namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 {
@@ -31,7 +32,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
       #region [ IBlobStorage ]
 
-      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse)
+      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 

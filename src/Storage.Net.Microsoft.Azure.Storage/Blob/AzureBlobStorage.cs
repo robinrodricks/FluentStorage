@@ -9,6 +9,7 @@ using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blob
 {
@@ -151,7 +152,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       /// <summary>
       /// Gets all the blob names, then filters by prefix optionally
       /// </summary>
-      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse)
+      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 

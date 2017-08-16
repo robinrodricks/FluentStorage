@@ -73,7 +73,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          }
       }
 
-      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse)
+      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
          var result = new List<BlobId>();
 
