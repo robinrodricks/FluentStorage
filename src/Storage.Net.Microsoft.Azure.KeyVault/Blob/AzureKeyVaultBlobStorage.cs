@@ -31,18 +31,18 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
       #region [ IBlobStorage ]
 
-      public override async Task<IEnumerable<BlobItem>> ListAsync(string folderPath, string prefix, bool recurse)
+      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
-         var secretNames = new List<BlobItem>();
+         var secretNames = new List<BlobId>();
          IPage<SecretItem> page = await _vaultClient.GetSecretsAsync(_vaultUri);
 
          do
          {
             foreach(SecretItem item in page)
             {
-               secretNames.Add(new BlobItem(item.Id));
+               secretNames.Add(new BlobId(null, item.Id, BlobItemKind.File));
             }
          }
          while (page.NextPageLink != null && (page = await _vaultClient.GetSecretsNextAsync(page.NextPageLink)) != null);

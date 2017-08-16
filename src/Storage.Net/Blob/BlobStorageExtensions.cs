@@ -13,6 +13,19 @@ namespace Storage.Net.Blob
    {
 
       /// <summary>
+      /// Returns the list of available blobs
+      /// </summary>
+      /// <param name="folderPath">Path to the folder. When null works with a root folder.</param>
+      /// <param name="prefix">Blob prefix to filter by. When null returns all blobs.
+      /// Cannot be longer than 50 characters.</param>
+      /// <param name="recurse">When true returns files recursively</param>
+      /// <returns>List of blob IDs</returns>
+      public static IEnumerable<BlobId> List(this IBlobStorage storage, string folderPath = null, string prefix = null, bool recurse = false)
+      {
+         return G.CallAsync(() => storage.ListAsync(folderPath, prefix, recurse));
+      }
+
+      /// <summary>
       /// Downloads blob to a stream
       /// </summary>
       /// <param name="storage"></param>

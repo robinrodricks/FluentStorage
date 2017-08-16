@@ -27,30 +27,30 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Returns the list of blob names in this storage, optionally filtered by prefix
       /// </summary>
-      public override IEnumerable<BlobItem> List(string folderPath, string prefix, bool recurse)
+      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] path, string prefix, bool recurse)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
          if(!_directory.Exists) return null;
 
-         string path = GetFolder(folderPath, false);
-         if (path == null) return Enumerable.Empty<BlobItem>();
+         string fullPath = GetFolder(path, false);
+         if (path == null) return Enumerable.Empty<BlobId>();
 
          string[] fileIds = Directory.GetFiles(
-            path,
+            fullPath,
             string.IsNullOrEmpty(prefix)
                ? "*"
                : prefix + "*",
             recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
          string[] directoryIds = Directory.GetDirectories(
-               path,
+               fullPath,
                string.IsNullOrEmpty(prefix)
                   ? "*"
                   : prefix + "*",
                recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
-         var result = new List<BlobItem>();
+         var result = new List<BlobId>();
          result.AddRange(directoryIds.Select(id => ToBlobItem(id, BlobItemKind.Folder)));
          result.AddRange(fileIds.Select(id => ToBlobItem(id, BlobItemKind.File)));
          return result;
@@ -67,7 +67,7 @@ namespace Storage.Net.Blob.Files
          return string.Join(StoragePath.PathStrSeparator, parts.Select(DecodePathPart));
       }
 
-      private BlobItem ToBlobItem(string fullPath, BlobItemKind kind)
+      private BlobId ToBlobItem(string fullPath, BlobItemKind kind)
       {
          string id = Path.GetFileName(fullPath);
 
@@ -77,7 +77,7 @@ namespace Storage.Net.Blob.Files
          fullPath = fullPath.Trim(StoragePath.PathSeparator);
          fullPath = StoragePath.PathStrSeparator + fullPath;
 
-         return new BlobItem(fullPath, id, kind);
+         return new BlobId(fullPath, id, kind);
       }
 
       /// <summary>
@@ -164,14 +164,13 @@ namespace Storage.Net.Blob.Files
             md5);
       }
 
-      private string GetFolder(string folderPath, bool createIfNotExists)
+      private string GetFolder(string[] path, bool createIfNotExists)
       {
-         if (folderPath == null) return _directory.FullName;
+         if (path == null || path.Length == 0) return _directory.FullName;
 
-         string[] parts = folderPath.Split(StoragePath.PathSeparator).Select(EncodePathPart).ToArray();
          string fullPath = _directory.FullName;
 
-         foreach (string part in parts)
+         foreach (string part in path)
          {
             fullPath = Path.Combine(fullPath, part);
          }

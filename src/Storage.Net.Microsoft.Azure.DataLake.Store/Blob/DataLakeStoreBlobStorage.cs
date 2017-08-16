@@ -64,6 +64,62 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          return new DataLakeStoreBlobStorage(accountName, credential.Domain, credential.UserName, credential.Password, null);
       }
 
+      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse)
+      {
+         GenericValidation.CheckBlobPrefix(prefix);
+
+         var client = await GetFsClient();
+
+         var files = new List<BlobId>();
+
+         await ListByPrefixIntoContainer(client, prefix ?? "/", files, recurse);
+
+         //return files.Select(f => f.TrimStart('/'));
+         throw new NotImplementedException();
+      }
+
+      private async Task ListByPrefixIntoContainer(DataLakeStoreFileSystemManagementClient client, string prefix, List<BlobId> files, bool recurse)
+      {
+         //todo: not sure whether this should list just top level files or not, but then what to do with folders?
+
+         throw new NotImplementedException();
+
+         /*if (prefix == null)
+         {
+            prefix = "/";
+         }
+         else if(!prefix.StartsWith("/"))
+         {
+            prefix = "/" + prefix;
+         }
+
+         try
+         {
+            FileStatusesResult statuses = await client.FileSystem.ListFileStatusAsync(_accountName, prefix);
+
+            files.AddRange(statuses.FileStatuses.FileStatus
+               .Where(fs => fs.Type == FileType.FILE)
+               .Select(f => prefix + f.PathSuffix));
+
+            List<string> directories = statuses.FileStatuses.FileStatus
+               .Where(fs => fs.Type == FileType.DIRECTORY)
+               .Select(fs => prefix + fs.PathSuffix + "/")
+               .ToList();
+
+            if (directories.Count > 0)
+            {
+               foreach (string dirPath in directories)
+               {
+                  await ListByPrefixIntoContainer(client, dirPath, files);
+               }
+            }
+         }
+         catch(AdlsErrorException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
+         {
+
+         }*/
+      }
+
       public override async Task DeleteAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
@@ -119,62 +175,6 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          //fsr.FileStatus.
 
          return new BlobMeta(fsr.FileStatus.Length.Value, null);
-      }
-
-      public override async Task<IEnumerable<BlobItem>> ListAsync(string folderPath, string prefix, bool recurse)
-      {
-         GenericValidation.CheckBlobPrefix(prefix);
-
-         var client = await GetFsClient();
-
-         var files = new List<BlobItem>();
-
-         await ListByPrefixIntoContainer(client, prefix ?? "/", files, recurse);
-
-         //return files.Select(f => f.TrimStart('/'));
-         throw new NotImplementedException();
-      }
-
-      private async Task ListByPrefixIntoContainer(DataLakeStoreFileSystemManagementClient client, string prefix, List<BlobItem> files, bool recurse)
-      {
-         //todo: not sure whether this should list just top level files or not, but then what to do with folders?
-
-         throw new NotImplementedException();
-
-         /*if (prefix == null)
-         {
-            prefix = "/";
-         }
-         else if(!prefix.StartsWith("/"))
-         {
-            prefix = "/" + prefix;
-         }
-
-         try
-         {
-            FileStatusesResult statuses = await client.FileSystem.ListFileStatusAsync(_accountName, prefix);
-
-            files.AddRange(statuses.FileStatuses.FileStatus
-               .Where(fs => fs.Type == FileType.FILE)
-               .Select(f => prefix + f.PathSuffix));
-
-            List<string> directories = statuses.FileStatuses.FileStatus
-               .Where(fs => fs.Type == FileType.DIRECTORY)
-               .Select(fs => prefix + fs.PathSuffix + "/")
-               .ToList();
-
-            if (directories.Count > 0)
-            {
-               foreach (string dirPath in directories)
-               {
-                  await ListByPrefixIntoContainer(client, dirPath, files);
-               }
-            }
-         }
-         catch(AdlsErrorException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
-         {
-
-         }*/
       }
 
       public override async Task WriteAsync(string id, Stream sourceStream)

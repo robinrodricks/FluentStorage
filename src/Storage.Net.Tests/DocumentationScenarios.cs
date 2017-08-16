@@ -30,7 +30,7 @@ namespace Storage.Net.Tests
          storage.Write("folder1/file2", Generator.RandomString.ToMemoryStream());
          storage.Write("folder2/file1", Generator.RandomString.ToMemoryStream());
 
-         BlobItem[] folderBlobs = storage.List("folder1").ToArray();
+         BlobId[] folderBlobs = storage.List("folder1").ToArray();
       }
 
       public void Blobs_save_file_to_a_specific_folder()

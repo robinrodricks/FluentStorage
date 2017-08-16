@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -10,6 +11,19 @@ namespace Storage.Net.Blob
    /// <seealso cref="Storage.Net.Blob.IBlobStorage" />
    public abstract class AsyncBlobStorage : IBlobStorage
    {
+      /// <summary>
+      /// See interface
+      /// </summary>
+      public async Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse)
+      {
+         GenericValidation.CheckBlobPrefix(prefix);
+         string[] path = StoragePath.GetParts(folderPath);
+
+         return await ListAsync(path, prefix, recurse);
+      }
+
+      protected abstract Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse);
+
       /// <summary>
       /// Deletes a blob by id
       /// </summary>
@@ -67,22 +81,6 @@ namespace Storage.Net.Blob
       public virtual Task<BlobMeta> GetMetaAsync(string id)
       {
          return Task.FromResult(GetMeta(id));
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
-      public virtual IEnumerable<BlobItem> List(string folderPath, string prefix, bool recurse)
-      {
-         return G.CallAsync(() => ListAsync(folderPath, prefix, recurse));
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
-      public virtual Task<IEnumerable<BlobItem>> ListAsync(string folderPath, string prefix, bool recurse)
-      {
-         return Task.FromResult(List(folderPath, prefix, recurse));
       }
 
       /// <summary>

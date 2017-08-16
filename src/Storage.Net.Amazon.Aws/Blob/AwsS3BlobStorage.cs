@@ -57,6 +57,22 @@ namespace Storage.Net.Aws.Blob
       }
 
       /// <summary>
+      /// Lists all buckets, optionaly filtering by prefix. Prefix filtering happens on client side.
+      /// </summary>
+      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse)
+      {
+         GenericValidation.CheckBlobPrefix(prefix);
+
+         ListObjectsV2Response response = await _client.ListObjectsV2Async(new ListObjectsV2Request()
+         {
+            BucketName = _bucketName,
+            Prefix = prefix ?? null
+         });
+
+         return response.S3Objects.Select(s3Obj => new BlobId(null, s3Obj.Key, BlobItemKind.File));
+      }
+
+      /// <summary>
       /// deletes object from current bucket
       /// </summary>
       public override async Task DeleteAsync(string id)
@@ -110,22 +126,6 @@ namespace Storage.Net.Aws.Blob
          {
             return null;
          }
-      }
-
-      /// <summary>
-      /// Lists all buckets, optionaly filtering by prefix. Prefix filtering happens on client side.
-      /// </summary>
-      public override async Task<IEnumerable<BlobItem>> ListAsync(string folderPath, string prefix, bool recurse)
-      {
-         GenericValidation.CheckBlobPrefix(prefix);
-
-         ListObjectsV2Response response = await _client.ListObjectsV2Async(new ListObjectsV2Request()
-         {
-            BucketName = _bucketName,
-            Prefix = prefix ?? null
-         });
-
-         return response.S3Objects.Select(s3Obj => new BlobItem(s3Obj.Key));
       }
 
       /// <summary>

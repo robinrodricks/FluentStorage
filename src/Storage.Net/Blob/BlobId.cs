@@ -5,7 +5,7 @@ namespace Storage.Net.Blob
    /// <summary>
    /// Blob item description
    /// </summary>
-   public class BlobItem
+   public class BlobId : IEquatable<BlobId>
    {
       /// <summary>
       /// Gets the kind of item
@@ -22,18 +22,7 @@ namespace Storage.Net.Blob
       /// </summary>
       public string Id { get; private set; }
 
-      /// <summary>
-      /// Creates an instance of BlobItem as a file in root folder
-      /// </summary>
-      /// <param name="id">Blob ID</param>
-      public BlobItem(string id)
-      {
-         Id = id ?? throw new ArgumentNullException(nameof(id));
-         FolderPath = "/";
-         Kind = BlobItemKind.File;
-      }
-
-      public BlobItem(string folderPath, string id, BlobItemKind kind)
+      public BlobId(string folderPath, string id, BlobItemKind kind)
       {
          Id = id ?? throw new ArgumentNullException(nameof(id));
          FolderPath = folderPath;
@@ -45,6 +34,11 @@ namespace Storage.Net.Blob
          string k = Kind == BlobItemKind.File ? "file" : "folder";
          
          return $"{k}: {Id}@{FolderPath}";
+      }
+
+      public bool Equals(BlobId other)
+      {
+         throw new NotImplementedException();
       }
    }
 }

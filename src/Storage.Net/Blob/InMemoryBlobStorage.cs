@@ -4,12 +4,18 @@ using System;
 using NetBox.Model;
 using System.Linq;
 using NetBox.IO;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Blob
 {
    class InMemoryBlobStorage : AsyncBlobStorage
    {
       private readonly Dictionary<string, MemoryStream> _idToData = new Dictionary<string, MemoryStream>();
+
+      protected override Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse)
+      {
+         throw new NotImplementedException();
+      }
 
       public override void Append(string id, Stream sourceStream)
       {
@@ -71,17 +77,5 @@ namespace Storage.Net.Blob
 
          return new BlobMeta(ms.Length, ms.GetHash(HashType.Md5));
       }
-
-      public override IEnumerable<BlobItem> List(string folderPath, string prefix, bool recurse)
-      {
-         GenericValidation.CheckBlobPrefix(prefix);
-
-         throw new NotImplementedException();
-
-         //if (prefix == null) return _idToData.Keys.ToList();
-
-         //return _idToData.Keys.Where(k => k.StartsWith(prefix)).ToList();
-      }
-
    }
 }

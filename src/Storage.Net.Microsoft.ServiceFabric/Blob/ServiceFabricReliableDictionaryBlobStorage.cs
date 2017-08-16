@@ -73,9 +73,9 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          }
       }
 
-      public override async Task<IEnumerable<BlobItem>> ListAsync(string folderPath, string prefix, bool recurse)
+      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse)
       {
-         var result = new List<BlobItem>();
+         var result = new List<BlobId>();
 
          using (var tx = await OpenCollection())
          {
@@ -90,7 +90,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
                   if (prefix == null || current.Key.StartsWith(prefix))
                   {
-                     result.Add(new BlobItem(current.Key));
+                     result.Add(new BlobId(null, current.Key, BlobItemKind.File));
                   }
                }
             }

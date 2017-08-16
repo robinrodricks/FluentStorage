@@ -107,24 +107,24 @@ namespace Storage.Net.Tests.Integration
       [Fact]
       public void List_All_DoesntCrash()
       {
-         List<BlobItem> allBlobNames = _storage.List(null, null, true).ToList();
+         List<BlobId> allBlobNames = _storage.List(null, null, true).ToList();
       }
 
       [Fact]
-      public void List_ByPrefix_Filtered()
+      public void List_ByFlatPrefix_Filtered()
       {
-         int countBefore1 = _storage.List(null, "pref1").ToList().Count;
-         int countBefore2 = _storage.List(null, "pref2").ToList().Count;
+         string prefix = Generator.RandomString;
+         string id1 = prefix + Generator.RandomString;
+         string id2 = prefix = Generator.RandomString;
 
-         string blob1 = GetRandomStreamId("pref1");
-         string blob2 = GetRandomStreamId("pref1");
-         string blob3 = GetRandomStreamId("pref2");
+         List<BlobId> items = _storage.List(null, prefix, false).ToList();
+         Assert.Equal(2, items.Count);
+      }
 
-         List<BlobItem> pref1 = _storage.List(null, "pref1").ToList();
-         List<BlobItem> pref2 = _storage.List(null, "pref2").ToList();
+      [Fact]
+      public void List_FilesInFolder_NonRecursive()
+      {
 
-         Assert.Equal(2 + countBefore1, pref1.Count);
-         Assert.Equal(1 + countBefore2, pref2.Count);
       }
 
       [Fact]
@@ -293,7 +293,7 @@ namespace Storage.Net.Tests.Integration
          _storage.WriteText("one/two/three.json", "{}");
          _storage.WriteText("two/three/four.json", "{p:1}");
 
-         BlobItem[] files = _storage.List(null, null, true).ToArray();
+         BlobId[] files = _storage.List(null, null, true).ToArray();
 
          throw new NotImplementedException();
          //Assert.True(files.Length >= 2);

@@ -151,11 +151,11 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       /// <summary>
       /// Gets all the blob names, then filters by prefix optionally
       /// </summary>
-      public override async Task<IEnumerable<BlobItem>> ListAsync(string folderPath, string prefix, bool recurse)
+      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
-         var result = new List<BlobItem>();
+         var result = new List<BlobId>();
 
          BlobContinuationToken token = null;
 
@@ -165,7 +165,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
             foreach (CloudBlockBlob blob in segment.Results.OfType<CloudBlockBlob>())
             {
-               result.Add(new BlobItem(ToUserId(blob.Name)));
+               result.Add(new BlobId(null, ToUserId(blob.Name), BlobItemKind.File));
             }
 
          }
@@ -173,6 +173,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          return result;
       }
+
 
       /// <summary>
       /// Deletes blob remotely
