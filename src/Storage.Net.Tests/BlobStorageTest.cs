@@ -115,7 +115,12 @@ namespace Storage.Net.Tests.Integration
       {
          string prefix = Generator.RandomString;
          string id1 = prefix + Generator.RandomString;
-         string id2 = prefix = Generator.RandomString;
+         string id2 = prefix + Generator.RandomString;
+         string id3 = Generator.RandomString;
+
+         _storage.WriteText(id1, Generator.RandomString);
+         _storage.WriteText(id2, Generator.RandomString);
+         _storage.WriteText(id3, Generator.RandomString);
 
          List<BlobId> items = _storage.List(null, prefix, false).ToList();
          Assert.Equal(2, items.Count);

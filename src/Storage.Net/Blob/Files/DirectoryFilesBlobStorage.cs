@@ -35,7 +35,7 @@ namespace Storage.Net.Blob.Files
          if(!_directory.Exists) return null;
 
          string fullPath = GetFolder(path, false);
-         if (path == null) return Enumerable.Empty<BlobId>();
+         if (fullPath == null) return Enumerable.Empty<BlobId>();
 
          string[] fileIds = Directory.GetFiles(
             fullPath,
