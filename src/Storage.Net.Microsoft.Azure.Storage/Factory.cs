@@ -49,12 +49,12 @@ namespace Storage.Net
       /// <param name="containerName">Container name in the blob storage. If the container doesn't exist it will be automatically
       /// created for you.</param>
       /// <returns>Generic blob storage interface</returns>
-      public static IBlobStorage AzureBlobStorage(this IBlobStorageFactory factory,
+      public static IBlobStorageProvider AzureBlobStorage(this IBlobStorageFactory factory,
          string accountName,
          string key,
          string containerName)
       {
-         return new AzureBlobStorage(accountName, key, containerName);
+         return new AzureBlobStorageProvider(accountName, key, containerName);
       }
 
       /// <summary>
@@ -65,11 +65,11 @@ namespace Storage.Net
       /// <param name="containerName">Container name in the blob storage. If the container doesn't exist it will be automatically
       /// created for you.</param>
       /// <returns>Generic blob storage interface</returns>
-      public static IBlobStorage AzureBlobStorage(this IBlobStorageFactory factory,
+      public static IBlobStorageProvider AzureBlobStorage(this IBlobStorageFactory factory,
          NetworkCredential credential,
          string containerName)
       {
-         return new AzureBlobStorage(credential, containerName);
+         return new AzureBlobStorageProvider(credential, containerName);
       }
 
       /// <summary>
@@ -80,11 +80,11 @@ namespace Storage.Net
       /// <param name="containerName">Container name in the blob storage. If the container doesn't exist it will be automatically
       /// create for you.</param>
       /// <returns>Generic blob storage  interface</returns>
-      public static IBlobStorage AzureBlobStorage(this IBlobStorageFactory factory,
+      public static IBlobStorageProvider AzureBlobStorage(this IBlobStorageFactory factory,
          string connectionString,
          string containerName)
       {
-         return new AzureBlobStorage(connectionString, containerName);
+         return new AzureBlobStorageProvider(connectionString, containerName);
       }
 
       /// <summary>

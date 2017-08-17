@@ -16,14 +16,14 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
    /// <summary>
    /// Azure Blob Storage
    /// </summary>
-   public class AzureBlobStorage : AsyncBlobStorage
+   public class AzureBlobStorageProvider : IBlobStorageProvider
    {
       private readonly CloudBlobContainer _blobContainer;
 
       /// <summary>
       /// Creates an instance from account name, private key and container name
       /// </summary>
-      public AzureBlobStorage(string accountName, string key, string containerName)
+      public AzureBlobStorageProvider(string accountName, string key, string containerName)
       {
          ValidateContainerName(containerName);
 
@@ -85,7 +85,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       /// </summary>
       /// <param name="credential"></param>
       /// <param name="containerName"></param>
-      public AzureBlobStorage(NetworkCredential credential, string containerName) :
+      public AzureBlobStorageProvider(NetworkCredential credential, string containerName) :
          this(credential.UserName, credential.Password, containerName)
       {
 
@@ -94,7 +94,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       /// <summary>
       /// Creates an insance from connection string
       /// </summary>
-      public AzureBlobStorage(string connectionString, string containerName)
+      public AzureBlobStorageProvider(string connectionString, string containerName)
       {
          if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
          ValidateContainerName(containerName);
@@ -148,17 +148,18 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       /// <summary>
       /// Gets all the blob names, then filters by prefix optionally
       /// </summary>
-      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
+      public async Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
          var browser = new AzureBlobDirectoryBrowser(_blobContainer);
 
          return await browser.ListFolder(
-            StoragePath.Combine(folderPath),
+            folderPath,
             prefix,
             recurse,
             cancellationToken); 
       }
 
+      /*
       /// <summary>
       /// Deletes blob remotely
       /// </summary>
@@ -264,6 +265,17 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          if (path == null) return null;
 
          return path.Trim(StoragePath.PathSeparator);
+      }
+
+      public Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken = default(CancellationToken))
+      {
+         throw new NotImplementedException();
+      }
+      */
+
+      public void Dispose()
+      {
+         throw new NotImplementedException();
       }
    }
 }

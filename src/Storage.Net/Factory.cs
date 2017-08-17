@@ -28,7 +28,7 @@ namespace Storage.Net
       /// <param name="factory"></param>
       /// <param name="directory">Root directory</param>
       /// </summary>
-      public static IBlobStorage DirectoryFiles(this IBlobStorageFactory factory,
+      public static IBlobStorageProvider DirectoryFiles(this IBlobStorageFactory factory,
          DirectoryInfo directory)
       {
          return new DirectoryFilesBlobStorage(directory);
@@ -40,7 +40,7 @@ namespace Storage.Net
       /// </summary>
       /// <param name="factory">Factory reference</param>
       /// <returns>In-memory blob storage instance</returns>
-      public static IBlobStorage InMemory(this IBlobStorageFactory factory)
+      public static IBlobStorageProvider InMemory(this IBlobStorageFactory factory)
       {
          return new InMemoryBlobStorage();
       }

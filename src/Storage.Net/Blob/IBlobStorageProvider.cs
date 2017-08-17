@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace Storage.Net.Blob
 {
    /// <summary>
-   /// Generic interface for blob storage implementations
+   /// Slim interface providing access to blob storage.
    /// </summary>
-   public interface IBlobStorage : IDisposable
+   public interface IBlobStorageProvider : IDisposable
    {
       /// <summary>
       /// Returns the list of available blobs
@@ -20,8 +20,13 @@ namespace Storage.Net.Blob
       /// <param name="recurse">When true returns files recursively</param>
       /// <param name="cancellationToken"></param>
       /// <returns>List of blob IDs</returns>
-      Task<IEnumerable<BlobId>> ListAsync(string folderPath = null, string prefix = null, bool recurse = false, CancellationToken cancellationToken = default(CancellationToken));
+      Task<IEnumerable<BlobId>> ListAsync(string folderPath,
+         string prefix,
+         bool recurse,
+         CancellationToken cancellationToken = default(CancellationToken));
 
+      //----
+      /*
       /// <summary>
       /// Deletes a blob by id
       /// </summary>
@@ -127,5 +132,7 @@ namespace Storage.Net.Blob
       /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
       Task<Stream> OpenReadAsync(string id);
+
+   */
    }
 }

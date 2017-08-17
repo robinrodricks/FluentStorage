@@ -35,7 +35,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       public AzureEventHubReceiver(string connectionString, string hubPath,
          IEnumerable<string> partitionIds = null,
          string consumerGroupName = null,
-         IBlobStorage stateStorage = null)
+         IBlobStorageProvider stateStorage = null)
       {
          if (connectionString == null)
             throw new ArgumentNullException(nameof(connectionString));

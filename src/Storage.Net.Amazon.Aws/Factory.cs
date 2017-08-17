@@ -17,12 +17,12 @@ namespace Storage.Net
       /// <param name="secretAccessKey">Secret access key</param>
       /// <param name="bucketName">Bucket name</param>
       /// <returns>A reference to the created storage</returns>
-      public static IBlobStorage AmazonS3BlobStorage(this IBlobStorageFactory factory,
+      public static IBlobStorageProvider AmazonS3BlobStorage(this IBlobStorageFactory factory,
          string accessKeyId,
          string secretAccessKey,
          string bucketName)
       {
-         return new AwsS3BlobStorage(accessKeyId, secretAccessKey, bucketName);
+         return new AwsS3BlobStorageProvider(accessKeyId, secretAccessKey, bucketName);
       }
    }
 }

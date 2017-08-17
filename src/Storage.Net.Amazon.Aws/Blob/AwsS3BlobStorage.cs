@@ -17,7 +17,7 @@ namespace Storage.Net.Aws.Blob
    /// <summary>
    /// Amazon S3 storage adapter for blobs
    /// </summary>
-   public class AwsS3BlobStorage : AsyncBlobStorage
+   public class AwsS3BlobStorageProvider : IBlobStorageProvider
    {
       private readonly string _bucketName;
       private readonly AmazonS3Client _client;
@@ -26,12 +26,12 @@ namespace Storage.Net.Aws.Blob
       //https://github.com/awslabs/aws-sdk-net-samples/blob/master/ConsoleSamples/AmazonS3Sample/AmazonS3Sample/S3Sample.cs
 
       /// <summary>
-      /// Creates a new instance of <see cref="AwsS3BlobStorage"/>
+      /// Creates a new instance of <see cref="AwsS3BlobStorageProvider"/>
       /// </summary>
       /// <param name="accessKeyId"></param>
       /// <param name="secretAccessKey"></param>
       /// <param name="bucketName"></param>
-      public AwsS3BlobStorage(string accessKeyId, string secretAccessKey, string bucketName)
+      public AwsS3BlobStorageProvider(string accessKeyId, string secretAccessKey, string bucketName)
       {
          if(accessKeyId == null) throw new ArgumentNullException(nameof(accessKeyId));
          if(secretAccessKey == null) throw new ArgumentNullException(nameof(secretAccessKey));
@@ -60,7 +60,7 @@ namespace Storage.Net.Aws.Blob
       /// <summary>
       /// Lists all buckets, optionaly filtering by prefix. Prefix filtering happens on client side.
       /// </summary>
-      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
+      public async Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
@@ -73,6 +73,7 @@ namespace Storage.Net.Aws.Blob
          return response.S3Objects.Select(s3Obj => new BlobId(null, s3Obj.Key, BlobItemKind.File));
       }
 
+      /*
       /// <summary>
       /// deletes object from current bucket
       /// </summary>
@@ -196,6 +197,17 @@ namespace Storage.Net.Aws.Blob
          }
 
          return false;
+      }
+
+      public Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken = default(CancellationToken))
+      {
+         throw new NotImplementedException();
+      }
+      */
+
+      public void Dispose()
+      {
+         throw new NotImplementedException();
       }
    }
 }

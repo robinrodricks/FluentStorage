@@ -11,7 +11,7 @@ namespace Storage.Net.Blob
    /// </summary>
    public static class BlobStorageExtensions
    {
-
+      /*
       /// <summary>
       /// Returns the list of available blobs
       /// </summary>
@@ -20,7 +20,7 @@ namespace Storage.Net.Blob
       /// Cannot be longer than 50 characters.</param>
       /// <param name="recurse">When true returns files recursively</param>
       /// <returns>List of blob IDs</returns>
-      public static IEnumerable<BlobId> List(this IBlobStorage storage, string folderPath = null, string prefix = null, bool recurse = false)
+      public static IEnumerable<BlobId> List(this IBlobStorageProvider storage, string folderPath = null, string prefix = null, bool recurse = false)
       {
          return G.CallAsync(() => storage.ListAsync(folderPath, prefix, recurse));
       }
@@ -34,7 +34,7 @@ namespace Storage.Net.Blob
       /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
       /// <exception cref="StorageException">Thrown when blob does not exist, error code set to <see cref="ErrorCode.NotFound"/></exception>
-      public static void ReadToStream(this IBlobStorage storage, string id, Stream targetStream)
+      public static void ReadToStream(this IBlobStorageProvider storage, string id, Stream targetStream)
       {
          if (targetStream == null)
             throw new ArgumentNullException(nameof(targetStream));
@@ -57,7 +57,7 @@ namespace Storage.Net.Blob
       /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
       /// <exception cref="StorageException">Thrown when blob does not exist, error code set to <see cref="ErrorCode.NotFound"/></exception>
-      public static async Task ReadToStreamAsync(this IBlobStorage storage, string id, Stream targetStream)
+      public static async Task ReadToStreamAsync(this IBlobStorageProvider storage, string id, Stream targetStream)
       {
          if (targetStream == null)
             throw new ArgumentNullException(nameof(targetStream));
@@ -78,7 +78,7 @@ namespace Storage.Net.Blob
       /// <param name="storage">Blob storage</param>
       /// <param name="id">Blob ID to download</param>
       /// <param name="filePath">Full path to the local file to be downloaded to. If the file exists it will be recreated wtih blob data.</param>
-      public static void ReadToFile(this IBlobStorage storage, string id, string filePath)
+      public static void ReadToFile(this IBlobStorageProvider storage, string id, string filePath)
       {
          Stream src = storage.OpenRead(id);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
@@ -99,7 +99,7 @@ namespace Storage.Net.Blob
       /// <param name="storage">Blob storage</param>
       /// <param name="id">Blob ID to download</param>
       /// <param name="filePath">Full path to the local file to be downloaded to. If the file exists it will be recreated wtih blob data.</param>
-      public static async Task ReadToFileAsync(this IBlobStorage storage, string id, string filePath)
+      public static async Task ReadToFileAsync(this IBlobStorageProvider storage, string id, string filePath)
       {
          Stream src = await storage.OpenReadAsync(id);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
@@ -120,7 +120,7 @@ namespace Storage.Net.Blob
       /// <param name="blobStorage">Blob storage</param>
       /// <param name="id">Blob ID to create or overwrite</param>
       /// <param name="filePath">Path to local file</param>
-      public static void WriteFile(this IBlobStorage blobStorage, string id, string filePath)
+      public static void WriteFile(this IBlobStorageProvider blobStorage, string id, string filePath)
       {
          using (Stream src = File.OpenRead(filePath))
          {
@@ -134,7 +134,7 @@ namespace Storage.Net.Blob
       /// <param name="blobStorage">Blob storage</param>
       /// <param name="id">Blob ID to create or overwrite</param>
       /// <param name="filePath">Path to local file</param>
-      public static async Task WriteFileAsync(this IBlobStorage blobStorage, string id, string filePath)
+      public static async Task WriteFileAsync(this IBlobStorageProvider blobStorage, string id, string filePath)
       {
          using (Stream src = File.OpenRead(filePath))
          {
@@ -148,7 +148,7 @@ namespace Storage.Net.Blob
       /// <param name="blobStorage">Blob storage</param>
       /// <param name="id">Blob ID</param>
       /// <param name="text">Test to upload</param>
-      public static void WriteText(this IBlobStorage blobStorage, string id, string text)
+      public static void WriteText(this IBlobStorageProvider blobStorage, string id, string text)
       {
          using (Stream s = text.ToMemoryStream())
          {
@@ -162,7 +162,7 @@ namespace Storage.Net.Blob
       /// <param name="blobStorage">Blob storage</param>
       /// <param name="id">Blob ID</param>
       /// <param name="text">Test to upload</param>
-      public static async Task WriteTextAsync(this IBlobStorage blobStorage, string id, string text)
+      public static async Task WriteTextAsync(this IBlobStorageProvider blobStorage, string id, string text)
       {
          using (Stream s = text.ToMemoryStream())
          {
@@ -176,7 +176,7 @@ namespace Storage.Net.Blob
       /// <param name="blobStorage">Blob storage</param>
       /// <param name="id">Blob ID</param>
       /// <returns>Text representation of the blob</returns>
-      public static string ReadText(this IBlobStorage blobStorage, string id)
+      public static string ReadText(this IBlobStorageProvider blobStorage, string id)
       {
          Stream src = blobStorage.OpenRead(id);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
@@ -196,7 +196,7 @@ namespace Storage.Net.Blob
       /// <param name="blobStorage">Blob storage</param>
       /// <param name="id">Blob ID</param>
       /// <returns>Text representation of the blob</returns>
-      public static async Task<string> ReadTextAsync(this IBlobStorage blobStorage, string id)
+      public static async Task<string> ReadTextAsync(this IBlobStorageProvider blobStorage, string id)
       {
          Stream src = await blobStorage.OpenReadAsync(id);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
@@ -217,7 +217,7 @@ namespace Storage.Net.Blob
       /// <param name="blobId">Blob ID to copy</param>
       /// <param name="targetStorage">Target storage</param>
       /// <param name="newId">Optional, when specified uses this id in the target storage. If null uses the original ID.</param>
-      public static void CopyTo(this IBlobStorage blobStorage, string blobId, IBlobStorage targetStorage, string newId)
+      public static void CopyTo(this IBlobStorageProvider blobStorage, string blobId, IBlobStorageProvider targetStorage, string newId)
       {
          Stream src = blobStorage.OpenRead(blobId);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
@@ -235,7 +235,7 @@ namespace Storage.Net.Blob
       /// <param name="blobId">Blob ID to copy</param>
       /// <param name="targetStorage">Target storage</param>
       /// <param name="newId">Optional, when specified uses this id in the target storage. If null uses the original ID.</param>
-      public static async Task CopyToAsync(this IBlobStorage blobStorage, string blobId, IBlobStorage targetStorage, string newId)
+      public static async Task CopyToAsync(this IBlobStorageProvider blobStorage, string blobId, IBlobStorageProvider targetStorage, string newId)
       {
          Stream src = await blobStorage.OpenReadAsync(blobId);
          if (src == null) throw new StorageException(ErrorCode.NotFound, null);
@@ -254,7 +254,7 @@ namespace Storage.Net.Blob
       /// <param name="blobStorage">Storage reference</param>
       /// <param name="id">Blob ID.</param>
       /// <returns>Deserialized object or null</returns>
-      public static T Read<T>(this IBlobStorage blobStorage, string id) where T : new()
+      public static T Read<T>(this IBlobStorageProvider blobStorage, string id) where T : new()
       {
          string json;
 
@@ -278,7 +278,7 @@ namespace Storage.Net.Blob
       /// <param name="blobStorage">Storage reference</param>
       /// <param name="id">Blob ID.</param>
       /// <returns>Deserialized object or null</returns>
-      public async static Task<T> ReadAsync<T>(this IBlobStorage blobStorage, string id) where T : new()
+      public async static Task<T> ReadAsync<T>(this IBlobStorageProvider blobStorage, string id) where T : new()
       {
          string json;
 
@@ -301,7 +301,7 @@ namespace Storage.Net.Blob
       /// <param name="blobStorage">Storage reference</param>
       /// <param name="id">Blob ID</param>
       /// <param name="instance">Object instance. If this parameter is null the blob is deleted if it exists</param>
-      public static void Write<T>(this IBlobStorage blobStorage, string id, T instance) where T : new()
+      public static void Write<T>(this IBlobStorageProvider blobStorage, string id, T instance) where T : new()
       {
          if(EqualityComparer<T>.Default.Equals(instance, default(T)))
          {
@@ -320,7 +320,7 @@ namespace Storage.Net.Blob
       /// <param name="blobStorage">Storage reference</param>
       /// <param name="id">Blob ID</param>
       /// <param name="instance">Object instance. If this parameter is null the blob is deleted if it exists</param>
-      public static async Task WriteAsync<T>(this IBlobStorage blobStorage, string id, T instance) where T : new()
+      public static async Task WriteAsync<T>(this IBlobStorageProvider blobStorage, string id, T instance) where T : new()
       {
          if (EqualityComparer<T>.Default.Equals(instance, default(T)))
          {
@@ -331,5 +331,6 @@ namespace Storage.Net.Blob
             await blobStorage.WriteTextAsync(id, instance.ToJsonString());
          }
       }
+      */
    }
 }

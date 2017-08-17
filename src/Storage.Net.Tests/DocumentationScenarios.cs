@@ -21,7 +21,7 @@ namespace Storage.Net.Tests
 
       public void Blobs_list_files_in_a_folder()
       {
-         IBlobStorage storage = StorageFactory.Blobs.AmazonS3BlobStorage(
+         IBlobStorageProvider storage = StorageFactory.Blobs.AmazonS3BlobStorage(
             TestSettings.Instance.AwsAccessKeyId,
             TestSettings.Instance.AwsSecretAccessKey,
             TestSettings.Instance.AwsTestBucketName);
@@ -36,7 +36,7 @@ namespace Storage.Net.Tests
       public void Blobs_save_file_to_a_specific_folder()
       {
          //create the storage over a specific local directory
-         IBlobStorage storage = StorageFactory.Blobs.DirectoryFiles(new DirectoryInfo("c:\\tmp\\files"));
+         IBlobStorageProvider storage = StorageFactory.Blobs.DirectoryFiles(new DirectoryInfo("c:\\tmp\\files"));
 
 
          string content = "test content";
@@ -56,7 +56,7 @@ namespace Storage.Net.Tests
       public void Blobs_save_file_to_azure_storage_and_read_it_later()
       {
          //create the storage
-         IBlobStorage storage = StorageFactory.Blobs.AzureBlobStorage(
+         IBlobStorageProvider storage = StorageFactory.Blobs.AzureBlobStorage(
             TestSettings.Instance.AzureStorageName,
             TestSettings.Instance.AzureStorageKey,
             "mycontainer");

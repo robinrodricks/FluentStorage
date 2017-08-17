@@ -9,15 +9,21 @@ using System.Threading;
 
 namespace Storage.Net.Blob
 {
-   class InMemoryBlobStorage : AsyncBlobStorage
+   class InMemoryBlobStorage : IBlobStorageProvider
    {
       private readonly Dictionary<string, MemoryStream> _idToData = new Dictionary<string, MemoryStream>();
 
-      protected override Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
+      public async Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
          throw new NotImplementedException();
       }
 
+      public void Dispose()
+      {
+         throw new NotImplementedException();
+      }
+
+      /*
       public override void Append(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
@@ -78,5 +84,6 @@ namespace Storage.Net.Blob
 
          return new BlobMeta(ms.Length, ms.GetHash(HashType.Md5));
       }
+      */
    }
 }

@@ -11,10 +11,9 @@ namespace Storage.Net.Blob.Files
    /// <summary>
    /// Blob storage implementation which uses local file system directory
    /// </summary>
-   public class DirectoryFilesBlobStorage : AsyncBlobStorage
+   public class DirectoryFilesBlobStorage : IBlobStorageProvider
    {
       private readonly DirectoryInfo _directory;
-      private static readonly string FsPathSeparator = new string(Path.DirectorySeparatorChar, 1);
 
       /// <summary>
       /// Creates an instance in a specific disk directory
@@ -28,7 +27,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Returns the list of blob names in this storage, optionally filtered by prefix
       /// </summary>
-      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] path, string prefix, bool recurse, CancellationToken cancellationToken)
+      public async Task<IEnumerable<BlobId>> ListAsync(string path, string prefix, bool recurse, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
@@ -85,7 +84,7 @@ namespace Storage.Net.Blob.Files
       /// Deletes blob file
       /// </summary>
       /// <param name="id"></param>
-      public override void Delete(string id)
+      public void Delete(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -96,7 +95,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Writes blob to file
       /// </summary>
-      public override void Write(string id, Stream sourceStream)
+      public void Write(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
          GenericValidation.CheckSourceStream(sourceStream);
@@ -110,7 +109,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Append chunk to file
       /// </summary>
-      public override void Append(string id, Stream sourceStream)
+      public void Append(string id, Stream sourceStream)
       {
          GenericValidation.CheckBlobId(id);
          GenericValidation.CheckSourceStream(sourceStream);
@@ -124,7 +123,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Opens the blob as a readable stream
       /// </summary>
-      public override Stream OpenRead(string id)
+      public Stream OpenRead(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -134,7 +133,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Checks if file exists
       /// </summary>
-      public override bool Exists(string id)
+      public bool Exists(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -144,7 +143,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Gets blob metadata
       /// </summary>
-      public override BlobMeta GetMeta(string id)
+      public BlobMeta GetMeta(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -165,13 +164,14 @@ namespace Storage.Net.Blob.Files
             md5);
       }
 
-      private string GetFolder(string[] path, bool createIfNotExists)
+      private string GetFolder(string path, bool createIfNotExists)
       {
-         if (path == null || path.Length == 0) return _directory.FullName;
+         if (path == null) return _directory.FullName;
+         string[] parts = StoragePath.GetParts(path);
 
          string fullPath = _directory.FullName;
 
-         foreach (string part in path)
+         foreach (string part in parts)
          {
             fullPath = Path.Combine(fullPath, part);
          }
@@ -203,7 +203,7 @@ namespace Storage.Net.Blob.Files
          }
          else
          {
-            string extraPath = string.Join(FsPathSeparator, parts, 0, parts.Length - 1);
+            string extraPath = string.Join(StoragePath.PathStrSeparator, parts, 0, parts.Length - 1);
 
             string fullPath = Path.Combine(_directory.FullName, extraPath);
 
@@ -242,6 +242,11 @@ namespace Storage.Net.Blob.Files
       private static string DecodePathPart(string path)
       {
          return path.UrlDecode();
+      }
+
+      public void Dispose()
+      {
+         throw new NotImplementedException();
       }
    }
 }
