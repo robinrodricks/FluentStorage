@@ -150,72 +150,13 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       /// </summary>
       protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
-         return await ListFolder(
+         var browser = new AzureBlobDirectoryBrowser(_blobContainer);
+
+         return await browser.ListFolder(
             StoragePath.Combine(folderPath),
             prefix,
             recurse,
             cancellationToken); 
-      }
-
-      private async Task<IEnumerable<BlobId>> ListFolder(string path, string prefix, bool recurse, CancellationToken cancellationToken)
-      {
-         //todo: need to start off CloudBlobDirectory.ListBlobs, but for this the directory need to be found first
-
-         var result = new List<BlobId>();
-
-         BlobContinuationToken token = null;
-
-         //blob path cannot start with '/'
-         string listPrefix = StoragePath.Combine(path, prefix).Trim(StoragePath.PathSeparator);
-         if (prefix != null) listPrefix = StoragePath.Combine(listPrefix, prefix);
-
-         do
-         {
-            BlobResultSegment segment = await _blobContainer.ListBlobsSegmentedAsync(
-               listPrefix,
-               false,
-               BlobListingDetails.None,
-               null,
-               token,
-               null,
-               null,
-               cancellationToken);
-
-            foreach (IListBlobItem blob in segment.Results)
-            {
-               BlobId id;
-
-               if (blob is CloudBlockBlob blockBlob)
-                  id = new BlobId(blockBlob.Name, BlobItemKind.File);
-               else if (blob is CloudAppendBlob appendBlob)
-                  id = new BlobId(appendBlob.Name, BlobItemKind.File);
-               else if (blob is CloudBlobDirectory dirBlob)
-                  id = new BlobId(dirBlob.Prefix, BlobItemKind.Folder);
-               else
-                  throw new InvalidOperationException($"unknown item type {blob.GetType()}");
-
-               result.Add(id);
-            }
-
-         }
-         while (token != null);
-
-         if(recurse)
-         {
-            List<BlobId> folderIds = result.Where(r => r.Kind == BlobItemKind.Folder).ToList();
-            foreach(BlobId folderId in folderIds)
-            {
-               IEnumerable<BlobId> children = await ListFolder(
-                  StoragePath.Combine(path, folderId.Id),
-                  prefix,
-                  recurse,
-                  cancellationToken);
-
-               result.AddRange(children);
-            }
-         }
-
-         return result;
       }
 
       /// <summary>

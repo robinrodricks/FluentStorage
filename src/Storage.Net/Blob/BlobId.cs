@@ -30,7 +30,7 @@ namespace Storage.Net.Blob
 
          Id = parts.Last();
          FolderPath = parts.Length > 1
-            ? StoragePath.Combine(parts.Skip(1))
+            ? StoragePath.Combine(parts.Take(parts.Length - 1))
             : StoragePath.PathStrSeparator;
 
          Kind = kind;
