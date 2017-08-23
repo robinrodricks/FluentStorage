@@ -159,50 +159,28 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             cancellationToken); 
       }
 
-      /*
-      /// <summary>
-      /// Deletes blob remotely
-      /// </summary>
-      public override async Task DeleteAsync(string id)
-      {
-         GenericValidation.CheckBlobId(id);
-
-         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
-         await blob.DeleteIfExistsAsync();
-      }
-
-      /// <summary>
-      /// Uploads from stream
-      /// </summary>
-      public override async Task WriteAsync(string id, Stream sourceStream)
+      public async Task WriteAsync(string id, Stream sourceStream, bool append)
       {
          GenericValidation.CheckBlobId(id);
          GenericValidation.CheckSourceStream(sourceStream);
 
-         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(ToPath(id));
-         await blob.UploadFromStreamAsync(sourceStream);
+         if (append)
+         {
+            CloudAppendBlob cab = _blobContainer.GetAppendBlobReference(id);
+            if (!(await cab.ExistsAsync())) await cab.CreateOrReplaceAsync();
+
+            await cab.AppendFromStreamAsync(sourceStream);
+
+         }
+         else
+         {
+            CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(ToPath(id));
+
+            await blob.UploadFromStreamAsync(sourceStream);
+         }
       }
 
-      /// <summary>
-      /// Appends to the append blob.
-      /// </summary>
-      public override async Task AppendAsync(string id, Stream sourceStream)
-      {
-         GenericValidation.CheckBlobId(id);
-         GenericValidation.CheckSourceStream(sourceStream);
-
-         CloudAppendBlob cab = _blobContainer.GetAppendBlobReference(id);
-         if (!(await cab.ExistsAsync())) await cab.CreateOrReplaceAsync();
-
-         await cab.AppendFromStreamAsync(sourceStream);
-      }
-
-      /// <summary>
-      /// Opens stream to read
-      /// </summary>
-      /// <param name="id"></param>
-      /// <returns></returns>
-      public override async Task<Stream> OpenReadAsync(string id)
+      public async Task<Stream> OpenReadAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -212,7 +190,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          {
             return await blob.OpenReadAsync();
          }
-         catch(AzureStorageException ex)
+         catch (AzureStorageException ex)
          {
             if (!TryHandleStorageException(ex)) throw;
          }
@@ -220,44 +198,58 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          throw new Exception("must not be here");
       }
 
-      /// <summary>
-      /// Checks if the blob exists by trying to fetch attributes from the blob reference and checkign if that fails
-      /// </summary>
-      public override async Task<bool> ExistsAsync(string id)
+      public async Task DeleteAsync(IEnumerable<string> ids)
       {
-         GenericValidation.CheckBlobId(id);
-         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
-         return await blob.ExistsAsync();
-      }
-
-      /// <summary>
-      /// Gets blob metadata
-      /// </summary>
-      public override async Task<BlobMeta> GetMetaAsync(string id)
-      {
-         GenericValidation.CheckBlobId(id);
-
-         CloudBlob blob = _blobContainer.GetBlobReference(id);
-         if (!(await blob.ExistsAsync())) return null;
-
-         await blob.FetchAttributesAsync();
-
-         //ContentMD5 is base64-encoded hash, whereas we work with HEX encoded ones
-         string md5 = blob.Properties.ContentMD5.Base64DecodeAsBytes().ToHexString();
-
-         return new BlobMeta(
-            blob.Properties.Length,
-            md5);
-      }
-
-      private static bool TryHandleStorageException(AzureStorageException ex)
-      {
-         if(ex.RequestInformation?.HttpStatusCode == 404)
+         foreach (string id in ids)
          {
-            throw new StorageException(ErrorCode.NotFound, ex);
+            GenericValidation.CheckBlobId(id);
+
+            CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
+            await blob.DeleteIfExistsAsync();
+         }
+      }
+
+      public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
+      {
+         var result = new List<bool>();
+
+         foreach (string id in ids)
+         {
+            GenericValidation.CheckBlobId(id);
+            CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
+            bool exists = await blob.ExistsAsync();
+            result.Add(exists);
          }
 
-         return false;
+         return result;
+      }
+
+      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids)
+      {
+         var result = new List<BlobMeta>();
+         foreach (string id in ids)
+         {
+            GenericValidation.CheckBlobId(id);
+         }
+
+         foreach (string id in ids)
+         {
+            CloudBlob blob = _blobContainer.GetBlobReference(id);
+            if (!(await blob.ExistsAsync())) return null;
+
+            await blob.FetchAttributesAsync();
+
+            //ContentMD5 is base64-encoded hash, whereas we work with HEX encoded ones
+            string md5 = blob.Properties.ContentMD5.Base64DecodeAsBytes().ToHexString();
+
+            var meta = new BlobMeta(
+               blob.Properties.Length,
+               md5);
+
+            result.Add(meta);
+         }
+
+         return result;
       }
 
       private static string ToPath(string path)
@@ -267,15 +259,18 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          return path.Trim(StoragePath.PathSeparator);
       }
 
-      public Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken = default(CancellationToken))
+      private static bool TryHandleStorageException(AzureStorageException ex)
       {
-         throw new NotImplementedException();
+         if (ex.RequestInformation?.HttpStatusCode == 404)
+         {
+            throw new StorageException(ErrorCode.NotFound, ex);
+         }
+
+         return false;
       }
-      */
 
       public void Dispose()
       {
-         throw new NotImplementedException();
       }
    }
 }

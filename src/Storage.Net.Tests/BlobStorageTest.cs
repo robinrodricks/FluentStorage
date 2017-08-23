@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using NetBox;
 using Xunit;
 using Storage.Net.Aws.Blob;
 using Storage.Net.Blob;
 using Storage.Net.Blob.Files;
-using NetBox.Model;
 using Storage.Net.Microsoft.Azure.Storage.Blob;
 using System.Threading.Tasks;
 
@@ -155,7 +153,7 @@ namespace Storage.Net.Tests.Integration
       [Fact]
       public async Task List_VeryLongPrefix_NoResultsNoCrash()
       {
-         Assert.Throws<ArgumentException>() => await _provider.ListAsync(null, Generator.GetRandomString(100000, false), true));
+         await Assert.ThrowsAsync<ArgumentException>(async () => await _provider.ListAsync(null, Generator.GetRandomString(100000, false), true));
       }
 
       class TestDocument
