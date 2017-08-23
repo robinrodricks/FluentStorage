@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Storage.Net
@@ -45,6 +46,16 @@ namespace Storage.Net
             if (part.Length > MaxBlobIdPartLength)
                throw new ArgumentException(string.Format(Exceptions.BlobId_TooLong, MaxBlobIdPartLength),
                   nameof(id));
+         }
+      }
+
+      public static void CheckBlobId(IEnumerable<string> ids)
+      {
+         if (ids == null) return;
+
+         foreach (string id in ids)
+         {
+            CheckBlobId(id);
          }
       }
 

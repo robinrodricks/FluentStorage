@@ -80,90 +80,6 @@ namespace Storage.Net.Blob.Files
          return new BlobId(fullPath, id, kind);
       }
 
-      /// <summary>
-      /// Deletes blob file
-      /// </summary>
-      /// <param name="id"></param>
-      public void Delete(string id)
-      {
-         GenericValidation.CheckBlobId(id);
-
-         string path = GetFilePath(id);
-         if(File.Exists(path)) File.Delete(path);
-      }
-
-      /// <summary>
-      /// Writes blob to file
-      /// </summary>
-      public void Write(string id, Stream sourceStream)
-      {
-         GenericValidation.CheckBlobId(id);
-         GenericValidation.CheckSourceStream(sourceStream);
-
-         using (Stream dest = CreateStream(id))
-         {
-            sourceStream.CopyTo(dest);
-         }
-      }
-
-      /// <summary>
-      /// Append chunk to file
-      /// </summary>
-      public void Append(string id, Stream sourceStream)
-      {
-         GenericValidation.CheckBlobId(id);
-         GenericValidation.CheckSourceStream(sourceStream);
-
-         using (Stream dest = CreateStream(id, false))
-         {
-            sourceStream.CopyTo(dest);
-         }
-      }
-
-      /// <summary>
-      /// Opens the blob as a readable stream
-      /// </summary>
-      public Stream OpenRead(string id)
-      {
-         GenericValidation.CheckBlobId(id);
-
-         return OpenStream(id);
-      }
-
-      /// <summary>
-      /// Checks if file exists
-      /// </summary>
-      public bool Exists(string id)
-      {
-         GenericValidation.CheckBlobId(id);
-
-         return File.Exists(GetFilePath(id));
-      }
-
-      /// <summary>
-      /// Gets blob metadata
-      /// </summary>
-      public BlobMeta GetMeta(string id)
-      {
-         GenericValidation.CheckBlobId(id);
-
-         string path = GetFilePath(id);
-
-         if (!File.Exists(path)) return null;
-
-         var fi = new FileInfo(path);
-
-         string md5;
-         using (Stream fs = File.OpenRead(fi.FullName))
-         {
-            md5 = fs.GetHash(HashType.Md5);
-         }
-
-         return new BlobMeta(
-            fi.Length,
-            md5);
-      }
-
       private string GetFolder(string path, bool createIfNotExists)
       {
          if (path == null) return _directory.FullName;
@@ -247,6 +163,101 @@ namespace Storage.Net.Blob.Files
       public void Dispose()
       {
          throw new NotImplementedException();
+      }
+
+      public Task WriteAsync(string id, Stream sourceStream, bool append)
+      {
+         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckSourceStream(sourceStream);
+
+         using (Stream dest = CreateStream(id, !append))
+         {
+            sourceStream.CopyTo(dest);
+         }
+
+         return Task.FromResult(true);
+      }
+
+      public Task<Stream> OpenReadAsync(string id)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         Stream result =  OpenStream(id);
+
+         return Task.FromResult(result);
+      }
+
+      public Task DeleteAsync(IEnumerable<string> ids)
+      {
+         if (ids == null) return null;
+
+         foreach (string id in ids)
+         {
+            GenericValidation.CheckBlobId(id);
+
+            string path = GetFilePath(id);
+            if (File.Exists(path)) File.Delete(path);
+         }
+
+         return Task.FromResult(true);
+      }
+
+      public Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
+      {
+         var result = new List<bool>();
+
+         if (ids != null)
+         {
+            foreach (string id in ids)
+            {
+               GenericValidation.CheckBlobId(id);
+            }
+
+            foreach (string id in ids)
+            {
+               bool exists = File.Exists(GetFilePath(id));
+               result.Add(exists);
+            }
+         }
+
+         return Task.FromResult((IEnumerable<bool>)result);
+      }
+
+      public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids)
+      {
+         if (ids == null) return null;
+
+         GenericValidation.CheckBlobId(ids);
+
+         var result = new List<BlobMeta>();
+
+         foreach (string id in ids)
+         {
+            string path = GetFilePath(id);
+
+            if (!File.Exists(path))
+            {
+               result.Add(null);
+            }
+            else
+            {
+               var fi = new FileInfo(path);
+
+               string md5;
+               using (Stream fs = File.OpenRead(fi.FullName))
+               {
+                  md5 = fs.GetHash(HashType.Md5);
+               }
+
+               var meta = new BlobMeta(
+                  fi.Length,
+                  md5);
+
+               result.Add(meta);
+            }
+         }
+
+         return Task.FromResult((IEnumerable<BlobMeta>) result);
       }
    }
 }
