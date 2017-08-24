@@ -7,10 +7,18 @@ using System.Threading.Tasks;
 namespace Storage.Net.Blob
 {
    /// <summary>
-   /// Extension utilities for blog storage
+   /// Blob storage on steroids. Takes in <see cref="IBlobStorageProvider"/> and adds a lot of extra useful operations on top we as
+   /// normal people use every day.
    /// </summary>
-   public static class BlobStorageExtensions
+   public class BlobStorage
    {
+      private readonly IBlobStorageProvider _provider;
+
+      public BlobStorage(IBlobStorageProvider provider)
+      {
+         this._provider = provider ?? throw new ArgumentNullException(nameof(provider));
+      }
+
       /*
       /// <summary>
       /// Returns the list of available blobs

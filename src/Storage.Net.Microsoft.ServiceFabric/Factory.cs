@@ -15,7 +15,7 @@ namespace Storage.Net
          IReliableStateManager stateManager,
          string collectionName)
       {
-         return new ServiceFabricReliableDictionaryBlobStorage(stateManager, collectionName);
+         return new ServiceFabricReliableDictionaryBlobStorageProvider(stateManager, collectionName);
       }
 
       public static IMessagePublisher AzureServiceFabricReliableQueuePublisher(

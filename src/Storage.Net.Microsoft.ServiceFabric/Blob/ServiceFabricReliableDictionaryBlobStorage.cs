@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Storage.Net.Microsoft.ServiceFabric.Blob
 {
-   class ServiceFabricReliableDictionaryBlobStorage : AsyncBlobStorage
+   class ServiceFabricReliableDictionaryBlobStorageProvider : IBlobStorageProvider
    {
       private IReliableStateManager _stateManager;
       private readonly string _collectionName;
 
-      public ServiceFabricReliableDictionaryBlobStorage(IReliableStateManager stateManager, string collectionName)
+      public ServiceFabricReliableDictionaryBlobStorageProvider(IReliableStateManager stateManager, string collectionName)
       {
          _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
          _collectionName = collectionName ?? throw new ArgumentNullException(nameof(collectionName));
