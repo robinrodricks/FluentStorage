@@ -19,6 +19,34 @@ namespace Storage.Net.Blob
          this._provider = provider ?? throw new ArgumentNullException(nameof(provider));
       }
 
+      #region [ Text ]
+
+      public async Task<string> ReadTextAsync(string id)
+      {
+         throw new NotImplementedException();
+      }
+
+      public async Task WriteTextAsync(string id, string text)
+      {
+         throw new NotImplementedException();
+      }
+
+      #endregion
+
+      #region [ JSON Transforms ]
+
+      public async Task<T> ReadFromJsonAsync<T>(string id) where T : new()
+      {
+         throw new NotImplementedException();
+      }
+
+      public async Task WriteAsJsonAsync<T>(string id, T instance) where T : new()
+      {
+         throw new NotImplementedException();
+      }
+
+      #endregion
+
       /*
       /// <summary>
       /// Returns the list of available blobs
