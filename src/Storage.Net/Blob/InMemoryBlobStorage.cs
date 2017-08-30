@@ -59,6 +59,16 @@ namespace Storage.Net.Blob
          return Task.FromResult(true);
       }
 
+      public Task<Stream> OpenReadAsync(string id)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         if (!_idToData.TryGetValue(id, out MemoryStream ms)) return null;
+
+         ms.Seek(0, SeekOrigin.Begin);
+         return Task.FromResult<Stream>(new NonCloseableStream(ms));
+      }
+
       private void Write(string id, Stream sourceStream)
       {
          var ms = new MemoryStream(sourceStream.ToByteArray());
