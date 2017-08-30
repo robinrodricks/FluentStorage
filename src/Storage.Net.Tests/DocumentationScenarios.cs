@@ -1,11 +1,9 @@
 ﻿using NetBox;
-using Storage.Net;
 using Storage.Net.Blob;
 using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Xunit;
 using System.Threading.Tasks;
 
 namespace Storage.Net.Tests
@@ -52,33 +50,6 @@ namespace Storage.Net.Tests
 
             await storage.WriteAsync(subfolderBlobId, s);
          }
-      }
-
-      public async Task Blobs_save_file_to_azure_storage_and_read_it_later()
-      {
-         //create the storage
-         IBlobStorageProvider storage = StorageFactory.Blobs.AzureBlobStorage(
-            TestSettings.Instance.AzureStorageName,
-            TestSettings.Instance.AzureStorageKey,
-            "mycontainer");
-
-         //upload it
-         string content = "test content";
-         using (var s = new MemoryStream(Encoding.UTF8.GetBytes(content)))
-         {
-            await storage.WriteAsync("someid", s);
-         }
-
-         //read back
-         using (var s = new MemoryStream())
-         {
-            storage.ReadToStream("someid", s);
-
-            //content is now "test content"
-            content = Encoding.UTF8.GetString(s.ToArray());
-         }
-         
-
       }
    }
 }

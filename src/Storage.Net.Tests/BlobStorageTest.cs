@@ -171,9 +171,9 @@ namespace Storage.Net.Tests.Integration
 
          string id = Generator.GetRandomString(10, false);
 
-         _provider.WriteAsync(id, td);
+         await _bs.WriteObjectToJsonAsync(id, td);
 
-         TestDocument td2 = _provider.Read<TestDocument>(id);
+         TestDocument td2 = await _bs.ReadObjectFromJsonAsync<TestDocument>(id);
 
          Assert.Equal("string", td2.M);
       }
