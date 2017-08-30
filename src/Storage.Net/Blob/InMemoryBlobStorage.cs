@@ -11,13 +11,13 @@ namespace Storage.Net.Blob
 {
    class InMemoryBlobStorage : IBlobStorageProvider
    {
-      private readonly Dictionary<BlobId, MemoryStream> _pathToData = new Dictionary<BlobId, MemoryStream>();
+      private readonly Dictionary<BlobId, MemoryStream> _idToData = new Dictionary<BlobId, MemoryStream>();
 
       public Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
          folderPath = StoragePath.Normalize(folderPath);
 
-         List<BlobId> matches = _pathToData
+         List<BlobId> matches = _idToData
 
             .Where(e => recurse
                ? e.Key.FolderPath.StartsWith(folderPath)
@@ -30,6 +30,46 @@ namespace Storage.Net.Blob
             .ToList();
 
          return Task.FromResult((IEnumerable<BlobId>)matches);
+      }
+
+      public Task WriteAsync(string id, Stream sourceStream, bool append)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         if (append)
+         {
+            if (!Exists(id))
+            {
+               Write(id, sourceStream);
+            }
+            else
+            {
+               MemoryStream ms = _idToData[id];
+
+               byte[] part1 = ms.ToArray();
+               byte[] part2 = sourceStream.ToByteArray();
+               _idToData[id] = new MemoryStream(part1.Concat(part2).ToArray());
+            }
+         }
+         else
+         {
+            Write(id, sourceStream);
+         }
+
+         return Task.FromResult(true);
+      }
+
+      private void Write(string id, Stream sourceStream)
+      {
+         var ms = new MemoryStream(sourceStream.ToByteArray());
+         _idToData[new BlobId(id, BlobItemKind.File)] = ms;
+      }
+
+      private bool Exists(string id)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         return _idToData.ContainsKey(id);
       }
 
       public void Dispose()

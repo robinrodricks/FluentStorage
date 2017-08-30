@@ -25,7 +25,7 @@ namespace Storage.Net.Blob
 
       public string FullPath => StoragePath.Combine(FolderPath, Id);
 
-      public BlobId(string fullId, BlobItemKind kind)
+      public BlobId(string fullId, BlobItemKind kind = BlobItemKind.File)
       {
          string path = StoragePath.Normalize(fullId);
          string[] parts = StoragePath.GetParts(path);
@@ -56,5 +56,11 @@ namespace Storage.Net.Blob
       {
          throw new NotImplementedException();
       }
+
+      public static implicit operator BlobId(string fileId)
+      {
+         return new BlobId(fileId, BlobItemKind.File);
+      }
+
    }
 }
