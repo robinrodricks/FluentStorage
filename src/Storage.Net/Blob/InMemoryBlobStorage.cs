@@ -69,6 +69,55 @@ namespace Storage.Net.Blob
          return Task.FromResult<Stream>(new NonCloseableStream(ms));
       }
 
+      public Task DeleteAsync(IEnumerable<string> ids)
+      {
+         GenericValidation.CheckBlobId(ids);
+
+         foreach (string blobId in ids)
+         {
+            _idToData.Remove(blobId);
+         }
+
+         return Task.FromResult(true);
+      }
+
+      public Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
+      {
+         var result = new List<bool>();
+
+         foreach (string id in ids)
+         {
+            result.Add(_idToData.ContainsKey(id));
+         }
+
+         return Task.FromResult<IEnumerable<bool>>(result);
+      }
+
+      public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids)
+      {
+         GenericValidation.CheckBlobId(ids);
+
+         var result = new List<BlobMeta>();
+
+         foreach (string id in ids)
+         {
+            if (!_idToData.TryGetValue(id, out MemoryStream ms))
+            {
+               result.Add(null);
+            }
+            else
+            {
+               ms.Seek(0, SeekOrigin.Begin);
+
+               var meta = new BlobMeta(ms.Length, ms.GetHash(HashType.Md5));
+
+               result.Add(meta);
+            }
+         }
+
+         return Task.FromResult<IEnumerable<BlobMeta>>(result);
+      }
+
       private void Write(string id, Stream sourceStream)
       {
          var ms = new MemoryStream(sourceStream.ToByteArray());
@@ -88,56 +137,9 @@ namespace Storage.Net.Blob
       }
 
       /*
-      public override void Append(string id, Stream sourceStream)
-      {
-         GenericValidation.CheckBlobId(id);
 
-         if(!Exists(id))
-         {
-            Write(id, sourceStream);
-         }
-         else
-         {
-            MemoryStream ms = _idToData[id];
 
-            byte[] part1 = ms.ToArray();
-            byte[] part2 = sourceStream.ToByteArray();
-            _idToData[id] = new MemoryStream(part1.Concat(part2).ToArray());
-         }
-      }
-
-      public override Stream OpenRead(string id)
-      {
-         GenericValidation.CheckBlobId(id);
-
-         if (!_idToData.TryGetValue(id, out MemoryStream ms)) return null;
-
-         ms.Seek(0, SeekOrigin.Begin);
-         return new NonCloseableStream(ms);
-      }
-
-      public override void Write(string id, Stream sourceStream)
-      {
-         GenericValidation.CheckBlobId(id);
-
-         var ms = new MemoryStream(sourceStream.ToByteArray());
-         _idToData[id] = ms;
-      }
-
-      public override void Delete(string id)
-      {
-         GenericValidation.CheckBlobId(id);
-
-         _idToData.Remove(id);
-      }
-
-      public override bool Exists(string id)
-      {
-         GenericValidation.CheckBlobId(id);
-
-         return _idToData.ContainsKey(id);
-      }
-
+      
       public override BlobMeta GetMeta(string id)
       {
          GenericValidation.CheckBlobId(id);
