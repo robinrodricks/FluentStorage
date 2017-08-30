@@ -51,6 +51,7 @@ namespace Storage.Net.Tests.Integration
    {
       private readonly string _type;
       private IBlobStorageProvider _provider;
+      private BlobStorage _bs;
 
       public BlobStorageProviderTest(string type)
       {
@@ -88,6 +89,8 @@ namespace Storage.Net.Tests.Integration
                   TestSettings.Instance.KeyVaultCreds);
                break;
          }
+
+         _bs = new BlobStorage(_provider);
       }
 
       private async Task<string> GetRandomStreamId(string prefix = null)
@@ -117,11 +120,11 @@ namespace Storage.Net.Tests.Integration
          string id2 = prefix + Generator.RandomString;
          string id3 = Generator.RandomString;
 
-         _provider.WriteText(id1, Generator.RandomString);
-         _provider.WriteText(id2, Generator.RandomString);
-         _provider.WriteText(id3, Generator.RandomString);
+         await _bs.WriteTextAsync(id1, Generator.RandomString);
+         await _bs.WriteTextAsync(id2, Generator.RandomString);
+         await _bs.WriteTextAsync(id3, Generator.RandomString);
 
-         List<BlobId> items = _provider.List(null, prefix, false).ToList();
+         List<BlobId> items = (await _provider.ListAsync(null, prefix, false)).ToList();
          Assert.Equal(2, items.Count);
       }
 
@@ -130,7 +133,7 @@ namespace Storage.Net.Tests.Integration
       {
          string id = Generator.RandomString;
 
-         _provider.WriteText(id, Generator.RandomString);
+         await _bs.WriteTextAsync(id, Generator.RandomString);
 
          var items = await _provider.ListAsync(null, null, true);
       }
@@ -142,9 +145,9 @@ namespace Storage.Net.Tests.Integration
          string id2 = StoragePath.Combine(Generator.RandomString, Generator.RandomString);
          string id3 = StoragePath.Combine(Generator.RandomString, Generator.RandomString, Generator.RandomString);
 
-         _provider.WriteText(id1, Generator.RandomString);
-         _provider.WriteText(id2, Generator.RandomString);
-         _provider.WriteText(id3, Generator.RandomString);
+         await _bs.WriteTextAsync(id1, Generator.RandomString);
+         await _bs.WriteTextAsync(id2, Generator.RandomString);
+         await _bs.WriteTextAsync(id3, Generator.RandomString);
 
          var items = await _provider.ListAsync(null, null, true);
       }

@@ -31,7 +31,7 @@ namespace Storage.Net.Tests
          await storage.WriteAsync("folder1/file2", Generator.RandomString.ToMemoryStream(), false);
          await storage.WriteAsync("folder2/file1", Generator.RandomString.ToMemoryStream(), false);
 
-         BlobId[] folderBlobs = await storage.ListAsync("folder1", null, true).ToArray();
+         BlobId[] folderBlobs = (await storage.ListAsync("folder1", null, true)).ToArray();
       }
 
       public async Task Blobs_save_file_to_a_specific_folder()

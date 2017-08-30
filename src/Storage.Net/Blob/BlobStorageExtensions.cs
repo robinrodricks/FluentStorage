@@ -23,12 +23,29 @@ namespace Storage.Net.Blob
 
       public async Task<string> ReadTextAsync(string id)
       {
-         throw new NotImplementedException();
+         Stream src = await _provider.OpenReadAsync(id);
+         if (src == null) throw new StorageException(ErrorCode.NotFound, null);
+
+         var ms = new MemoryStream();
+         using (src)
+         {
+            src.CopyTo(ms);
+         }
+
+         return Encoding.UTF8.GetString(ms.ToArray());
       }
 
       public async Task WriteTextAsync(string id, string text)
       {
-         throw new NotImplementedException();
+         using (Stream s = text.ToMemoryStream())
+         {
+            await _provider.WriteAsync(id, s);
+         }
+      }
+
+      public void WriteText(string id, string text)
+      {
+         G.CallAsync(() => WriteTextAsync(id, text));
       }
 
       #endregion
@@ -46,6 +63,16 @@ namespace Storage.Net.Blob
       }
 
       #endregion
+
+      #region [ Singletons ]
+
+      public Task DeleteAsync(string id)
+      {
+         return _provider.DeleteAsync(new[] {id});
+      }
+
+      #endregion
+
 
       /*
       /// <summary>

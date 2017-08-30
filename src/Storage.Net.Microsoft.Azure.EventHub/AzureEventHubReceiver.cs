@@ -49,7 +49,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
          _hubClient = EventHubClient.CreateFromConnectionString(builder.ToString());
          if (partitionIds != null) _partitionIds.AddRange(_partitionIds);
          _consumerGroupName = consumerGroupName;
-         _state = new EventHubStateAdapter(stateStorage);
+         _state = new EventHubStateAdapter(new BlobStorage(stateStorage));
       }
 
       /// <summary>
