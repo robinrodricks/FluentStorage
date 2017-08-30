@@ -18,7 +18,7 @@ namespace Storage.Net
       public static IBlobStorageProvider AzureKeyVault(this IBlobStorageFactory factory,
          Uri vaultUri, string azureAadClientId, string azureAadClientSecret)
       {
-         return new AzureKeyVaultBlobStorage(vaultUri, azureAadClientId, azureAadClientSecret);
+         return new AzureKeyVaultBlobStorageProvider(vaultUri, azureAadClientId, azureAadClientSecret);
       }
 
       /// <summary>
@@ -31,7 +31,7 @@ namespace Storage.Net
       public static IBlobStorageProvider AzureKeyVault(this IBlobStorageFactory factory,
          Uri vaultUri, NetworkCredential cred)
       {
-         return new AzureKeyVaultBlobStorage(vaultUri, cred.UserName, cred.Password);
+         return new AzureKeyVaultBlobStorageProvider(vaultUri, cred.UserName, cred.Password);
       }
 
    }

@@ -15,13 +15,13 @@ using System.Threading;
 
 namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 {
-   class AzureKeyVaultBlobStorage : AsyncBlobStorage
+   class AzureKeyVaultBlobStorageProvider : IBlobStorageProvider
    {
       private KeyVaultClient _vaultClient;
       private ClientCredential _credential;
       private readonly string _vaultUri;
 
-      public AzureKeyVaultBlobStorage(Uri vaultUri, string azureAadClientId, string azureAadClientSecret)
+      public AzureKeyVaultBlobStorageProvider(Uri vaultUri, string azureAadClientId, string azureAadClientSecret)
       {
          _credential = new ClientCredential(azureAadClientId, azureAadClientSecret);
 
@@ -32,7 +32,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
       #region [ IBlobStorage ]
 
-      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
+      public async Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
@@ -53,17 +53,18 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
          return secretNames.Where(n => n.Id.StartsWith(prefix));
       }
 
-      public override async Task WriteAsync(string id, Stream sourceStream)
+      public async Task WriteAsync(string id, Stream sourceStream, bool append)
       {
          GenericValidation.CheckBlobId(id);
          GenericValidation.CheckSourceStream(sourceStream);
+         if (append) throw new ArgumentException("appending to secrets is not supported", nameof(append));
 
          string value = Encoding.UTF8.GetString(sourceStream.ToByteArray());
 
          await _vaultClient.SetSecretAsync(_vaultUri, id, value);
       }
 
-      public override async Task<Stream> OpenReadAsync(string id)
+      public async Task<Stream> OpenReadAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -83,35 +84,29 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
          return value.ToMemoryStream();
       }
 
-      public override async Task DeleteAsync(string id)
+      public async Task DeleteAsync(IEnumerable<string> ids)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobId(ids);
 
-         await _vaultClient.DeleteSecretAsync(_vaultUri, id);
+         await Task.WhenAll(ids.Select(id => _vaultClient.DeleteSecretAsync(_vaultUri, id)));
       }
 
-      public override async Task AppendAsync(string id, Stream sourceStream)
+      public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobId(ids);
 
-         SecretBundle secret = await _vaultClient.GetSecretAsync(id);
-         string value = secret.Value;
-         value += Encoding.UTF8.GetString(sourceStream.ToByteArray());
-
-         await _vaultClient.SetSecretAsync(_vaultUri, id, value);
+         return await Task.WhenAll(ids.Select(id => ExistsAsync(id)));
       }
 
-      public override async Task<bool> ExistsAsync(string id)
+      private async Task<bool> ExistsAsync(string id)
       {
-         GenericValidation.CheckBlobId(id);
-
          SecretBundle secret;
 
          try
          {
             secret = await _vaultClient.GetSecretAsync(_vaultUri, id);
          }
-         catch(KeyVaultErrorException)
+         catch (KeyVaultErrorException)
          {
             secret = null;
          }
@@ -119,10 +114,15 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
          return secret != null;
       }
 
-      public override async Task<BlobMeta> GetMetaAsync(string id)
+      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobId(ids);
 
+         return await Task.WhenAll(ids.Select(id => GetMetaAsync(id)));
+      }
+
+      private async Task<BlobMeta> GetMetaAsync(string id)
+      {
          SecretBundle secret = await _vaultClient.GetSecretAsync(id);
          byte[] data = Encoding.UTF8.GetBytes(secret.Value);
 
@@ -168,5 +168,8 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
          return false;
       }
 
+      public void Dispose()
+      {
+      }
    }
 }
