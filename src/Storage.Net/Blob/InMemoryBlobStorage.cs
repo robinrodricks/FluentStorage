@@ -11,11 +11,25 @@ namespace Storage.Net.Blob
 {
    class InMemoryBlobStorage : IBlobStorageProvider
    {
-      private readonly Dictionary<string, MemoryStream> _idToData = new Dictionary<string, MemoryStream>();
+      private readonly Dictionary<BlobId, MemoryStream> _pathToData = new Dictionary<BlobId, MemoryStream>();
 
-      public async Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
+      public Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
-         throw new NotImplementedException();
+         folderPath = StoragePath.Normalize(folderPath);
+
+         List<BlobId> matches = _pathToData
+
+            .Where(e => recurse
+               ? e.Key.FolderPath.StartsWith(folderPath)
+               : e.Key.FolderPath == folderPath)
+
+            .Where(e => prefix == null || e.Key.Id.StartsWith(prefix))
+
+            .Select(e => e.Key)
+
+            .ToList();
+
+         return Task.FromResult((IEnumerable<BlobId>)matches);
       }
 
       public void Dispose()

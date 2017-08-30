@@ -24,6 +24,8 @@ namespace Storage.Net
       /// </summary>
       public static string PathStrSeparator = new string(PathSeparator, 1);
 
+      public static readonly string RootFolderPath = "/";
+
       /// <summary>
       /// Combines parts of path
       /// </summary>
@@ -53,7 +55,7 @@ namespace Storage.Net
       /// <returns></returns>
       public static string Normalize(string path)
       {
-         if (path == null) return PathSeparatorString;
+         if (path == null) return RootFolderPath;
 
          return PathSeparatorString + path.Trim(PathSeparator);
       }

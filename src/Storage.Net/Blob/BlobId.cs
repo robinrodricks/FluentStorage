@@ -23,6 +23,8 @@ namespace Storage.Net.Blob
       /// </summary>
       public string Id { get; private set; }
 
+      public string FullPath => StoragePath.Combine(FolderPath, Id);
+
       public BlobId(string fullId, BlobItemKind kind)
       {
          string path = StoragePath.Normalize(fullId);
