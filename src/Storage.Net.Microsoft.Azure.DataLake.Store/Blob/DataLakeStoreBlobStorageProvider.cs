@@ -16,7 +16,7 @@ using System.Threading;
 
 namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 {
-   public class DataLakeStoreBlobStorage : AsyncBlobStorage
+   public class DataLakeStoreBlobStorageProvider : IBlobStorageProvider
    {
       private readonly string _accountName;
       private readonly string _domain;
@@ -27,7 +27,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
       //some info on how to use sdk here: https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-get-started-net-sdk
 
-      private DataLakeStoreBlobStorage(string accountName, string domain, string clientId, string clientSecret, string clientCert)
+      private DataLakeStoreBlobStorageProvider(string accountName, string domain, string clientId, string clientSecret, string clientCert)
       {
          _accountName = accountName ?? throw new ArgumentNullException(nameof(accountName));
 
@@ -49,7 +49,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       public DataLakeStoreFileSystemManagementClient FsClient => _fsClient;
 
 
-      public static DataLakeStoreBlobStorage CreateByClientSecret(string accountName, NetworkCredential credential)
+      public static DataLakeStoreBlobStorageProvider CreateByClientSecret(string accountName, NetworkCredential credential)
       {
          if (credential == null) throw new ArgumentNullException(nameof(credential));
 
@@ -62,21 +62,20 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          if (string.IsNullOrEmpty(credential.Password))
             throw new ArgumentException("Principal Secret (Password in NetworkCredential) part is required");
 
-         return new DataLakeStoreBlobStorage(accountName, credential.Domain, credential.UserName, credential.Password, null);
+         return new DataLakeStoreBlobStorageProvider(accountName, credential.Domain, credential.UserName, credential.Password, null);
       }
 
-      protected override async Task<IEnumerable<BlobId>> ListAsync(string[] folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
+      public async Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobPrefix(prefix);
 
          var client = await GetFsClient();
 
-         var files = new List<BlobId>();
+         var blobs = new List<BlobId>();
 
-         await ListByPrefixIntoContainer(client, prefix ?? "/", files, recurse);
+         await ListByPrefixIntoContainer(client, prefix ?? "/", blobs, recurse);
 
-         //return files.Select(f => f.TrimStart('/'));
-         throw new NotImplementedException();
+         return blobs;
       }
 
       private async Task ListByPrefixIntoContainer(DataLakeStoreFileSystemManagementClient client, string prefix, List<BlobId> files, bool recurse)
@@ -121,16 +120,30 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          }*/
       }
 
-      public override async Task DeleteAsync(string id)
+      public async Task WriteAsync(string id, Stream sourceStream, bool append)
       {
          GenericValidation.CheckBlobId(id);
 
          var client = await GetFsClient();
 
-         await client.FileSystem.DeleteAsync(_accountName, id);
+         if (append)
+         {
+            if ((await ExistsAsync(new[] { id })).First())
+            {
+               await client.FileSystem.AppendAsync(_accountName, id, new NonCloseableStream(sourceStream));
+            }
+            else
+            {
+               await client.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(sourceStream), true);
+            }
+         }
+         else
+         {
+            await client.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(sourceStream), true);
+         }
       }
 
-      public override async Task<Stream> OpenReadAsync(string id)
+      public async Task<Stream> OpenReadAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -146,61 +159,56 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          }
       }
 
-      public override async Task<bool> ExistsAsync(string id)
+      public async Task DeleteAsync(IEnumerable<string> ids)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobId(ids);
 
          var client = await GetFsClient();
 
-         try
-         {
-            await client.FileSystem.GetFileStatusAsync(_accountName, id);
-
-            return true;
-         }
-         catch(AdlsErrorException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
-         {
-            return false;
-         }
+         await Task.WhenAll(ids.Select(id => client.FileSystem.DeleteAsync(_accountName, id)));
       }
 
-      public override async Task<BlobMeta> GetMetaAsync(string id)
+      public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobId(ids);
 
          var client = await GetFsClient();
 
-         //ContentSummaryResult csr = await client.FileSystem.GetContentSummaryAsync(_accountName, id);
-         //csr.ContentSummary.
+         var result = new List<bool>();
+
+         foreach (string id in ids)
+         {
+            try
+            {
+               await client.FileSystem.GetFileStatusAsync(_accountName, id);
+
+               result.Add(true);
+            }
+            catch (AdlsErrorException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
+            {
+               result.Add(false);
+            }
+         }
+
+         return result;
+      }
+
+      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids)
+      {
+         GenericValidation.CheckBlobId(ids);
+
+         DataLakeStoreFileSystemManagementClient client = await GetFsClient();
+
+         return await Task.WhenAll(ids.Select(id => GetMetaAsync(id, client)));
+      }
+
+      private async Task<BlobMeta> GetMetaAsync(string id, DataLakeStoreFileSystemManagementClient client)
+      {
          FileStatusResult fsr = await client.FileSystem.GetFileStatusAsync(_accountName, id);
-         //fsr.FileStatus.
 
-         return new BlobMeta(fsr.FileStatus.Length.Value, null);
-      }
+         var meta = new BlobMeta(fsr.FileStatus.Length.Value, null);
 
-      public override async Task WriteAsync(string id, Stream sourceStream)
-      {
-         GenericValidation.CheckBlobId(id);
-
-         var client = await GetFsClient();
-
-         await client.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(sourceStream), true);
-      }
-
-      public override async Task AppendAsync(string id, Stream sourceStream)
-      {
-         GenericValidation.CheckBlobId(id);
-
-         var client = await GetFsClient();
-
-         if (await ExistsAsync(id))
-         {
-            await client.FileSystem.AppendAsync(_accountName, id, new NonCloseableStream(sourceStream));
-         }
-         else
-         {
-            await WriteAsync(id, sourceStream);
-         }
+         return meta;
       }
 
       private async Task<DataLakeStoreFileSystemManagementClient> GetFsClient()
@@ -231,6 +239,10 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          }
 
          return _credential;
+      }
+
+      public void Dispose()
+      {
       }
    }
 }
