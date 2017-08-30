@@ -35,7 +35,7 @@ namespace Storage.Net.Blob
       /// <returns>Writeable stream</returns>
       /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task WriteAsync(string id, Stream sourceStream, bool append);
+      Task WriteAsync(string id, Stream sourceStream, bool append = false);
 
       /// <summary>
       /// Opens the blob stream to read.

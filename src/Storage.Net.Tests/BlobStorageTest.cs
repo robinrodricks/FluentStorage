@@ -97,7 +97,7 @@ namespace Storage.Net.Tests.Integration
 
          using (Stream s = "kjhlkhlkhlkhlkh".ToMemoryStream())
          {
-            await _provider.WriteAsync(id, s);
+            await _provider.WriteAsync(id, s, false);
          }
 
          return id;
@@ -132,7 +132,7 @@ namespace Storage.Net.Tests.Integration
 
          _provider.WriteText(id, Generator.RandomString);
 
-         var items = _provider.List(null, null, true);
+         var items = await _provider.ListAsync(null, null, true);
       }
 
       [Fact]
@@ -162,13 +162,13 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void Objects_Add_Retreives()
+      public async Task Objects_Add_Retreives()
       {
          var td = new TestDocument() { M = "string" };
 
          string id = Generator.GetRandomString(10, false);
 
-         _provider.Write(id, td);
+         _provider.WriteAsync(id, td);
 
          TestDocument td2 = _provider.Read<TestDocument>(id);
 
