@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using NetBox;
-using Xunit;
 using Storage.Net.Aws.Blob;
 using Storage.Net.Blob;
 using Storage.Net.Blob.Files;
 using Storage.Net.Microsoft.Azure.Storage.Blob;
-using System.Threading.Tasks;
+using Storage.Net.Tests.Integration;
+using Xunit;
 
-namespace Storage.Net.Tests.Integration
+namespace Storage.Net.Tests.Blobs
 {
    #region [ Test Variations ]
 
@@ -51,7 +52,7 @@ namespace Storage.Net.Tests.Integration
    {
       private readonly string _type;
       private IBlobStorageProvider _provider;
-      private BlobStorage _bs;
+      private BlobStorage _bs;   //use only as helper
 
       public BlobStorageProviderTest(string type)
       {

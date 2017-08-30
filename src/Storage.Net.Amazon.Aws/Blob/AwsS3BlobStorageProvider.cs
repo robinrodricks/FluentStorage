@@ -73,21 +73,44 @@ namespace Storage.Net.Aws.Blob
          return response.S3Objects.Select(s3Obj => new BlobId(null, s3Obj.Key, BlobItemKind.File));
       }
 
-      /*
-      /// <summary>
-      /// deletes object from current bucket
-      /// </summary>
-      public override async Task DeleteAsync(string id)
+      public async Task WriteAsync(string id, Stream sourceStream, bool append = false)
+      {
+         if (append) throw new NotSupportedException();
+
+         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckSourceStream(sourceStream);
+
+         //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
+
+         await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, id);
+      }
+
+      public async Task<Stream> OpenReadAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
-         await _client.DeleteObjectAsync(_bucketName, id);
+         GetObjectResponse response = await GetObjectAsync(id);
+         return new AwsS3BlobStorageExternalStream(response);
       }
 
-      /// <summary>
-      /// Checks if the object exists by trying to fetch the details
-      /// </summary>
-      public override async Task<bool> ExistsAsync(string id)
+      public Task DeleteAsync(IEnumerable<string> ids)
+      {
+         return Task.WhenAll(ids.Select(id => DeleteAsync(id)));
+      }
+
+      private Task DeleteAsync(string id)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         return _client.DeleteObjectAsync(_bucketName, id);
+      }
+
+      public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
+      {
+         return await Task.WhenAll(ids.Select(ExistsAsync));
+      }
+
+      private async Task<bool> ExistsAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -106,19 +129,21 @@ namespace Storage.Net.Aws.Blob
          return true;
       }
 
-      /// <summary>
-      /// Gets blob metadata
-      /// </summary>
-      public override async Task<BlobMeta> GetMetaAsync(string id)
+      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids)
+      {
+         return await Task.WhenAll(ids.Select(GetMetaAsync));
+      }
+
+      private async Task<BlobMeta> GetMetaAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
-
+   
          try
          {
             using (GetObjectResponse obj = await GetObjectAsync(id))
             {
                //ETag contains actual MD5 hash, not sure why!
-
+   
                return new BlobMeta(
                   obj.ContentLength,
                   obj.ETag.Trim('\"'));  
@@ -128,48 +153,6 @@ namespace Storage.Net.Aws.Blob
          {
             return null;
          }
-      }
-
-      /// <summary>
-      /// Opens AWS stream and returns it. Note that you absolutely have to dispose it yourself in order for this
-      /// adapter to close the network connection properly.
-      /// </summary>
-      /// <param name="id"></param>
-      /// <returns></returns>
-      public override async Task<Stream> OpenReadAsync(string id)
-      {
-         GenericValidation.CheckBlobId(id);
-
-         GetObjectResponse response = await GetObjectAsync(id);
-         return new AwsS3BlobStorageExternalStream(response);
-      }
-
-      /// <summary>
-      /// Uploads the stream using transfer manager
-      /// </summary>
-      /// <param name="id">Unique resource ID</param>
-      /// <param name="sourceStream">Stream to upload</param>
-      public override async Task WriteAsync(string id, Stream sourceStream)
-      {
-         GenericValidation.CheckBlobId(id);
-         GenericValidation.CheckSourceStream(sourceStream);
-
-         //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
-
-         await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, id);
-      }
-
-      /// <summary>
-      /// Simulates append operation in a very inefficient way as AWS doesn't support appending to blobs. Avoid at all costs!
-      /// </summary>
-      /// <param name="id"></param>
-      /// <param name="sourceStream"></param>
-      public override void Append(string id, Stream sourceStream)
-      {
-         GenericValidation.CheckBlobId(id);
-         GenericValidation.CheckSourceStream(sourceStream);
-
-         throw new NotSupportedException();
       }
 
       private async Task<GetObjectResponse> GetObjectAsync(string key)
@@ -198,12 +181,6 @@ namespace Storage.Net.Aws.Blob
 
          return false;
       }
-
-      public Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken = default(CancellationToken))
-      {
-         throw new NotImplementedException();
-      }
-      */
 
       public void Dispose()
       {
