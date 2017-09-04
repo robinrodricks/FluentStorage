@@ -43,16 +43,19 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
          do
          {
-            foreach(SecretItem item in page)
-            {
-               secretNames.Add(new BlobId(null, item.Id, BlobItemKind.File));
-            }
+            secretNames.AddRange(page.Select(ToBlobId));
          }
          while (page.NextPageLink != null && (page = await _vaultClient.GetSecretsNextAsync(page.NextPageLink)) != null);
 
          if (options.Prefix == null) return secretNames;
 
          return secretNames.Where(n => n.Id.StartsWith(options.Prefix));
+      }
+
+      private static BlobId ToBlobId(SecretItem item)
+      {
+         int idx = item.Id.LastIndexOf('/');
+         return new BlobId(item.Id.Substring(idx + 1), BlobItemKind.File);
       }
 
       public async Task WriteAsync(string id, Stream sourceStream, bool append)
