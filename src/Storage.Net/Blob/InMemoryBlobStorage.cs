@@ -13,17 +13,19 @@ namespace Storage.Net.Blob
    {
       private readonly Dictionary<BlobId, MemoryStream> _idToData = new Dictionary<BlobId, MemoryStream>();
 
-      public Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
+      public Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
-         folderPath = StoragePath.Normalize(folderPath);
+         if (options == null) options = new ListOptions();
+
+         options.FolderPath = StoragePath.Normalize(options.FolderPath);
 
          List<BlobId> matches = _idToData
 
-            .Where(e => recurse
-               ? e.Key.FolderPath.StartsWith(folderPath)
-               : e.Key.FolderPath == folderPath)
+            .Where(e => options.Recurse
+               ? e.Key.FolderPath.StartsWith(options.FolderPath)
+               : e.Key.FolderPath == options.FolderPath)
 
-            .Where(e => prefix == null || e.Key.Id.StartsWith(prefix))
+            .Where(e => options.Prefix == null || e.Key.Id.StartsWith(options.Prefix))
 
             .Select(e => e.Key)
 

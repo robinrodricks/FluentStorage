@@ -32,9 +32,11 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
       #region [ IBlobStorage ]
 
-      public async Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
+      public async Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobPrefix(prefix);
+         if (options == null) options = new ListOptions();
+
+         GenericValidation.CheckBlobPrefix(options.Prefix);
 
          var secretNames = new List<BlobId>();
          IPage<SecretItem> page = await _vaultClient.GetSecretsAsync(_vaultUri);
@@ -48,9 +50,9 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
          }
          while (page.NextPageLink != null && (page = await _vaultClient.GetSecretsNextAsync(page.NextPageLink)) != null);
 
-         if (prefix == null) return secretNames;
+         if (options.Prefix == null) return secretNames;
 
-         return secretNames.Where(n => n.Id.StartsWith(prefix));
+         return secretNames.Where(n => n.Id.StartsWith(options.Prefix));
       }
 
       public async Task WriteAsync(string id, Stream sourceStream, bool append)

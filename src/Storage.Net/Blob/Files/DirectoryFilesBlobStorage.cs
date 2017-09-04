@@ -27,28 +27,30 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Returns the list of blob names in this storage, optionally filtered by prefix
       /// </summary>
-      public async Task<IEnumerable<BlobId>> ListAsync(string path, string prefix, bool recurse, CancellationToken cancellationToken)
+      public async Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobPrefix(prefix);
+         if (options == null) options = new ListOptions();
+
+         GenericValidation.CheckBlobPrefix(options.Prefix);
 
          if(!_directory.Exists) return null;
 
-         string fullPath = GetFolder(path, false);
+         string fullPath = GetFolder(options?.FolderPath, false);
          if (fullPath == null) return Enumerable.Empty<BlobId>();
 
          string[] fileIds = Directory.GetFiles(
             fullPath,
-            string.IsNullOrEmpty(prefix)
+            string.IsNullOrEmpty(options.Prefix)
                ? "*"
-               : prefix + "*",
-            recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+               : options.Prefix + "*",
+            options.Recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
          string[] directoryIds = Directory.GetDirectories(
                fullPath,
-               string.IsNullOrEmpty(prefix)
+               string.IsNullOrEmpty(options.Prefix)
                   ? "*"
-                  : prefix + "*",
-               recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+                  : options.Prefix + "*",
+               options.Recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
          var result = new List<BlobId>();
          result.AddRange(directoryIds.Select(id => ToBlobItem(id, BlobItemKind.Folder)));

@@ -148,14 +148,16 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       /// <summary>
       /// Gets all the blob names, then filters by prefix optionally
       /// </summary>
-      public async Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
+      public async Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
+         if (options == null) options = new ListOptions();
+
          var browser = new AzureBlobDirectoryBrowser(_blobContainer);
 
          return await browser.ListFolder(
-            folderPath,
-            prefix,
-            recurse,
+            options.FolderPath,
+            options.Prefix,
+            options.Recurse,
             cancellationToken); 
       }
 

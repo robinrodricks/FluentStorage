@@ -65,15 +65,17 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          return new DataLakeStoreBlobStorageProvider(accountName, credential.Domain, credential.UserName, credential.Password, null);
       }
 
-      public async Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
+      public async Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobPrefix(prefix);
+         if (options == null) options = new ListOptions();
+
+         GenericValidation.CheckBlobPrefix(options.Prefix);
 
          var client = await GetFsClient();
 
          var blobs = new List<BlobId>();
 
-         await ListByPrefixIntoContainer(client, prefix ?? "/", blobs, recurse);
+         await ListByPrefixIntoContainer(client, options.Prefix ?? "/", blobs, options.Recurse);
 
          return blobs;
       }

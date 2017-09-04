@@ -20,7 +20,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          _collectionName = collectionName ?? throw new ArgumentNullException(nameof(collectionName));
       }
 
-      public async Task<IEnumerable<BlobId>> ListAsync(string folderPath, string prefix, bool recurse, CancellationToken cancellationToken)
+      public async Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
          var result = new List<BlobId>();
 
@@ -35,7 +35,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
                {
                   KeyValuePair<string, byte[]> current = enumerator.Current;
 
-                  if (prefix == null || current.Key.StartsWith(prefix))
+                  if (options.Prefix == null || current.Key.StartsWith(options.Prefix))
                   {
                      result.Add(new BlobId(null, current.Key, BlobItemKind.File));
                   }

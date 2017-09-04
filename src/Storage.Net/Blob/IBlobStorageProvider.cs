@@ -14,15 +14,10 @@ namespace Storage.Net.Blob
       /// <summary>
       /// Returns the list of available blobs
       /// </summary>
-      /// <param name="folderPath">Path to the folder. When null works with a root folder.</param>
-      /// <param name="prefix">Blob prefix to filter by. When null returns all blobs.
-      /// Cannot be longer than 50 characters.</param>
-      /// <param name="recurse">When true returns files recursively</param>
+      /// <param name="options"></param>
       /// <param name="cancellationToken"></param>
       /// <returns>List of blob IDs</returns>
-      Task<IEnumerable<BlobId>> ListAsync(string folderPath,
-         string prefix,
-         bool recurse,
+      Task<IEnumerable<BlobId>> ListAsync(ListOptions options,
          CancellationToken cancellationToken = default(CancellationToken));
 
       /// <summary>

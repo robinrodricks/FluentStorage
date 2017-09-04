@@ -110,7 +110,7 @@ namespace Storage.Net.Tests.Blobs
       [Fact]
       public async Task List_All_DoesntCrash()
       {
-         List<BlobId> allBlobNames = (await _provider.ListAsync(null, null, true)).ToList();
+         List<BlobId> allBlobNames = (await _provider.ListAsync(new ListOptions { Recurse = true })).ToList();
       }
 
       [Fact]
@@ -118,7 +118,7 @@ namespace Storage.Net.Tests.Blobs
       {
          string prefix = Generator.RandomString;
 
-         int countBefore = (await _provider.ListAsync(null, prefix, false)).Count();
+         int countBefore = (await _provider.ListAsync(new ListOptions { Prefix = prefix })).Count();
 
          string id1 = prefix + Generator.RandomString;
          string id2 = prefix + Generator.RandomString;
@@ -128,7 +128,7 @@ namespace Storage.Net.Tests.Blobs
          await _bs.WriteTextAsync(id2, Generator.RandomString);
          await _bs.WriteTextAsync(id3, Generator.RandomString);
 
-         List<BlobId> items = (await _provider.ListAsync(null, prefix, false)).ToList();
+         List<BlobId> items = (await _provider.ListAsync(new ListOptions { Prefix = prefix })).ToList();
          Assert.Equal(2 + countBefore, items.Count); //2 files + containing folder
       }
 
@@ -139,7 +139,7 @@ namespace Storage.Net.Tests.Blobs
 
          await _bs.WriteTextAsync(id, Generator.RandomString);
 
-         var items = await _provider.ListAsync(null, null, true);
+         var items = await _provider.ListAsync(new ListOptions { Recurse = false });
       }
 
       [Fact]
@@ -153,14 +153,14 @@ namespace Storage.Net.Tests.Blobs
          await _bs.WriteTextAsync(id2, Generator.RandomString);
          await _bs.WriteTextAsync(id3, Generator.RandomString);
 
-         var items = await _provider.ListAsync(null, null, true);
+         var items = await _provider.ListAsync(new ListOptions { Recurse = true });
       }
 
 
       [Fact]
       public async Task List_VeryLongPrefix_NoResultsNoCrash()
       {
-         await Assert.ThrowsAsync<ArgumentException>(async () => await _provider.ListAsync(null, Generator.GetRandomString(100000, false), true));
+         await Assert.ThrowsAsync<ArgumentException>(async () => await _provider.ListAsync(new ListOptions { Prefix = Generator.GetRandomString(100000, false) }));
       }
 
       class TestDocument
