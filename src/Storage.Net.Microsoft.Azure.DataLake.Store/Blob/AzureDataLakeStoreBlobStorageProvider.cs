@@ -69,57 +69,10 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          if (options == null) options = new ListOptions();
 
-         GenericValidation.CheckBlobPrefix(options.Prefix);
+         DataLakeStoreFileSystemManagementClient client = await GetFsClient();
 
-         var client = await GetFsClient();
-
-         var blobs = new List<BlobId>();
-
-         await ListByPrefixIntoContainer(client, options.Prefix ?? "/", blobs, options.Recurse);
-
-         return blobs;
-      }
-
-      private async Task ListByPrefixIntoContainer(DataLakeStoreFileSystemManagementClient client, string prefix, List<BlobId> files, bool recurse)
-      {
-         //todo: not sure whether this should list just top level files or not, but then what to do with folders?
-
-         throw new NotImplementedException();
-
-         /*if (prefix == null)
-         {
-            prefix = "/";
-         }
-         else if(!prefix.StartsWith("/"))
-         {
-            prefix = "/" + prefix;
-         }
-
-         try
-         {
-            FileStatusesResult statuses = await client.FileSystem.ListFileStatusAsync(_accountName, prefix);
-
-            files.AddRange(statuses.FileStatuses.FileStatus
-               .Where(fs => fs.Type == FileType.FILE)
-               .Select(f => prefix + f.PathSuffix));
-
-            List<string> directories = statuses.FileStatuses.FileStatus
-               .Where(fs => fs.Type == FileType.DIRECTORY)
-               .Select(fs => prefix + fs.PathSuffix + "/")
-               .ToList();
-
-            if (directories.Count > 0)
-            {
-               foreach (string dirPath in directories)
-               {
-                  await ListByPrefixIntoContainer(client, dirPath, files);
-               }
-            }
-         }
-         catch(AdlsErrorException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
-         {
-
-         }*/
+         var browser = new DirectoryBrowser(client, _accountName);
+         return await browser.Browse(options, cancellationToken);
       }
 
       public async Task WriteAsync(string id, Stream sourceStream, bool append)
