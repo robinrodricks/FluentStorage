@@ -21,7 +21,7 @@ namespace Storage.Net
          string accountName,
          NetworkCredential credential)
       {
-         return DataLakeStoreBlobStorageProvider.CreateByClientSecret(accountName, credential);
+         return AzureDataLakeStoreBlobStorageProvider.CreateByClientSecret(accountName, credential);
       }
 
       /// <summary>
@@ -51,7 +51,7 @@ namespace Storage.Net
          if (principalSecret == null)
             throw new ArgumentNullException(nameof(principalSecret));
 
-         return DataLakeStoreBlobStorageProvider.CreateByClientSecret(accountName, new NetworkCredential(principalId, principalSecret, tenantId));
+         return AzureDataLakeStoreBlobStorageProvider.CreateByClientSecret(accountName, new NetworkCredential(principalId, principalSecret, tenantId));
       }
    }
 }

@@ -16,7 +16,7 @@ using System.Threading;
 
 namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 {
-   public class DataLakeStoreBlobStorageProvider : IBlobStorageProvider
+   public class AzureDataLakeStoreBlobStorageProvider : IBlobStorageProvider
    {
       private readonly string _accountName;
       private readonly string _domain;
@@ -27,7 +27,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
       //some info on how to use sdk here: https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-get-started-net-sdk
 
-      private DataLakeStoreBlobStorageProvider(string accountName, string domain, string clientId, string clientSecret, string clientCert)
+      private AzureDataLakeStoreBlobStorageProvider(string accountName, string domain, string clientId, string clientSecret, string clientCert)
       {
          _accountName = accountName ?? throw new ArgumentNullException(nameof(accountName));
 
@@ -49,7 +49,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       public DataLakeStoreFileSystemManagementClient FsClient => _fsClient;
 
 
-      public static DataLakeStoreBlobStorageProvider CreateByClientSecret(string accountName, NetworkCredential credential)
+      public static AzureDataLakeStoreBlobStorageProvider CreateByClientSecret(string accountName, NetworkCredential credential)
       {
          if (credential == null) throw new ArgumentNullException(nameof(credential));
 
@@ -62,7 +62,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          if (string.IsNullOrEmpty(credential.Password))
             throw new ArgumentException("Principal Secret (Password in NetworkCredential) part is required");
 
-         return new DataLakeStoreBlobStorageProvider(accountName, credential.Domain, credential.UserName, credential.Password, null);
+         return new AzureDataLakeStoreBlobStorageProvider(accountName, credential.Domain, credential.UserName, credential.Password, null);
       }
 
       public async Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
