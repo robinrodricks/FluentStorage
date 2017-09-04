@@ -10,8 +10,8 @@ using System.IO;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Rest.Azure;
-using NetBox.Model;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 {
@@ -20,6 +20,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
       private KeyVaultClient _vaultClient;
       private ClientCredential _credential;
       private readonly string _vaultUri;
+      private static readonly Regex secretNameRegex = new Regex("^[0-9a-zA-Z-]+$");
 
       public AzureKeyVaultBlobStorageProvider(Uri vaultUri, string azureAadClientId, string azureAadClientSecret)
       {
@@ -61,6 +62,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
       public async Task WriteAsync(string id, Stream sourceStream, bool append)
       {
          GenericValidation.CheckBlobId(id);
+         ValidateSecretName(id);
          GenericValidation.CheckSourceStream(sourceStream);
          if (append) throw new ArgumentException("appending to secrets is not supported", nameof(append));
 
@@ -72,6 +74,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
       public async Task<Stream> OpenReadAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
+         ValidateSecretName(id);
 
          SecretBundle secret;
          try
@@ -171,6 +174,14 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
          }
 
          return false;
+      }
+
+      private static void ValidateSecretName(string id)
+      {
+         if(!secretNameRegex.IsMatch(id))
+         {
+            throw new ArgumentException($"secret '{id}' does not match expected pattern '^[0-9a-zA-Z-]+$'");
+         }
       }
 
       public void Dispose()
