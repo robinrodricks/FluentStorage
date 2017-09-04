@@ -26,9 +26,6 @@
     <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>
     <Description>Storage.Net abstracts storage implementation like blobs, tables and messages from the .NET Application Developer. It's aimed to provide a generic interface regardless on which storage provider you are using. It also provides both synchronous and asynchronous alternatives of all methods and implements it to the best effort possible. Supports .NET 4.5.1 and .NET Standard 1.6.</Description>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="netbox" Version="1.4.20" />
-  </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
     <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
   </ItemGroup>
@@ -41,5 +38,8 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NetBox" Version="1.4.22" />
   </ItemGroup>
 </Project>

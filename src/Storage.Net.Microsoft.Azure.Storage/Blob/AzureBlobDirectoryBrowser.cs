@@ -76,7 +76,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
       private CloudBlobDirectory GetCloudBlobDirectory(string path)
       {
-         path = path.Trim(StoragePath.PathSeparator);
+         path = path == null ? string.Empty : path.Trim(StoragePath.PathSeparator);
 
          CloudBlobDirectory dir = _container.GetDirectoryReference(path);
 
