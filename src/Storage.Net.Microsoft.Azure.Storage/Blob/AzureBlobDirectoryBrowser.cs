@@ -48,9 +48,8 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
                else
                   throw new InvalidOperationException($"unknown item type {blob.GetType()}");
 
-
-
-               result.Add(id);
+               if(prefix == null ||  id.Id.StartsWith(prefix))
+                  result.Add(id);
             }
 
          }

@@ -117,6 +117,9 @@ namespace Storage.Net.Tests.Blobs
       public async Task List_ByFlatPrefix_Filtered()
       {
          string prefix = Generator.RandomString;
+
+         int countBefore = (await _provider.ListAsync(null, prefix, false)).Count();
+
          string id1 = prefix + Generator.RandomString;
          string id2 = prefix + Generator.RandomString;
          string id3 = Generator.RandomString;
@@ -126,7 +129,7 @@ namespace Storage.Net.Tests.Blobs
          await _bs.WriteTextAsync(id3, Generator.RandomString);
 
          List<BlobId> items = (await _provider.ListAsync(null, prefix, false)).ToList();
-         Assert.Equal(2, items.Count);
+         Assert.Equal(2 + countBefore, items.Count); //2 files + containing folder
       }
 
       [Fact]
