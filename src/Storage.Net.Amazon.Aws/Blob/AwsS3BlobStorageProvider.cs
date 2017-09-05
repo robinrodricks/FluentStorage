@@ -69,8 +69,9 @@ namespace Storage.Net.Aws.Blob
          ListObjectsV2Response response = await _client.ListObjectsV2Async(new ListObjectsV2Request()
          {
             BucketName = _bucketName,
-            Prefix = options.Prefix ?? null
-         });
+            Prefix = options.Prefix ?? null,
+         },
+         cancellationToken);
 
          return response.S3Objects.Select(s3Obj => new BlobId(null, s3Obj.Key, BlobItemKind.File));
       }

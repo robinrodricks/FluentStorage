@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,10 +36,21 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
       private async Task Browse(string path, string prefix, bool recurse, ICollection<BlobId> container, CancellationToken token)
       {
-         FileStatusesResult statuses = await _client.FileSystem.ListFileStatusAsync(_accountName, path,
-            null, null, null, null,
-            token);
+         FileStatusesResult statuses;
 
+         try
+         {
+            statuses = await _client.FileSystem.ListFileStatusAsync(_accountName, path,
+               null, null, null, null,
+               token);
+         }
+         //skip files with forbidden access
+         catch (AdlsErrorException ex) when (ex.Response.StatusCode == HttpStatusCode.Forbidden)
+         {
+            statuses = null;
+         }
+
+         if (statuses == null) return;
 
          List<BlobId> batch =
             statuses.FileStatuses.FileStatus
