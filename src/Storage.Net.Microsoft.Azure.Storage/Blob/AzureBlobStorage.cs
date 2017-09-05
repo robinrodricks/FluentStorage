@@ -51,7 +51,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       {
          GenericValidation.CheckBlobId(id);
 
-         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
+         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(StoragePath.Normalize(id, false));
 
          bool exists = await blob.ExistsAsync();
          if (!exists) return null;
@@ -70,7 +70,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          GenericValidation.CheckBlobId(id);
          if (policy == null) throw new ArgumentNullException(nameof(policy));
 
-         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
+         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(StoragePath.Normalize(id, false));
 
          bool exists = await blob.ExistsAsync();
          if (!exists) return null;
@@ -164,7 +164,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          if (append)
          {
-            CloudAppendBlob cab = _blobContainer.GetAppendBlobReference(id);
+            CloudAppendBlob cab = _blobContainer.GetAppendBlobReference(StoragePath.Normalize(id, false));
             if (!(await cab.ExistsAsync())) await cab.CreateOrReplaceAsync();
 
             await cab.AppendFromStreamAsync(sourceStream);
@@ -172,7 +172,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          }
          else
          {
-            CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(ToPath(id));
+            CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(StoragePath.Normalize(id, false));
 
             await blob.UploadFromStreamAsync(sourceStream);
          }
@@ -182,7 +182,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       {
          GenericValidation.CheckBlobId(id);
 
-         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
+         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(StoragePath.Normalize(id, false));
 
          try
          {
@@ -202,7 +202,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          {
             GenericValidation.CheckBlobId(id);
 
-            CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
+            CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(StoragePath.Normalize(id, false));
             await blob.DeleteIfExistsAsync();
          }
       }
@@ -214,7 +214,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          foreach (string id in ids)
          {
             GenericValidation.CheckBlobId(id);
-            CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(id);
+            CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(StoragePath.Normalize(id, false));
             bool exists = await blob.ExistsAsync();
             result.Add(exists);
          }
@@ -232,7 +232,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          foreach (string id in ids)
          {
-            CloudBlob blob = _blobContainer.GetBlobReference(id);
+            CloudBlob blob = _blobContainer.GetBlobReference(StoragePath.Normalize(id, false));
             if (!(await blob.ExistsAsync())) return null;
 
             await blob.FetchAttributesAsync();
@@ -248,13 +248,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          }
 
          return result;
-      }
-
-      private static string ToPath(string path)
-      {
-         if (path == null) return null;
-
-         return path.Trim(StoragePath.PathSeparator);
       }
 
       private static bool TryHandleStorageException(AzureStorageException ex)

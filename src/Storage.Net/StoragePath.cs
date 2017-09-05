@@ -52,12 +52,17 @@ namespace Storage.Net
       /// Normalizes path
       /// </summary>
       /// <param name="path"></param>
+      /// <param name="includeTrailingRoot">When true, includes trailing '/' as path prefix</param>
       /// <returns></returns>
-      public static string Normalize(string path)
+      public static string Normalize(string path, bool includeTrailingRoot = false)
       {
          if (path == null) return RootFolderPath;
 
-         return PathSeparatorString + path.Trim(PathSeparator);
+         path = path.Trim(PathSeparator);
+
+         return includeTrailingRoot ?
+            PathSeparatorString + path
+            : path;
       }
 
       /// <summary>

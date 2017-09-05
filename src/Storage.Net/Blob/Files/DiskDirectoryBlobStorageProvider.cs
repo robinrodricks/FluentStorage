@@ -113,6 +113,7 @@ namespace Storage.Net.Blob.Files
       private string GetFilePath(string id, bool createIfNotExists = true)
       {
          //id can contain path separators
+         id = id.Trim(StoragePath.PathSeparator);
          string[] parts = id.Split(StoragePath.PathSeparator).Select(EncodePathPart).ToArray();
          string name = parts[parts.Length - 1];
          DirectoryInfo dir;
@@ -173,6 +174,7 @@ namespace Storage.Net.Blob.Files
          GenericValidation.CheckBlobId(id);
          GenericValidation.CheckSourceStream(sourceStream);
 
+         id = StoragePath.Normalize(id, false);
          using (Stream dest = CreateStream(id, !append))
          {
             sourceStream.CopyTo(dest);
@@ -185,7 +187,8 @@ namespace Storage.Net.Blob.Files
       {
          GenericValidation.CheckBlobId(id);
 
-         Stream result =  OpenStream(id);
+         id = StoragePath.Normalize(id, false);
+         Stream result = OpenStream(id);
 
          return Task.FromResult(result);
       }
@@ -198,7 +201,7 @@ namespace Storage.Net.Blob.Files
          {
             GenericValidation.CheckBlobId(id);
 
-            string path = GetFilePath(id);
+            string path = GetFilePath(StoragePath.Normalize(id, false));
             if (File.Exists(path)) File.Delete(path);
          }
 
@@ -211,14 +214,11 @@ namespace Storage.Net.Blob.Files
 
          if (ids != null)
          {
-            foreach (string id in ids)
-            {
-               GenericValidation.CheckBlobId(id);
-            }
+            GenericValidation.CheckBlobId(ids);
 
             foreach (string id in ids)
             {
-               bool exists = File.Exists(GetFilePath(id));
+               bool exists = File.Exists(GetFilePath(StoragePath.Normalize(id, false)));
                result.Add(exists);
             }
          }
@@ -236,7 +236,7 @@ namespace Storage.Net.Blob.Files
 
          foreach (string id in ids)
          {
-            string path = GetFilePath(id);
+            string path = GetFilePath(StoragePath.Normalize(id, false));
 
             if (!File.Exists(path))
             {

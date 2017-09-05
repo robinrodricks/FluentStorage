@@ -116,6 +116,8 @@ namespace Storage.Net.Blob
          return all.Where(i => i.Kind == BlobItemKind.File);
       }
 
+      #endregion
+
       #region [ Text ]
 
       /// <summary>

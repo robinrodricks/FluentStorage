@@ -178,6 +178,18 @@ namespace Storage.Net.Tests.Blobs
          Assert.Equal(1, countOne);
       }
 
+      [Fact]
+      public async Task List_and_read_back()
+      {
+         string id = Generator.RandomString;
+         await _bs.WriteTextAsync(id, Generator.RandomString);
+
+         BlobId bid = (await _provider.ListAsync(new ListOptions { Prefix = id })).First();
+
+         string text = await _bs.ReadTextAsync(bid.FullPath);
+         Assert.NotNull(text);
+      }
+
       class TestDocument
       {
          public string M { get; set; }

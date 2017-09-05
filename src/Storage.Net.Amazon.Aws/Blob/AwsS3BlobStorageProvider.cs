@@ -90,6 +90,7 @@ namespace Storage.Net.Aws.Blob
 
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
 
+         id = StoragePath.Normalize(id, false);
          await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, id);
       }
 
@@ -97,6 +98,7 @@ namespace Storage.Net.Aws.Blob
       {
          GenericValidation.CheckBlobId(id);
 
+         id = StoragePath.Normalize(id, false);
          GetObjectResponse response = await GetObjectAsync(id);
          return new AwsS3BlobStorageExternalStream(response);
       }
@@ -110,6 +112,7 @@ namespace Storage.Net.Aws.Blob
       {
          GenericValidation.CheckBlobId(id);
 
+         id = StoragePath.Normalize(id, false);
          return _client.DeleteObjectAsync(_bucketName, id);
       }
 
@@ -124,6 +127,7 @@ namespace Storage.Net.Aws.Blob
 
          try
          {
+            id = StoragePath.Normalize(id, false);
             using (await GetObjectAsync(id))
             {
 
@@ -148,6 +152,7 @@ namespace Storage.Net.Aws.Blob
    
          try
          {
+            id = StoragePath.Normalize(id, false);
             using (GetObjectResponse obj = await GetObjectAsync(id))
             {
                //ETag contains actual MD5 hash, not sure why!

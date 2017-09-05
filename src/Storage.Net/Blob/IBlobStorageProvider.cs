@@ -50,12 +50,17 @@ namespace Storage.Net.Blob
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
       Task DeleteAsync(IEnumerable<string> ids);
 
+      /// <summary>
+      /// Checksi if blobs exists in the storage
+      /// </summary>
+      /// <param name="ids">List of ids</param>
+      /// <returns>List of results of true and false indicating existence</returns>
       Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids);
 
       /// <summary>
       /// Gets basic blob metadata
       /// </summary>
-      /// <param name="id">Blob id</param>
+      /// <param name="ids">Blob id</param>
       /// <returns>Blob metadata or null if blob doesn't exist</returns>
       Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids);
    }
