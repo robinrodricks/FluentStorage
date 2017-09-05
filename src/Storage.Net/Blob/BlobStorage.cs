@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,7 +38,7 @@ namespace Storage.Net.Blob
       /// <param name="options"></param>
       /// <param name="cancellationToken"></param>
       /// <returns>List of blob IDs</returns>
-      Task<IEnumerable<BlobId>> ListAsync(ListOptions options,
+      public Task<IEnumerable<BlobId>> ListAsync(ListOptions options,
          CancellationToken cancellationToken = default(CancellationToken))
       {
          return _provider.ListAsync(options, cancellationToken);
@@ -53,7 +54,7 @@ namespace Storage.Net.Blob
       /// <returns>Writeable stream</returns>
       /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task WriteAsync(string id, Stream sourceStream, bool append = false)
+      public Task WriteAsync(string id, Stream sourceStream, bool append = false)
       {
          return _provider.WriteAsync(id, sourceStream, append);
       }
@@ -66,7 +67,7 @@ namespace Storage.Net.Blob
       /// stream after use.</returns>
       /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task<Stream> OpenReadAsync(string id)
+      public Task<Stream> OpenReadAsync(string id)
       {
          return _provider.OpenReadAsync(id);
       }
@@ -77,12 +78,12 @@ namespace Storage.Net.Blob
       /// <param name="ids">Blob IDs to delete.</param>
       /// <exception cref="ArgumentNullException">Thrown when ID is null.</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task DeleteAsync(IEnumerable<string> ids)
+      public Task DeleteAsync(IEnumerable<string> ids)
       {
          return _provider.DeleteAsync(ids);
       }
 
-      Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
+      public Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
       {
          return _provider.ExistsAsync(ids);
       }
@@ -92,12 +93,28 @@ namespace Storage.Net.Blob
       /// </summary>
       /// <param name="ids">Blob id</param>
       /// <returns>Blob metadata or null if blob doesn't exist</returns>
-      Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids)
+      public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids)
       {
          return _provider.GetMetaAsync(ids);
       }
 
       #endregion
+
+      #region [ List Helpers ]
+
+      /// <summary>
+      /// Returns the list of available files, excluding folders.
+      /// </summary>
+      /// <param name="options"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns>List of blob IDs</returns>
+      public async Task<IEnumerable<BlobId>> ListFilesAsync(ListOptions options,
+         CancellationToken cancellationToken = default(CancellationToken))
+      {
+         IEnumerable<BlobId> all = await _provider.ListAsync(options, cancellationToken);
+
+         return all.Where(i => i.Kind == BlobItemKind.File);
+      }
 
       #region [ Text ]
 
