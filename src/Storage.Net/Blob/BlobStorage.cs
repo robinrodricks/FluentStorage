@@ -24,12 +24,12 @@ namespace Storage.Net.Blob
       public async Task<string> ReadTextAsync(string id)
       {
          Stream src = await _provider.OpenReadAsync(id);
-         if (src == null) throw new StorageException(ErrorCode.NotFound, null);
+         if (src == null) return null;
 
          var ms = new MemoryStream();
          using (src)
          {
-            src.CopyTo(ms);
+            await src.CopyToAsync(ms);
          }
 
          return Encoding.UTF8.GetString(ms.ToArray());
@@ -76,7 +76,7 @@ namespace Storage.Net.Blob
             throw new ArgumentNullException(nameof(targetStream));
 
          Stream src = await _provider.OpenReadAsync(id);
-         if (src == null) throw new StorageException(ErrorCode.NotFound, null);
+         if (src == null) return;
 
          using (src)
          {
@@ -96,7 +96,7 @@ namespace Storage.Net.Blob
       public async Task ReadToFileAsync(string id, string filePath)
       {
          Stream src = await _provider.OpenReadAsync(id);
-         if (src == null) throw new StorageException(ErrorCode.NotFound, null);
+         if (src == null) return;
 
          using (src)
          {
@@ -134,7 +134,7 @@ namespace Storage.Net.Blob
       public async Task CopyToAsync(string blobId, IBlobStorageProvider targetStorage, string newId)
       {
          Stream src = await _provider.OpenReadAsync(blobId);
-         if (src == null) throw new StorageException(ErrorCode.NotFound, null);
+         if (src == null) return;
 
          using (src)
          {
@@ -155,18 +155,8 @@ namespace Storage.Net.Blob
       /// <returns>Deserialized object or null</returns>
       public async Task<T> ReadObjectFromJsonAsync<T>(string id) where T : new()
       {
-         string json;
-
-         try
-         {
-            json = await ReadTextAsync(id);
-         }
-         catch (StorageException ex) when (ex.ErrorCode == ErrorCode.NotFound)
-         {
-            return default(T);
-         }
-
-         return json.AsJsonObject<T>();
+         string json = await ReadTextAsync(id);
+         return json == null ? default(T) : json.AsJsonObject<T>();
       }
 
       /// <summary>

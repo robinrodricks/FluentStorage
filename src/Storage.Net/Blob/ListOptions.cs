@@ -7,6 +7,9 @@
    {
       private string _prefix;
 
+      /// <summary>
+      /// Folder path to start browsing from
+      /// </summary>
       public string FolderPath { get; set; }
 
       /// <summary>
@@ -18,7 +21,7 @@
          set
          {
             GenericValidation.CheckBlobPrefix(value);
-            _prefix = Prefix;
+            _prefix = value;
          }
       }
 

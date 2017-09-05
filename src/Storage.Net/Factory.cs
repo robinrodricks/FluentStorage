@@ -42,7 +42,7 @@ namespace Storage.Net
       /// <returns>In-memory blob storage instance</returns>
       public static IBlobStorageProvider InMemory(this IBlobStorageFactory factory)
       {
-         return new InMemoryBlobStorage();
+         return new InMemoryBlobStorageProvider();
       }
    }
 }

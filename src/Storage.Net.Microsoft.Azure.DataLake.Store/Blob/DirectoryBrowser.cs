@@ -58,7 +58,10 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
                .Where(b => prefix == null || b.Id.StartsWith(prefix))
                .ToList();
 
-         container.AddRange(batch);
+         if (prefix != null)
+            container.AddRange(batch.Where(i => i.Id.StartsWith(prefix)));
+         else
+            container.AddRange(batch);
 
          if(recurse)
          {

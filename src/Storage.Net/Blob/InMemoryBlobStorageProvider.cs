@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Storage.Net.Blob
 {
-   class InMemoryBlobStorage : IBlobStorageProvider
+   class InMemoryBlobStorageProvider : IBlobStorageProvider
    {
       private readonly Dictionary<BlobId, MemoryStream> _idToData = new Dictionary<BlobId, MemoryStream>();
 
