@@ -1,28 +1,10 @@
-# Microsoft Azure Data Lake Store (Preview)
+# Microsoft Azure Data Lake Store
 
 Microsoft Azure implementations reside in a separate package hosted on [NuGet](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.DataLake.Store/). Follow the link for installation instructions.
 
 This package tries to abstract access to [Azure Data Lake Store](https://azure.microsoft.com/en-gb/services/data-lake-store/) and making them available as `IBlobStorage`.
 
-The official Data Lake Store SDK is still in preview, therefore this package is also marked as a preview version.
-
 ## Using
-
-> WARNING!!! `Microsoft.Azure.Management.DataLake.Store` has a dependency on `Newtonsoft.Json v6` therefore you may need to add this to app.config:
-
-```xml
-<?xml version="1.0" encoding="utf-8" ?>
-<configuration>
-   <runtime>
-      <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
-         <dependentAssembly>
-            <assemblyIdentity name="Newtonsoft.Json" publicKeyToken="30ad4fe6b2a6aeed" culture="neutral" />
-            <bindingRedirect oldVersion="0.0.0.0-9.0.0.0" newVersion="9.0.0.0" />
-         </dependentAssembly>
-      </assemblyBinding>
-   </runtime>
-</configuration>
-```
 
 This library supports service-to-service authentication either with a **client secret** or a **client certificate** (not supported in preview yet).
 
@@ -46,7 +28,7 @@ see appendix below on how to obtain this information.
 
 - Uploading a file always overwrites existing file if it exists, otherwise a new file is created. This still takes one network call.
 - Appending to a file checks if a file exists first, so this operation results in two network calls.
-- List operation returns all files in all subfolders recursively when you pass `null` as an arugument. Passing folder path lists all files recursively in that subfolder. There is no way to enumerate folders within a folder or only files within a folder at the moment.
+- List operation supports folder hierary, folders, recursion, and limiting by number of items, i.e. no limitations whatsoever.
 
 
 ## Appendix. Creating a Service Principal
@@ -70,7 +52,3 @@ Now open the application and create a new key. We need to write down this **key*
 You can get the **tenant id** (sometimes called a **diretory id** or **domain**) from the directory properties:
 
 ![Adl 03](adl-03.png)
-
-- 1
-- 2
-- 3
