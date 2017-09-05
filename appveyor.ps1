@@ -11,12 +11,12 @@ if($bn -eq $null)
 }
 
 $vt = @{
-   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "3.0.0-alpha-$bn";
-   "Storage.Net.Microsoft.Azure.EventHub.csproj" = "3.0.0-alpha-$bn";
-   "Storage.Net.Microsoft.Azure.ServiceBus.csproj" = "3.0.0-alpha-$bn";
-   "Storage.Net.Microsoft.Azure.Storage.csproj" = "3.0.0-alpha-$bn";
-   "Storage.Net.Microsoft.Azure.KeyVault.csproj" = "2.0.0-alpha-$bn";
-   "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204-alpha-$bn";
+   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "3.0.$bn";
+   "Storage.Net.Microsoft.Azure.EventHub.csproj" = "3.0.$bn";
+   "Storage.Net.Microsoft.Azure.ServiceBus.csproj" = "3.0.$bn";
+   "Storage.Net.Microsoft.Azure.Storage.csproj" = "3.0.$bn";
+   "Storage.Net.Microsoft.Azure.KeyVault.csproj" = "2.0.$bn";
+   "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204.$bn";
    "Storage.Net.WebHDFS" = "1.0.alpha-$bn"
 }
 

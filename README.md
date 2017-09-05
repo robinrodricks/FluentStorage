@@ -8,7 +8,7 @@
 
 Storage.Net also implements inmemory and on disk versions of all the abstractions, therefore you can develop fast on local machine or use vendor free serverless implementations for parts of your applciation which don't require a separate third party backend at a particular point in development.
 
-This framework supports `.NET 4.5.1` and `.NET Standard 1.6`, however not all of the concrete implementations exist for both frameworks. When not otherwise mentioned assume that functionality is supported everywhere.
+This framework supports `.NET 4.5.2` and `.NET Standard 1.6`, and most of the implementations exist for all frameworks.
 
 Storage.Net defines three different storage types:
 
@@ -22,7 +22,7 @@ There are various implementations of storage types curated on a [separate page](
 
 ## Installation
 
-All packages are available on `nuget` and I consider it the primary release target. This is the list of curated packages we know about:
+All packages are available on `nuget` and I consider it the primary release target. This is the list of curated packages [we know about](doc/implementations/index.md).
 
 ## Contributing
 
@@ -41,3 +41,7 @@ When I think of the best way to document a framework I tend to think that workin
 ### Reporting bugs or requesting features
 
 Please use the GitHub issue tracker to do this.
+
+### Support
+
+You can get support by raising an issue here, or contacting me directly for consulting services.
