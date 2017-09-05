@@ -60,7 +60,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
          //delete the message and get the deleted element, very nice method!
          if (!_messageIdToBrokeredMessage.TryRemove(message.Id, out Message bm)) return;
 
-         await _client.CompleteAsync(bm.MessageId);
+         await _client.CompleteAsync(bm.SystemProperties.LockToken);
       }
 
       /// <summary>
@@ -82,6 +82,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
             async (message, token) =>
             {
                QueueMessage qm = Converter.ToQueueMessage(message);
+               _messageIdToBrokeredMessage[qm.Id] = message;
                await onMessage(qm);
             },
             options);

@@ -11,7 +11,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
          var result = new Message(message.Content);
          if(message.Properties != null && message.Properties.Count > 0)
          {
-            foreach(var prop in message.Properties)
+            foreach(KeyValuePair<string, string> prop in message.Properties)
             {
                result.UserProperties.Add(prop.Key, prop.Value);
             }
@@ -21,7 +21,9 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
 
       public static QueueMessage ToQueueMessage(Message message)
       {
-         var result = new QueueMessage(message.MessageId, message.Body);
+         string id = message.MessageId ?? message.SystemProperties.SequenceNumber.ToString();
+
+         var result = new QueueMessage(id, message.Body);
          if(message.UserProperties != null && message.UserProperties.Count > 0)
          {
             foreach(KeyValuePair<string, object> pair in message.UserProperties)
