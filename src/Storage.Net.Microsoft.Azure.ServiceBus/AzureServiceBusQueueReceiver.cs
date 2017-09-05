@@ -72,7 +72,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
 
-         var options = new MessageHandlerOptions
+         var options = new MessageHandlerOptions(ExceptionReceiverHandler)
          {
             AutoComplete = false,
             MaxAutoRenewDuration = TimeSpan.FromMinutes(1),
@@ -87,6 +87,11 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
             },
             options);
 
+         return Task.FromResult(true);
+      }
+
+      private Task ExceptionReceiverHandler(ExceptionReceivedEventArgs args)
+      {
          return Task.FromResult(true);
       }
 
