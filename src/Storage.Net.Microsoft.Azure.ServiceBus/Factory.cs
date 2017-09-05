@@ -34,5 +34,22 @@ namespace Storage.Net
       {
          return new AzureServiceBusQueueReceiver(connectionString, queueName, peekLock);
       }
+
+      public static IMessagePublisher AzureServiceBusTopicPublisher(this IMessagingFactory factory,
+         string connectionString,
+         string topicName)
+      {
+         return new AzureServiceBusTopicPublisher(connectionString, topicName);
+      }
+
+      public static IMessageReceiver AzureServiceBusTopicReceiver(this IMessagingFactory factory,
+         string connectionString,
+         string topicName,
+         string subscriptionName,
+         bool peekLock = true)
+      {
+         return new AzureServiceBusTopicReceiver(connectionString, topicName, subscriptionName, peekLock);
+      }
+
    }
 }

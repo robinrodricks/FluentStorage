@@ -21,6 +21,11 @@ namespace Storage.Net.Tests.Integration.Messaging
       public AzureServiceBusQueueMessageQeueueTest() : base("azure-servicebus-queue") { }
    }
 
+   public class AzureServiceBusTopicMessageQeueueTest : GenericMessageQueueTest
+   {
+      public AzureServiceBusTopicMessageQeueueTest() : base("azure-servicebus-topic") { }
+   }
+
    public class AzureEventHubMessageQeueueTest : GenericMessageQueueTest
    {
       public AzureEventHubMessageQeueueTest() : base("azure-eventhub") { }
@@ -62,6 +67,16 @@ namespace Storage.Net.Tests.Integration.Messaging
                _publisher = StorageFactory.Messages.AzureServiceBusQueuePublisher(
                   TestSettings.Instance.ServiceBusConnectionString,
                   "testqueue");
+               break;
+            case "azure-servicebus-topic":
+               _receiver = StorageFactory.Messages.AzureServiceBusTopicReceiver(
+                  TestSettings.Instance.ServiceBusConnectionString,
+                  "testtopic",
+                  "testsub",
+                  true);
+               _publisher = StorageFactory.Messages.AzureServiceBusTopicPublisher(
+                  TestSettings.Instance.ServiceBusConnectionString,
+                  "testtopic");
                break;
             case "azure-eventhub":
                _receiver = StorageFactory.Messages.AzureEventHubReceiver(
