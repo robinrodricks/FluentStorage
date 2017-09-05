@@ -11,7 +11,7 @@ namespace Storage.Net.Blob.Files
    /// <summary>
    /// Blob storage implementation which uses local file system directory
    /// </summary>
-   public class DirectoryFilesBlobStorage : IBlobStorageProvider
+   public class DiskDirectoryBlobStorageProvider : IBlobStorageProvider
    {
       private readonly DirectoryInfo _directory;
 
@@ -19,7 +19,7 @@ namespace Storage.Net.Blob.Files
       /// Creates an instance in a specific disk directory
       /// <param name="directory">Root directory</param>
       /// </summary>
-      public DirectoryFilesBlobStorage(DirectoryInfo directory)
+      public DiskDirectoryBlobStorageProvider(DirectoryInfo directory)
       {
          _directory = directory;
       }
@@ -27,7 +27,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Returns the list of blob names in this storage, optionally filtered by prefix
       /// </summary>
-      public async Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
+      public Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
          if (options == null) options = new ListOptions();
 
@@ -36,7 +36,7 @@ namespace Storage.Net.Blob.Files
          if(!_directory.Exists) return null;
 
          string fullPath = GetFolder(options?.FolderPath, false);
-         if (fullPath == null) return Enumerable.Empty<BlobId>();
+         if (fullPath == null) return Task.FromResult(Enumerable.Empty<BlobId>());
 
          string[] fileIds = Directory.GetFiles(
             fullPath,
@@ -55,7 +55,8 @@ namespace Storage.Net.Blob.Files
          var result = new List<BlobId>();
          result.AddRange(directoryIds.Select(id => ToBlobItem(id, BlobItemKind.Folder)));
          result.AddRange(fileIds.Select(id => ToBlobItem(id, BlobItemKind.File)));
-         return result;
+         result = result.Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value).ToList();
+         return Task.FromResult<IEnumerable<BlobId>>(result);
       }
 
       private string ToId(FileInfo fi)

@@ -31,7 +31,7 @@ namespace Storage.Net
       public static IBlobStorageProvider DirectoryFiles(this IBlobStorageFactory factory,
          DirectoryInfo directory)
       {
-         return new DirectoryFilesBlobStorage(directory);
+         return new DiskDirectoryBlobStorageProvider(directory);
       }
 
       /// <summary>

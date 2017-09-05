@@ -72,7 +72,7 @@ namespace Storage.Net.Tests.Blobs
                   TestSettings.Instance.AzureDataLakeCredential);
                break;
             case "disk-directory":
-               _provider = new DirectoryFilesBlobStorage(TestDir);
+               _provider = new DiskDirectoryBlobStorageProvider(TestDir);
                break;
             //break;
             case "aws-s3":

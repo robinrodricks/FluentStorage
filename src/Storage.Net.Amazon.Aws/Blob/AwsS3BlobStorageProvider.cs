@@ -66,14 +66,19 @@ namespace Storage.Net.Aws.Blob
 
          GenericValidation.CheckBlobPrefix(options.Prefix);
 
-         ListObjectsV2Response response = await _client.ListObjectsV2Async(new ListObjectsV2Request()
+         var request = new ListObjectsV2Request()
          {
             BucketName = _bucketName,
-            Prefix = options.Prefix ?? null,
-         },
-         cancellationToken);
+            Prefix = options.Prefix ?? null
+         };
+         if (options.MaxResults.HasValue) request.MaxKeys = options.MaxResults.Value;
 
-         return response.S3Objects.Select(s3Obj => new BlobId(null, s3Obj.Key, BlobItemKind.File));
+
+         //todo: paging
+         ListObjectsV2Response response = await _client.ListObjectsV2Async(request, cancellationToken);
+
+         return response.S3Objects
+            .Select(s3Obj => new BlobId(null, s3Obj.Key, BlobItemKind.File));
       }
 
       public async Task WriteAsync(string id, Stream sourceStream, bool append = false)

@@ -50,7 +50,9 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
          if (options.Prefix == null) return secretNames;
 
-         return secretNames.Where(n => n.Id.StartsWith(options.Prefix));
+         return secretNames
+            .Where(options.IsMatch)
+            .Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value);
       }
 
       private static BlobId ToBlobId(SecretItem item)
@@ -150,7 +152,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
       {
          var context = new AuthenticationContext(authority, TokenCache.DefaultShared);
 
-         var result = await context.AcquireTokenAsync(resource, _credential);
+         AuthenticationResult result = await context.AcquireTokenAsync(resource, _credential);
 
          return result.AccessToken;
       }

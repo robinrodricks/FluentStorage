@@ -25,10 +25,9 @@ namespace Storage.Net.Blob
                ? e.Key.FolderPath.StartsWith(options.FolderPath)
                : e.Key.FolderPath == options.FolderPath)
 
-            .Where(e => options.Prefix == null || e.Key.Id.StartsWith(options.Prefix))
-
             .Select(e => e.Key)
-
+            .Where(options.IsMatch)
+            .Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value)
             .ToList();
 
          return Task.FromResult((IEnumerable<BlobId>)matches);
