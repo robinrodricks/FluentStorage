@@ -57,6 +57,6 @@ namespace Storage.Net.Blob
       /// </summary>
       /// <param name="id">Blob id</param>
       /// <returns>Blob metadata or null if blob doesn't exist</returns>
-      Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> id);
+      Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids);
    }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Storage.Net.Blob
@@ -27,6 +28,76 @@ namespace Storage.Net.Blob
       /// Provider underneath this helper
       /// </summary>
       public IBlobStorageProvider Provider => _provider;
+
+      #region [ Simple delegation ]
+
+      /// <summary>
+      /// Returns the list of available blobs
+      /// </summary>
+      /// <param name="options"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns>List of blob IDs</returns>
+      Task<IEnumerable<BlobId>> ListAsync(ListOptions options,
+         CancellationToken cancellationToken = default(CancellationToken))
+      {
+         return _provider.ListAsync(options, cancellationToken);
+      }
+
+      /// <summary>
+      /// Creates a new blob and returns a writeable stream to it. If the blob already exists it will be
+      /// overwritten.
+      /// </summary>
+      /// <param name="id">Blob ID</param>
+      /// <param name="sourceStream">Source stream, must be readable and support Length</param>
+      /// <param name="append">When true, appends to the file instead of writing a new one.</param>
+      /// <returns>Writeable stream</returns>
+      /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      Task WriteAsync(string id, Stream sourceStream, bool append = false)
+      {
+         return _provider.WriteAsync(id, sourceStream, append);
+      }
+
+      /// <summary>
+      /// Opens the blob stream to read.
+      /// </summary>
+      /// <param name="id">Blob ID, required</param>
+      /// <returns>Stream in an open state, or null if blob doesn't exist by this ID. It is your responsibility to close and dispose this
+      /// stream after use.</returns>
+      /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      Task<Stream> OpenReadAsync(string id)
+      {
+         return _provider.OpenReadAsync(id);
+      }
+
+      /// <summary>
+      /// Deletes a blob by id
+      /// </summary>
+      /// <param name="ids">Blob IDs to delete.</param>
+      /// <exception cref="ArgumentNullException">Thrown when ID is null.</exception>
+      /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      Task DeleteAsync(IEnumerable<string> ids)
+      {
+         return _provider.DeleteAsync(ids);
+      }
+
+      Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
+      {
+         return _provider.ExistsAsync(ids);
+      }
+
+      /// <summary>
+      /// Gets basic blob metadata
+      /// </summary>
+      /// <param name="ids">Blob id</param>
+      /// <returns>Blob metadata or null if blob doesn't exist</returns>
+      Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids)
+      {
+         return _provider.GetMetaAsync(ids);
+      }
+
+      #endregion
 
       #region [ Text ]
 
@@ -95,7 +166,6 @@ namespace Storage.Net.Blob
       /// <summary>
       /// Downloads blob to a stream
       /// </summary>
-      /// <param name="storage"></param>
       /// <param name="id">Blob ID, required</param>
       /// <param name="targetStream">Target stream to copy to, required</param>
       /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
