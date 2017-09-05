@@ -14,13 +14,27 @@ namespace Storage.Net.Blob
    {
       private readonly IBlobStorageProvider _provider;
 
+      /// <summary>
+      /// Creates an instance of the blob storage helper.
+      /// </summary>
+      /// <param name="provider"></param>
       public BlobStorage(IBlobStorageProvider provider)
       {
-         this._provider = provider ?? throw new ArgumentNullException(nameof(provider));
+         _provider = provider ?? throw new ArgumentNullException(nameof(provider));
       }
+
+      /// <summary>
+      /// Provider underneath this helper
+      /// </summary>
+      public IBlobStorageProvider Provider => _provider;
 
       #region [ Text ]
 
+      /// <summary>
+      /// Reads blob content and converts to text in UTF-8 encoding
+      /// </summary>
+      /// <param name="id">Blob id</param>
+      /// <returns></returns>
       public async Task<string> ReadTextAsync(string id)
       {
          Stream src = await _provider.OpenReadAsync(id);
@@ -35,6 +49,12 @@ namespace Storage.Net.Blob
          return Encoding.UTF8.GetString(ms.ToArray());
       }
 
+      /// <summary>
+      /// Converts text to blob content and writes to storage
+      /// </summary>
+      /// <param name="id">Blob id</param>
+      /// <param name="text">Text to write, treated in UTF-8 encoding</param>
+      /// <returns></returns>
       public async Task WriteTextAsync(string id, string text)
       {
          using (Stream s = text.ToMemoryStream())
@@ -43,6 +63,12 @@ namespace Storage.Net.Blob
          }
       }
 
+      /// <summary>
+      /// Converts text to blob content and writes to storage
+      /// </summary>
+      /// <param name="id">Blob id</param>
+      /// <param name="text">Text to write, treated in UTF-8 encoding</param>
+      /// <returns></returns>
       public void WriteText(string id, string text)
       {
          G.CallAsync(() => WriteTextAsync(id, text));
@@ -52,6 +78,11 @@ namespace Storage.Net.Blob
 
       #region [ Singletons ]
 
+      /// <summary>
+      /// Deletes a single blob
+      /// </summary>
+      /// <param name="id"></param>
+      /// <returns></returns>
       public Task DeleteAsync(string id)
       {
          return _provider.DeleteAsync(new[] {id});
