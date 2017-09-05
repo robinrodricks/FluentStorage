@@ -18,17 +18,22 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          _container = container;
       }
 
-      public async Task<IEnumerable<BlobId>> ListFolder(string path, string prefix, bool recurse, CancellationToken cancellationToken)
+      public async Task<IEnumerable<BlobId>> ListFolder(ListOptions options, CancellationToken cancellationToken)
+      {
+         var result = new List<BlobId>();
+
+         await ListFolder(result, options.FolderPath, options, cancellationToken);
+
+         return result;
+      }
+
+      public async Task ListFolder(List<BlobId> container, string path, ListOptions options, CancellationToken cancellationToken)
       {
          CloudBlobDirectory dir = GetCloudBlobDirectory(path);
 
-         var result = new List<BlobId>();
-
          BlobContinuationToken token = null;
 
-         //blob path cannot start with '/'
-         //string listPrefix = StoragePath.Combine(path, prefix).Trim(StoragePath.PathSeparator);
-         //if (prefix != null) listPrefix = StoragePath.Combine(listPrefix, prefix);
+         var batch = new List<BlobId>();
 
          do
          {
@@ -48,29 +53,27 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
                else
                   throw new InvalidOperationException($"unknown item type {blob.GetType()}");
 
-               if(prefix == null ||  id.Id.StartsWith(prefix))
-                  result.Add(id);
+               batch.Add(id);
             }
 
          }
          while (token != null);
 
-         if (recurse)
+         batch = batch.Where(options.IsMatch).ToList();
+         if (options.Add(container, batch)) return;
+
+         if (options.Recurse)
          {
-            List<BlobId> folderIds = result.Where(r => r.Kind == BlobItemKind.Folder).ToList();
+            List<BlobId> folderIds = batch.Where(r => r.Kind == BlobItemKind.Folder).ToList();
             foreach (BlobId folderId in folderIds)
             {
-               IEnumerable<BlobId> children = await ListFolder(
+               await ListFolder(
+                  container,
                   StoragePath.Combine(path, folderId.Id),
-                  prefix,
-                  recurse,
+                  options,
                   cancellationToken);
-
-               result.AddRange(children);
             }
          }
-
-         return result;
       }
 
       private CloudBlobDirectory GetCloudBlobDirectory(string path)

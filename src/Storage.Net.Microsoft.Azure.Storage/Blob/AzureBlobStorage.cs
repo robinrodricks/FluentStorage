@@ -154,11 +154,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          var browser = new AzureBlobDirectoryBrowser(_blobContainer);
 
-         return await browser.ListFolder(
-            options.FolderPath,
-            options.Prefix,
-            options.Recurse,
-            cancellationToken); 
+         return await browser.ListFolder(options, cancellationToken); 
       }
 
       public async Task WriteAsync(string id, Stream sourceStream, bool append)

@@ -139,7 +139,7 @@ namespace Storage.Net.Tests.Blobs
 
          await _bs.WriteTextAsync(id, Generator.RandomString);
 
-         var items = await _provider.ListAsync(new ListOptions { Recurse = false });
+         IEnumerable<BlobId> items = await _provider.ListAsync(new ListOptions { Recurse = false });
       }
 
       [Fact]
@@ -153,14 +153,29 @@ namespace Storage.Net.Tests.Blobs
          await _bs.WriteTextAsync(id2, Generator.RandomString);
          await _bs.WriteTextAsync(id3, Generator.RandomString);
 
-         var items = await _provider.ListAsync(new ListOptions { Recurse = true });
+         IEnumerable<BlobId> items = await _provider.ListAsync(new ListOptions { Recurse = true });
       }
-
 
       [Fact]
       public async Task List_VeryLongPrefix_NoResultsNoCrash()
       {
          await Assert.ThrowsAsync<ArgumentException>(async () => await _provider.ListAsync(new ListOptions { Prefix = Generator.GetRandomString(100000, false) }));
+      }
+
+      [Fact]
+      public async Task List_limited_number_of_results()
+      {
+         string prefix = Generator.RandomString;
+         string id1 = prefix + Generator.RandomString;
+         string id2 = prefix + Generator.RandomString;
+         await _bs.WriteTextAsync(id1, Generator.RandomString);
+         await _bs.WriteTextAsync(id2, Generator.RandomString);
+
+         int countAll = (await _provider.ListAsync(new ListOptions { Prefix = prefix })).Count();
+         int countOne = (await _provider.ListAsync(new ListOptions { Prefix = prefix, MaxResults = 1 })).Count();
+
+         Assert.Equal(2, countAll);
+         Assert.Equal(1, countOne);
       }
 
       class TestDocument

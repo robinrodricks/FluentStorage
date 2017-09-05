@@ -27,14 +27,12 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          string path = StoragePath.Normalize(options.FolderPath);
          var result = new List<BlobId>();
 
-         await Browse(path, options.Prefix, options.Recurse, result, token);
+         await Browse(path, options, result, token);
 
-         if (options.Prefix == null) return result;
-
-         return result.Where(i => i.Id.StartsWith(options.Prefix));
+         return result;
       }
 
-      private async Task Browse(string path, string prefix, bool recurse, ICollection<BlobId> container, CancellationToken token)
+      private async Task Browse(string path, ListOptions options, ICollection<BlobId> container, CancellationToken token)
       {
          FileStatusesResult statuses;
 
@@ -55,23 +53,19 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          List<BlobId> batch =
             statuses.FileStatuses.FileStatus
                .Select(p => ToBlobId(path, p))
-               .Where(b => prefix == null || b.Id.StartsWith(prefix))
+               .Where(options.IsMatch)
                .ToList();
 
-         if (prefix != null)
-            container.AddRange(batch.Where(i => i.Id.StartsWith(prefix)));
-         else
-            container.AddRange(batch);
+         if (options.Add(container, batch)) return;
 
-         if(recurse)
+         if(options.Recurse)
          {
             int folderCount = batch.Count(b => b.Kind == BlobItemKind.Folder);
             if(folderCount > 0)
             {
                await Task.WhenAll(batch.Select(bid => Browse(
                   StoragePath.Combine(path, bid.Id),
-                  prefix,
-                  recurse,
+                  options,
                   container,
                   token
                   )));
