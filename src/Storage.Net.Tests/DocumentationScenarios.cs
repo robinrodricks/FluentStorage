@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Storage.Net.Messaging;
 
 namespace Storage.Net.Tests
 {
@@ -94,6 +95,24 @@ namespace Storage.Net.Tests
 
          await storage.ListAsync(new ListOptions { Recurse = true });
          await storage.ListAsync(new ListOptions { FolderPath = "/folder1", Recurse = false });
+      }
+
+      public async Task Send_and_receive_eventhubs()
+      {
+         IMessagePublisher publisher = StorageFactory.Messages.AzureEventHubPublisher("connection string");
+
+         await publisher.PutMessagesAsync(new[]
+         {
+            new QueueMessage("hey mate!")
+         });
+
+         IMessageReceiver receiver = StorageFactory.Messages.AzureEventHubReceiver("connection string", "hub path");
+         await receiver.StartMessagePumpAsync(OnNewMessage);
+      }
+
+      public async Task OnNewMessage(QueueMessage message)
+      {
+         Console.WriteLine($"message received, id: {message.Id}, content: '{message.StringContent}'");
       }
    }
 }

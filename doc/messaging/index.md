@@ -4,6 +4,8 @@ Messaging is inteded for message passing between one or more systems in disconne
 
 To name a few examples, [Apache Kafka](http://kafka.apache.org/), [RabbitMQ](https://www.rabbitmq.com/), [Azure Service Bus](https://azure.microsoft.com/en-gb/services/service-bus/) are all falling into this category - essentially they are designed to pass messages. Some systems are more advanced to others of course, but most often it doesn't really matter.
 
+Storage.Net supports many messaging providers out of the box, including **Azure Service Bus Topics and Queues**, **Azure Event Hub** and others.
+
 ## Using
 
 There are two abstractions available - **message publisher** and **message receiver**. As the name stands, one is publishing messages, and another is receiving them on another end.
@@ -20,4 +22,43 @@ Similarly, to receive messages you can use factory methods to create receivers w
 
 These example use cases simulate some most common messaging operations which should help you to get started.
 
-> todo:
+### Sending and receiving messages to Azure Event Hub
+
+To start off, you need to create and instance of a `IMessagePublisher` which is an abstract sender, no matter which underlying impelmentation you use. Because we are using Azure Event Hub, the line to create the publisher is as follows:
+
+```csharp
+IMessagePublisher publisher = StorageFactory.Messages.AzureEventHubPublisher("connection string");
+```
+
+Now let's send a message `hey, mate!` to event hub. To do that we'll have to use the only method on `IMessagePublisher` interface - `PutMessagesAsync`:
+
+```csharp
+await publisher.PutMessagesAsync(new[]
+{
+	new QueueMessage("hey mate!")
+});
+
+```
+
+This method accepts an `IEnumerable` of `QueueMessage` which is also an abstract structure wrapping your message, not tied to any implementation. In essence, that's all you need to do to sent a message.
+
+To receive the messages on the other end, you will need to crate an instance of `IMessageReceiver`:
+
+```csharp
+IMessageReceiver receiver = StorageFactory.Messages.AzureEventHubReceiver("connection string", "hub path");
+```
+
+This instance is an entry point to receiving messages and performing different operations on the message. To listen for the message you'll have to start the message pump first as follows:
+
+```csharp
+await receiver.StartMessagePumpAsync(OnNewMessage);
+
+public async Task OnNewMessage(QueueMessage message)
+{
+    Console.WriteLine($"message received, id: {message.Id}, content: '{message.StringContent}'");
+}
+```
+
+The `StartMessagePumpAsync` method requires a method which it will call for any new message received, in our case `OnNewMessage`. And that's all you do to listen for messages.
+
+The message pump gets stopped when you dispose an instance of `IMessageReceiver`.
