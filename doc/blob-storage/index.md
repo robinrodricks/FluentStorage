@@ -1,5 +1,8 @@
 # Blob Storage
 
+![Slide Blobs](../slide-blobs.jpg)
+*The guy above is a blob.*
+
 Blob Storage stores files. A file has only two properties - `ID` and raw data. If you build an analogy with disk filesystem, file ID is a file name.
 
 Blob Storage is really simple abstraction - you read or write file data by it's ID, nothing else.
