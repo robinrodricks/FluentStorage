@@ -10,7 +10,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
    /// <summary>
    /// Publishes messages to Azure Event Hub
    /// </summary>
-   public class AzureEventHubPublisher : AsyncMessagePublisher
+   public class AzureEventHubPublisher : IMessagePublisher
    {
       private EventHubClient _client;
 
@@ -20,9 +20,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <param name="connectionString">Full connection string</param>
       public AzureEventHubPublisher(string connectionString)
       {
-         if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
-
-         ConnectionString = connectionString;
+         ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
 
          _client = EventHubClient.CreateFromConnectionString(connectionString);
       }
@@ -74,7 +72,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <summary>
       /// See interface
       /// </summary>
-      public override async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
+      public async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
       {
          if (messages == null) return;
 
@@ -84,11 +82,9 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <summary>
       /// Closes the receiver
       /// </summary>
-      public override void Dispose()
+      public void Dispose()
       {
          _client.CloseAsync().Wait();
-
-         base.Dispose();
       }
    }
 }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Storage.Net.Microsoft.ServiceFabric.Messaging
 {
-   class ServiceFabricReliableQueuePublisher : AsyncMessagePublisher
+   class ServiceFabricReliableQueuePublisher : IMessagePublisher
    {
       private IReliableStateManager _stateManager;
       private readonly string _queueName;
@@ -20,9 +20,9 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
          _queueName = queueName ?? throw new ArgumentNullException(nameof(queueName));
       }
 
-      public override async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
+      public async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
       {
-         var collection = await _stateManager.GetOrAddAsync<IReliableQueue<byte[]>>(_queueName);
+         IReliableQueue<byte[]> collection = await _stateManager.GetOrAddAsync<IReliableQueue<byte[]>>(_queueName);
 
          using (var tx = new FabricTransactionManager<string>(_stateManager, null))
          {
@@ -34,6 +34,11 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
 
             await tx.CommitAsync();
          }
+      }
+
+      public void Dispose()
+      {
+
       }
    }
 }

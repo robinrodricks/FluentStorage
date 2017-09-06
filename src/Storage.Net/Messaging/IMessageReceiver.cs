@@ -14,31 +14,12 @@ namespace Storage.Net.Messaging
       /// however this depends on implementation details when and how.
       /// </summary>
       /// <param name="message"></param>
-      void ConfirmMessage(QueueMessage message);
-
-      /// <summary>
-      /// Confirmation call that the message was acknowledged and processed by the receiver.
-      /// Client must call this when message processing has succeeded, otherwise the message will reappear,
-      /// however this depends on implementation details when and how.
-      /// </summary>
-      /// <param name="message"></param>
       Task ConfirmMessageAsync(QueueMessage message);
 
       /// <summary>
       /// Moves the message to a dead letter queue
       /// </summary>
-      void DeadLetter(QueueMessage message, string reason, string errorDescription);
-
-      /// <summary>
-      /// Moves the message to a dead letter queue
-      /// </summary>
       Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription);
-
-      /// <summary>
-      /// Starts automatic message pumping trying to use native features as much as possible. Message pump stops when you dispose the instance.
-      /// Disposing the instance will also stop message pump for you.
-      /// </summary>
-      void StartMessagePump(Action<QueueMessage> onMessage);
 
       /// <summary>
       /// Starts automatic message pumping trying to use native features as much as possible. Message pump stops when you dispose the instance.

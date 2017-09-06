@@ -129,10 +129,10 @@ namespace Storage.Net.Tests.Integration.Messaging
       }
 
       [Fact]
-      public void SendMessage_OneMessage_DoesntCrash()
+      public async Task SendMessage_OneMessage_DoesntCrash()
       {
          var qm = QueueMessage.FromText("test");
-         _publisher.PutMessage(qm);
+         await _publisher.PutMessagesAsync(new[] { qm });
       }
 
       [Fact]
@@ -140,7 +140,7 @@ namespace Storage.Net.Tests.Integration.Messaging
       {
          for(int i = 0; i < 2; i++)
          {
-            _publisher.PutMessage(new QueueMessage("test content at " + DateTime.UtcNow));
+            await _publisher.PutMessagesAsync(new[] { new QueueMessage("test content at " + DateTime.UtcNow) });
          }
 
          //there is a delay between messages sent and received on subscription, so sleep for a bit
@@ -149,12 +149,12 @@ namespace Storage.Net.Tests.Integration.Messaging
       }
 
       [Fact]
-      public void SendMessage_ExtraProperties_DoesntCrash()
+      public async Task SendMessage_ExtraProperties_DoesntCrash()
       {
          var msg = new QueueMessage("prop content at " + DateTime.UtcNow);
          msg.Properties["one"] = "one value";
          msg.Properties["two"] = "two value";
-         _publisher.PutMessage(msg);
+         await _publisher.PutMessagesAsync(new[] { msg });
       }
 
       [Fact]
@@ -162,7 +162,7 @@ namespace Storage.Net.Tests.Integration.Messaging
       {
          string content = Generator.RandomString;
 
-         await _publisher.PutMessageAsync(new QueueMessage(content));
+         await _publisher.PutMessagesAsync(new[] { new QueueMessage(content) });
 
          QueueMessage received = await WaitMessage();
 
@@ -178,7 +178,7 @@ namespace Storage.Net.Tests.Integration.Messaging
          var msg = new QueueMessage(content);
          msg.Properties["one"] = "v1";
 
-         await _publisher.PutMessageAsync(msg);
+         await _publisher.PutMessagesAsync(new[] { msg });
 
          QueueMessage received = await WaitMessage();
 
@@ -192,7 +192,7 @@ namespace Storage.Net.Tests.Integration.Messaging
       {
          string content = Generator.RandomString;
          var msg = new QueueMessage(content);
-         await _publisher.PutMessageAsync(msg);
+         await _publisher.PutMessagesAsync(new[] { msg });
 
          QueueMessage rmsg = await WaitMessage();
          Assert.NotNull(rmsg);
@@ -204,7 +204,7 @@ namespace Storage.Net.Tests.Integration.Messaging
          for (int i = 0; i < 10; i++)
          {
             var qm = new QueueMessage(nameof(MessagePump_AddFewMessages_CanReceiveOneAndPumpClearsThemAll) + "#" + i);
-            await _publisher.PutMessageAsync(qm);
+            await _publisher.PutMessagesAsync(new[] { qm });
          }
 
          await WaitMessage();

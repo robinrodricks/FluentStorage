@@ -11,7 +11,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
    /// <summary>
    /// Azure Storage queue publisher
    /// </summary>
-   class AzureStorageQueuePublisher : AsyncMessagePublisher
+   class AzureStorageQueuePublisher : IMessagePublisher
    {
       private readonly CloudQueue _queue;
 
@@ -28,7 +28,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
          if(queueName == null) throw new ArgumentNullException(nameof(queueName));
 
          var account = new CloudStorageAccount(new StorageCredentials(accountName, storageKey), true);
-         var client = account.CreateCloudQueueClient();
+         CloudQueueClient client = account.CreateCloudQueueClient();
          _queue = client.GetQueueReference(queueName);
          _queue.CreateIfNotExistsAsync().Wait();
       }
@@ -37,7 +37,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// Pushes new messages to storage queue. Due to the fact storage queues don't support batched pushes
       /// this method makes a call per message.
       /// </summary>
-      public override async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
+      public async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
       {
          if (messages == null) return;
          foreach (QueueMessage message in messages)
@@ -46,6 +46,10 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
             await _queue.AddMessageAsync(nativeMessage);
             message.Id = Converter.CreateId(nativeMessage);
          }
+      }
+
+      public void Dispose()
+      {
       }
    }
 }

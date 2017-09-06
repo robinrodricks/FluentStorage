@@ -10,7 +10,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
    /// <summary>
    /// Implements Azure Service Bus Queue
    /// </summary>
-   public class AzureServiceBusQueuePublisher : AsyncMessagePublisher
+   public class AzureServiceBusQueuePublisher : IMessagePublisher
    {
       private readonly string _queueName;
       private readonly QueueClient _client;
@@ -30,7 +30,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// <summary>
       /// Puts message to the queue with default options
       /// </summary>
-      public override async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
+      public async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
       {
          if (messages == null) return;
 
@@ -41,11 +41,9 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// <summary>
       /// Closes connection to the queue
       /// </summary>
-      public override void Dispose()
+      public void Dispose()
       {
          _client.CloseAsync().Wait();
-
-         base.Dispose();
       }
    }
 }
