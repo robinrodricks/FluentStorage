@@ -9,7 +9,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
    /// <summary>
    /// Implements message receiver on Azure Service Bus Queues
    /// </summary>
-   class AzureServiceBusTopicReceiver : AsyncMessageReceiver
+   class AzureServiceBusTopicReceiver : IMessageReceiver
    {
       //https://github.com/Azure/azure-service-bus/blob/master/samples/DotNet/Microsoft.Azure.ServiceBus/ReceiveSample/readme.md
 
@@ -33,7 +33,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// <summary>
       /// Calls .DeadLetter explicitly
       /// </summary>
-      public override async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
+      public async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
       {
          if (!_peekLock) return;
 
@@ -53,7 +53,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// Call at the end when done with the message.
       /// </summary>
       /// <param name="message"></param>
-      public override async Task ConfirmMessageAsync(QueueMessage message)
+      public async Task ConfirmMessageAsync(QueueMessage message)
       {
          if(!_peekLock) return;
 
@@ -67,7 +67,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// Starts message pump with AutoComplete = false, 1 minute session renewal and 1 concurrent call.
       /// </summary>
       /// <param name="onMessage"></param>
-      public override Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessage)
+      public Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessage)
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
 
@@ -98,7 +98,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// <summary>
       /// Stops message pump if started
       /// </summary>
-      public override void Dispose()
+      public void Dispose()
       {
          _client.CloseAsync().Wait();  //this also stops the message pump
       }

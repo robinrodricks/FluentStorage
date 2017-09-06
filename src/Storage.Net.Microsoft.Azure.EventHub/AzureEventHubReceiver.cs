@@ -11,7 +11,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
    /// <summary>
    /// Microsoft Azure Event Hub receiver
    /// </summary>
-   public class AzureEventHubReceiver : AsyncMessageReceiver
+   public class AzureEventHubReceiver : IMessageReceiver
    {
       private readonly EventHubClient _hubClient;
       private readonly HashSet<string> _partitionIds;
@@ -95,7 +95,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <summary>
       /// See interface
       /// </summary>
-      public override Task ConfirmMessageAsync(QueueMessage message)
+      public Task ConfirmMessageAsync(QueueMessage message)
       {
          //nothing to confirm
          return Task.FromResult(true);
@@ -104,15 +104,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <summary>
       /// See interface
       /// </summary>
-      public override void ConfirmMessage(QueueMessage message)
-      {
-         //nothing to confirm
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
-      public override Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
+      public Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
       {
          //no dead letter queue in EH
          return Task.FromResult(true);
@@ -121,15 +113,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <summary>
       /// See interface
       /// </summary>
-      public override void DeadLetter(QueueMessage message, string reason, string errorDescription)
-      {
-         //no dead letter queue in EH
-      }
-
-      /// <summary>
-      /// See interface
-      /// </summary>
-      public override async Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessageAsync)
+      public async Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessageAsync)
       {
          await CheckReady();
 
@@ -184,10 +168,9 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <summary>
       /// Cancels message pump and closes the client
       /// </summary>
-      public override void Dispose()
+      public void Dispose()
       {
          _tokenSource.Cancel();
-         base.Dispose();
       }
    }
 }

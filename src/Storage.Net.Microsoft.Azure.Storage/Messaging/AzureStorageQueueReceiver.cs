@@ -13,7 +13,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
    /// <summary>
    /// Queue receiver based on Azure Storage Queues
    /// </summary>
-   class AzureStorageQueueReceiver : AsyncMessageReceiver
+   class AzureStorageQueueReceiver : IMessageReceiver
    {
       private const int PollingBatchSize = 1;
       private readonly CloudQueueClient _client;
@@ -86,7 +86,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// Deletes the message from the queue
       /// </summary>
       /// <param name="message"></param>
-      public override async Task ConfirmMessageAsync(QueueMessage message)
+      public async Task ConfirmMessageAsync(QueueMessage message)
       {
          Converter.SplitId(message.Id, out string id, out string popReceipt);
          if (popReceipt == null) throw new ArgumentException("cannot delete message by short id", id);
@@ -97,7 +97,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// Moves message to a dead letter queue which has the same name as original queue prefixed with "-deadletter". This is done because 
       /// Azure Storage queues do not support deadlettering directly.
       /// </summary>
-      public override async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
+      public async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
       {
          var dead = (QueueMessage)message.Clone();
          dead.Properties["deadLetterReason"] = reason;
@@ -110,17 +110,17 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
          await ConfirmMessageAsync(message);
       }
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
       /// <summary>
       /// Due to the fact storage queues don't support notifications this method starts an internal thread to poll for messages.
       /// </summary>
-      public override async Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessage)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+      public Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessage)
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
          if (_pollingTask != null) throw new ArgumentException("polling already started", nameof(onMessage));
 
          _pollingTask = PollTasks(onMessage, _cts.Token);
+
+         return Task.FromResult(true);
       }
 
       private async Task PollTasks(Func<QueueMessage, Task> callback, CancellationToken ct)
@@ -147,7 +147,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// <summary>
       /// Stops message pump if any.
       /// </summary>
-      public override void Dispose()
+      public void Dispose()
       {
          if (!_disposed)
          {

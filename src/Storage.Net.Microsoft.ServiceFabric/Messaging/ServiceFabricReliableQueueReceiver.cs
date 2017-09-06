@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Storage.Net.Microsoft.ServiceFabric.Messaging
 {
-   class ServiceFabricReliableQueueReceiver : AsyncMessageReceiver
+   class ServiceFabricReliableQueueReceiver : IMessageReceiver
    {
       private IReliableStateManager _stateManager;
       private readonly string _queueName;
@@ -18,24 +18,24 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
          _queueName = queueName ?? throw new ArgumentNullException(nameof(queueName));
       }
 
-      public override Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessageAsync)
+      public Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessageAsync)
       {
          throw new NotImplementedException();
       }
 
-      public override Task ConfirmMessageAsync(QueueMessage message)
+      public Task ConfirmMessageAsync(QueueMessage message)
       {
          throw new NotSupportedException();
       }
 
-      public override Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
+      public Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
       {
          throw new NotSupportedException();
       }
 
       private async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
       {
-         var collection = await _stateManager.GetOrAddAsync<IReliableQueue<byte[]>>(_queueName);
+         IReliableQueue<byte[]> collection = await _stateManager.GetOrAddAsync<IReliableQueue<byte[]>>(_queueName);
          var result = new List<QueueMessage>();
 
          using (var tx = new FabricTransactionManager<string>(_stateManager, null))
@@ -59,6 +59,10 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
          }
 
          return result.Count == 0 ? null : result;
+      }
+
+      public void Dispose()
+      {
       }
    }
 }
