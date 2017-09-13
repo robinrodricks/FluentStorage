@@ -38,7 +38,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
          IReliableQueue<byte[]> collection = await _stateManager.GetOrAddAsync<IReliableQueue<byte[]>>(_queueName);
          var result = new List<QueueMessage>();
 
-         using (var tx = new FabricTransactionManager<string>(_stateManager, null))
+         using (var tx = new ServiceFabricTransaction(_stateManager, null))
          {
             while (result.Count < count)
             {
