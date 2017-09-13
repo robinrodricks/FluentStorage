@@ -262,5 +262,10 @@ namespace Storage.Net.Blob.Files
 
          return Task.FromResult((IEnumerable<BlobMeta>) result);
       }
+
+      public Task<ITransaction> OpenTransactionAsync()
+      {
+         return Task.FromResult(EmptyTransaction.Instance);
+      }
    }
 }

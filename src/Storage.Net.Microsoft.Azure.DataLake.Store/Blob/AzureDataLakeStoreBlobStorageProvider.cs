@@ -79,7 +79,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          GenericValidation.CheckBlobId(id);
 
-         var client = await GetFsClient();
+         DataLakeStoreFileSystemManagementClient client = await GetFsClient();
 
          if (append)
          {
@@ -102,7 +102,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          GenericValidation.CheckBlobId(id);
 
-         var client = await GetFsClient();
+         DataLakeStoreFileSystemManagementClient client = await GetFsClient();
 
          try
          {
@@ -118,7 +118,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          GenericValidation.CheckBlobId(ids);
 
-         var client = await GetFsClient();
+         DataLakeStoreFileSystemManagementClient client = await GetFsClient();
 
          await Task.WhenAll(ids.Select(id => client.FileSystem.DeleteAsync(_accountName, id)));
       }
@@ -127,7 +127,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          GenericValidation.CheckBlobId(ids);
 
-         var client = await GetFsClient();
+         DataLakeStoreFileSystemManagementClient client = await GetFsClient();
 
          var result = new List<bool>();
 
@@ -198,6 +198,11 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
       public void Dispose()
       {
+      }
+
+      public Task<ITransaction> OpenTransactionAsync()
+      {
+         return Task.FromResult(EmptyTransaction.Instance);
       }
    }
 }

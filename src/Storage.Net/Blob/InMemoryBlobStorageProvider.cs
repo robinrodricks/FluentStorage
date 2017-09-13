@@ -137,20 +137,9 @@ namespace Storage.Net.Blob
          throw new NotImplementedException();
       }
 
-      /*
-
-
-      
-      public override BlobMeta GetMeta(string id)
+      public Task<ITransaction> OpenTransactionAsync()
       {
-         GenericValidation.CheckBlobId(id);
-
-         if (!_idToData.TryGetValue(id, out MemoryStream ms)) return null;
-
-         ms.Seek(0, SeekOrigin.Begin);
-
-         return new BlobMeta(ms.Length, ms.GetHash(HashType.Md5));
+         return Task.FromResult(EmptyTransaction.Instance);
       }
-      */
    }
 }

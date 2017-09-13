@@ -263,5 +263,10 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       public void Dispose()
       {
       }
+
+      public Task<ITransaction> OpenTransactionAsync()
+      {
+         return Task.FromResult(EmptyTransaction.Instance);
+      }
    }
 }

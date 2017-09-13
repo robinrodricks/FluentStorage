@@ -189,5 +189,10 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
       public void Dispose()
       {
       }
+
+      public Task<ITransaction> OpenTransactionAsync()
+      {
+         return Task.FromResult(EmptyTransaction.Instance);
+      }
    }
 }

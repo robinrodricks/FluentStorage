@@ -199,5 +199,10 @@ namespace Storage.Net.Aws.Blob
       {
          throw new NotImplementedException();
       }
+
+      public Task<ITransaction> OpenTransactionAsync()
+      {
+         return Task.FromResult(EmptyTransaction.Instance);
+      }
    }
 }
