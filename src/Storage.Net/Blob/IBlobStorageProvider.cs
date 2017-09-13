@@ -63,5 +63,11 @@ namespace Storage.Net.Blob
       /// <param name="ids">Blob id</param>
       /// <returns>Blob metadata or null if blob doesn't exist</returns>
       Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids);
+
+      /// <summary>
+      /// Starts a new transaction
+      /// </summary>
+      /// <returns></returns>
+      Task<ITransaction> OpenTransactionAsync();
    }
 }

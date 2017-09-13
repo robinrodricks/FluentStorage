@@ -11,8 +11,9 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 {
    class ServiceFabricReliableDictionaryBlobStorageProvider : IBlobStorageProvider
    {
-      private IReliableStateManager _stateManager;
+      private readonly IReliableStateManager _stateManager;
       private readonly string _collectionName;
+      private ServiceFabricTransaction _currentTransaction;
 
       public ServiceFabricReliableDictionaryBlobStorageProvider(IReliableStateManager stateManager, string collectionName)
       {
@@ -24,10 +25,12 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
       {
          var result = new List<BlobId>();
 
-         using (var tx = await OpenCollection())
+         using (ServiceFabricTransaction tx = GetTransaction())
          {
+            IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync();
+
             IAsyncEnumerable<KeyValuePair<string, byte[]>> enumerable =
-               await tx.Collection.CreateEnumerableAsync(tx.Tx);
+               await coll.CreateEnumerableAsync(tx.Tx);
 
             using (IAsyncEnumerator<KeyValuePair<string, byte[]>> enumerator = enumerable.GetAsyncEnumerator())
             {
@@ -62,9 +65,11 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
       {
          byte[] value = sourceStream.ToByteArray();
 
-         using (var tx = await OpenCollection())
+         using (ServiceFabricTransaction tx = GetTransaction())
          {
-            await tx.Collection.AddOrUpdateAsync(tx.Tx, id, value, (k, v) => value);
+            IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync();
+
+            await coll.AddOrUpdateAsync(tx.Tx, id, value, (k, v) => value);
 
             await tx.CommitAsync();
          }
@@ -72,11 +77,13 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
       private async Task AppendAsync(string id, Stream sourceStream)
       {
-         using (var tx = await OpenCollection())
+         using (ServiceFabricTransaction tx = GetTransaction())
          {
+            IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync();
+
             //create a new byte array with
             byte[] extra = sourceStream.ToByteArray();
-            ConditionalValue<byte[]> value = await tx.Collection.TryGetValueAsync(tx.Tx, id);
+            ConditionalValue<byte[]> value = await coll.TryGetValueAsync(tx.Tx, id);
             int oldLength = value.HasValue ? value.Value.Length : 0;
             byte[] newData = new byte[oldLength + extra.Length];
             if(value.HasValue)
@@ -86,7 +93,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
             Array.Copy(extra, 0, newData, oldLength, extra.Length);
 
             //put new array into the key
-            await tx.Collection.AddOrUpdateAsync(tx.Tx, id, extra, (k, v) => extra);
+            await coll.AddOrUpdateAsync(tx.Tx, id, extra, (k, v) => extra);
 
             //commit the transaction
             await tx.CommitAsync();
@@ -95,9 +102,10 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
       public async Task<Stream> OpenReadAsync(string id)
       {
-         using (var tx = await OpenCollection())
+         using (ServiceFabricTransaction tx = GetTransaction())
          {
-            ConditionalValue<byte[]> value = await tx.Collection.TryGetValueAsync(tx.Tx, id);
+            IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync();
+            ConditionalValue<byte[]> value = await coll.TryGetValueAsync(tx.Tx, id);
 
             if (!value.HasValue) throw new StorageException(ErrorCode.NotFound, null);
 
@@ -107,11 +115,13 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
       public async Task DeleteAsync(IEnumerable<string> ids)
       {
-         using (var tx = await OpenCollection())
+         using (ServiceFabricTransaction tx = GetTransaction())
          {
+            IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync();
+
             foreach (string id in ids)
             {
-               await tx.Collection.TryRemoveAsync(tx.Tx, id);
+               await coll.TryRemoveAsync(tx.Tx, id);
             }
 
             await tx.CommitAsync();
@@ -121,11 +131,13 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
       public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
       {
          var result = new List<bool>();
-         using (var tx = await OpenCollection())
+         using (ServiceFabricTransaction tx = GetTransaction())
          {
+            IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync();
+
             foreach (string id in ids)
             {
-               bool exists = await tx.Collection.ContainsKeyAsync(tx.Tx, id);
+               bool exists = await coll.ContainsKeyAsync(tx.Tx, id);
 
                result.Add(exists);
             }
@@ -139,11 +151,13 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
          var result = new List<BlobMeta>();
 
-         using (var tx = await OpenCollection())
+         using (ServiceFabricTransaction tx = GetTransaction())
          {
+            IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync();
+
             foreach (string id in ids)
             {
-               ConditionalValue<byte[]> value = await tx.Collection.TryGetValueAsync(tx.Tx, id);
+               ConditionalValue<byte[]> value = await coll.TryGetValueAsync(tx.Tx, id);
 
                if (!value.HasValue)
                {
@@ -159,15 +173,42 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          return result;
       }
 
-      private async Task<FabricTransactionManager<IReliableDictionary<string, byte[]>>> OpenCollection()
+      private async Task<IReliableDictionary<string, byte[]>> OpenCollectionAsync()
       {
-         var collection = await _stateManager.GetOrAddAsync<IReliableDictionary<string, byte[]>>(_collectionName);
+         IReliableDictionary<string, byte[]> collection = 
+            await _stateManager.GetOrAddAsync<IReliableDictionary<string, byte[]>>(_collectionName);
 
-         return new FabricTransactionManager<IReliableDictionary<string, byte[]>>(_stateManager, collection);
+         return collection;
       }
 
       public void Dispose()
       {
+      }
+
+      private ServiceFabricTransaction GetTransaction()
+      {
+         if (_currentTransaction != null) return new ServiceFabricTransaction(_currentTransaction);
+
+         return new ServiceFabricTransaction(_stateManager, null);
+      }
+
+      public Task<ITransaction> OpenTransactionAsync()
+      {
+         if (_currentTransaction != null)
+            throw new InvalidOperationException($"transaction already open");
+
+         _currentTransaction = new ServiceFabricTransaction(_stateManager, CloseTransaction);
+
+         return Task.FromResult<ITransaction>(_currentTransaction);
+      }
+
+      private void CloseTransaction(bool b)
+      {
+         if(_currentTransaction != null)
+         {
+            _currentTransaction.Dispose();
+            _currentTransaction = null;
+         }
       }
    }
 }
