@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{59E9D41F-BCD2-4A64-B62F-515B78986B63}"
 EndProject
@@ -23,7 +23,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "blob-storage", "blob-storag
 	ProjectSection(SolutionItems) = preProject
 		..\doc\blob-storage\dirtextfile.png = ..\doc\blob-storage\dirtextfile.png
 		..\doc\blob-storage\dirtextfileindir.png = ..\doc\blob-storage\dirtextfileindir.png
-		..\doc\blob-storage\extensions.md = ..\doc\blob-storage\extensions.md
 		..\doc\blob-storage\index.md = ..\doc\blob-storage\index.md
 	EndProjectSection
 EndProject
@@ -63,15 +62,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Azure", "Azure", "{E5D1DA80
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AWS", "AWS", "{75082AEF-72A9-4874-8AFB-DB50013CAD28}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Net.Microsoft.Azure.Storage", "Storage.Net.Microsoft.Azure.Storage\Storage.Net.Microsoft.Azure.Storage.csproj", "{3D88DEB8-7118-418D-9FF8-09313DBAF735}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Microsoft.Azure.Storage", "Storage.Net.Microsoft.Azure.Storage\Storage.Net.Microsoft.Azure.Storage.csproj", "{3D88DEB8-7118-418D-9FF8-09313DBAF735}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Net.Microsoft.Azure.ServiceBus", "Storage.Net.Microsoft.Azure.ServiceBus\Storage.Net.Microsoft.Azure.ServiceBus.csproj", "{A90C9EF4-FDEC-412F-A653-528643C2791B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Microsoft.Azure.ServiceBus", "Storage.Net.Microsoft.Azure.ServiceBus\Storage.Net.Microsoft.Azure.ServiceBus.csproj", "{A90C9EF4-FDEC-412F-A653-528643C2791B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Net.Microsoft.Azure.EventHub", "Storage.Net.Microsoft.Azure.EventHub\Storage.Net.Microsoft.Azure.EventHub.csproj", "{59EADC43-4705-4925-A3A1-4AF3AE0DECDC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Microsoft.Azure.EventHub", "Storage.Net.Microsoft.Azure.EventHub\Storage.Net.Microsoft.Azure.EventHub.csproj", "{59EADC43-4705-4925-A3A1-4AF3AE0DECDC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Net.Microsoft.Azure.KeyVault", "Storage.Net.Microsoft.Azure.KeyVault\Storage.Net.Microsoft.Azure.KeyVault.csproj", "{0D93576D-A43D-4FB3-8BE2-72FDE233416F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Microsoft.Azure.KeyVault", "Storage.Net.Microsoft.Azure.KeyVault\Storage.Net.Microsoft.Azure.KeyVault.csproj", "{0D93576D-A43D-4FB3-8BE2-72FDE233416F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Net.WebHDFS", "Storage.Net.WebHDFS\Storage.Net.WebHDFS.csproj", "{FB92A237-D912-4078-9CB3-546000472941}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.WebHDFS", "Storage.Net.WebHDFS\Storage.Net.WebHDFS.csproj", "{FB92A237-D912-4078-9CB3-546000472941}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -146,5 +145,8 @@ Global
 		{59EADC43-4705-4925-A3A1-4AF3AE0DECDC} = {E5D1DA80-E9FE-4965-A498-DFFC8ED70E40}
 		{0D93576D-A43D-4FB3-8BE2-72FDE233416F} = {E5D1DA80-E9FE-4965-A498-DFFC8ED70E40}
 		{FB92A237-D912-4078-9CB3-546000472941} = {59E9D41F-BCD2-4A64-B62F-515B78986B63}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C5FC6E9A-255E-4FD4-B08C-8EDE44BFE37A}
 	EndGlobalSection
 EndGlobal
