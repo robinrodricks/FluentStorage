@@ -31,6 +31,9 @@ namespace Storage.Net.Microsoft.ServiceFabric
       public Task CommitAsync()
       {
          _commited = true;
+
+         if (_ignoreCommits) return Task.FromResult(true);
+
          return _transaction.CommitAsync();
       }
 
@@ -38,9 +41,12 @@ namespace Storage.Net.Microsoft.ServiceFabric
       {
          try
          {
-            if (!_commited) _transaction.Abort();
+            if (!_ignoreCommits)
+            {
+               if (!_commited) _transaction.Abort();
 
-            _transaction.Dispose();
+               _transaction.Dispose();
+            }
          }
          finally
          {

@@ -23,6 +23,8 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
       public async Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
+         if (options == null) options = new ListOptions();
+
          var result = new List<BlobId>();
 
          using (ServiceFabricTransaction tx = GetTransaction())
@@ -34,13 +36,13 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
             using (IAsyncEnumerator<KeyValuePair<string, byte[]>> enumerator = enumerable.GetAsyncEnumerator())
             {
-               while (await enumerator.MoveNextAsync(CancellationToken.None))
+               while (await enumerator.MoveNextAsync(cancellationToken))
                {
                   KeyValuePair<string, byte[]> current = enumerator.Current;
 
                   if (options.Prefix == null || current.Key.StartsWith(options.Prefix))
                   {
-                     result.Add(new BlobId(null, current.Key, BlobItemKind.File));
+                     result.Add(new BlobId(current.Key, BlobItemKind.File));
                   }
                }
             }
@@ -51,6 +53,8 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
       public async Task WriteAsync(string id, Stream sourceStream, bool append)
       {
+         GenericValidation.CheckBlobId(id);
+
          if (append)
          {
             await AppendAsync(id, sourceStream);
@@ -63,6 +67,8 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
       private async Task WriteAsync(string id, Stream sourceStream)
       {
+         id = ToId(id);
+
          byte[] value = sourceStream.ToByteArray();
 
          using (ServiceFabricTransaction tx = GetTransaction())
@@ -77,6 +83,8 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
       private async Task AppendAsync(string id, Stream sourceStream)
       {
+         id = ToId(id);
+
          using (ServiceFabricTransaction tx = GetTransaction())
          {
             IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync();
@@ -102,6 +110,9 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
       public async Task<Stream> OpenReadAsync(string id)
       {
+         GenericValidation.CheckBlobId(id);
+         id = ToId(id);
+
          using (ServiceFabricTransaction tx = GetTransaction())
          {
             IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync();
@@ -115,13 +126,15 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
       public async Task DeleteAsync(IEnumerable<string> ids)
       {
+         GenericValidation.CheckBlobId(ids);
+
          using (ServiceFabricTransaction tx = GetTransaction())
          {
             IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync();
 
             foreach (string id in ids)
             {
-               await coll.TryRemoveAsync(tx.Tx, id);
+               await coll.TryRemoveAsync(tx.Tx, ToId(id));
             }
 
             await tx.CommitAsync();
@@ -130,6 +143,8 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
       public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
       {
+         GenericValidation.CheckBlobId(ids);
+
          var result = new List<bool>();
          using (ServiceFabricTransaction tx = GetTransaction())
          {
@@ -137,7 +152,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
             foreach (string id in ids)
             {
-               bool exists = await coll.ContainsKeyAsync(tx.Tx, id);
+               bool exists = await coll.ContainsKeyAsync(tx.Tx, ToId(id));
 
                result.Add(exists);
             }
@@ -157,7 +172,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
             foreach (string id in ids)
             {
-               ConditionalValue<byte[]> value = await coll.TryGetValueAsync(tx.Tx, id);
+               ConditionalValue<byte[]> value = await coll.TryGetValueAsync(tx.Tx, ToId(id));
 
                if (!value.HasValue)
                {
@@ -206,9 +221,14 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
       {
          if(_currentTransaction != null)
          {
-            _currentTransaction.Dispose();
+            //dispose on transaction is already called!
             _currentTransaction = null;
          }
+      }
+
+      private string ToId(string id)
+      {
+         return StoragePath.Normalize(id, false);
       }
    }
 }

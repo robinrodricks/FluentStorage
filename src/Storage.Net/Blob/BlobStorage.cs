@@ -98,6 +98,15 @@ namespace Storage.Net.Blob
          return _provider.GetMetaAsync(ids);
       }
 
+      /// <summary>
+      /// Starts a new transaction
+      /// </summary>
+      /// <returns></returns>
+      public Task<ITransaction> OpenTransactionAsync()
+      {
+         return _provider.OpenTransactionAsync();
+      }
+
       #endregion
 
       #region [ List Helpers ]

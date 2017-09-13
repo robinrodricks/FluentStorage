@@ -10,6 +10,7 @@ using Microsoft.ServiceFabric.Services.Runtime;
 using Storage.Net;
 using Storage.Net.Blob;
 using Storage.Net.Messaging;
+using SFT = Microsoft.ServiceFabric.Data.ITransaction;
 
 namespace Stateful1
 {
@@ -18,14 +19,14 @@ namespace Stateful1
    /// </summary>
    internal sealed class Stateful1 : StatefulService
    {
-      private readonly IBlobStorage _blobs;
+      private readonly BlobStorage _blobs;
       private readonly IMessagePublisher _publisher;
       private readonly IMessageReceiver _receiver;
 
       public Stateful1(StatefulServiceContext context)
           : base(context)
       {
-         _blobs = StorageFactory.Blobs.AzureServiceFabricReliableStorage(this.StateManager, "c1");
+         _blobs = new BlobStorage(StorageFactory.Blobs.AzureServiceFabricReliableStorage(this.StateManager, "c1"));
          _publisher = StorageFactory.Messages.AzureServiceFabricReliableQueuePublisher(this.StateManager);
          _receiver = StorageFactory.Messages.AzureServiceFabricReliableQueueReceiver(this.StateManager);
       }
@@ -57,10 +58,20 @@ namespace Stateful1
 
             //qm = await _receiver.ReceiveMessagesAsync(100);
 
+            //separate writes
             await _blobs.WriteTextAsync("one", "test text 1");
             await _blobs.WriteTextAsync("two", "test text 2");
 
-            IEnumerable<string> keys = await _blobs.ListAsync(null);
+            //with transaction object
+            using (ITransaction tx = await _blobs.OpenTransactionAsync())
+            {
+               await _blobs.WriteTextAsync("three", "test text 1");
+               await _blobs.WriteTextAsync("four", "test text 2");
+
+               await tx.CommitAsync();
+            }
+
+            IEnumerable<BlobId> keys = await _blobs.ListAsync(null);
 
             string textBack = await _blobs.ReadTextAsync("one");
             textBack = await _blobs.ReadTextAsync("two");
@@ -70,15 +81,15 @@ namespace Stateful1
             throw;
          }
 
-         var myDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("myDictionary");
+         IReliableDictionary<string, long> myDictionary = await StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("myDictionary");
 
          while (true)
          {
             cancellationToken.ThrowIfCancellationRequested();
 
-            using (var tx = this.StateManager.CreateTransaction())
+            using (SFT tx = this.StateManager.CreateTransaction())
             {
-               var result = await myDictionary.TryGetValueAsync(tx, "Counter");
+               Microsoft.ServiceFabric.Data.ConditionalValue<long> result = await myDictionary.TryGetValueAsync(tx, "Counter");
 
                ServiceEventSource.Current.ServiceMessage(this.Context, "Current Counter Value: {0}",
                    result.HasValue ? result.Value.ToString() : "Value does not exist.");
