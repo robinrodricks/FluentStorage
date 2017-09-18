@@ -18,12 +18,13 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
    /// </summary>
    public class AzureBlobStorageProvider : IBlobStorageProvider
    {
+      private readonly CloudBlobClient _client;
       private readonly CloudBlobContainer _blobContainer;
 
       /// <summary>
       /// Creates an instance from account name, private key and container name
       /// </summary>
-      public AzureBlobStorageProvider(string accountName, string key, string containerName)
+      public AzureBlobStorageProvider(string accountName, string key, string containerName, bool createIfNotExists = true)
       {
          ValidateContainerName(containerName);
 
@@ -31,11 +32,21 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             new StorageCredentials(accountName, key),
             true);
 
-         CloudBlobClient blobClient = account.CreateCloudBlobClient();
+         _client = account.CreateCloudBlobClient();
 
-         _blobContainer = blobClient.GetContainerReference(containerName);
-         _blobContainer.CreateIfNotExistsAsync().Wait();
+         _blobContainer = _client.GetContainerReference(containerName);
+
+         if (createIfNotExists)
+         {
+            _blobContainer.CreateIfNotExistsAsync().Wait();
+         }
       }
+
+      /// <summary>
+      /// Returns reference to the native Azure SD blob client.
+      /// </summary>
+      public CloudBlobClient NativeBlobClient => _client;
+
 
       /// <summary>
       /// Returns reference to the native Azure SDK blob container
