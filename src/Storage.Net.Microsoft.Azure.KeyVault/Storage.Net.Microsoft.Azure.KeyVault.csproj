@@ -19,7 +19,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.KeyVault" Version="2.3.2" />
     <PackageReference Include="System.Net.Http" Version="4.3.2" />
-    <PackageReference Include="NetBox" Version="1.4.22" />
+    <PackageReference Include="NetBox" Version="1.4.23" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />

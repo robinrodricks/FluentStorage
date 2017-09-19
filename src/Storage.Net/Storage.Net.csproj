@@ -40,6 +40,6 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NetBox" Version="1.4.22" />
+    <PackageReference Include="NetBox" Version="1.4.23" />
   </ItemGroup>
 </Project>

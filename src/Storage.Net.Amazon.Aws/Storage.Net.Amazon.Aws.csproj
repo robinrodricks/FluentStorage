@@ -29,8 +29,8 @@
     <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <PackageReference Include="AWSSDK.Core" Version="3.3.17.6" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.10.2" />
+    <PackageReference Include="AWSSDK.Core" Version="3.3.17.9" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.11" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
