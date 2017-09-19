@@ -40,6 +40,8 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             BlobResultSegment segment = await dir.ListBlobsSegmentedAsync(
                false, BlobListingDetails.None, null, token, null, null, cancellationToken);
 
+            token = segment.ContinuationToken;
+
             foreach (IListBlobItem blob in segment.Results)
             {
                BlobId id;
@@ -53,11 +55,14 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
                else
                   throw new InvalidOperationException($"unknown item type {blob.GetType()}");
 
-               batch.Add(id);
+               if (options.IsMatch(id))
+               {
+                  batch.Add(id);
+               }
             }
 
          }
-         while (token != null);
+         while (token != null && ((options.MaxResults == null) || ( container.Count + batch.Count < options.MaxResults.Value)));
 
          batch = batch.Where(options.IsMatch).ToList();
          if (options.Add(container, batch)) return;
