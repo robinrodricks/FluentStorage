@@ -172,5 +172,10 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       {
          _tokenSource.Cancel();
       }
+
+      public async Task<ITransaction> OpenTransactionAsync()
+      {
+         return EmptyTransaction.Instance;
+      }
    }
 }

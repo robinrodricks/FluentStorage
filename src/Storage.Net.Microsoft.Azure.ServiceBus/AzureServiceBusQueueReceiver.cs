@@ -103,5 +103,10 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       {
          _client.CloseAsync().Wait();  //this also stops the message pump
       }
+
+      public async Task<ITransaction> OpenTransactionAsync()
+      {
+         return EmptyTransaction.Instance;
+      }
    }
 }

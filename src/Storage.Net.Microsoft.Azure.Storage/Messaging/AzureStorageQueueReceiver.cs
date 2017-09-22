@@ -165,5 +165,10 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
          if(batch == null) return null;
          return batch.Select(Converter.ToQueueMessage).ToList();
       }
+
+      public async Task<ITransaction> OpenTransactionAsync()
+      {
+         return EmptyTransaction.Instance;
+      }
    }
 }

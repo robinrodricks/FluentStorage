@@ -26,5 +26,11 @@ namespace Storage.Net.Messaging
       /// Disposing the instance will also stop message pump for you.
       /// </summary>
       Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessageAsync);
+
+      /// <summary>
+      /// Starts a new transaction
+      /// </summary>
+      /// <returns></returns>
+      Task<ITransaction> OpenTransactionAsync();
    }
 }
