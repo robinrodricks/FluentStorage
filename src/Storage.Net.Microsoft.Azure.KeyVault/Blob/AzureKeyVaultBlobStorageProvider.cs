@@ -61,7 +61,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
          return new BlobId(item.Id.Substring(idx + 1), BlobItemKind.File);
       }
 
-      public async Task WriteAsync(string id, Stream sourceStream, bool append)
+      public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
          ValidateSecretName(id);
@@ -73,7 +73,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
          await _vaultClient.SetSecretAsync(_vaultUri, id, value);
       }
 
-      public async Task<Stream> OpenReadAsync(string id)
+      public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
          ValidateSecretName(id);
@@ -94,21 +94,21 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
          return value.ToMemoryStream();
       }
 
-      public async Task DeleteAsync(IEnumerable<string> ids)
+      public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 
          await Task.WhenAll(ids.Select(id => _vaultClient.DeleteSecretAsync(_vaultUri, id)));
       }
 
-      public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
+      public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 
-         return await Task.WhenAll(ids.Select(id => ExistsAsync(id)));
+         return await Task.WhenAll(ids.Select(id => ExistsAsync(id, cancellationToken)));
       }
 
-      private async Task<bool> ExistsAsync(string id)
+      private async Task<bool> ExistsAsync(string id, CancellationToken cancellationToken)
       {
          SecretBundle secret;
 
@@ -124,7 +124,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
          return secret != null;
       }
 
-      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids)
+      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 

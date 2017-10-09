@@ -51,21 +51,21 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          return result;
       }
 
-      public async Task WriteAsync(string id, Stream sourceStream, bool append)
+      public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
 
          if (append)
          {
-            await AppendAsync(id, sourceStream);
+            await AppendAsync(id, sourceStream, cancellationToken);
          }
          else
          {
-            await WriteAsync(id, sourceStream);
+            await WriteAsync(id, sourceStream, cancellationToken);
          }
       }
 
-      private async Task WriteAsync(string id, Stream sourceStream)
+      private async Task WriteAsync(string id, Stream sourceStream, CancellationToken cancellationToken)
       {
          id = ToId(id);
 
@@ -81,7 +81,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          }
       }
 
-      private async Task AppendAsync(string id, Stream sourceStream)
+      private async Task AppendAsync(string id, Stream sourceStream, CancellationToken cancellationToken)
       {
          id = ToId(id);
 
@@ -108,7 +108,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          }
       }
 
-      public async Task<Stream> OpenReadAsync(string id)
+      public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
          id = ToId(id);
@@ -124,7 +124,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          }
       }
 
-      public async Task DeleteAsync(IEnumerable<string> ids)
+      public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 
@@ -141,7 +141,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          }
       }
 
-      public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
+      public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 
@@ -160,7 +160,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          return result;
       }
 
-      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids)
+      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 

@@ -168,7 +168,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          return await browser.ListFolder(options, cancellationToken); 
       }
 
-      public async Task WriteAsync(string id, Stream sourceStream, bool append)
+      public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
          GenericValidation.CheckSourceStream(sourceStream);
@@ -189,7 +189,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          }
       }
 
-      public async Task<Stream> OpenReadAsync(string id)
+      public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -207,7 +207,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          throw new Exception("must not be here");
       }
 
-      public async Task DeleteAsync(IEnumerable<string> ids)
+      public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          foreach (string id in ids)
          {
@@ -218,7 +218,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          }
       }
 
-      public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
+      public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          var result = new List<bool>();
 
@@ -233,7 +233,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          return result;
       }
 
-      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids)
+      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          var result = new List<BlobMeta>();
          foreach (string id in ids)

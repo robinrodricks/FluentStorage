@@ -81,7 +81,7 @@ namespace Storage.Net.Aws.Blob
             .Select(s3Obj => new BlobId(null, s3Obj.Key, BlobItemKind.File));
       }
 
-      public async Task WriteAsync(string id, Stream sourceStream, bool append = false)
+      public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
          if (append) throw new NotSupportedException();
 
@@ -91,10 +91,10 @@ namespace Storage.Net.Aws.Blob
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
 
          id = StoragePath.Normalize(id, false);
-         await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, id);
+         await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, id, cancellationToken);
       }
 
-      public async Task<Stream> OpenReadAsync(string id)
+      public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -103,20 +103,20 @@ namespace Storage.Net.Aws.Blob
          return new AwsS3BlobStorageExternalStream(response);
       }
 
-      public Task DeleteAsync(IEnumerable<string> ids)
+      public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         return Task.WhenAll(ids.Select(id => DeleteAsync(id)));
+         return Task.WhenAll(ids.Select(id => DeleteAsync(id, cancellationToken)));
       }
 
-      private Task DeleteAsync(string id)
+      private Task DeleteAsync(string id, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
 
          id = StoragePath.Normalize(id, false);
-         return _client.DeleteObjectAsync(_bucketName, id);
+         return _client.DeleteObjectAsync(_bucketName, id, cancellationToken);
       }
 
-      public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
+      public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          return await Task.WhenAll(ids.Select(ExistsAsync));
       }
@@ -141,7 +141,7 @@ namespace Storage.Net.Aws.Blob
          return true;
       }
 
-      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids)
+      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          return await Task.WhenAll(ids.Select(GetMetaAsync));
       }

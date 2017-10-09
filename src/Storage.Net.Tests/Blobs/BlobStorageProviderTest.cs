@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NetBox;
 using Storage.Net.Aws.Blob;
@@ -101,7 +102,7 @@ namespace Storage.Net.Tests.Blobs
 
          using (Stream s = "kjhlkhlkhlkhlkh".ToMemoryStream())
          {
-            await _provider.WriteAsync(id, s, false);
+            await _provider.WriteAsync(id, s);
          }
 
          return id;

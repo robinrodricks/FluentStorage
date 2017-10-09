@@ -33,7 +33,7 @@ namespace Storage.Net.Blob
          return Task.FromResult((IEnumerable<BlobId>)matches);
       }
 
-      public Task WriteAsync(string id, Stream sourceStream, bool append)
+      public Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -60,7 +60,7 @@ namespace Storage.Net.Blob
          return Task.FromResult(true);
       }
 
-      public Task<Stream> OpenReadAsync(string id)
+      public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -70,7 +70,7 @@ namespace Storage.Net.Blob
          return Task.FromResult<Stream>(new NonCloseableStream(ms));
       }
 
-      public Task DeleteAsync(IEnumerable<string> ids)
+      public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 
@@ -82,7 +82,7 @@ namespace Storage.Net.Blob
          return Task.FromResult(true);
       }
 
-      public Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
+      public Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          var result = new List<bool>();
 
@@ -94,7 +94,7 @@ namespace Storage.Net.Blob
          return Task.FromResult<IEnumerable<bool>>(result);
       }
 
-      public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids)
+      public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 

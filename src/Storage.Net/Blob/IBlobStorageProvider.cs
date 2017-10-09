@@ -26,43 +26,48 @@ namespace Storage.Net.Blob
       /// </summary>
       /// <param name="id">Blob ID</param>
       /// <param name="sourceStream">Source stream, must be readable and support Length</param>
+      /// <param name="cancellationToken"></param>
       /// <param name="append">When true, appends to the file instead of writing a new one.</param>
       /// <returns>Writeable stream</returns>
       /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task WriteAsync(string id, Stream sourceStream, bool append = false);
+      Task WriteAsync(string id, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default(CancellationToken));
 
       /// <summary>
       /// Opens the blob stream to read.
       /// </summary>
       /// <param name="id">Blob ID, required</param>
+      /// <param name="cancellationToken"></param>
       /// <returns>Stream in an open state, or null if blob doesn't exist by this ID. It is your responsibility to close and dispose this
       /// stream after use.</returns>
       /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task<Stream> OpenReadAsync(string id);
+      Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default(CancellationToken));
 
       /// <summary>
       /// Deletes a blob by id
       /// </summary>
       /// <param name="ids">Blob IDs to delete.</param>
+      /// <param name="cancellationToken"></param>
       /// <exception cref="ArgumentNullException">Thrown when ID is null.</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task DeleteAsync(IEnumerable<string> ids);
+      Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken));
 
       /// <summary>
       /// Checksi if blobs exists in the storage
       /// </summary>
       /// <param name="ids">List of ids</param>
+      /// <param name="cancellationToken"></param>
       /// <returns>List of results of true and false indicating existence</returns>
-      Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids);
+      Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken));
 
       /// <summary>
       /// Gets basic blob metadata
       /// </summary>
       /// <param name="ids">Blob id</param>
+      /// <param name="cancellationToken"></param>
       /// <returns>Blob metadata or null if blob doesn't exist</returns>
-      Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids);
+      Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken));
 
       /// <summary>
       /// Starts a new transaction

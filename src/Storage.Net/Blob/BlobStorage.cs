@@ -14,6 +14,8 @@ namespace Storage.Net.Blob
    /// </summary>
    public class BlobStorage
    {
+      private const int BufferSize = 81920;
+
       private readonly IBlobStorageProvider _provider;
 
       /// <summary>
@@ -50,52 +52,56 @@ namespace Storage.Net.Blob
       /// </summary>
       /// <param name="id">Blob ID</param>
       /// <param name="sourceStream">Source stream, must be readable and support Length</param>
+      /// <param name="cancellationToken"></param>
       /// <param name="append">When true, appends to the file instead of writing a new one.</param>
       /// <returns>Writeable stream</returns>
       /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      public Task WriteAsync(string id, Stream sourceStream, bool append = false)
+      public Task WriteAsync(string id, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default(CancellationToken))
       {
-         return _provider.WriteAsync(id, sourceStream, append);
+         return _provider.WriteAsync(id, sourceStream, append, cancellationToken);
       }
 
       /// <summary>
       /// Opens the blob stream to read.
       /// </summary>
       /// <param name="id">Blob ID, required</param>
+      /// <param name="cancellationToken"></param>
       /// <returns>Stream in an open state, or null if blob doesn't exist by this ID. It is your responsibility to close and dispose this
       /// stream after use.</returns>
       /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      public Task<Stream> OpenReadAsync(string id)
+      public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
       {
-         return _provider.OpenReadAsync(id);
+         return _provider.OpenReadAsync(id, cancellationToken);
       }
 
       /// <summary>
       /// Deletes a blob by id
       /// </summary>
       /// <param name="ids">Blob IDs to delete.</param>
+      /// <param name="cancellationToken"></param>
       /// <exception cref="ArgumentNullException">Thrown when ID is null.</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      public Task DeleteAsync(IEnumerable<string> ids)
+      public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken))
       {
-         return _provider.DeleteAsync(ids);
+         return _provider.DeleteAsync(ids, cancellationToken);
       }
 
-      public Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids)
+      public Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken))
       {
-         return _provider.ExistsAsync(ids);
+         return _provider.ExistsAsync(ids, cancellationToken);
       }
 
       /// <summary>
       /// Gets basic blob metadata
       /// </summary>
       /// <param name="ids">Blob id</param>
+      /// <param name="cancellationToken"></param>
       /// <returns>Blob metadata or null if blob doesn't exist</returns>
-      public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids)
+      public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken))
       {
-         return _provider.GetMetaAsync(ids);
+         return _provider.GetMetaAsync(ids, cancellationToken);
       }
 
       /// <summary>
@@ -133,10 +139,11 @@ namespace Storage.Net.Blob
       /// Reads blob content and converts to text in UTF-8 encoding
       /// </summary>
       /// <param name="id">Blob id</param>
+      /// <param name="cancellationToken"></param>
       /// <returns></returns>
-      public async Task<string> ReadTextAsync(string id)
+      public async Task<string> ReadTextAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
       {
-         Stream src = await _provider.OpenReadAsync(id);
+         Stream src = await _provider.OpenReadAsync(id, cancellationToken);
          if (src == null) return null;
 
          var ms = new MemoryStream();
@@ -153,12 +160,13 @@ namespace Storage.Net.Blob
       /// </summary>
       /// <param name="id">Blob id</param>
       /// <param name="text">Text to write, treated in UTF-8 encoding</param>
+      /// <param name="cancellationToken"></param>
       /// <returns></returns>
-      public async Task WriteTextAsync(string id, string text)
+      public async Task WriteTextAsync(string id, string text, CancellationToken cancellationToken = default(CancellationToken))
       {
          using (Stream s = text.ToMemoryStream())
          {
-            await _provider.WriteAsync(id, s);
+            await _provider.WriteAsync(id, s, false, cancellationToken);
          }
       }
 
@@ -167,6 +175,7 @@ namespace Storage.Net.Blob
       /// </summary>
       /// <param name="id">Blob id</param>
       /// <param name="text">Text to write, treated in UTF-8 encoding</param>
+      /// <param name="cancellationToken"></param>
       /// <returns></returns>
       public void WriteText(string id, string text)
       {
@@ -181,10 +190,11 @@ namespace Storage.Net.Blob
       /// Deletes a single blob
       /// </summary>
       /// <param name="id"></param>
+      /// <param name="cancellationToken"></param>
       /// <returns></returns>
-      public Task DeleteAsync(string id)
+      public Task DeleteAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
       {
-         return _provider.DeleteAsync(new[] {id});
+         return _provider.DeleteAsync(new[] {id}, cancellationToken);
       }
 
       #endregion
@@ -199,17 +209,17 @@ namespace Storage.Net.Blob
       /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="System.ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
       /// <exception cref="StorageException">Thrown when blob does not exist, error code set to <see cref="ErrorCode.NotFound"/></exception>
-      public async Task ReadToStreamAsync(string id, Stream targetStream)
+      public async Task ReadToStreamAsync(string id, Stream targetStream, CancellationToken cancellationToken = default(CancellationToken))
       {
          if (targetStream == null)
             throw new ArgumentNullException(nameof(targetStream));
 
-         Stream src = await _provider.OpenReadAsync(id);
+         Stream src = await _provider.OpenReadAsync(id, cancellationToken);
          if (src == null) return;
 
          using (src)
          {
-            await src.CopyToAsync(targetStream);
+            await src.CopyToAsync(targetStream, BufferSize, cancellationToken);
          }
       }
 
@@ -222,16 +232,17 @@ namespace Storage.Net.Blob
       /// </summary>
       /// <param name="id">Blob ID to download</param>
       /// <param name="filePath">Full path to the local file to be downloaded to. If the file exists it will be recreated wtih blob data.</param>
-      public async Task ReadToFileAsync(string id, string filePath)
+      /// <param name="cancellationToken"></param>
+      public async Task ReadToFileAsync(string id, string filePath, CancellationToken cancellationToken = default(CancellationToken))
       {
-         Stream src = await _provider.OpenReadAsync(id);
+         Stream src = await _provider.OpenReadAsync(id, cancellationToken);
          if (src == null) return;
 
          using (src)
          {
             using (Stream dest = File.Create(filePath))
             {
-               await src.CopyToAsync(dest);
+               await src.CopyToAsync(dest, BufferSize, cancellationToken);
                await dest.FlushAsync();
             }
          }
@@ -242,11 +253,12 @@ namespace Storage.Net.Blob
       /// </summary>
       /// <param name="id">Blob ID to create or overwrite</param>
       /// <param name="filePath">Path to local file</param>
-      public async Task WriteFileAsync(string id, string filePath)
+      /// <param name="cancellationToken"></param>
+      public async Task WriteFileAsync(string id, string filePath, CancellationToken cancellationToken = default(CancellationToken))
       {
          using (Stream src = File.OpenRead(filePath))
          {
-            await _provider.WriteAsync(id, src);
+            await _provider.WriteAsync(id, src, false, cancellationToken);
          }
       }
 
@@ -260,14 +272,15 @@ namespace Storage.Net.Blob
       /// <param name="blobId">Blob ID to copy</param>
       /// <param name="targetStorage">Target storage</param>
       /// <param name="newId">Optional, when specified uses this id in the target storage. If null uses the original ID.</param>
-      public async Task CopyToAsync(string blobId, IBlobStorageProvider targetStorage, string newId)
+      /// <param name="cancellationToken"></param>
+      public async Task CopyToAsync(string blobId, IBlobStorageProvider targetStorage, string newId, CancellationToken cancellationToken = default(CancellationToken))
       {
-         Stream src = await _provider.OpenReadAsync(blobId);
+         Stream src = await _provider.OpenReadAsync(blobId, cancellationToken);
          if (src == null) return;
 
          using (src)
          {
-            await targetStorage.WriteAsync(newId ?? blobId, src);
+            await targetStorage.WriteAsync(newId ?? blobId, src, false, cancellationToken);
          }
       }
 
@@ -281,10 +294,11 @@ namespace Storage.Net.Blob
       /// </summary>
       /// <typeparam name="T">Object type</typeparam>
       /// <param name="id">Blob ID.</param>
+      /// <param name="cancellationToken"></param>
       /// <returns>Deserialized object or null</returns>
-      public async Task<T> ReadObjectFromJsonAsync<T>(string id) where T : new()
+      public async Task<T> ReadObjectFromJsonAsync<T>(string id, CancellationToken cancellationToken = default(CancellationToken)) where T : new()
       {
-         string json = await ReadTextAsync(id);
+         string json = await ReadTextAsync(id, cancellationToken);
          return json == null ? default(T) : json.AsJsonObject<T>();
       }
 
@@ -294,15 +308,16 @@ namespace Storage.Net.Blob
       /// <typeparam name="T">Object type</typeparam>
       /// <param name="id">Blob ID</param>
       /// <param name="instance">Object instance. If this parameter is null the blob is deleted if it exists</param>
-      public async Task WriteObjectToJsonAsync<T>(string id, T instance) where T : new()
+      /// <param name="cancellationToken"></param>
+      public async Task WriteObjectToJsonAsync<T>(string id, T instance, CancellationToken cancellationToken = default(CancellationToken)) where T : new()
       {
          if (EqualityComparer<T>.Default.Equals(instance, default(T)))
          {
-            await DeleteAsync(id);
+            await DeleteAsync(id, cancellationToken);
          }
          else
          {
-            await WriteTextAsync(id, instance.ToJsonString());
+            await WriteTextAsync(id, instance.ToJsonString(), cancellationToken);
          }
       }
 
