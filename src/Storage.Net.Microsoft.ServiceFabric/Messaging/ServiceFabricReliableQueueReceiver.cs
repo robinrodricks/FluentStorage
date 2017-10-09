@@ -19,7 +19,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
          _queueName = queueName ?? throw new ArgumentNullException(nameof(queueName));
       }
 
-      public async Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessageAsync)
+      public async Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize)
       {
          IReliableQueue<byte[]> collection = await GetCollectionAsync();
 

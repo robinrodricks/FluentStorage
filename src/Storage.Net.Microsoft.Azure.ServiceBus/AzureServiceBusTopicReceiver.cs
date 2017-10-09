@@ -3,6 +3,8 @@ using Storage.Net.Messaging;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Storage.Net.Microsoft.Azure.ServiceBus
 {
@@ -67,7 +69,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// Starts message pump with AutoComplete = false, 1 minute session renewal and 1 concurrent call.
       /// </summary>
       /// <param name="onMessage"></param>
-      public Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessage)
+      public Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize)
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
 
@@ -78,12 +80,14 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
             MaxConcurrentCalls = 1
          };
 
+         _client.PrefetchCount = maxBatchSize;
+
          _client.RegisterMessageHandler(
             async (message, token) =>
             {
                QueueMessage qm = Converter.ToQueueMessage(message);
                _messageIdToBrokeredMessage[qm.Id] = message;
-               await onMessage(qm);
+               await onMessage(Enumerable.Repeat(qm, 1));
             },
             options);
 

@@ -98,10 +98,14 @@ namespace Storage.Net.Tests.Integration.Messaging
          _receiver.StartMessagePumpAsync(ReceiverPump);
       }
 
-      private async Task ReceiverPump(QueueMessage message)
+      private async Task ReceiverPump(IEnumerable<QueueMessage> messages)
       {
-         _receivedMessages.Add(message);
-         await _receiver.ConfirmMessageAsync(message);
+         _receivedMessages.AddRange(messages);
+
+         foreach (QueueMessage qm in messages)
+         {
+            await _receiver.ConfirmMessageAsync(qm);
+         }
       }
 
       private async Task<QueueMessage> WaitMessage()

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Storage.Net.Messaging;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace Storage.Net.Tests
 {
@@ -111,9 +112,9 @@ namespace Storage.Net.Tests
          await receiver.StartMessagePumpAsync(OnNewMessage);
       }
 
-      public async Task OnNewMessage(QueueMessage message)
+      public async Task OnNewMessage(IEnumerable<QueueMessage> message)
       {
-         Console.WriteLine($"message received, id: {message.Id}, content: '{message.StringContent}'");
+         //Console.WriteLine($"message received, id: {message.Id}, content: '{message.StringContent}'");
       }
    }
 }

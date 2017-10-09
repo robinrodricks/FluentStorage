@@ -15,7 +15,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
    /// </summary>
    class AzureStorageQueueReceiver : IMessageReceiver
    {
-      private const int PollingBatchSize = 1;
       private readonly CloudQueueClient _client;
       private readonly string _queueName;
       private readonly CloudQueue _queue;
@@ -113,34 +112,30 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// <summary>
       /// Due to the fact storage queues don't support notifications this method starts an internal thread to poll for messages.
       /// </summary>
-      public Task StartMessagePumpAsync(Func<QueueMessage, Task> onMessage)
+      public Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize)
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
          if (_pollingTask != null) throw new ArgumentException("polling already started", nameof(onMessage));
 
-         _pollingTask = PollTasks(onMessage, _cts.Token);
+         _pollingTask = PollTasks(onMessage, maxBatchSize, _cts.Token);
 
          return Task.FromResult(true);
       }
 
-      private async Task PollTasks(Func<QueueMessage, Task> callback, CancellationToken ct)
+      private async Task PollTasks(Func<IEnumerable<QueueMessage>, Task> callback, int maxBatchSize, CancellationToken ct)
       {
          if (ct.IsCancellationRequested) return;
 
-         IEnumerable<QueueMessage> messages = await ReceiveMessagesAsync(PollingBatchSize);
+         IEnumerable<QueueMessage> messages = await ReceiveMessagesAsync(maxBatchSize);
          while(messages != null)
          {
-            foreach(QueueMessage msg in messages)
-            {
-               await callback(msg);
-            }
-
-            messages = await ReceiveMessagesAsync(PollingBatchSize);
+            await callback(messages);
+            messages = await ReceiveMessagesAsync(maxBatchSize);
          }
 
          await Task.Delay(_messagePumpPollingTimeout, ct).ContinueWith(async (t) =>
          {
-            await PollTasks(callback, ct);
+            await PollTasks(callback, maxBatchSize, ct);
          });
       }
 
