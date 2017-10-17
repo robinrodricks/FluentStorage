@@ -75,8 +75,7 @@ namespace Storage.Net.Blob.Files
          string id = Path.GetFileName(fullPath);
 
          fullPath = fullPath.Substring(_directory.FullName.Length);
-         fullPath = fullPath.Trim(Path.DirectorySeparatorChar);
-         fullPath = fullPath.Substring(0, id.Length);
+         fullPath = fullPath.Replace(Path.DirectorySeparatorChar, StoragePath.PathSeparator);
          fullPath = fullPath.Trim(StoragePath.PathSeparator);
          fullPath = StoragePath.PathStrSeparator + fullPath;
 
