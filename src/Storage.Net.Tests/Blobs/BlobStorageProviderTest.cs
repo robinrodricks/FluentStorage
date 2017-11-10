@@ -165,11 +165,18 @@ namespace Storage.Net.Tests.Blobs
          string id2 = StoragePath.Combine(Generator.RandomString, Generator.RandomString);
          string id3 = StoragePath.Combine(Generator.RandomString, Generator.RandomString, Generator.RandomString);
 
-         await _bs.WriteTextAsync(id1, Generator.RandomString);
-         await _bs.WriteTextAsync(id2, Generator.RandomString);
-         await _bs.WriteTextAsync(id3, Generator.RandomString);
+         try
+         {
+            await _bs.WriteTextAsync(id1, Generator.RandomString);
+            await _bs.WriteTextAsync(id2, Generator.RandomString);
+            await _bs.WriteTextAsync(id3, Generator.RandomString);
 
-         IEnumerable<BlobId> items = await _provider.ListAsync(new ListOptions { Recurse = true });
+            IEnumerable<BlobId> items = await _provider.ListAsync(new ListOptions { Recurse = true });
+         }
+         catch(NotSupportedException)
+         {
+            //it ok for providers not to support hierarchy
+         }
       }
 
       [Fact]

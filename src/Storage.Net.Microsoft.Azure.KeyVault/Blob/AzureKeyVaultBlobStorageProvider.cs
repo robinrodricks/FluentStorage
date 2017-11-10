@@ -182,7 +182,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
       {
          if(!secretNameRegex.IsMatch(id))
          {
-            throw new ArgumentException($"secret '{id}' does not match expected pattern '^[0-9a-zA-Z-]+$'");
+            throw new NotSupportedException($"secret '{id}' does not match expected pattern '^[0-9a-zA-Z-]+$'");
          }
       }
 
