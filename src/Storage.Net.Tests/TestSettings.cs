@@ -14,7 +14,7 @@ namespace Storage.Net.Tests
       [Option(Alias = "Azure.Storage.Key")]
       string AzureStorageKey { get; }
 
-      [Option(Alias = "ServiceBus.ConnectionString")]
+      [Option(Alias = "Azure.ServiceBus.ConnectionString")]
       string ServiceBusConnectionString { get; }
 
       [Option(DefaultValue = "testqueuelocal")]
