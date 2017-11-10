@@ -54,7 +54,26 @@ namespace Storage.Net.Blob
 
       public bool Equals(BlobId other)
       {
-         throw new NotImplementedException();
+         if (ReferenceEquals(other, null)) return false;
+
+         return
+            other.FullPath == FullPath &&
+            other.Kind == Kind;
+      }
+
+      // override object.Equals
+      public override bool Equals(object other)
+      {
+         if (ReferenceEquals(other, null)) return false;
+         if (ReferenceEquals(other, this)) return true;
+         if (other.GetType() != typeof(BlobId)) return false;
+
+         return Equals((BlobId)other);
+      }
+
+      public override int GetHashCode()
+      {
+         return FullPath.GetHashCode() * Kind.GetHashCode();
       }
 
       public static implicit operator BlobId(string fileId)
