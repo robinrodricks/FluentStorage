@@ -79,7 +79,7 @@ namespace Storage.Net.Blob.Files
          fullPath = fullPath.Trim(StoragePath.PathSeparator);
          fullPath = StoragePath.PathStrSeparator + fullPath;
 
-         return new BlobId(fullPath, id, kind);
+         return new BlobId(fullPath, kind);
       }
 
       private string GetFolder(string path, bool createIfNotExists)

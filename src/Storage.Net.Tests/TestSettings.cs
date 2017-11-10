@@ -29,8 +29,14 @@ namespace Storage.Net.Tests
       [Option(Alias = "Azure.EventHub.Path")]
       string EventHubPath { get; }
 
-      [Option(Alias = "Azure.DataLake.Store.Credential")]
-      NetworkCredential AzureDataLakeCredential { get; }
+      [Option(Alias = "Azure.DataLake.TenantId")]
+      string AzureDataLakeTenantId { get; }
+
+      [Option(Alias = "Azure.DataLake.PrincipalId")]
+      string AzureDataLakePrincipalId { get; }
+
+      [Option(Alias = "Azure.DataLake.PrincipalSecret")]
+      string AzureDataLakePrincipalSecret { get; }
 
       [Option(Alias = "Azure.DataLake.Store.AccountName")]
       string AzureDataLakeStoreAccountName { get; }

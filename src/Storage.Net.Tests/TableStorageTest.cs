@@ -116,7 +116,7 @@ namespace Storage.Net.Tests.Integration
 
          var names = _tables.ListTableNames().ToList();
          Assert.Equal(count + 1, names.Count);
-         Assert.True(names.Contains(_tableName));
+         Assert.Contains(_tableName, names);
          _tables.Delete(_tableName);
       }
 

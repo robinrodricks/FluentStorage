@@ -43,16 +43,13 @@ namespace Storage.Net.Tests.Integration.Messaging
       private readonly List<QueueMessage> _receivedMessages = new List<QueueMessage>();
       private ITestSettings _settings;
 
-      public GenericMessageQueueTest()
+      protected GenericMessageQueueTest(string name)
       {
          _settings = new ConfigurationBuilder<ITestSettings>()
             .UseIniFile("c:\\tmp\\integration-tests.ini")
             .UseEnvironmentVariables()
             .Build();
-      }
 
-      protected GenericMessageQueueTest(string name)
-      {
          _name = name;
 
          switch(_name)

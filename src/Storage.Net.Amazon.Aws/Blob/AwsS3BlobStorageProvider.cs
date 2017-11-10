@@ -78,7 +78,7 @@ namespace Storage.Net.Aws.Blob
          ListObjectsV2Response response = await _client.ListObjectsV2Async(request, cancellationToken);
 
          return response.S3Objects
-            .Select(s3Obj => new BlobId(null, s3Obj.Key, BlobItemKind.File));
+            .Select(s3Obj => new BlobId(StoragePath.RootFolderPath, s3Obj.Key, BlobItemKind.File));
       }
 
       public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)

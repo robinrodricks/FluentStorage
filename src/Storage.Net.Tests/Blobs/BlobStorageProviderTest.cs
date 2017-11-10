@@ -77,7 +77,9 @@ namespace Storage.Net.Tests.Blobs
             case "azure-datalakestore":
                _provider = StorageFactory.Blobs.AzureDataLakeStoreByClientSecret(
                   _settings.AzureDataLakeStoreAccountName,
-                  _settings.AzureDataLakeCredential);
+                  _settings.AzureDataLakeTenantId,
+                  _settings.AzureDataLakePrincipalId,
+                  _settings.AzureDataLakePrincipalSecret);
                break;
             case "disk-directory":
                _provider = new DiskDirectoryBlobStorageProvider(TestDir);
@@ -149,7 +151,11 @@ namespace Storage.Net.Tests.Blobs
 
          List<BlobId> items = (await _provider.ListAsync(new ListOptions { Recurse = false })).ToList();
 
-         Assert.Equal(1, items.Count);
+         Assert.True(items.Count > 0);
+
+         BlobId tid = items.Where(i => i.Id == id).First();
+         Assert.Equal(StoragePath.RootFolderPath, tid.FolderPath);
+         Assert.Equal(id, tid.Id);
       }
 
       [Fact]
