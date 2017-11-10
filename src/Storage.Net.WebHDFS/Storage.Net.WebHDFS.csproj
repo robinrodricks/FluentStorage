@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.4;netstandard1.6;net452</TargetFrameworks>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
     <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
     <PackageIconUrl>http://i.isolineltd.com/nuget/storage.png</PackageIconUrl>
