@@ -8,11 +8,23 @@ using System.Threading.Tasks;
 using Storage.Net.Messaging;
 using System.Threading;
 using System.Collections.Generic;
+using Config.Net;
 
 namespace Storage.Net.Tests
 {
    public class DocumentationScenarios
    {
+
+      private ITestSettings _settings;
+
+      public DocumentationScenarios()
+      {
+         _settings = new ConfigurationBuilder<ITestSettings>()
+            .UseIniFile("c:\\tmp\\integration-tests.ini")
+            .UseEnvironmentVariables()
+            .Build();
+      }
+
       //[Fact]
       public void Run()
       {
@@ -24,9 +36,9 @@ namespace Storage.Net.Tests
       public async Task Blobs_list_files_in_a_folder()
       {
          IBlobStorageProvider storage = StorageFactory.Blobs.AmazonS3BlobStorage(
-            TestSettings.Instance.AwsAccessKeyId,
-            TestSettings.Instance.AwsSecretAccessKey,
-            TestSettings.Instance.AwsTestBucketName);
+            _settings.AwsAccessKeyId,
+            _settings.AwsSecretAccessKey,
+            _settings.AwsTestBucketName);
 
          await storage.WriteAsync("folder1/file1", Generator.RandomString.ToMemoryStream(), false);
          await storage.WriteAsync("folder1/file2", Generator.RandomString.ToMemoryStream(), false);
@@ -38,8 +50,8 @@ namespace Storage.Net.Tests
       public async Task BlobStorage_sample1()
       {
          IBlobStorageProvider storage = StorageFactory.Blobs.AzureBlobStorage(
-            TestSettings.Instance.AzureStorageName,
-            TestSettings.Instance.AzureStorageKey,
+            _settings.AzureStorageName,
+            _settings.AzureStorageKey,
             "container name");
 
          //upload it
@@ -65,8 +77,8 @@ namespace Storage.Net.Tests
       public async Task BlobStorage_sample2()
       {
          IBlobStorageProvider provider = StorageFactory.Blobs.AzureBlobStorage(
-            TestSettings.Instance.AzureStorageName,
-            TestSettings.Instance.AzureStorageKey,
+            _settings.AzureStorageName,
+            _settings.AzureStorageKey,
             "container name");
          BlobStorage storage = new BlobStorage(provider);
 

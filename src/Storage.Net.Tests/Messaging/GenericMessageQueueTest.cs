@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using NetBox;
 using System.Linq;
+using Config.Net;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
@@ -40,6 +41,15 @@ namespace Storage.Net.Tests.Integration.Messaging
       private IMessagePublisher _publisher;
       private IMessageReceiver _receiver;
       private readonly List<QueueMessage> _receivedMessages = new List<QueueMessage>();
+      private ITestSettings _settings;
+
+      public GenericMessageQueueTest()
+      {
+         _settings = new ConfigurationBuilder<ITestSettings>()
+            .UseIniFile("c:\\tmp\\integration-tests.ini")
+            .UseEnvironmentVariables()
+            .Build();
+      }
 
       protected GenericMessageQueueTest(string name)
       {
@@ -49,48 +59,48 @@ namespace Storage.Net.Tests.Integration.Messaging
          {
             case "azure-storage-queue":
                _publisher = StorageFactory.Messages.AzureStorageQueuePublisher(
-                  TestSettings.Instance.AzureStorageName,
-                  TestSettings.Instance.AzureStorageKey,
-                  TestSettings.Instance.ServiceBusQueueName);
+                  _settings.AzureStorageName,
+                  _settings.AzureStorageKey,
+                  _settings.ServiceBusQueueName);
                _receiver = StorageFactory.Messages.AzureStorageQueueReceiver(
-                  TestSettings.Instance.AzureStorageName,
-                  TestSettings.Instance.AzureStorageKey,
-                  TestSettings.Instance.ServiceBusQueueName,
+                  _settings.AzureStorageName,
+                  _settings.AzureStorageKey,
+                  _settings.ServiceBusQueueName,
                   TimeSpan.FromMinutes(1),
                   TimeSpan.FromMilliseconds(500));
                break;
             case "azure-servicebus-queue":
                _receiver = StorageFactory.Messages.AzureServiceBusQueueReceiver(
-                  TestSettings.Instance.ServiceBusConnectionString,
+                  _settings.ServiceBusConnectionString,
                   "testqueue",
                   true);
                _publisher = StorageFactory.Messages.AzureServiceBusQueuePublisher(
-                  TestSettings.Instance.ServiceBusConnectionString,
+                  _settings.ServiceBusConnectionString,
                   "testqueue");
                break;
             case "azure-servicebus-topic":
                _receiver = StorageFactory.Messages.AzureServiceBusTopicReceiver(
-                  TestSettings.Instance.ServiceBusConnectionString,
+                  _settings.ServiceBusConnectionString,
                   "testtopic",
                   "testsub",
                   true);
                _publisher = StorageFactory.Messages.AzureServiceBusTopicPublisher(
-                  TestSettings.Instance.ServiceBusConnectionString,
+                  _settings.ServiceBusConnectionString,
                   "testtopic");
                break;
             case "azure-eventhub":
                _receiver = StorageFactory.Messages.AzureEventHubReceiver(
-                  TestSettings.Instance.EventHubConnectionString,
-                  TestSettings.Instance.EventHubPath,
+                  _settings.EventHubConnectionString,
+                  _settings.EventHubPath,
                   null,
                   null,
                   StorageFactory.Blobs.AzureBlobStorage(
-                     TestSettings.Instance.AzureStorageName,
-                     TestSettings.Instance.AzureStorageKey,
+                     _settings.AzureStorageName,
+                     _settings.AzureStorageKey,
                      "integration-hub"));
                _publisher = StorageFactory.Messages.AzureEventHubPublisher(
-                  TestSettings.Instance.EventHubConnectionString,
-                  TestSettings.Instance.EventHubPath);
+                  _settings.EventHubConnectionString,
+                  _settings.EventHubPath);
                break;
          }
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Config.Net;
 using NetBox;
 using Storage.Net.Aws.Blob;
 using Storage.Net.Blob;
@@ -54,23 +55,29 @@ namespace Storage.Net.Tests.Blobs
       private readonly string _type;
       private IBlobStorageProvider _provider;
       private BlobStorage _bs;   //use only as helper
+      private ITestSettings _settings;
 
       public BlobStorageProviderTest(string type)
       {
+         _settings = new ConfigurationBuilder<ITestSettings>()
+            .UseIniFile("c:\\tmp\\integration-tests.ini")
+            .UseEnvironmentVariables()
+            .Build();
+
          _type = type;
 
          switch (_type)
          {
             case "azure":
                _provider = new AzureBlobStorageProvider(
-                  TestSettings.Instance.AzureStorageName,
-                  TestSettings.Instance.AzureStorageKey,
+                  _settings.AzureStorageName,
+                  _settings.AzureStorageKey,
                   "blobstoragetest");
                break;
             case "azure-datalakestore":
                _provider = StorageFactory.Blobs.AzureDataLakeStoreByClientSecret(
-                  TestSettings.Instance.AzureDataLakeStoreAccountName,
-                  TestSettings.Instance.AzureDataLakeCredential);
+                  _settings.AzureDataLakeStoreAccountName,
+                  _settings.AzureDataLakeCredential);
                break;
             case "disk-directory":
                _provider = new DiskDirectoryBlobStorageProvider(TestDir);
@@ -78,17 +85,17 @@ namespace Storage.Net.Tests.Blobs
             //break;
             case "aws-s3":
                _provider = new AwsS3BlobStorageProvider(
-                  TestSettings.Instance.AwsAccessKeyId,
-                  TestSettings.Instance.AwsSecretAccessKey,
-                  TestSettings.Instance.AwsTestBucketName);
+                  _settings.AwsAccessKeyId,
+                  _settings.AwsSecretAccessKey,
+                  _settings.AwsTestBucketName);
                break;
             case "inmemory":
                _provider = StorageFactory.Blobs.InMemory();
                break;
             case "azurekeyvault":
                _provider = StorageFactory.Blobs.AzureKeyVault(
-                  TestSettings.Instance.KeyVaultUri,
-                  TestSettings.Instance.KeyVaultCreds);
+                  _settings.KeyVaultUri,
+                  _settings.KeyVaultCreds);
                break;
          }
 
@@ -140,7 +147,9 @@ namespace Storage.Net.Tests.Blobs
 
          await _bs.WriteTextAsync(id, Generator.RandomString);
 
-         IEnumerable<BlobId> items = await _provider.ListAsync(new ListOptions { Recurse = false });
+         List<BlobId> items = (await _provider.ListAsync(new ListOptions { Recurse = false })).ToList();
+
+         Assert.Equal(1, items.Count);
       }
 
       [Fact]

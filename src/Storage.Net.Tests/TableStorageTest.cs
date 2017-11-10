@@ -5,6 +5,7 @@ using Xunit;
 using Storage.Net.Table;
 using System.IO;
 using NetBox;
+using Config.Net;
 
 namespace Storage.Net.Tests.Integration
 {
@@ -29,9 +30,15 @@ namespace Storage.Net.Tests.Integration
       private readonly string _name;
       private ITableStorage _tables;
       private string _tableName;
+      private ITestSettings _settings;
 
       protected TableStorageTest(string name)
       {
+         _settings = new ConfigurationBuilder<ITestSettings>()
+            .UseIniFile("c:\\tmp\\integration-tests.ini")
+            .UseEnvironmentVariables()
+            .Build();
+
          _name = name;
 
          if(_name == "csv-files")
@@ -41,8 +48,8 @@ namespace Storage.Net.Tests.Integration
          else if(_name == "azure")
          {
             _tables = StorageFactory.Tables.AzureTableStorage(
-               TestSettings.Instance.AzureStorageName,
-               TestSettings.Instance.AzureStorageKey);
+               _settings.AzureStorageName,
+               _settings.AzureStorageKey);
          }
          else if(_name == "esent")
          {
@@ -126,7 +133,7 @@ namespace Storage.Net.Tests.Integration
          };
          _tables.Insert(_tableName, new[] {row1, row2});
          _tables.Delete(_tableName, new[] {new TableRowId("part1", "2")});
-         var rows = _tables.Get(_tableName, "part1");
+         IEnumerable<TableRow> rows = _tables.Get(_tableName, "part1");
 
          Assert.Equal(1, rows.Count());
       }
@@ -340,7 +347,7 @@ namespace Storage.Net.Tests.Integration
          var row = new TableRow("partition", "ivan@si.com");
          _tables.Insert(_tableName, row);
 
-         var foundRow = _tables.Get(_tableName, "partition", "ivan@si.com");
+         TableRow foundRow = _tables.Get(_tableName, "partition", "ivan@si.com");
          Assert.NotNull(foundRow);
       }
 
@@ -357,7 +364,7 @@ namespace Storage.Net.Tests.Integration
       [Fact]
       public void Insert_CleanTableDuplicateRows_FailsWithDuplicateKeyCode()
       {
-         var rows = new[]
+         TableRow[] rows = new[]
          {
             new TableRow("pk", "rk"),
             new TableRow("pk", "rk"),
@@ -367,7 +374,7 @@ namespace Storage.Net.Tests.Integration
          StorageException ex = Assert.Throws<StorageException>(() => _tables.Insert(_tableName, rows));
          Assert.Equal(ErrorCode.DuplicateKey, ex.ErrorCode);
 
-         var rows2 = _tables.Get(_tableName, "pk");
+         IEnumerable<TableRow> rows2 = _tables.Get(_tableName, "pk");
          Assert.Equal(0, rows2.Count());
       }
 
@@ -375,21 +382,21 @@ namespace Storage.Net.Tests.Integration
       public void Insert_RowsExistInsertDuplicateRows_FailsWithDuplicateKeyCode()
       {
          var dupeRow = new TableRow("pk", "rk1");
-         var insertRows = new[] { new TableRow("pk", "rk2"), dupeRow };
+         TableRow[] insertRows = new[] { new TableRow("pk", "rk2"), dupeRow };
 
          _tables.Insert(_tableName, dupeRow);
 
          StorageException ex = Assert.Throws<StorageException>(() => _tables.Insert(_tableName, insertRows));
          Assert.Equal(ErrorCode.DuplicateKey, ex.ErrorCode);
 
-         var rows2 = _tables.Get(_tableName, "pk");
+         IEnumerable<TableRow> rows2 = _tables.Get(_tableName, "pk");
          Assert.Equal(1, rows2.Count());
       }
 
       [Fact]
       public void InsertOrReplace_CleanTableDuplicateRowsInRequest_ContinuesAnyway()
       {
-         var rows = new[]
+         TableRow[] rows = new[]
          {
             new TableRow("pk", "rk"),
             new TableRow("pk", "rk"),
@@ -400,7 +407,7 @@ namespace Storage.Net.Tests.Integration
          StorageException ex = Assert.Throws<StorageException>(() => _tables.InsertOrReplace(_tableName, rows));
          Assert.Equal(ErrorCode.DuplicateKey, ex.ErrorCode);
 
-         var rows2 = _tables.Get(_tableName, "pk");
+         IEnumerable<TableRow> rows2 = _tables.Get(_tableName, "pk");
          Assert.Equal(0, rows2.Count());
       }
 

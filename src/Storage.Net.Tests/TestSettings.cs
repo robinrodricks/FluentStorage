@@ -1,60 +1,62 @@
-﻿using Config.Net;
-using System;
+﻿using System;
 using System.Net;
+using Config.Net;
 
 namespace Storage.Net.Tests
 {
-   public class TestSettings : SettingsContainer
+   public interface ITestSettings
    {
       #region [ Azure ]
 
-      public readonly Option<string> AzureStorageName = new Option<string>("Azure.Storage.Name", null);
+      [Option(Alias = "Azure.Storage.Name")]
+      string AzureStorageName { get; }
 
-      public readonly Option<string> AzureStorageKey = new Option<string>("Azure.Storage.Key", null);
+      [Option(Alias = "Azure.Storage.Key")]
+      string AzureStorageKey { get; }
 
-      public readonly Option<string> ServiceBusConnectionString = new Option<string>("Azure.ServiceBus.ConnectionString", null);
+      [Option(Alias = "ServiceBus.ConnectionString")]
+      string ServiceBusConnectionString { get; }
 
-      public readonly Option<string> ServiceBusQueueName = new Option<string>("Azure.ServiceBus.QueueName", "testqueuelocal");
+      [Option(DefaultValue = "testqueuelocal")]
+      string ServiceBusQueueName { get; }
 
-      public readonly Option<string> ServiceBusTopicName = new Option<string>("Azure.ServiceBus.TopicName", "testtopiclocal");
+      [Option(DefaultValue = "testtopiclocal")]
+      string ServiceBusTopicName { get; }
 
-      public readonly Option<string> EventHubConnectionString = new Option<string>("Azure.EventHub.ConnectionString", null);
+      [Option(Alias = "Azure.EventHub.ConnectionString")]
+      string EventHubConnectionString { get; }
 
-      public readonly Option<string> EventHubPath = new Option<string>("Azure.EventHub.Path", null);
+      [Option(Alias = "Azure.EventHub.Path")]
+      string EventHubPath { get; }
 
-      public readonly Option<NetworkCredential> AzureDataLakeCredential = new Option<NetworkCredential>("Azure.DataLake.Store.Credential", null);
+      [Option(Alias = "Azure.DataLake.Store.Credential")]
+      NetworkCredential AzureDataLakeCredential { get; }
 
-      public readonly Option<string> AzureDataLakeStoreAccountName = new Option<string>("Azure.DataLake.Store.AccountName", null);
+      [Option(Alias = "Azure.DataLake.Store.AccountName")]
+      string AzureDataLakeStoreAccountName { get; }
 
-      public readonly Option<string> AzureDataLakeSubscriptionId = new Option<string>("Azure.DataLake.SubscriptionId", null);
+      [Option(Alias = "Azure.DataLake.SubscriptionId")]
+      string AzureDataLakeSubscriptionId { get; }
 
-      public readonly Option<Uri> KeyVaultUri = new Option<Uri>("Azure.KeyVault.Uri", null);
+      [Option(Alias = "Azure.KeyVault.Uri")]
+      Uri KeyVaultUri { get; }
 
-      public readonly Option<NetworkCredential> KeyVaultCreds = new Option<NetworkCredential>("Azure.KeyVault.Creds", null);
+      [Option(Alias = "Azure.KeyVault.Creds")]
+      NetworkCredential KeyVaultCreds { get; }
 
       #endregion
 
       #region [ Amazon Web Services ]
 
-      public readonly Option<string> AwsAccessKeyId = new Option<string>("Aws.AccessKeyId", null);
+      [Option(Alias = "Aws.AccessKeyId")]
+      string AwsAccessKeyId { get; }
 
-      public readonly Option<string> AwsSecretAccessKey = new Option<string>("Aws.SecretAccessKey", null);
+      [Option(Alias = "Aws.SecretAccessKey")]
+      string AwsSecretAccessKey { get; }
 
-      public readonly Option<string> AwsTestBucketName = new Option<string>("Aws.TestBucketName", null);
+      [Option(Alias = "Aws.TestBucketName")]
+      string AwsTestBucketName { get; }
 
       #endregion
-
-      protected override void OnConfigure(IConfigConfiguration configuration)
-      {
-         configuration.UseIniFile("c:\\tmp\\integration-tests.ini");
-         configuration.UseEnvironmentVariables();
-      }
-
-      private static TestSettings _instance;
-
-      public static TestSettings Instance
-      {
-         get { return _instance ?? (_instance = new TestSettings()); }
-      }
    }
 }
