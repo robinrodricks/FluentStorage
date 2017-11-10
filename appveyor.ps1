@@ -4,8 +4,6 @@ if($gv -eq $null)
    $gv = "5.0.0"
 }
 
-Get-ChildItem Env:
-
 $bn = $env:APPVEYOR_BUILD_NUMBER
 if($bn -eq $null)
 {
