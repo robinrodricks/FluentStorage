@@ -133,7 +133,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
       private async Task<BlobMeta> GetMetaAsync(string id)
       {
-         SecretBundle secret = await _vaultClient.GetSecretAsync(id);
+         SecretBundle secret = await _vaultClient.GetSecretAsync(_vaultUri, id);
          byte[] data = Encoding.UTF8.GetBytes(secret.Value);
 
          return new BlobMeta(data.Length, secret.Value.GetHash(HashType.Md5));

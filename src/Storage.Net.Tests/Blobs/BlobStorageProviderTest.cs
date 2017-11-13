@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Config.Net;
@@ -47,6 +48,11 @@ namespace Storage.Net.Tests.Blobs
       public AzureKeyVaultBlobStorageProviderTest() : base("azurekeyvault") { }
    }
 
+   public class ZipFileBlobStorageProviderTest : BlobStorageProviderTest
+   {
+      public ZipFileBlobStorageProviderTest() : base("zip") { }
+   }
+
 
    #endregion
 
@@ -86,7 +92,9 @@ namespace Storage.Net.Tests.Blobs
             case "disk-directory":
                _provider = new DiskDirectoryBlobStorageProvider(TestDir);
                break;
-            //break;
+            case "zip":
+               _provider = StorageFactory.Blobs.ZipFile(Path.Combine(TestDir.FullName, "test.zip"));
+               break;
             case "aws-s3":
                _provider = new AwsS3BlobStorageProvider(
                   _settings.AwsAccessKeyId,
@@ -213,6 +221,23 @@ namespace Storage.Net.Tests.Blobs
 
          string text = await _bs.ReadTextAsync(bid.FullPath);
          Assert.NotNull(text);
+      }
+
+      [Fact]
+      public async Task GetMeta_for_one_file_succeeds()
+      {
+         string content = Generator.GetRandomString(1000, false);
+         string id = Generator.RandomString;
+
+         await _bs.WriteTextAsync(id, content);
+
+         BlobMeta meta = (await _provider.GetMetaAsync(new[] { id })).First();
+
+         long size = Encoding.UTF8.GetBytes(content).Length;
+         string md5 = content.GetHash(HashType.Md5);
+
+         Assert.Equal(size, meta.Size);
+         Assert.True(meta.MD5 == null || meta.MD5 == md5);
       }
 
       class TestDocument
