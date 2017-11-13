@@ -75,7 +75,7 @@ namespace Storage.Net.Tests.Blobs
                   "blobstoragetest");
                break;
             case "azure-datalakestore":
-               Console.WriteLine("ac: {0}, tid: {1}, pid: {2}, ps: {3}", _settings.AzureDataLakeStoreAccountName, _settings.AzureDataLakeTenantId, _settings.AzureDataLakePrincipalId, _settings.AzureDataLakePrincipalSecret);
+               //Console.WriteLine("ac: {0}, tid: {1}, pid: {2}, ps: {3}", _settings.AzureDataLakeStoreAccountName, _settings.AzureDataLakeTenantId, _settings.AzureDataLakePrincipalId, _settings.AzureDataLakePrincipalSecret);
 
                _provider = StorageFactory.Blobs.AzureDataLakeStoreByClientSecret(
                   _settings.AzureDataLakeStoreAccountName,
