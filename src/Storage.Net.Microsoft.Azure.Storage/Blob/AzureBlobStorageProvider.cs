@@ -241,24 +241,24 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             GenericValidation.CheckBlobId(id);
          }
 
-         foreach (string id in ids)
-         {
-            CloudBlob blob = _blobContainer.GetBlobReference(StoragePath.Normalize(id, false));
-            if (!(await blob.ExistsAsync())) return null;
+         return await Task.WhenAll(ids.Select(id => GetMetaAsync(id, cancellationToken)));
+      }
 
-            await blob.FetchAttributesAsync();
+      private async Task<BlobMeta> GetMetaAsync(string id, CancellationToken cancellationToken)
+      {
+         CloudBlob blob = _blobContainer.GetBlobReference(StoragePath.Normalize(id, false));
+         if (!(await blob.ExistsAsync())) return null;
 
-            //ContentMD5 is base64-encoded hash, whereas we work with HEX encoded ones
-            string md5 = blob.Properties.ContentMD5.Base64DecodeAsBytes().ToHexString();
+         await blob.FetchAttributesAsync();
 
-            var meta = new BlobMeta(
-               blob.Properties.Length,
-               md5);
+         //ContentMD5 is base64-encoded hash, whereas we work with HEX encoded ones
+         string md5 = blob.Properties.ContentMD5.Base64DecodeAsBytes().ToHexString();
 
-            result.Add(meta);
-         }
+         var meta = new BlobMeta(
+            blob.Properties.Length,
+            md5);
 
-         return result;
+         return meta;
       }
 
       private static bool TryHandleStorageException(AzureStorageException ex)
