@@ -8,7 +8,7 @@ build:
   project: src/storage.sln
   verbosity: minimal
 test_script:
-- ps: dotnet test .\src\Storage.Net.Tests\
+- ps: dotnet test .\src\Storage.Net.Tests\ -c debug
 artifacts:
 - path: src/**/*.nupkg
 deploy:
