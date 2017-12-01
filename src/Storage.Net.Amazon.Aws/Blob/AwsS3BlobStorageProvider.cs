@@ -197,7 +197,6 @@ namespace Storage.Net.Aws.Blob
 
       public void Dispose()
       {
-         throw new NotImplementedException();
       }
 
       public Task<ITransaction> OpenTransactionAsync()

@@ -165,7 +165,6 @@ namespace Storage.Net.Blob.Files
 
       public void Dispose()
       {
-         throw new NotImplementedException();
       }
 
       public Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)

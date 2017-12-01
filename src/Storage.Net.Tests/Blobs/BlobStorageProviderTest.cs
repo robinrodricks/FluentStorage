@@ -258,5 +258,11 @@ namespace Storage.Net.Tests.Blobs
 
          Assert.Equal("string", td2.M);
       }
+
+      [Fact]
+      public void Dispose_does_not_fail()
+      {
+         _provider.Dispose();
+      }
    }
 }
