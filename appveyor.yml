@@ -3,6 +3,8 @@ version: 5.4.0
 image: Visual Studio 2017
 configuration: Release
 platform: Any CPU
+environment:
+  NUGET_DEPLOY: 0
 before_build:
 - ps: .\appveyor.ps1
 build:
