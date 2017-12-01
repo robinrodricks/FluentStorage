@@ -11,10 +11,12 @@
     <Version>2.6.204.0</Version>
     <FileVersion>2.6.204.0</FileVersion>
     <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Description>Provides Storage.Net integration with Azure Service Fabric. This library implements Reliable Storage as Blobs and Messages.</Description>
     <AssemblyOriginatorKeyFile>../storage.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.ServiceFabric.Data" Version="2.6.204" />

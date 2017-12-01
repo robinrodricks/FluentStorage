@@ -13,8 +13,10 @@
     <PackageIconUrl>http://i.isolineltd.com/nuget/storage.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
     <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Description>Provides Azure Data Lake Store integration for Storage.Net library</Description>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Management.DataLake.Store" Version="2.2.0" />
