@@ -11,7 +11,6 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
    {
       private IReliableStateManager _stateManager;
       private readonly string _queueName;
-      private IReliableQueue<byte[]> _collection;
 
       public ServiceFabricReliableQueueReceiver(IReliableStateManager stateManager, string queueName)
       {
@@ -73,14 +72,9 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
          return EmptyTransaction.Instance;
       }
 
-      private async Task<IReliableQueue<byte[]>> GetCollectionAsync()
+      private Task<IReliableQueue<byte[]>> GetCollectionAsync()
       {
-         if(_collection == null)
-         {
-            _collection = await _stateManager.GetOrAddAsync<IReliableQueue<byte[]>>(_queueName);
-         }
-
-         return _collection;
+         return _stateManager.GetOrAddAsync<IReliableQueue<byte[]>>(_queueName);
       }
    }
 }
