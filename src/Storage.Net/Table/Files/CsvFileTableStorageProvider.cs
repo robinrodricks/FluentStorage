@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 namespace Storage.Net.Table.Files
 {
    /// <summary>
-   /// Creates an abstaction of <see cref="ITableStorage"/> in a CSV file structure.
+   /// Creates an abstaction of <see cref="ITableStorageProvider"/> in a CSV file structure.
    /// Works relative to the root directory specified in the constructor.
    /// Each table will be a separate subfolder, where files are partitions.
    /// </summary>
-   public class CsvFileTableStorage : ITableStorage
+   public class CsvFileTableStorageProvider : ITableStorageProvider
    {
       private const string TablePartitionFormat = "{0}.partition.csv";
       private const string TablePartitionSearchFilter = "*.partition.csv";
@@ -31,7 +31,7 @@ namespace Storage.Net.Table.Files
       /// </summary>
       /// <param name="rootDir"></param>
       /// <exception cref="ArgumentNullException"></exception>
-      public CsvFileTableStorage(DirectoryInfo rootDir)
+      public CsvFileTableStorageProvider(DirectoryInfo rootDir)
       {
          _rootDir = rootDir ?? throw new ArgumentNullException(nameof(rootDir));
          _rootDirPath = rootDir.FullName;

@@ -18,7 +18,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
    /// <summary>
    /// Microsoft Azure Table storage
    /// </summary>
-   public class AzureTableStorage : ITableStorage
+   public class AzureTableStorageProvider : ITableStorageProvider
    {
       private const int MaxInsertLimit = 100;
       private const string PartitionKeyName = "PartitionKey";
@@ -39,7 +39,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// </summary>
       /// <param name="accountName"></param>
       /// <param name="storageKey"></param>
-      public AzureTableStorage(string accountName, string storageKey)
+      public AzureTableStorageProvider(string accountName, string storageKey)
       {
          if (accountName == null) throw new ArgumentNullException(nameof(accountName));
          if (storageKey == null) throw new ArgumentNullException(nameof(storageKey));

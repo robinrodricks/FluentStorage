@@ -7,7 +7,7 @@ namespace Storage.Net.Table
    /// <summary>
    /// Common interface for working with table storage
    /// </summary>
-   public interface ITableStorage : IDisposable
+   public interface ITableStorageProvider : IDisposable
    {
       /// <summary>
       /// Storage returns true if it supports optimistic concurrency. This mode affect the update

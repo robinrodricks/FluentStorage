@@ -34,7 +34,7 @@ namespace Storage.Net.Tests.Integration
    public abstract class TableStorageTest : AbstractTestFixture
    {
       private readonly string _name;
-      private ITableStorage _tables;
+      private ITableStorageProvider _tables;
       private string _tableName;
       private ITestSettings _settings;
 

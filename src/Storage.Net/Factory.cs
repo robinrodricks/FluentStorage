@@ -17,10 +17,10 @@ namespace Storage.Net
       /// </summary>
       /// <param name="factory"></param>
       /// <param name="rootDir"></param>
-      public static ITableStorage CsvFiles(this ITableStorageFactory factory,
+      public static ITableStorageProvider CsvFiles(this ITableStorageFactory factory,
          DirectoryInfo rootDir)
       {
-         return new CsvFileTableStorage(rootDir);
+         return new CsvFileTableStorageProvider(rootDir);
       }
 
       /// <summary>

@@ -21,11 +21,11 @@ namespace Storage.Net
       /// <param name="accountName">Account name</param>
       /// <param name="storageKey">Account key</param>
       /// <returns></returns>
-      public static ITableStorage AzureTableStorage(this ITableStorageFactory factory,
+      public static ITableStorageProvider AzureTableStorage(this ITableStorageFactory factory,
          string accountName,
          string storageKey)
       {
-         return new AzureTableStorage(accountName, storageKey);
+         return new AzureTableStorageProvider(accountName, storageKey);
       }
 
       /// <summary>
@@ -34,10 +34,10 @@ namespace Storage.Net
       /// <param name="factory">Factory reference</param>
       /// <param name="credential">Credential structure cotnaining account name in username and account key in password.</param>
       /// <returns></returns>
-      public static ITableStorage AzureTableStorage(this ITableStorageFactory factory,
+      public static ITableStorageProvider AzureTableStorage(this ITableStorageFactory factory,
          NetworkCredential credential)
       {
-         return new AzureTableStorage(credential.UserName, credential.Password);
+         return new AzureTableStorageProvider(credential.UserName, credential.Password);
       }
 
       /// <summary>

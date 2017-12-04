@@ -8,13 +8,20 @@ using Storage.Net.Table;
 
 namespace Storage.Net.Mssql
 {
-   public class MssqlTableStorage : ITableStorage
+   public class MssqlTableStorageProvider : ITableStorageProvider
    {
       private readonly SqlConnection _connection;
+      private readonly CommandBuilder _cb;
+      private readonly CommandExecutor _exec;
+      private readonly SqlConfiguration _config;
 
-      public MssqlTableStorage(string connectionString)
+      public MssqlTableStorageProvider(string connectionString, SqlConfiguration config)
       {
+         _config = config ?? new SqlConfiguration();
+
          _connection = new SqlConnection(connectionString);
+         _cb = new CommandBuilder(_connection, _config);
+         _exec = new CommandExecutor(_connection, _config);
       }
 
       public bool HasOptimisticConcurrency => false;
@@ -23,7 +30,7 @@ namespace Storage.Net.Mssql
       {
          try
          {
-            await Exec($"DROP TABLE [{tableName}]");
+            await _exec.ExecAsync($"DROP TABLE [{tableName}]");
          }
          catch(SqlException ex) when (ex.Number == 3701)
          {
@@ -50,26 +57,11 @@ namespace Storage.Net.Mssql
          return (await InternalGetAsync(tableName, partitionKey, rowKey)).FirstOrDefault();
       }
 
-      private async Task<List<TableRow>> InternalGetAsync(string tableName, string partitionKey, string rowKey)
+      private async Task<ICollection<TableRow>> InternalGetAsync(string tableName, string partitionKey, string rowKey)
       {
-         string sql = $"SELECT * FROM [{tableName}] WHERE [{CommandBuilder.PartitionKey}] = '{partitionKey}'";
-         if (rowKey != null) sql += $" AND [{CommandBuilder.RowKey}] = '{rowKey}'";
-         var result = new List<TableRow>();
-
-         using (SqlDataReader reader = await ExecReaderAsync(sql))
-         {
-            while(await reader.ReadAsync())
-            {
-               string pk = reader[CommandBuilder.PartitionKey] as string;
-               string rk = reader[CommandBuilder.RowKey] as string;
-
-               var row = new TableRow(pk, rk);
-
-               result.Add(row);
-            }
-         }
-
-         return result;
+         string sql = $"SELECT * FROM [{tableName}] WHERE [{_config.PartitionKeyColumnName}] = '{partitionKey}'";
+         if (rowKey != null) sql += $" AND [{_config.RowKeyColumnName}] = '{rowKey}'";
+         return await _exec.ExecRowsAsync(sql);
       }
 
       public async Task InsertAsync(string tableName, IEnumerable<TableRow> rows)
@@ -111,46 +103,12 @@ namespace Storage.Net.Mssql
 
       private async Task Exec(string tableName, IEnumerable<TableRow> rows)
       {
-         var b = new CommandBuilder(_connection);
-         List<Tuple<SqlCommand, TableRow>> commands = rows.Select(r => Tuple.Create(b.BuidInsertRowCommand(tableName, r), r)).ToList();
+         List<Tuple<SqlCommand, TableRow>> commands = rows.Select(r => Tuple.Create(_cb.BuidInsertRowCommand(tableName, r), r)).ToList();
 
          foreach(Tuple<SqlCommand, TableRow> cmd in commands)
          {
-            await Exec(tableName, cmd.Item1, cmd.Item2);
+            await _exec.ExecRowsAsync(tableName, cmd.Item1, cmd.Item2);
          }
-      }
-
-      private async Task Exec(string tableName, SqlCommand cmd, TableRow row)
-      {
-         try
-         {
-            await Exec(cmd);
-         }
-         catch (SqlException ex) when (ex.Number == 208)
-         {
-            await CreateTable(tableName, row);
-
-            await Exec(cmd);
-         }
-         catch(SqlException ex) when (ex.Number == 2627)
-         {
-            throw new StorageException(ErrorCode.DuplicateKey, ex);
-         }
-
-      }
-
-      private async Task CreateTable(string tableName, TableRow row)
-      {
-         var b = new CommandBuilder(_connection);
-         SqlCommand cmd = b.BuildCreateSchemaCommand(tableName, row);
-         await Exec(cmd);
-      }
-
-      private async Task Exec(string sql)
-      {
-         SqlCommand cmd = _connection.CreateCommand();
-         cmd.CommandText = sql;
-         await Exec(cmd);
       }
 
       private async Task<SqlDataReader> ExecReaderAsync(string sql)
@@ -160,13 +118,6 @@ namespace Storage.Net.Mssql
 
          if (_connection.State != ConnectionState.Open) await _connection.OpenAsync();
          return await cmd.ExecuteReaderAsync();
-      }
-
-      private async Task Exec(SqlCommand cmd)
-      {
-         if (_connection.State != ConnectionState.Open) await _connection.OpenAsync();
-
-         await cmd.ExecuteNonQueryAsync();
       }
    }
 }
