@@ -60,8 +60,7 @@ namespace Storage.Net.Tests.Integration
          else if(_name == "mssql")
          {
             _tables = StorageFactory.Tables.MssqlServer(
-               _settings.MssqlConnectionString,
-               _settings.MssqlTableName);
+               _settings.MssqlConnectionString);
          }
          /*else if(_name == "esent")
          {

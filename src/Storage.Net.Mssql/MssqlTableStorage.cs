@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 using Storage.Net.Table;
 
@@ -7,16 +10,24 @@ namespace Storage.Net.Mssql
 {
    public class MssqlTableStorage : ITableStorage
    {
-      public MssqlTableStorage(string connectionString, string tableName)
-      {
+      private readonly SqlConnection _connection;
 
+      public MssqlTableStorage(string connectionString)
+      {
+         _connection = new SqlConnection(connectionString);
       }
 
-      public bool HasOptimisticConcurrency => throw new NotImplementedException();
+      public bool HasOptimisticConcurrency => false;
 
-      public Task DeleteAsync(string tableName)
+      public async Task DeleteAsync(string tableName)
       {
-         throw new NotImplementedException();
+         try
+         {
+            await Exec($"DROP TABLE [{tableName}]");
+         }
+         catch(SqlException ex) when (ex.Number == 3701)
+         {
+         }
       }
 
       public Task DeleteAsync(string tableName, IEnumerable<TableRowId> rowIds)
@@ -26,7 +37,7 @@ namespace Storage.Net.Mssql
 
       public void Dispose()
       {
-         throw new NotImplementedException();
+         _connection.Dispose();
       }
 
       public Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey)
@@ -39,9 +50,9 @@ namespace Storage.Net.Mssql
          throw new NotImplementedException();
       }
 
-      public Task InsertAsync(string tableName, IEnumerable<TableRow> rows)
+      public async Task InsertAsync(string tableName, IEnumerable<TableRow> rows)
       {
-         throw new NotImplementedException();
+         await Exec(tableName, rows);
       }
 
       public Task InsertOrReplaceAsync(string tableName, IEnumerable<TableRow> rows)
@@ -49,9 +60,21 @@ namespace Storage.Net.Mssql
          throw new NotImplementedException();
       }
 
-      public Task<IEnumerable<string>> ListTableNamesAsync()
+      public async Task<IEnumerable<string>> ListTableNamesAsync()
       {
-         throw new NotImplementedException();
+         string sql = $"SELECT TABLE_NAME FROM {_connection.Database}.INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
+         var names = new List<string>();
+
+         using (SqlDataReader reader = await ExecReader(sql))
+         {
+            while(await reader.ReadAsync())
+            {
+               string name = reader[0] as string;
+               names.Add(name);
+            }
+         }
+
+         return names;
       }
 
       public Task MergeAsync(string tableName, IEnumerable<TableRow> rows)
@@ -62,6 +85,62 @@ namespace Storage.Net.Mssql
       public Task UpdateAsync(string tableName, IEnumerable<TableRow> rows)
       {
          throw new NotImplementedException();
+      }
+
+      private async Task Exec(string tableName, IEnumerable<TableRow> rows)
+      {
+         var b = new CommandBuilder(_connection);
+         List<Tuple<SqlCommand, TableRow>> commands = rows.Select(r => Tuple.Create(b.BuidInsertRowCommand(tableName, r), r)).ToList();
+
+         foreach(Tuple<SqlCommand, TableRow> cmd in commands)
+         {
+            await Exec(tableName, cmd.Item1, cmd.Item2);
+         }
+      }
+
+      private async Task Exec(string tableName, SqlCommand cmd, TableRow row)
+      {
+         try
+         {
+            await Exec(cmd);
+         }
+         catch (SqlException ex) when (ex.Number == 208)
+         {
+            await CreateTable(tableName, row);
+
+            await Exec(cmd);
+         }
+
+      }
+
+      private async Task CreateTable(string tableName, TableRow row)
+      {
+         var b = new CommandBuilder(_connection);
+         SqlCommand cmd = b.BuildCreateSchemaCommand(tableName, row);
+         await Exec(cmd);
+      }
+
+      private async Task Exec(string sql)
+      {
+         SqlCommand cmd = _connection.CreateCommand();
+         cmd.CommandText = sql;
+         await Exec(cmd);
+      }
+
+      private async Task<SqlDataReader> ExecReader(string sql)
+      {
+         SqlCommand cmd = _connection.CreateCommand();
+         cmd.CommandText = sql;
+
+         if (_connection.State != ConnectionState.Open) await _connection.OpenAsync();
+         return await cmd.ExecuteReaderAsync();
+      }
+
+      private async Task Exec(SqlCommand cmd)
+      {
+         if (_connection.State != ConnectionState.Open) await _connection.OpenAsync();
+
+         await cmd.ExecuteNonQueryAsync();
       }
    }
 }
