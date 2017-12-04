@@ -18,7 +18,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
    /// <summary>
    /// Microsoft Azure Table storage
    /// </summary>
-   public class AzureTableStorage : AsyncTableStorage
+   public class AzureTableStorage : ITableStorage
    {
       private const int MaxInsertLimit = 100;
       private const string PartitionKeyName = "PartitionKey";
@@ -51,7 +51,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// <summary>
       /// Returns true as Azure supports optimistic concurrency
       /// </summary>
-      public override bool HasOptimisticConcurrency
+      public bool HasOptimisticConcurrency
       {
          get { return true; }
       }
@@ -60,7 +60,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// Returns the list of table names in this storage
       /// </summary>
       /// <returns></returns>
-      public override async Task<IEnumerable<string>> ListTableNamesAsync()
+      public async Task<IEnumerable<string>> ListTableNamesAsync()
       {
          var result = new List<string>();
 
@@ -86,7 +86,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// Deletes table completely
       /// </summary>
       /// <param name="tableName"></param>
-      public override async Task DeleteAsync(string tableName)
+      public async Task DeleteAsync(string tableName)
       {
          CloudTable table = await GetTableAsync(tableName, false);
          if (table != null)
@@ -99,7 +99,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// <summary>
       /// Gets the list of rows in a specified partition
       /// </summary>
-      public override async Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey)
+      public async Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
@@ -110,7 +110,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// <summary>
       /// Gets the list of rows in a table by partition and row key
       /// </summary>
-      public override async Task<TableRow> GetAsync(string tableName, string partitionKey, string rowKey)
+      public async Task<TableRow> GetAsync(string tableName, string partitionKey, string rowKey)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
@@ -118,18 +118,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
 
          return (await InternalGetAsync(tableName, partitionKey, rowKey, -1))?.FirstOrDefault();
       }
-
-      /// <summary>
-      /// As per interface
-      /// </summary>
-      /*public IEnumerable<TableRow> Get(string tableName, string partitionKey, string rowKey, int maxRecords)
-      {
-         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
-         if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
-         if (rowKey == null) throw new ArgumentNullException(nameof(rowKey));
-
-         return InternalGet(tableName, partitionKey, rowKey, maxRecords);
-      }*/
 
       private async Task<IEnumerable<TableRow>> InternalGetAsync(string tableName, string partitionKey, string rowKey, int maxRecords)
       {
@@ -180,7 +168,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// <summary>
       /// As per interface
       /// </summary>
-      public override async Task InsertAsync(string tableName, IEnumerable<TableRow> rows)
+      public async Task InsertAsync(string tableName, IEnumerable<TableRow> rows)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
@@ -200,7 +188,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// <summary>
       /// See interface
       /// </summary>
-      public override async Task InsertOrReplaceAsync(string tableName, IEnumerable<TableRow> rows)
+      public async Task InsertOrReplaceAsync(string tableName, IEnumerable<TableRow> rows)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
@@ -220,7 +208,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// <summary>
       /// As per interface
       /// </summary>
-      public override async Task UpdateAsync(string tableName, IEnumerable<TableRow> rows)
+      public async Task UpdateAsync(string tableName, IEnumerable<TableRow> rows)
       {
          await BatchedOperationAsync(tableName, false,
             (b, te) => b.Replace(te),
@@ -230,7 +218,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// <summary>
       /// As per interface
       /// </summary>
-      public override async Task MergeAsync(string tableName, IEnumerable<TableRow> rows)
+      public async Task MergeAsync(string tableName, IEnumerable<TableRow> rows)
       {
          await BatchedOperationAsync(tableName, true,
             (b, te) => b.InsertOrMerge(te),
@@ -240,7 +228,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// <summary>
       /// As per interface
       /// </summary>
-      public override async Task DeleteAsync(string tableName, IEnumerable<TableRowId> rowIds)
+      public async Task DeleteAsync(string tableName, IEnumerable<TableRowId> rowIds)
       {
          if (rowIds == null) return;
 
@@ -259,7 +247,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
          CloudTable table = await GetTableAsync(tableName, createTable);
          if (table == null) return;
 
-         foreach (var group in rows.GroupBy(e => e.PartitionKey))
+         foreach (IGrouping<string, TableRow> group in rows.GroupBy(e => e.PartitionKey))
          {
             foreach (IEnumerable<TableRow> chunk in group.Chunk(MaxInsertLimit))
             {
@@ -294,7 +282,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
          CloudTable table = await GetTableAsync(tableName, createTable);
          if (table == null) return;
 
-         foreach (var group in rowIds.GroupBy(e => e.PartitionKey))
+         foreach (IGrouping<string, TableRowId> group in rowIds.GroupBy(e => e.PartitionKey))
          {
             foreach (IEnumerable<TableRowId> chunk in group.Chunk(MaxInsertLimit))
             {
@@ -519,6 +507,13 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
          if (id.UrlEncode() != id) return false;
 
          return true;
+      }
+
+      /// <summary>
+      /// Nothing to dispose here
+      /// </summary>
+      public void Dispose()
+      {
       }
    }
 }

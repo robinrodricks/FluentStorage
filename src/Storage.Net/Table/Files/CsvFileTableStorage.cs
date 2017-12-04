@@ -14,7 +14,7 @@ namespace Storage.Net.Table.Files
    /// Works relative to the root directory specified in the constructor.
    /// Each table will be a separate subfolder, where files are partitions.
    /// </summary>
-   public class CsvFileTableStorage : AsyncTableStorage
+   public class CsvFileTableStorage : ITableStorage
    {
       private const string TablePartitionFormat = "{0}.partition.csv";
       private const string TablePartitionSearchFilter = "*.partition.csv";
@@ -40,57 +40,59 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public override bool HasOptimisticConcurrency => false;
+      public bool HasOptimisticConcurrency => false;
 
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public override IEnumerable<string> ListTableNames()
+      public Task<IEnumerable<string>> ListTableNamesAsync()
       {
-         return _rootDir
+         return Task.FromResult(_rootDir
             .GetDirectories(TableNamesSearchPattern, SearchOption.TopDirectoryOnly)
-            .Select(d => d.Name.Substring(0, d.Name.Length - TableNamesSuffix.Length));
+            .Select(d => d.Name.Substring(0, d.Name.Length - TableNamesSuffix.Length)));
       }
 
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public override void Delete(string tableName)
+      public Task DeleteAsync(string tableName)
       {
          if(tableName == null) throw new ArgumentNullException(nameof(tableName));
 
          DirectoryInfo table = OpenTable(tableName, false);
          table?.Delete(true);
+
+         return Task.FromResult(true);
       }
 
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public override IEnumerable<TableRow> Get(string tableName, string partitionKey)
+      public Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
 
-         return InternalGet(tableName, partitionKey, null);
+         return Task.FromResult(InternalGet(tableName, partitionKey, null));
       }
 
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public override TableRow Get(string tableName, string partitionKey, string rowKey)
+      public Task<TableRow> GetAsync(string tableName, string partitionKey, string rowKey)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
          if (rowKey == null) throw new ArgumentNullException(nameof(rowKey));
 
-         return InternalGet(tableName, partitionKey, rowKey)?.FirstOrDefault();
+         return Task.FromResult(InternalGet(tableName, partitionKey, rowKey)?.FirstOrDefault());
       }
 
       private IEnumerable<TableRow> InternalGet(string tableName, string partitionKey, string rowKey)
       {
          if(tableName == null) throw new ArgumentNullException(nameof(tableName));
 
-         var partitions = partitionKey == null
+         IEnumerable<string> partitions = partitionKey == null
             ? GetAllPartitionNames(tableName)
             : new List<string> { partitionKey };
 
@@ -121,29 +123,32 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public override void Insert(string tableName, IEnumerable<TableRow> rows)
+      public Task InsertAsync(string tableName, IEnumerable<TableRow> rows)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
 
          OperateRows(tableName, rows, (p, g) => Insert(p, g, true, true));
+
+         return Task.FromResult(true);
       }
 
       /// <summary>
       /// See interface
       /// </summary>
-      public override void InsertOrReplace(string tableName, IEnumerable<TableRow> rows)
+      public Task InsertOrReplaceAsync(string tableName, IEnumerable<TableRow> rows)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
 
          OperateRows(tableName, rows, (p, g) => Insert(p, g, true, false));
+         return Task.FromResult(true);
       }
 
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public override void Update(string tableName, IEnumerable<TableRow> rows)
+      public Task UpdateAsync(string tableName, IEnumerable<TableRow> rows)
       {
          throw new NotImplementedException();
       }
@@ -151,12 +156,12 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public override void Merge(string tableName, IEnumerable<TableRow> rows)
+      public Task MergeAsync(string tableName, IEnumerable<TableRow> rows)
       {
          if(tableName == null) throw new ArgumentNullException(nameof(tableName));
-         if(rows == null) return;
+         if(rows == null) return Task.FromResult(true);
 
-         foreach(var group in rows.GroupBy(r => r.PartitionKey))
+         foreach(IGrouping<string, TableRow> group in rows.GroupBy(r => r.PartitionKey))
          {
             string partitionKey = group.Key;
 
@@ -165,17 +170,19 @@ namespace Storage.Net.Table.Files
             Merge(partition, group);
             WritePartition(tableName, partitionKey, partition.Values);
          }
+
+         return Task.FromResult(true);
       }
 
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public override void Delete(string tableName, IEnumerable<TableRowId> rowIds)
+      public Task DeleteAsync(string tableName, IEnumerable<TableRowId> rowIds)
       {
          if(tableName == null) throw new ArgumentNullException(nameof(tableName));
-         if(rowIds == null) return;
+         if(rowIds == null) return Task.FromResult(true);
 
-         foreach(var group in rowIds.GroupBy(r => r.PartitionKey))
+         foreach(IGrouping<string, TableRowId> group in rowIds.GroupBy(r => r.PartitionKey))
          {
             string partitionKey = group.Key;
 
@@ -184,6 +191,8 @@ namespace Storage.Net.Table.Files
             Delete(partition, group);
             WritePartition(tableName, partitionKey, partition.Values);
          }
+
+         return Task.FromResult(true);
       }
 
       /// <summary>
@@ -199,7 +208,7 @@ namespace Storage.Net.Table.Files
       private void OperateRows(string tableName, IEnumerable<TableRow> rows,
          Action<Dictionary<string, TableRow>, IEnumerable<TableRow>> partitionAction)
       {
-         foreach (var group in rows.GroupBy(r => r.PartitionKey))
+         foreach (IGrouping<string, TableRow> group in rows.GroupBy(r => r.PartitionKey))
          {
             string partitionKey = group.Key;
 
@@ -418,7 +427,14 @@ namespace Storage.Net.Table.Files
          return row;
       }
 
+
       #endregion
 
+      /// <summary>
+      /// Does nothing as no handles are kept open
+      /// </summary>
+      public void Dispose()
+      {
+      }
    }
 }

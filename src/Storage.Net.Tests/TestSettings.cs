@@ -64,5 +64,15 @@ namespace Storage.Net.Tests
       string AwsTestBucketName { get; }
 
       #endregion
+
+      #region [ MSSQL ]
+
+      [Option(Alias = "Mssql.ConnectionString")]
+      string MssqlConnectionString { get; }
+
+      [Option(Alias = "Mssql.TableName")]
+      string MssqlTableName { get; }
+
+      #endregion
    }
 }

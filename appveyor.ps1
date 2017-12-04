@@ -22,6 +22,7 @@ $vt = @{
    "Storage.Net.Microsoft.Azure.KeyVault.csproj" = "5.4.0";
    "Storage.Net.Microsoft.Azure.ServiceBus.csproj" = "5.4.0";
    "Storage.Net.Microsoft.Azure.Storage.csproj" = "5.4.0";
+   "Storage.Net.Mssql.csproj" = "1.0.0"
 }
 
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"

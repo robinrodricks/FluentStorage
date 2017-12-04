@@ -6,6 +6,7 @@ using Storage.Net.Table;
 using System.IO;
 using NetBox;
 using Config.Net;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Tests.Integration
 {
@@ -17,6 +18,11 @@ namespace Storage.Net.Tests.Integration
    public class AzureTableStorageTest : TableStorageTest
    {
       public AzureTableStorageTest() : base("azure") { }
+   }
+
+   public class MssqlTableStorageTest : TableStorageTest
+   {
+      public MssqlTableStorageTest() : base("mssql") { }
    }
 
    //bored of maintaining ESENT tests when I don't really use ESENT anymore for a long time
@@ -51,11 +57,17 @@ namespace Storage.Net.Tests.Integration
                _settings.AzureStorageName,
                _settings.AzureStorageKey);
          }
-         else if(_name == "esent")
+         else if(_name == "mssql")
+         {
+            _tables = StorageFactory.Tables.MssqlServer(
+               _settings.MssqlConnectionString,
+               _settings.MssqlTableName);
+         }
+         /*else if(_name == "esent")
          {
             _tables = StorageFactory.Tables.Esent(
                Path.Combine(TestDir.FullName, "test.edb"));
-         }
+         }*/
 
          _tableName = "TableStorageTest" + Guid.NewGuid().ToString().Replace("-", "");
          //_tableName = "TableStorageTest";
@@ -63,7 +75,7 @@ namespace Storage.Net.Tests.Integration
 
       public override void Dispose()
       {
-         _tables.Delete(_tableName);
+         _tables.DeleteAsync(_tableName).Wait();
 
          _tables.Dispose();
 
@@ -73,55 +85,55 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void DeleteTable_NonExisting_DoesntCrash()
+      public async Task DeleteTable_NonExisting_DoesntCrash()
       {
-         _tables.Delete(_tableName + "del");
+         await _tables.DeleteAsync(_tableName + "del");
       }
 
       [Fact]
-      public void DeleteTable_CreateAndDelete_BackToPreviousState()
+      public async Task DeleteTable_CreateAndDelete_BackToPreviousState()
       {
-         int tableNo1 = _tables.ListTableNames().Count();
+         int tableNo1 = (await _tables.ListTableNamesAsync()).Count();
 
-         _tables.Insert(_tableName, new TableRow("pk", "rk"));
+         await _tables.InsertAsync(_tableName, new[] { new TableRow("pk", "rk") });
 
-         int tableNo2 = _tables.ListTableNames().Count();
+         int tableNo2 = (await _tables.ListTableNamesAsync()).Count();
          Assert.Equal(tableNo1 + 1, tableNo2);
 
-         _tables.Delete(_tableName);
+         await _tables.DeleteAsync(_tableName);
 
-         int tableNo3 = _tables.ListTableNames().Count();
+         int tableNo3 = (await _tables.ListTableNamesAsync()).Count();
          Assert.Equal(tableNo3, tableNo1);
       }
 
       [Fact]
-      public void DeleteTable_NullInput_ArgumentNullException()
+      public async Task DeleteTable_NullInput_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() =>
          {
-            _tables.Delete(null);
+            _tables.DeleteAsync(null).Wait();
          });
       }
 
       [Fact]
-      public void ListTables_NoTablesWriteARow_OneTable()
+      public async Task ListTables_NoTablesWriteARow_OneTable()
       {
-         int count = _tables.ListTableNames().Count();
+         int count = (await _tables.ListTableNamesAsync()).Count();
 
          var row1 = new TableRow("part1", "k1")
          {
             ["col1"] = "value1"
          };
-         _tables.Insert(_tableName, new[] {row1});
+         await _tables.InsertAsync(_tableName, new[] {row1});
 
-         var names = _tables.ListTableNames().ToList();
+         var names = (await _tables.ListTableNamesAsync()).ToList();
          Assert.Equal(count + 1, names.Count);
          Assert.Contains(_tableName, names);
-         _tables.Delete(_tableName);
+         await _tables.DeleteAsync(_tableName);
       }
 
       [Fact]
-      public void DeleteRows_AddTwoRows_DeletedDisappears()
+      public async Task DeleteRows_AddTwoRows_DeletedDisappears()
       {
          var row1 = new TableRow("part1", "1")
          {
@@ -131,33 +143,33 @@ namespace Storage.Net.Tests.Integration
          {
             ["col1"] = "value2"
          };
-         _tables.Insert(_tableName, new[] {row1, row2});
-         _tables.Delete(_tableName, new[] {new TableRowId("part1", "2")});
-         IEnumerable<TableRow> rows = _tables.Get(_tableName, "part1");
+         await _tables.InsertAsync(_tableName, new[] {row1, row2});
+         await _tables.DeleteAsync(_tableName, new[] {new TableRowId("part1", "2")});
+         IEnumerable<TableRow> rows = await _tables.GetAsync(_tableName, "part1");
 
-         Assert.Equal(1, rows.Count());
+         Assert.Single(rows);
       }
 
       [Fact]
-      public void DeleteRows_NullArrayInput_DoesntCrash()
+      public async Task DeleteRows_NullArrayInput_DoesntCrash()
       {
-         _tables.Delete(_tableName, (TableRowId[])null);
+         await _tables.DeleteAsync(_tableName, (TableRowId[])null);
       }
 
       [Fact]
-      public void DeleteRows_NullInput_DoesntCrash()
+      public async Task DeleteRows_NullInput_DoesntCrash()
       {
-         _tables.Delete(_tableName, (TableRowId)null);
+         await _tables.DeleteAsync(_tableName, (TableRowId[])null);
       }
 
       [Fact]
-      public void DeleteRows_TableDoesNotExist_DoesntCrash()
+      public async Task DeleteRows_TableDoesNotExist_DoesntCrash()
       {
-         _tables.Delete(_tableName + "d", (TableRowId)null);
+         await _tables.DeleteAsync(_tableName + "d", (TableRowId[])null);
       }
 
       [Fact]
-      public void Concurrency_DeleteWithWrongEtag_Fails()
+      public async Task Concurrency_DeleteWithWrongEtag_Fails()
       {
          if (!_tables.HasOptimisticConcurrency) return;
 
@@ -166,19 +178,19 @@ namespace Storage.Net.Tests.Integration
          {
             ["c"] = "1"
          };
-         _tables.Insert(_tableName, row);
+         await _tables.InsertAsync(_tableName, new TableRow[] { row });
          Assert.NotNull(row.Id.ConcurrencyKey);
 
          //change it's ETag and try to delete which must fail!
          row.Id.ConcurrencyKey = Guid.NewGuid().ToString();
          Assert.Throws<StorageException>(() =>
          {
-            _tables.Delete(_tableName, row.Id);
+            _tables.DeleteAsync(_tableName, new TableRowId[] { row.Id }).Wait();
          });
       }
 
       [Fact]
-      public void Concurrency_RowOldCopy_MustNotUpdate()
+      public async Task Concurrency_RowOldCopy_MustNotUpdate()
       {
          if (!_tables.HasOptimisticConcurrency) return;
 
@@ -187,7 +199,7 @@ namespace Storage.Net.Tests.Integration
          {
             ["c"] = "1"
          };
-         _tables.Insert(_tableName, row);
+         await _tables.InsertAsync(_tableName, new TableRow[] { row });
          Assert.NotNull(row.Id.ConcurrencyKey);
 
          //update with a new value
@@ -195,52 +207,52 @@ namespace Storage.Net.Tests.Integration
          {
             ["c"] = "2"
          };
-         _tables.Merge(_tableName, row1);
+         _tables.MergeAsync(_tableName, new TableRow[] { row1 });
          Assert.NotNull(row1.Id.ConcurrencyKey);
          Assert.NotEqual(row.Id.ConcurrencyKey, row1.Id.ConcurrencyKey);
 
          //now use the first row (old ETag) to set the new value
          row["c"] = "2";
-         Assert.Throws<StorageException>(() => _tables.Update(_tableName, row));
+         Assert.Throws<StorageException>(() => _tables.UpdateAsync(_tableName, new TableRow[] { row }).Wait());
 
-         Assert.Throws<StorageException>(() => _tables.Delete(_tableName, row.Id));
+         Assert.Throws<StorageException>(() => _tables.DeleteAsync(_tableName, new TableRowId[] { row.Id }).Wait());
       }
 
       [Fact]
-      public void Insert_OneRowNullTable_ArgumentNullException()
+      public async Task Insert_OneRowNullTable_ArgumentNullException()
       {
-         Assert.Throws<ArgumentNullException>(() => _tables.Insert(null, new TableRow("pk", "rk")));
+         Assert.Throws<ArgumentNullException>(() => _tables.InsertAsync(null, new[] { new TableRow("pk", "rk") }).Wait());
       }
 
       [Fact]
-      public void Insert_MultipleRowsNullTable_ArgumentNullException()
+      public async Task Insert_MultipleRowsNullTable_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() =>
          {
-            _tables.Insert(null, new[] { new TableRow("pk", "rk1"), new TableRow("pk", "rk2") });
+            _tables.InsertAsync(null, new[] { new TableRow("pk", "rk1"), new TableRow("pk", "rk2") }).Wait();
          });
       }
 
       [Fact]
-      public void Insert_ValidTableNullRow_ArgumentNullException()
+      public async Task Insert_ValidTableNullRow_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() =>
          {
-            _tables.Insert(_tableName, (TableRow)null);
+            _tables.InsertAsync(_tableName, new TableRow[] { }).Wait();
          });
       }
 
       [Fact]
-      public void Insert_ValidTableNullRows_ArgumentNullException()
+      public async Task Insert_ValidTableNullRows_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() =>
          {
-            _tables.Insert(_tableName, (TableRow[])null);
+            _tables.InsertAsync(_tableName, (TableRow[])null).Wait();
          });
       }
 
       [Fact]
-      public void Insert_VariableRows_StillReads()
+      public async Task Insert_VariableRows_StillReads()
       {
          var row1 = new TableRow("pk", "rk1")
          {
@@ -252,10 +264,10 @@ namespace Storage.Net.Tests.Integration
             ["col2"] = "val2",
             ["col3"] = "val3"
          };
-         _tables.Insert(_tableName, new[] {row1, row2});
+         await _tables.InsertAsync(_tableName, new[] {row1, row2});
 
-         TableRow row11 = _tables.Get(_tableName, "pk", "rk1");
-         TableRow row12 = _tables.Get(_tableName, "pk", "rk2");
+         TableRow row11 = await _tables.GetAsync(_tableName, "pk", "rk1");
+         TableRow row12 = await _tables.GetAsync(_tableName, "pk", "rk2");
 
 
          Assert.Equal("val1", (string)row11["col1"]);
@@ -267,7 +279,7 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void Insert_DifferentTypes_ReadsBack()
+      public async Task Insert_DifferentTypes_ReadsBack()
       {
          var row = new TableRow("pk", "rk")
          {
@@ -276,28 +288,11 @@ namespace Storage.Net.Tests.Integration
             ["bytes"] = new byte[] { 0x1, 0x2 },
             ["date"] = DateTime.UtcNow
          };
-         _tables.Insert(_tableName, row);
+         await _tables.InsertAsync(_tableName, new TableRow[] { row });
       }
 
       [Fact]
-      public void Insert_Entities_ReadsBack()
-      {
-         var e = new TestEntity
-         {
-            PartitionKey = "pk",
-            RowKey = "rke",
-
-            M1 = "a string",
-            Date = DateTime.UtcNow
-         };
-
-         _tables.Insert(_tableName, new[] { e });
-
-         TestEntity fetched = _tables.Get<TestEntity>(_tableName, "pk", "rke");
-      }
-
-      [Fact]
-      public void Dates_are_travelled_in_correct_timezone()
+      public async Task Dates_are_travelled_in_correct_timezone()
       {
          DateTime date = DateTime.UtcNow.RoundToSecond();
 
@@ -306,9 +301,9 @@ namespace Storage.Net.Tests.Integration
             ["date"] = date
          };
 
-         _tables.Insert(_tableName, i);
+         await _tables.InsertAsync(_tableName, new TableRow[] { i });
 
-         TableRow o = _tables.Get(_tableName, "pk", "rk");
+         TableRow o = await _tables.GetAsync(_tableName, "pk", "rk");
          DateTime date2 = o["date"];
 
          Assert.Equal(date, date2);
@@ -326,7 +321,7 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void Insert_TwoRows_DoesntFail()
+      public async Task Insert_TwoRows_DoesntFail()
       {
          var row1 = new TableRow("part1", "k1")
          {
@@ -336,33 +331,33 @@ namespace Storage.Net.Tests.Integration
          {
             ["col1"] = "value2"
          };
-         _tables.Insert(_tableName, new[] { row1, row2 });
+         await _tables.InsertAsync(_tableName, new[] { row1, row2 });
       }
 
       [Fact]
-      public void Insert_EmailRowKey_CanFetchBack()
+      public async Task Insert_EmailRowKey_CanFetchBack()
       {
          //this only tests encoding problem
 
          var row = new TableRow("partition", "ivan@si.com");
-         _tables.Insert(_tableName, row);
+         await _tables.InsertAsync(_tableName, new TableRow[] { row });
 
-         TableRow foundRow = _tables.Get(_tableName, "partition", "ivan@si.com");
+         TableRow foundRow = await _tables.GetAsync(_tableName, "partition", "ivan@si.com");
          Assert.NotNull(foundRow);
       }
 
       [Fact]
-      public void Insert_DuplicateRow_StorageExceptionWithDuplicateKeyCode()
+      public async Task Insert_DuplicateRow_StorageExceptionWithDuplicateKeyCode()
       {
          var row = new TableRow("pk", "rk");
-         _tables.Insert(_tableName, row);
+         await _tables.InsertAsync(_tableName, new TableRow[] { row });
 
-         StorageException ex = Assert.Throws<StorageException>(() => _tables.Insert(_tableName, row));
+         StorageException ex = Assert.Throws<StorageException>(() => _tables.InsertAsync(_tableName, new TableRow[] { row }).Wait());
          Assert.Equal(ErrorCode.DuplicateKey, ex.ErrorCode);
       }
 
       [Fact]
-      public void Insert_CleanTableDuplicateRows_FailsWithDuplicateKeyCode()
+      public async Task Insert_CleanTableDuplicateRows_FailsWithDuplicateKeyCode()
       {
          TableRow[] rows = new[]
          {
@@ -371,30 +366,30 @@ namespace Storage.Net.Tests.Integration
             new TableRow("pk", "rk1")
          };
 
-         StorageException ex = Assert.Throws<StorageException>(() => _tables.Insert(_tableName, rows));
+         StorageException ex = Assert.Throws<StorageException>(() => _tables.InsertAsync(_tableName, rows).Wait());
          Assert.Equal(ErrorCode.DuplicateKey, ex.ErrorCode);
 
-         IEnumerable<TableRow> rows2 = _tables.Get(_tableName, "pk");
+         IEnumerable<TableRow> rows2 = await _tables.GetAsync(_tableName, "pk");
          Assert.Equal(0, rows2.Count());
       }
 
       [Fact]
-      public void Insert_RowsExistInsertDuplicateRows_FailsWithDuplicateKeyCode()
+      public async Task Insert_RowsExistInsertDuplicateRows_FailsWithDuplicateKeyCode()
       {
          var dupeRow = new TableRow("pk", "rk1");
          TableRow[] insertRows = new[] { new TableRow("pk", "rk2"), dupeRow };
 
-         _tables.Insert(_tableName, dupeRow);
+         await _tables.InsertAsync(_tableName, new TableRow[] { dupeRow });
 
-         StorageException ex = Assert.Throws<StorageException>(() => _tables.Insert(_tableName, insertRows));
+         StorageException ex = Assert.Throws<StorageException>(() => _tables.InsertAsync(_tableName, insertRows).Wait());
          Assert.Equal(ErrorCode.DuplicateKey, ex.ErrorCode);
 
-         IEnumerable<TableRow> rows2 = _tables.Get(_tableName, "pk");
+         IEnumerable<TableRow> rows2 = await _tables.GetAsync(_tableName, "pk");
          Assert.Equal(1, rows2.Count());
       }
 
       [Fact]
-      public void InsertOrReplace_CleanTableDuplicateRowsInRequest_ContinuesAnyway()
+      public async Task InsertOrReplace_CleanTableDuplicateRowsInRequest_ContinuesAnyway()
       {
          TableRow[] rows = new[]
          {
@@ -404,72 +399,72 @@ namespace Storage.Net.Tests.Integration
          };
 
 
-         StorageException ex = Assert.Throws<StorageException>(() => _tables.InsertOrReplace(_tableName, rows));
+         StorageException ex = Assert.Throws<StorageException>(() => _tables.InsertOrReplaceAsync(_tableName, rows).Wait());
          Assert.Equal(ErrorCode.DuplicateKey, ex.ErrorCode);
 
-         IEnumerable<TableRow> rows2 = _tables.Get(_tableName, "pk");
+         IEnumerable<TableRow> rows2 = await _tables.GetAsync(_tableName, "pk");
          Assert.Equal(0, rows2.Count());
       }
 
       [Fact]
-      public void Get_NullTablePartition_ArgumentNullException()
+      public async Task Get_NullTablePartition_ArgumentNullException()
       {
          Assert.Throws<ArgumentNullException>(() =>
          {
-            _tables.Get(null, "p");
+            _tables.GetAsync(null, "p").Wait();
          });
       }
 
       [Fact]
-      public void Get_TableButNullPartition_ArgumentNullException()
+      public async Task Get_TableButNullPartition_ArgumentNullException()
       {
-         Assert.Throws<ArgumentNullException>(() => _tables.Get(_tableName, null));
+         Assert.Throws<ArgumentNullException>(() => _tables.GetAsync(_tableName, null).Wait());
       }
 
       [Fact]
-      public void Get_TableNullPartitionRowKey_ArgumentNullException()
+      public async Task Get_TableNullPartitionRowKey_ArgumentNullException()
       {
-         Assert.Throws<ArgumentNullException>(() => _tables.Get(_tableName, null, "rk"));
+         Assert.Throws<ArgumentNullException>(() => _tables.GetAsync(_tableName, null, "rk").Wait());
       }
 
       [Fact]
-      public void Get_NullTablePartitionRowKey_ArgumentNullException()
+      public async Task Get_NullTablePartitionRowKey_ArgumentNullException()
       {
-         Assert.Throws<ArgumentNullException>(() => _tables.Get(null, "pk", "rk"));
+         Assert.Throws<ArgumentNullException>(() => _tables.GetAsync(null, "pk", "rk").Wait());
       }
 
       [Fact]
-      public void Get_TablePartitionNullRowKey_ArgumentNullException()
+      public async Task Get_TablePartitionNullRowKey_ArgumentNullException()
       {
-         Assert.Throws<ArgumentNullException>(() => _tables.Get(_tableName, "pk", null));
+         Assert.Throws<ArgumentNullException>(() => _tables.GetAsync(_tableName, "pk", null).Wait());
       }
 
       [Fact]
-      public void Get_NonExistingTable_EmptyNotNull()
+      public async Task Get_NonExistingTable_EmptyNotNull()
       {
-         IEnumerable<TableRow> rows = _tables.Get(_tableName, "pk");
+         IEnumerable<TableRow> rows = await _tables.GetAsync(_tableName, "pk");
 
          Assert.NotNull(rows);
          Assert.True(!rows.Any());
       }
 
       [Fact]
-      public void Get_WriteToTwoPartitions_GetsAll()
+      public async Task Get_WriteToTwoPartitions_GetsAll()
       {
          var row1 = new TableRow("pk1", "rk1");
          var row2 = new TableRow("pk2", "rk2");
 
-         _tables.Insert(_tableName, new[] { row1, row2 });
+         await _tables.InsertAsync(_tableName, new[] { row1, row2 });
 
-         List<TableRow> rows1 = _tables.Get(_tableName, "pk1").ToList();
-         List<TableRow> rows2 = _tables.Get(_tableName, "pk2").ToList();
+         List<TableRow> rows1 = (await _tables.GetAsync(_tableName, "pk1")).ToList();
+         List<TableRow> rows2 = (await _tables.GetAsync(_tableName, "pk2")).ToList();
 
          Assert.True(rows1.Count >= 1);
          Assert.True(rows2.Count >= 1);
       }
 
       [Fact]
-      public void Get_AddTwoRows_ReturnsTheOne()
+      public async Task Get_AddTwoRows_ReturnsTheOne()
       {
          var row1 = new TableRow("part1", "1")
          {
@@ -479,23 +474,23 @@ namespace Storage.Net.Tests.Integration
          {
             ["col1"] = "value2"
          };
-         _tables.Insert(_tableName, new[] { row1, row2 });
+         await _tables.InsertAsync(_tableName, new[] { row1, row2 });
 
-         TableRow theOne = _tables.Get(_tableName, "part1", "2");
+         TableRow theOne = await _tables.GetAsync(_tableName, "part1", "2");
          Assert.Equal("part1", theOne.PartitionKey);
          Assert.Equal("2", theOne.RowKey);
       }
 
       [Fact]
-      public void Get_TwoPartitions_ReadSeparately()
+      public async Task Get_TwoPartitions_ReadSeparately()
       {
          var row1 = new TableRow("pk1", "rk1");
          var row2 = new TableRow("pk2", "rk1");
 
-         _tables.Insert(_tableName, new[] { row1, row2 });
+         await _tables.InsertAsync(_tableName, new[] { row1, row2 });
 
-         TableRow row11 = _tables.Get(_tableName, "pk1", "rk1");
-         TableRow row22 = _tables.Get(_tableName, "pk2", "rk1");
+         TableRow row11 = await _tables.GetAsync(_tableName, "pk1", "rk1");
+         TableRow row22 = await _tables.GetAsync(_tableName, "pk2", "rk1");
 
          Assert.NotNull(row11);
          Assert.NotNull(row22);
@@ -506,31 +501,31 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
-      public void Get_PartitionDoesntExist_EmptyCollection()
+      public async Task Get_PartitionDoesntExist_EmptyCollection()
       {
-         IEnumerable<TableRow> rows = _tables.Get(_tableName, Guid.NewGuid().ToString());
+         IEnumerable<TableRow> rows = await _tables.GetAsync(_tableName, Guid.NewGuid().ToString());
 
          Assert.NotNull(rows);
          Assert.Equal(0, rows.Count());
       }
 
       [Fact]
-      public void Get_RowDoesntExist_Null()
+      public async Task Get_RowDoesntExist_Null()
       {
-         _tables.Insert(_tableName, new TableRow("pk", "rk1"));
+         await _tables.InsertAsync(_tableName, new[] { new TableRow("pk", "rk1") });
 
-         TableRow row = _tables.Get(_tableName, "pk", Guid.NewGuid().ToString());
+         TableRow row = await _tables.GetAsync(_tableName, "pk", Guid.NewGuid().ToString());
 
          Assert.Null(row);
       }
 
       [Fact]
-      public void Get_RowsDontExist_EmptyCollection()
+      public async Task Get_RowsDontExist_EmptyCollection()
       {
-         _tables.Insert(_tableName, new TableRow("pk", "rk1"));
-         _tables.Delete(_tableName, new TableRowId("pk", "rk1"));
+         await _tables.InsertAsync(_tableName, new[] { new TableRow("pk", "rk1") });
+         await _tables.DeleteAsync(_tableName, new[] { new TableRowId("pk", "rk1")});
 
-         IEnumerable<TableRow> rows = _tables.Get(_tableName, "pk");
+         IEnumerable<TableRow> rows = await _tables.GetAsync(_tableName, "pk");
          Assert.NotNull(rows);
          Assert.Equal(0, rows.Count());
       }

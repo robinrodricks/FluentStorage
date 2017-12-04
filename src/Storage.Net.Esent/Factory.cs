@@ -1,4 +1,4 @@
-﻿using Storage.Net.Net45.Esent;
+﻿/*using Storage.Net.Net45.Esent;
 using Storage.Net.Table;
 
 namespace Storage.Net
@@ -20,4 +20,4 @@ namespace Storage.Net
          return new EsentTableStorage(databasePath);
       }
    }
-}
+}*/
