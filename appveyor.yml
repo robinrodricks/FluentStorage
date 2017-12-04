@@ -1,4 +1,5 @@
-version: {build}
+version: 5.{build}
+# was - 5.3.{build}
 image: Visual Studio 2017
 configuration: Release
 platform: Any CPU
