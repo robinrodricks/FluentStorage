@@ -335,6 +335,22 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public async Task Insert_row_fetches_back_exactly()
+      {
+         var row = new TableRow("pk", "rk");
+         row["1"] = 1;
+         row["2"] = "string";
+
+         await _tables.InsertAsync(_tableName, new TableRow[] { row });
+
+         TableRow row1 = await _tables.GetAsync(_tableName, "pk", "rk");
+         Assert.Equal("pk", row1.PartitionKey);
+         Assert.Equal("rk", row1.RowKey);
+         Assert.Equal(1, row1["1"].GetValue<int>());
+         Assert.Equal("string", row1["2"].GetValue<string>());
+      }
+
+      [Fact]
       public async Task Insert_CleanTableDuplicateRows_FailsWithDuplicateKeyCode()
       {
          TableRow[] rows = new[]

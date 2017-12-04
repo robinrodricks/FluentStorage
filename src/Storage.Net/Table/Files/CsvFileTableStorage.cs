@@ -397,6 +397,7 @@ namespace Storage.Net.Table.Files
             var reader = new CsvReader(s, Encoding.UTF8);
             string[] allColumns = reader.ReadNextRow()?.ToArray();
             if(allColumns == null) return null;
+            allColumns = allColumns.Select(c => c.Trim('\r')).ToArray();
 
             TableRow row;
             while((row = ReadNextRow(reader, partitionName, allColumns)) != null)
