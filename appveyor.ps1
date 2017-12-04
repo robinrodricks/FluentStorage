@@ -12,7 +12,6 @@ if($bn -eq $null)
 
 $vt = @{
    "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204.$bn";
-   "Storage.Net.WebHDFS" = "1.0.alpha-$bn"
 }
 
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
