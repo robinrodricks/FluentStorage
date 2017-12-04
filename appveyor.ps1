@@ -11,7 +11,17 @@ if($bn -eq $null)
 }
 
 $vt = @{
-   "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204.$bn";
+   "Storage.Net" = "5.4.1";
+
+   "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204.80";
+
+   "Storage.Net.Amazon.Aws" = "5.4.1";
+   "Storage.Net.ZipFile" = "5.4.1";
+   "Storage.Net.Microsoft.Azure.DataLake.Store" = "5.4.1";
+   "Storage.Net.Microsoft.Azure.EventHub" = "5.4.1";
+   "Storage.Net.Microsoft.Azure.KeyVault" = "5.4.1";
+   "Storage.Net.Microsoft.Azure.ServiceBus" = "5.4.1";
+   "Storage.Net.Microsoft.Azure.Storage" = "5.4.1";
 }
 
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"

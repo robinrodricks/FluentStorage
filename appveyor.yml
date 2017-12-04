@@ -1,5 +1,4 @@
-version: 5.4.1-preview-{build}
-# was - 5.3.{build}
+version: {build}
 image: Visual Studio 2017
 configuration: Release
 platform: Any CPU
