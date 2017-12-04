@@ -45,9 +45,31 @@ namespace Storage.Net.Mssql
          throw new NotImplementedException();
       }
 
-      public Task<TableRow> GetAsync(string tableName, string partitionKey, string rowKey)
+      public async Task<TableRow> GetAsync(string tableName, string partitionKey, string rowKey)
       {
-         throw new NotImplementedException();
+         return (await InternalGetAsync(tableName, partitionKey, rowKey)).FirstOrDefault();
+      }
+
+      private async Task<List<TableRow>> InternalGetAsync(string tableName, string partitionKey, string rowKey)
+      {
+         string sql = $"SELECT * FROM [{tableName}] WHERE [{CommandBuilder.PartitionKey}] = '{partitionKey}'";
+         if (rowKey != null) sql += $" AND [{CommandBuilder.RowKey}] = '{rowKey}'";
+         var result = new List<TableRow>();
+
+         using (SqlDataReader reader = await ExecReaderAsync(sql))
+         {
+            while(await reader.ReadAsync())
+            {
+               string pk = reader[CommandBuilder.PartitionKey] as string;
+               string rk = reader[CommandBuilder.RowKey] as string;
+
+               var row = new TableRow(pk, rk);
+
+               result.Add(row);
+            }
+         }
+
+         return result;
       }
 
       public async Task InsertAsync(string tableName, IEnumerable<TableRow> rows)
@@ -65,7 +87,7 @@ namespace Storage.Net.Mssql
          string sql = $"SELECT TABLE_NAME FROM {_connection.Database}.INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
          var names = new List<string>();
 
-         using (SqlDataReader reader = await ExecReader(sql))
+         using (SqlDataReader reader = await ExecReaderAsync(sql))
          {
             while(await reader.ReadAsync())
             {
@@ -131,7 +153,7 @@ namespace Storage.Net.Mssql
          await Exec(cmd);
       }
 
-      private async Task<SqlDataReader> ExecReader(string sql)
+      private async Task<SqlDataReader> ExecReaderAsync(string sql)
       {
          SqlCommand cmd = _connection.CreateCommand();
          cmd.CommandText = sql;

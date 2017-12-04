@@ -9,8 +9,8 @@ namespace Storage.Net.Mssql
 {
    class CommandBuilder
    {
-      private const string PartitionKey = "PK";
-      private const string RowKey = "RK";
+      public const string PartitionKey = "PK";
+      public const string RowKey = "RK";
       private readonly SqlConnection _sqlConnection;
 
       private static readonly Dictionary<Type, string> TypeToSqlTypeName = new Dictionary<Type, string>
