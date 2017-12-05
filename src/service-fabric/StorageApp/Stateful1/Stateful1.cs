@@ -28,7 +28,7 @@ namespace Stateful1
       {
          _blobs = new BlobStorage(StorageFactory.Blobs.AzureServiceFabricReliableStorage(this.StateManager, "c1"));
          _publisher = StorageFactory.Messages.AzureServiceFabricReliableQueuePublisher(this.StateManager);
-         _receiver = StorageFactory.Messages.AzureServiceFabricReliableQueueReceiver(this.StateManager);
+         _receiver = StorageFactory.Messages.AzureServiceFabricReliableQueueReceiver(this.StateManager, TimeSpan.FromSeconds(1));
       }
 
       /// <summary>
@@ -52,6 +52,8 @@ namespace Stateful1
       {
          try
          {
+            await _receiver.StartMessagePumpAsync(OnNewMessages, 1, cancellationToken);
+
             //IEnumerable<QueueMessage> qm = await _receiver.ReceiveMessagesAsync(100);
 
             await _publisher.PutMessagesAsync(new[] { QueueMessage.FromText("content at " + DateTime.UtcNow) });
@@ -103,6 +105,11 @@ namespace Stateful1
 
             await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
          }
+      }
+
+      private async Task OnNewMessages(IEnumerable<QueueMessage> messages)
+      {
+         ServiceEventSource.Current.ServiceMessage(this.Context, "received message(s)");
       }
    }
 }

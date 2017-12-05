@@ -3,6 +3,8 @@ using Microsoft.ServiceFabric.Data.Collections;
 using Storage.Net.Messaging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Storage.Net.Microsoft.ServiceFabric.Messaging
@@ -11,60 +13,83 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
    {
       private IReliableStateManager _stateManager;
       private readonly string _queueName;
+      private readonly TimeSpan _scanInterval;
+      private bool _disposed;
 
-      public ServiceFabricReliableQueueReceiver(IReliableStateManager stateManager, string queueName)
+      public ServiceFabricReliableQueueReceiver(IReliableStateManager stateManager, string queueName, TimeSpan scanInterval)
       {
          _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
          _queueName = queueName ?? throw new ArgumentNullException(nameof(queueName));
+
+         if (scanInterval < TimeSpan.FromSeconds(1)) throw new ArgumentException("scan interval must be at least 1 second", nameof(scanInterval));
+
+         _scanInterval = scanInterval;
       }
 
-      public async Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize)
+      public async Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
       {
-         IReliableQueue<byte[]> collection = await GetCollectionAsync();
-
-         throw new NotImplementedException();
+         Task.Run(() => ReceiveMessagesAsync(onMessage, maxBatchSize, cancellationToken));
       }
 
-      public Task ConfirmMessageAsync(QueueMessage message)
+      public Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken)
       {
-         throw new NotSupportedException();
+         return Task.FromResult(true);
       }
 
-      public Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
+      public Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken)
       {
-         throw new NotSupportedException();
+         return Task.FromResult(true);
       }
 
-      private async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
+      private async Task ReceiveMessagesAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
       {
-         IReliableQueue<byte[]> collection = await _stateManager.GetOrAddAsync<IReliableQueue<byte[]>>(_queueName);
-         var result = new List<QueueMessage>();
+         var messages = new List<QueueMessage>();
 
-         using (var tx = new ServiceFabricTransaction(_stateManager, null))
+         while (!cancellationToken.IsCancellationRequested && !_disposed)
          {
-            while (result.Count < count)
+            try
             {
-               ConditionalValue<byte[]> message = await collection.TryDequeueAsync(tx.Tx);
-               if (message.HasValue)
+               using (var tx = new ServiceFabricTransaction(_stateManager, null))
                {
-                  QueueMessage qm = QueueMessage.FromByteArray(message.Value);
+                  IReliableQueue<byte[]> collection = await GetCollectionAsync();
 
-                  result.Add(qm);
-               }
-               else
-               {
-                  break;
+                  while (messages.Count < maxBatchSize)
+                  {
+                     ConditionalValue<byte[]> message = await collection.TryDequeueAsync(tx.Tx, TimeSpan.FromSeconds(4), cancellationToken);
+                     if (message.HasValue)
+                     {
+                        QueueMessage qm = QueueMessage.FromByteArray(message.Value);
+
+                        messages.Add(qm);
+                     }
+                     else
+                     {
+                        break;
+                     }
+                  }
+
+                  //make the call before committing the transaction
+                  if (messages.Count > 0)
+                  {
+                     await onMessage(messages);
+                     messages.Clear();
+                  }
+
+                  await tx.CommitAsync();
                }
             }
+            catch(Exception ex)
+            {
+               Trace.Fail($"failed to listen to messages on queue '{_queueName}'", ex.ToString());
+            }
 
-            await tx.CommitAsync();
+            await Task.Delay(_scanInterval);
          }
-
-         return result.Count == 0 ? null : result;
       }
 
       public void Dispose()
       {
+         _disposed = true;
       }
 
       public async Task<ITransaction> OpenTransactionAsync()

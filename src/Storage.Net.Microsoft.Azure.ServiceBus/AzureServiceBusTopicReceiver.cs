@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Storage.Net.Microsoft.Azure.ServiceBus
 {
@@ -35,7 +36,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// <summary>
       /// Calls .DeadLetter explicitly
       /// </summary>
-      public async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
+      public async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken)
       {
          if (!_peekLock) return;
 
@@ -55,7 +56,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// Call at the end when done with the message.
       /// </summary>
       /// <param name="message"></param>
-      public async Task ConfirmMessageAsync(QueueMessage message)
+      public async Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken)
       {
          if(!_peekLock) return;
 
@@ -69,7 +70,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// Starts message pump with AutoComplete = false, 1 minute session renewal and 1 concurrent call.
       /// </summary>
       /// <param name="onMessage"></param>
-      public Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize)
+      public Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
 

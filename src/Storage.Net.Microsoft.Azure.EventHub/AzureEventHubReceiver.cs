@@ -95,7 +95,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <summary>
       /// See interface
       /// </summary>
-      public Task ConfirmMessageAsync(QueueMessage message)
+      public Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken)
       {
          //nothing to confirm
          return Task.FromResult(true);
@@ -104,7 +104,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <summary>
       /// See interface
       /// </summary>
-      public Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
+      public Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken)
       {
          //no dead letter queue in EH
          return Task.FromResult(true);
@@ -113,17 +113,17 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <summary>
       /// See interface
       /// </summary>
-      public async Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessageAsync, int maxBatchSize)
+      public async Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessageAsync, int maxBatchSize, CancellationToken cancellationToken)
       {
          await CheckReady();
 
          foreach(PartitionReceiver receiver in _partitonReceivers)
          {
-            Task pump = ReceiverPump(receiver, onMessageAsync, maxBatchSize);
+            Task pump = ReceiverPump(receiver, onMessageAsync, maxBatchSize, cancellationToken);
          }
       }
 
-      private async Task ReceiverPump(PartitionReceiver receiver, Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize)
+      private async Task ReceiverPump(PartitionReceiver receiver, Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
       {
          while (true)
          {

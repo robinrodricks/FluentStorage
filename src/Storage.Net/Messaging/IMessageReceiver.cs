@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Storage.Net.Messaging
@@ -15,18 +16,19 @@ namespace Storage.Net.Messaging
       /// however this depends on implementation details when and how.
       /// </summary>
       /// <param name="message"></param>
-      Task ConfirmMessageAsync(QueueMessage message);
+      /// <param name="cancellationToken"></param>
+      Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Moves the message to a dead letter queue
       /// </summary>
-      Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription);
+      Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Starts automatic message pumping trying to use native features as much as possible. Message pump stops when you dispose the instance.
       /// Disposing the instance will also stop message pump for you.
       /// </summary>
-      Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessageAsync, int maxBatchSize = 1);
+      Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessageAsync, int maxBatchSize = 1, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Starts a new transaction

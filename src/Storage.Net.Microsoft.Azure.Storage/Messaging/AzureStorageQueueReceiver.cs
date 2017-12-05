@@ -85,7 +85,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// Deletes the message from the queue
       /// </summary>
       /// <param name="message"></param>
-      public async Task ConfirmMessageAsync(QueueMessage message)
+      public async Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken)
       {
          Converter.SplitId(message.Id, out string id, out string popReceipt);
          if (popReceipt == null) throw new ArgumentException("cannot delete message by short id", id);
@@ -96,7 +96,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// Moves message to a dead letter queue which has the same name as original queue prefixed with "-deadletter". This is done because 
       /// Azure Storage queues do not support deadlettering directly.
       /// </summary>
-      public async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription)
+      public async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken)
       {
          var dead = (QueueMessage)message.Clone();
          dead.Properties["deadLetterReason"] = reason;
@@ -106,13 +106,13 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
 
          await deadLetterQueue.AddMessageAsync(Converter.ToCloudQueueMessage(message));
 
-         await ConfirmMessageAsync(message);
+         await ConfirmMessageAsync(message, cancellationToken);
       }
 
       /// <summary>
       /// Due to the fact storage queues don't support notifications this method starts an internal thread to poll for messages.
       /// </summary>
-      public Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize)
+      public Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
          if (_pollingTask != null) throw new ArgumentException("polling already started", nameof(onMessage));
