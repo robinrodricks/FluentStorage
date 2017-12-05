@@ -94,7 +94,7 @@ function Exec($Command, [switch]$ContinueOnError)
 }
 
 # Update versioning information
-Get-ChildItem *.csproj -Recurse | Where-Object {-not(($_.Name -like "*test*") -or ($_.Name -like "*Stateful*") -or ($_.Name -like "*Esent*")) } | % {
+Get-ChildItem *.csproj -Recurse | Where-Object {-not(($_.Name -like "*test*") -or ($_.Name -like "*Stateful*") -or ($_.Name -like "*Esent*") -or ($_.Name -like "*Monitor*")) } | % {
    Update-ProjectVersion $_
 }
 
