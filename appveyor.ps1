@@ -11,18 +11,18 @@ if($bn -eq $null)
 }
 
 $vt = @{
-   "Storage.Net.csproj" = "5.5.1";
+   "Storage.Net.csproj" = "5.5.2";
 
-   "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204.80";
+   "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204.81";
 
-   "Storage.Net.Amazon.Aws.csproj" = "5.5.1";
-   "Storage.Net.ZipFile.csproj" = "5.5.1";
-   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "5.5.1";
-   "Storage.Net.Microsoft.Azure.EventHub.csproj" = "5.5.1";
-   "Storage.Net.Microsoft.Azure.KeyVault.csproj" = "5.5.1";
-   "Storage.Net.Microsoft.Azure.ServiceBus.csproj" = "5.5.1";
-   "Storage.Net.Microsoft.Azure.Storage.csproj" = "5.5.1";
-   "Storage.Net.Mssql.csproj" = "1.0.0"
+   "Storage.Net.Amazon.Aws.csproj" = "5.5.2";
+   "Storage.Net.ZipFile.csproj" = "5.5.2";
+   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "5.5.2";
+   "Storage.Net.Microsoft.Azure.EventHub.csproj" = "5.5.2";
+   "Storage.Net.Microsoft.Azure.KeyVault.csproj" = "5.5.2";
+   "Storage.Net.Microsoft.Azure.ServiceBus.csproj" = "5.5.2";
+   "Storage.Net.Microsoft.Azure.Storage.csproj" = "5.5.2";
+   "Storage.Net.Mssql.csproj" = "1.0.1"
 }
 
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
