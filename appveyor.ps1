@@ -1,28 +1,9 @@
-$gv = $env:APPVEYOR_BUILD_VERSION
-if($gv -eq $null)
-{
-   $gv = "5.0.0"
-}
-
 $bn = $env:APPVEYOR_BUILD_NUMBER
-if($bn -eq $null)
-{
-   $bn = "0"
-}
+$gv = "5.6.$bn"
 
 $vt = @{
-   "Storage.Net.csproj" = "5.5.2";
-
-   "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204.81";
-
-   "Storage.Net.Amazon.Aws.csproj" = "5.5.2";
-   "Storage.Net.ZipFile.csproj" = "5.5.2";
-   "Storage.Net.Microsoft.Azure.DataLake.Store.csproj" = "5.5.2";
-   "Storage.Net.Microsoft.Azure.EventHub.csproj" = "5.5.2";
-   "Storage.Net.Microsoft.Azure.KeyVault.csproj" = "5.5.2";
-   "Storage.Net.Microsoft.Azure.ServiceBus.csproj" = "5.5.2";
-   "Storage.Net.Microsoft.Azure.Storage.csproj" = "5.5.2";
-   "Storage.Net.Mssql.csproj" = "1.0.1"
+   "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204.$bn";
+   "Storage.Net.Mssql.csproj" = "1.0.$bn"
 }
 
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
