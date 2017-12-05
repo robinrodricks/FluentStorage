@@ -28,6 +28,11 @@ namespace Storage.Net.Mssql
 
       public async Task DeleteAsync(string tableName)
       {
+         if (tableName == null)
+         {
+            throw new ArgumentNullException(nameof(tableName));
+         }
+
          try
          {
             await _exec.ExecAsync($"DROP TABLE [{tableName}]");
@@ -37,9 +42,17 @@ namespace Storage.Net.Mssql
          }
       }
 
-      public Task DeleteAsync(string tableName, IEnumerable<TableRowId> rowIds)
+      public async Task DeleteAsync(string tableName, IEnumerable<TableRowId> rowIds)
       {
-         throw new NotImplementedException();
+         if (rowIds == null) return;
+
+         foreach(TableRowId id in rowIds)
+         {
+            await _exec.ExecAsync("DELETE FROM [{0}] where [{1}] = '{2}' AND [{3}] = '{4}'",
+               tableName,
+               _config.PartitionKeyColumnName, id.PartitionKey,
+               _config.RowKeyColumnName, id.RowKey);
+         }
       }
 
       public void Dispose()
@@ -47,13 +60,20 @@ namespace Storage.Net.Mssql
          _connection.Dispose();
       }
 
-      public Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey)
+      public async Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey)
       {
-         throw new NotImplementedException();
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
+
+         return await InternalGetAsync(tableName, partitionKey, null);
       }
 
       public async Task<TableRow> GetAsync(string tableName, string partitionKey, string rowKey)
       {
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+         if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
+         if (rowKey == null) throw new ArgumentNullException(nameof(rowKey));
+
          return (await InternalGetAsync(tableName, partitionKey, rowKey)).FirstOrDefault();
       }
 
@@ -66,58 +86,46 @@ namespace Storage.Net.Mssql
 
       public async Task InsertAsync(string tableName, IEnumerable<TableRow> rows)
       {
-         await Exec(tableName, rows);
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+
+         await Exec(tableName, rows, false);
       }
 
-      public Task InsertOrReplaceAsync(string tableName, IEnumerable<TableRow> rows)
+      public async Task InsertOrReplaceAsync(string tableName, IEnumerable<TableRow> rows)
       {
-         throw new NotImplementedException();
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+
+         await Exec(tableName, rows, true);
       }
 
       public async Task<IEnumerable<string>> ListTableNamesAsync()
       {
-         string sql = $"SELECT TABLE_NAME FROM {_connection.Database}.INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
-         var names = new List<string>();
+         string sql = "SELECT TABLE_NAME FROM {0}.INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
 
-         using (SqlDataReader reader = await ExecReaderAsync(sql))
-         {
-            while(await reader.ReadAsync())
-            {
-               string name = reader[0] as string;
-               names.Add(name);
-            }
-         }
+         ICollection<TableRow> rows = await _exec.ExecRowsAsync(sql, _connection.Database);
 
-         return names;
+         return rows.Select(r => (string)r[r.Keys.First()]);
       }
 
       public Task MergeAsync(string tableName, IEnumerable<TableRow> rows)
       {
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+
          throw new NotImplementedException();
       }
 
       public Task UpdateAsync(string tableName, IEnumerable<TableRow> rows)
       {
+         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+
          throw new NotImplementedException();
       }
 
-      private async Task Exec(string tableName, IEnumerable<TableRow> rows)
+      private async Task Exec(string tableName, IEnumerable<TableRow> rows, bool isUpsert)
       {
-         List<Tuple<SqlCommand, TableRow>> commands = rows.Select(r => Tuple.Create(_cb.BuidInsertRowCommand(tableName, r), r)).ToList();
+         List<Tuple<SqlCommand, TableRow>> commands = rows.Select(r => Tuple.Create(_cb.BuidInsertRowCommand(tableName, r, isUpsert), r)).ToList();
 
-         foreach(Tuple<SqlCommand, TableRow> cmd in commands)
-         {
-            await _exec.ExecRowsAsync(tableName, cmd.Item1, cmd.Item2);
-         }
-      }
-
-      private async Task<SqlDataReader> ExecReaderAsync(string sql)
-      {
-         SqlCommand cmd = _connection.CreateCommand();
-         cmd.CommandText = sql;
-
-         if (_connection.State != ConnectionState.Open) await _connection.OpenAsync();
-         return await cmd.ExecuteReaderAsync();
+         await _exec.ExecAsync(tableName, commands);
       }
    }
 }

@@ -233,7 +233,7 @@ namespace Storage.Net.Table
       {
          if (rows == null) return true;
 
-         var groups = rows.GroupBy(r => r.Id);
+         IEnumerable<IGrouping<TableRowId, TableRow>> groups = rows.GroupBy(r => r.Id);
          IEnumerable<int> counts = groups.Select(g => g.Count());
          return counts.OrderByDescending(c => c).First() == 1;
       }

@@ -4,6 +4,21 @@
     <TargetFrameworks>netstandard1.6;net452</TargetFrameworks>
     <AssemblyOriginatorKeyFile>../storage.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
+    <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
+    <AssemblyTitle>Storage.Net.ZipFile</AssemblyTitle>
+    <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
+    <PackageIconUrl>http://i.isolineltd.com/nuget/storage.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <Description>Extension to Storage.Net to integrate with Microsoft SQL Server as table storage.</Description>
   </PropertyGroup>
 
   <ItemGroup>

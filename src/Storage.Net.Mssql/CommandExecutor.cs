@@ -32,24 +32,42 @@ namespace Storage.Net.Mssql
          _config = config;
       }
 
-      private async Task ExecAsync(SqlCommand cmd)
+      private async Task ExecAsync(SqlCommand cmd, SqlTransaction transaction = null)
       {
          await CheckConnection();
 
+         cmd.Transaction = transaction;
          await cmd.ExecuteNonQueryAsync();
       }
 
-      private async Task ExecAsync(string tableName, SqlCommand cmd, TableRow row)
+      public async Task ExecAsync(string tableName, List<Tuple<SqlCommand, TableRow>> commands)
+      {
+         await CheckConnection();
+
+         var sample = commands.Select(c => c.Item2).ToList();
+
+         using (SqlTransaction tx = _sqlConnection.BeginTransaction())
+         {
+            foreach (Tuple<SqlCommand, TableRow> cmd in commands)
+            {
+               await ExecAsync(tableName, cmd.Item1, sample, tx);
+            }
+
+            tx.Commit();
+         }
+      }
+
+      public async Task ExecAsync(string tableName, SqlCommand cmd, IEnumerable<TableRow> rows, SqlTransaction transaction = null)
       {
          try
          {
-            await ExecAsync(cmd);
+            await ExecAsync(cmd, transaction);
          }
-         catch (SqlException ex) when (ex.Number == 208)
+         catch (SqlException ex) when (ex.Number == SqlCodes.InvalidObjectName)
          {
-            await CreateTable(tableName, row);
+            await CreateTable(tableName, rows, transaction);
 
-            await ExecAsync(cmd);
+            await ExecAsync(cmd, transaction);
          }
          catch (SqlException ex) when (ex.Number == 2627)
          {
@@ -58,16 +76,35 @@ namespace Storage.Net.Mssql
 
       }
 
-      private async Task CreateTable(string tableName, TableRow row)
+      private async Task CreateTable(string tableName, IEnumerable<TableRow> rows, SqlTransaction transaction = null)
       {
-         SqlCommand cmd = BuildCreateSchemaCommand(tableName, row);
-         await ExecAsync(cmd);
+         TableRow masterRow = null;
+         foreach(TableRow row in rows)
+         {
+            if(masterRow == null)
+            {
+               masterRow = row;
+            }
+            else
+            {
+               foreach(KeyValuePair<string, DynamicValue> cell in row)
+               {
+                  if(!masterRow.ContainsKey(cell.Key))
+                  {
+                     masterRow[cell.Key] = cell.Value;
+                  }
+               }
+            }
+         }
+
+         SqlCommand cmd = BuildCreateSchemaCommand(tableName, masterRow);
+         await ExecAsync(cmd, transaction);
       }
 
-      public async Task ExecAsync(string sql)
+      public async Task ExecAsync(string sql, params object[] parameters)
       {
          SqlCommand cmd = _sqlConnection.CreateCommand();
-         cmd.CommandText = sql;
+         cmd.CommandText = string.Format(sql, parameters);
          await ExecAsync(cmd);
       }
 
@@ -81,19 +118,25 @@ namespace Storage.Net.Mssql
 
             await CheckConnection();
 
-            using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+            try
             {
-               while(await reader.ReadAsync())
+               using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                {
-                  result.Add(CreateRow(reader));
+                  while (await reader.ReadAsync())
+                  {
+                     result.Add(CreateRow(reader));
+                  }
                }
+            }
+            catch(SqlException ex) when (ex.Number == SqlCodes.InvalidObjectName)
+            {
             }
          }
 
          return result;
       }
 
-      private async Task CheckConnection()
+      public async Task CheckConnection()
       {
          if(_sqlConnection.State != ConnectionState.Open)
          {
@@ -103,25 +146,31 @@ namespace Storage.Net.Mssql
 
       private TableRow CreateRow(SqlDataReader reader)
       {
-         var row = new TableRow(
-            reader[_config.PartitionKeyColumnName] as string,
-            reader[_config.RowKeyColumnName] as string);
+         TableRow row = CreateMinRow(reader, out int colsUsed);
 
-         string[] columnNames = Enumerable
-            .Range(0, reader.FieldCount)
-            .Select(i => reader.GetName(i))
-            .Where(n => n != _config.PartitionKeyColumnName)
-            .Where(n => n != _config.RowKeyColumnName)
-            .Where(n => n != null)
-            .ToArray();
-
-         foreach(string name in columnNames)
+         for(int i = colsUsed; i < reader.FieldCount; i++)
          {
-            object value = reader[name];
+            string name = reader.GetName(i);
+            object value = reader[i];
             row[name] = new DynamicValue(value);
          }
 
          return row;
+      }
+
+      private TableRow CreateMinRow(SqlDataReader reader, out int colsUsed)
+      {
+         string partitionKey = (reader.FieldCount > 0 && reader.GetName(0) == _config.PartitionKeyColumnName)
+            ? reader[_config.PartitionKeyColumnName] as string
+            : null;
+
+         string rowKey = (reader.FieldCount > 1 && reader.GetName(1) == _config.RowKeyColumnName)
+            ? reader[_config.RowKeyColumnName] as string
+            : null;
+
+         colsUsed = (partitionKey == null ? 0 : 1) + (rowKey == null ? 0 : 1);
+
+         return new TableRow(partitionKey ?? "none", rowKey ?? "none");
       }
 
       private SqlCommand BuildCreateSchemaCommand(string tableName, TableRow row)

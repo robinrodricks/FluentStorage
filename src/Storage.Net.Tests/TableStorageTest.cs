@@ -338,16 +338,16 @@ namespace Storage.Net.Tests.Integration
       public async Task Insert_row_fetches_back_exactly()
       {
          var row = new TableRow("pk", "rk");
-         row["1"] = 1;
-         row["2"] = "string";
+         row["C1"] = 1;
+         row["C2"] = "string";
 
          await _tables.InsertAsync(_tableName, new TableRow[] { row });
 
          TableRow row1 = await _tables.GetAsync(_tableName, "pk", "rk");
          Assert.Equal("pk", row1.PartitionKey);
          Assert.Equal("rk", row1.RowKey);
-         Assert.Equal(1, row1["1"].GetValue<int>());
-         Assert.Equal("string", row1["2"].GetValue<string>());
+         Assert.Equal(1, row1["C1"].GetValue<int>());
+         Assert.Equal("string", row1["C2"].GetValue<string>());
       }
 
       [Fact]
@@ -364,7 +364,7 @@ namespace Storage.Net.Tests.Integration
          Assert.Equal(ErrorCode.DuplicateKey, ex.ErrorCode);
 
          IEnumerable<TableRow> rows2 = await _tables.GetAsync(_tableName, "pk");
-         Assert.Equal(0, rows2.Count());
+         Assert.Empty(rows2);
       }
 
       [Fact]
@@ -398,6 +398,25 @@ namespace Storage.Net.Tests.Integration
 
          IEnumerable<TableRow> rows2 = await _tables.GetAsync(_tableName, "pk");
          Assert.Empty(rows2);
+      }
+
+      [Fact]
+      public async Task InsertOrReplace_UpdateValues_Updated()
+      {
+         var row = new TableRow("pk", "rk")
+         {
+            ["col1"] = "v1"
+         };
+
+         await _tables.InsertAsync(_tableName, new[] { row });
+
+         //update the row
+         row["col1"] = "v2";
+         await _tables.InsertOrReplaceAsync(_tableName, new[] { row });
+
+         //check it's updated
+         row = await _tables.GetAsync(_tableName, "pk", "rk");
+         Assert.Equal("v2", (string)row["col1"]);
       }
 
       [Fact]
