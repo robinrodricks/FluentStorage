@@ -21,6 +21,10 @@
     <Description>Extension to Storage.Net to integrate with Microsoft SQL Server as table storage.</Description>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Data.SqlClient" Version="4.4.0" />
   </ItemGroup>
