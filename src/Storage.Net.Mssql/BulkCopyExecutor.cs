@@ -31,7 +31,7 @@ namespace Storage.Net.Mssql
          using (var sbc = new SqlBulkCopy(_connection))
          {
             sbc.DestinationTableName = _tableName;
-            sbc.BulkCopyTimeout = _configuration.BulkCopyTimeout;
+            sbc.BulkCopyTimeout = (int)_configuration.BulkCopyTimeout.TotalSeconds;
 
             var dataTable = new DataTable(_tableName);
             AddColumns(dataTable, rowsList);
