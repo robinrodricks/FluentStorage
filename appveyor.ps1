@@ -1,5 +1,5 @@
 $bn = $env:APPVEYOR_BUILD_NUMBER
-$gv = "5.6.$bn"
+$gv = $env:APPVEYOR_BUILD_VERSION
 
 $vt = @{
    "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204.$bn";

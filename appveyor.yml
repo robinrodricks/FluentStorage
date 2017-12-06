@@ -1,10 +1,7 @@
-version: 5.{build}
-# was - 5.3.{build}
+version: 5.7.0-preview-{build}
 image: Visual Studio 2017
 configuration: Release
 platform: Any CPU
-environment:
-  NUGET_DEPLOY: 1
 before_build:
 - ps: .\appveyor.ps1
 build:
@@ -15,8 +12,4 @@ test: off
 #- ps: dotnet test .\src\Storage.Net.Tests\ -c debug
 artifacts:
 - path: src/**/*.nupkg
-deploy:
-- provider: Environment
-  name: aloneguid NuGet
-  on:
-    NUGET_DEPLOY: 1
+deploy: off
