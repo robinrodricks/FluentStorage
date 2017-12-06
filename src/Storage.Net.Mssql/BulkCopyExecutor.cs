@@ -52,10 +52,8 @@ namespace Storage.Net.Mssql
                dataTable.Rows.Add(dataRow);
             }
 
-            //todo: do I need to add column mapping still?
-
-            //execute bulk copy?
-            await _connection.OpenAsync();
+            //execute bulk copy
+            await CheckConnection();
 
             try
             {
@@ -66,9 +64,11 @@ namespace Storage.Net.Mssql
                //table doesn't exist, create it now
                var composer = new TableComposer(_connection, _configuration);
                SqlCommand cmd = composer.BuildCreateSchemaCommand(_tableName, TableRow.Merge(rowsList));
+               await CheckConnection();
                await cmd.ExecuteNonQueryAsync();
 
                //run it again
+               await CheckConnection();
                await sbc.WriteToServerAsync(dataTable);
             }
          }
@@ -87,6 +87,15 @@ namespace Storage.Net.Mssql
             dataTable.Columns.Add(name);
          }
       }
+
+      private async Task CheckConnection()
+      {
+         if (_connection.State != ConnectionState.Open)
+         {
+            await _connection.OpenAsync();
+         }
+      }
+
 
    }
 }
