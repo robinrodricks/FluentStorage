@@ -270,6 +270,14 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public async Task Insert_ManyRows_Succeeds()
+      {
+         await _tables.InsertAsync(_tableName, Enumerable.Range(0, 10000)
+            .Select(i => 
+            new TableRow("pk" + i, "rk" + i) { ["col"] = i }));
+      }
+
+      [Fact]
       public async Task Dates_are_travelled_in_correct_timezone()
       {
          DateTime date = DateTime.UtcNow.RoundToSecond();

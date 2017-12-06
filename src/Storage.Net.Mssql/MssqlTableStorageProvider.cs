@@ -88,7 +88,19 @@ namespace Storage.Net.Mssql
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
 
+#if NETFULL
+         if(rows.Count() > 10)
+         {
+            var sbc = new BulkCopyExecutor(_connection, _config, tableName);
+            await sbc.InsertAsync(rows);
+         }
+         else
+         {
+            await Exec(tableName, rows, false);
+         }
+#else
          await Exec(tableName, rows, false);
+#endif
       }
 
       public async Task InsertOrReplaceAsync(string tableName, IEnumerable<TableRow> rows)

@@ -12,17 +12,6 @@ namespace Storage.Net.Mssql
 {
    class CommandExecutor
    {
-      private static readonly Dictionary<Type, string> TypeToSqlTypeName = new Dictionary<Type, string>
-      {
-         [typeof(bool)] = "BIT",
-         [typeof(DateTime)] = "DATETIME",
-         [typeof(DateTimeOffset)] = "DATETIMEOFFSET",
-         [typeof(int)] = "INT",
-         [typeof(long)] = "BIGINT",
-         [typeof(double)] = "FLOAT",
-         [typeof(Guid)] = "UNIQUEIDENTIFIER",
-      };
-
       private readonly SqlConnection _sqlConnection;
       private readonly SqlConfiguration _config;
 
@@ -78,26 +67,10 @@ namespace Storage.Net.Mssql
 
       private async Task CreateTable(string tableName, IEnumerable<TableRow> rows, SqlTransaction transaction = null)
       {
-         TableRow masterRow = null;
-         foreach(TableRow row in rows)
-         {
-            if(masterRow == null)
-            {
-               masterRow = row;
-            }
-            else
-            {
-               foreach(KeyValuePair<string, DynamicValue> cell in row)
-               {
-                  if(!masterRow.ContainsKey(cell.Key))
-                  {
-                     masterRow[cell.Key] = cell.Value;
-                  }
-               }
-            }
-         }
+         TableRow masterRow = TableRow.Merge(rows);
 
-         SqlCommand cmd = BuildCreateSchemaCommand(tableName, masterRow);
+         var composer = new TableComposer(_sqlConnection, _config);
+         SqlCommand cmd = composer.BuildCreateSchemaCommand(tableName, masterRow);
          await ExecAsync(cmd, transaction);
       }
 
@@ -172,41 +145,5 @@ namespace Storage.Net.Mssql
 
          return new TableRow(partitionKey ?? "none", rowKey ?? "none");
       }
-
-      private SqlCommand BuildCreateSchemaCommand(string tableName, TableRow row)
-      {
-         var s = new StringBuilder();
-         s.Append("CREATE TABLE [");
-         s.Append(tableName);
-         s.Append("] ([");
-         s.Append(_config.PartitionKeyColumnName);
-         s.Append("] NVARCHAR(50) NOT NULL, [");
-         s.Append(_config.RowKeyColumnName);
-         s.Append("] NVARCHAR(50) NOT NULL, ");
-
-         foreach (KeyValuePair<string, DynamicValue> cell in row)
-         {
-            Type t = cell.Value.OriginalType;
-
-            if (!TypeToSqlTypeName.TryGetValue(t, out string typeName))
-            {
-               typeName = "NVARCHAR(MAX)";
-            }
-
-            s.Append("[");
-            s.Append(cell.Key);
-            s.Append("] ");
-            s.Append(typeName);
-            s.Append(" NULL, ");
-         }
-
-         s.Append($"PRIMARY KEY ([{_config.PartitionKeyColumnName}], [{_config.RowKeyColumnName}])");
-         s.Append(")");
-
-         SqlCommand cmd = _sqlConnection.CreateCommand();
-         cmd.CommandText = s.ToString();
-         return cmd;
-      }
-
    }
 }

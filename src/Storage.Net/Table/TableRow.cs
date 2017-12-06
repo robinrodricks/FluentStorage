@@ -237,5 +237,30 @@ namespace Storage.Net.Table
          IEnumerable<int> counts = groups.Select(g => g.Count());
          return counts.OrderByDescending(c => c).First() == 1;
       }
+
+      public static TableRow Merge(IEnumerable<TableRow> rows)
+      {
+         TableRow masterRow = null;
+
+         foreach (TableRow row in rows)
+         {
+            if (masterRow == null)
+            {
+               masterRow = row;
+            }
+            else
+            {
+               foreach (KeyValuePair<string, DynamicValue> cell in row)
+               {
+                  if (!masterRow.ContainsKey(cell.Key))
+                  {
+                     masterRow[cell.Key] = cell.Value;
+                  }
+               }
+            }
+         }
+
+         return masterRow;
+      }
    }
 }
