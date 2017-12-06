@@ -19,6 +19,7 @@
     <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>GitHub</RepositoryType>
     <Description>Extension to Storage.Net to integrate with Microsoft SQL Server as table storage.</Description>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">

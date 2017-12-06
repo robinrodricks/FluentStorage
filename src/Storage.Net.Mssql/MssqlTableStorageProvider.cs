@@ -18,7 +18,6 @@ namespace Storage.Net.Mssql
       public MssqlTableStorageProvider(string connectionString, SqlConfiguration config)
       {
          _config = config ?? new SqlConfiguration();
-
          _connection = new SqlConnection(connectionString);
          _cb = new CommandBuilder(_connection, _config);
          _exec = new CommandExecutor(_connection, _config);
