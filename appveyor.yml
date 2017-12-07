@@ -1,4 +1,4 @@
-version: 5.7.0-preview-{build}
+version: 5.7.1-preview-{build}
 image: Visual Studio 2017
 configuration: Release
 platform: Any CPU

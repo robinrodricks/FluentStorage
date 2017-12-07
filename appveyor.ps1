@@ -3,7 +3,7 @@ $gv = $env:APPVEYOR_BUILD_VERSION
 
 $vt = @{
    "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204.$bn";
-   "Storage.Net.Mssql.csproj" = "1.0.$bn"
+   "Storage.Net.Mssql.csproj" = "1.1.$bn"
 }
 
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
