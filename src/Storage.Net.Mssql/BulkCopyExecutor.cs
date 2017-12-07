@@ -62,16 +62,24 @@ namespace Storage.Net.Mssql
             catch(InvalidOperationException)
             {
                //table doesn't exist, create it now
-               var composer = new TableComposer(_connection, _configuration);
-               SqlCommand cmd = composer.BuildCreateSchemaCommand(_tableName, TableRow.Merge(rowsList));
-               await CheckConnection();
-               await cmd.ExecuteNonQueryAsync();
+               await CreateTableAsync(rowsList);
 
                //run it again
-               await CheckConnection();
                await sbc.WriteToServerAsync(dataTable);
             }
+            catch(SqlException ex)
+            {
+               throw new Exception("number: " + ex.Number, ex);
+            }
          }
+      }
+
+      private async Task CreateTableAsync(List<TableRow> rowsList)
+      {
+         var composer = new TableComposer(_connection, _configuration);
+         SqlCommand cmd = composer.BuildCreateSchemaCommand(_tableName, TableRow.Merge(rowsList));
+         await CheckConnection();
+         await cmd.ExecuteNonQueryAsync();
       }
 
       private void AddColumns(DataTable dataTable, IReadOnlyCollection<TableRow> rows)
