@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,8 +60,10 @@ namespace Storage.Net.Mssql
             {
                await sbc.WriteToServerAsync(dataTable);
             }
-            catch(InvalidOperationException)
+            catch(InvalidOperationException ex)
             {
+               Debug.Fail("failed to write on first attempt", ex.ToString());
+
                //table doesn't exist, create it now
                await CreateTableAsync(rowsList);
 
