@@ -15,7 +15,7 @@ namespace Storage.Net.Mssql
          [typeof(DateTime)] = "DATETIME",
          [typeof(DateTimeOffset)] = "DATETIMEOFFSET",
          [typeof(int)] = "INT",
-         [typeof(long)] = "BIGINT",
+         [typeof(long)] = "INT",
          [typeof(double)] = "FLOAT",
          [typeof(Guid)] = "UNIQUEIDENTIFIER",
       };
