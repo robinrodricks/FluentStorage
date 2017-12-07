@@ -62,7 +62,7 @@ namespace Storage.Net.Mssql
             }
             catch(InvalidOperationException ex)
             {
-               Debug.Fail("failed to write on first attempt", ex.ToString());
+               Trace.Fail("failed to write on first attempt", ex.ToString());
 
                //table doesn't exist, create it now
                await CreateTableAsync(rowsList);
