@@ -58,7 +58,7 @@ namespace Storage.Net.Mssql
 
             await ExecAsync(cmd, transaction);
          }
-         catch (SqlException ex) when (ex.Number == 2627)
+         catch (SqlException ex) when (ex.Number == SqlCodes.DuplicateKey)
          {
             throw new StorageException(ErrorCode.DuplicateKey, ex);
          }

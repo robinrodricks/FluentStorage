@@ -343,6 +343,20 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public async Task Insert_LoadsOfDuplicateRows_StorageExceptionWithDuplicateKeyCode()
+      {
+         var rows = Enumerable.Range(0, 100)
+            .Select(i => new TableRow("pk" + i, "rk" + i))
+            .ToList();
+
+         await _tables.InsertAsync(_tableName, rows);
+
+         StorageException ex = await Assert.ThrowsAsync<StorageException>(() => _tables.InsertAsync(_tableName, rows));
+         Assert.Equal(ErrorCode.DuplicateKey, ex.ErrorCode);
+      }
+
+
+      [Fact]
       public async Task Insert_row_fetches_back_exactly()
       {
          var row = new TableRow("pk", "rk");

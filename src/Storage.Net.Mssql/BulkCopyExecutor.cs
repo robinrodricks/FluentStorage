@@ -60,19 +60,28 @@ namespace Storage.Net.Mssql
             {
                await sbc.WriteToServerAsync(dataTable);
             }
-            catch(InvalidOperationException ex)
+            catch(InvalidOperationException ex) when (ExceptonTranslator.GetSqlException(ex) != null)
             {
-               Trace.Fail("failed to write on first attempt", ex.ToString());
+               SqlException sqlEx = ExceptonTranslator.GetSqlException(ex);
 
-               //table doesn't exist, create it now
-               await CreateTableAsync(rowsList);
+               if(sqlEx.Number == SqlCodes.InvalidObjectName)
+               {
+                  await CreateTableAsync(rowsList);
 
-               //run it again
-               await sbc.WriteToServerAsync(dataTable);
+                  //run it again
+                  try
+                  {
+                     await sbc.WriteToServerAsync(dataTable);
+                  }
+                  catch(Exception ex1)
+                  {
+                     throw;
+                  }
+               }
             }
-            catch(SqlException ex)
+            catch(SqlException ex) when (ex.Number == SqlCodes.DuplicateKey)
             {
-               throw new Exception("number: " + ex.Number, ex);
+               throw new StorageException(ErrorCode.DuplicateKey, ex);
             }
          }
       }
