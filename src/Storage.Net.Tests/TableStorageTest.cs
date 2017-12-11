@@ -355,6 +355,22 @@ namespace Storage.Net.Tests.Integration
          Assert.Equal(ErrorCode.DuplicateKey, ex.ErrorCode);
       }
 
+      [Theory]
+      [InlineData("test string", 1)]
+      [InlineData("test string", 100)]
+      [InlineData(true, 1)]
+      [InlineData(true, 100)]
+      //[InlineData(DateTime.UtcNow, 1)]
+      //[InlineData(DateTime.UtcNow, 100)]
+      public async Task Insert_AllSupportedTypes_Without_Crashing(object value, int repeats)
+      {
+         var rows = Enumerable.Range(0, repeats)
+            .Select(i => new TableRow("pk" + i, "rk" + i) { ["col"] = new DynamicValue(value) })
+            .ToList();
+
+         await _tables.InsertAsync(_tableName, rows);
+      }
+
 
       [Fact]
       public async Task Insert_row_fetches_back_exactly()

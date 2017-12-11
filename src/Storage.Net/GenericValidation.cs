@@ -9,7 +9,7 @@ namespace Storage.Net
    /// </summary>
    public static class GenericValidation
    {
-      private const int MaxBlobIdPartLength = 50;
+      //private const int MaxBlobIdPartLength = 50;
       private const int MaxBlobPrefixLength = 50;
 
       /// <summary>
@@ -39,14 +39,15 @@ namespace Storage.Net
       {
          if (id == null) throw new ArgumentNullException(nameof(id));
 
-         string[] parts = id.Split('/');
+         //this validation just doesn't make sense and is causing problems
+         /*string[] parts = id.Split('/');
 
          foreach (string part in parts)
          {
             if (part.Length > MaxBlobIdPartLength)
                throw new ArgumentException(string.Format(Exceptions.BlobId_TooLong, MaxBlobIdPartLength),
                   nameof(id));
-         }
+         }*/
       }
 
       public static void CheckBlobId(IEnumerable<string> ids)
