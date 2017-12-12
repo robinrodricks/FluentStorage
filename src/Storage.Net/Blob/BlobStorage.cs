@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using NetBox.Extensions;
 
 namespace Storage.Net.Blob
 {
@@ -281,43 +282,6 @@ namespace Storage.Net.Blob
          using (src)
          {
             await targetStorage.WriteAsync(newId ?? blobId, src, false, cancellationToken);
-         }
-      }
-
-      #endregion
-
-      #region [ Objects ]
-
-      /// <summary>
-      /// Downloads blob and tried to deserialize it to an object instance. If the blob doesn't exist or can't be
-      /// deserialized returns a default value
-      /// </summary>
-      /// <typeparam name="T">Object type</typeparam>
-      /// <param name="id">Blob ID.</param>
-      /// <param name="cancellationToken"></param>
-      /// <returns>Deserialized object or null</returns>
-      public async Task<T> ReadObjectFromJsonAsync<T>(string id, CancellationToken cancellationToken = default(CancellationToken)) where T : new()
-      {
-         string json = await ReadTextAsync(id, cancellationToken);
-         return json == null ? default(T) : json.AsJsonObject<T>();
-      }
-
-      /// <summary>
-      /// Uploads object instance as a blob by serializing it
-      /// </summary>
-      /// <typeparam name="T">Object type</typeparam>
-      /// <param name="id">Blob ID</param>
-      /// <param name="instance">Object instance. If this parameter is null the blob is deleted if it exists</param>
-      /// <param name="cancellationToken"></param>
-      public async Task WriteObjectToJsonAsync<T>(string id, T instance, CancellationToken cancellationToken = default(CancellationToken)) where T : new()
-      {
-         if (EqualityComparer<T>.Default.Equals(instance, default(T)))
-         {
-            await DeleteAsync(id, cancellationToken);
-         }
-         else
-         {
-            await WriteTextAsync(id, instance.ToJsonString(), cancellationToken);
          }
       }
 

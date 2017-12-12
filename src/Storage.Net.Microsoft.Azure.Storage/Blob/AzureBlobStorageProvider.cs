@@ -10,6 +10,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using System.Threading.Tasks;
 using System.Threading;
+using NetBox.Extensions;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blob
 {

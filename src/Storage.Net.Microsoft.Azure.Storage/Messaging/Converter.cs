@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAzure.Storage.Queue;
+using NetBox.Extensions;
 using Storage.Net.Messaging;
 using System;
 using System.IO;

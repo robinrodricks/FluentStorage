@@ -1,4 +1,6 @@
 ﻿using NetBox;
+using NetBox.Data;
+using NetBox.Extensions;
 using NetBox.FileFormats;
 using System;
 using System.Collections.Generic;

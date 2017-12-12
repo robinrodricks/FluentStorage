@@ -9,6 +9,8 @@ using Storage.Net.Messaging;
 using System.Threading;
 using System.Collections.Generic;
 using Config.Net;
+using NetBox.Generator;
+using NetBox.Extensions;
 
 namespace Storage.Net.Tests
 {
@@ -40,9 +42,9 @@ namespace Storage.Net.Tests
             _settings.AwsSecretAccessKey,
             _settings.AwsTestBucketName);
 
-         await storage.WriteAsync("folder1/file1", Generator.RandomString.ToMemoryStream(), false);
-         await storage.WriteAsync("folder1/file2", Generator.RandomString.ToMemoryStream(), false);
-         await storage.WriteAsync("folder2/file1", Generator.RandomString.ToMemoryStream(), false);
+         await storage.WriteAsync("folder1/file1", RandomGenerator.RandomString.ToMemoryStream(), false);
+         await storage.WriteAsync("folder1/file2", RandomGenerator.RandomString.ToMemoryStream(), false);
+         await storage.WriteAsync("folder2/file1", RandomGenerator.RandomString.ToMemoryStream(), false);
 
          BlobId[] folderBlobs = (await storage.ListAsync(new ListOptions { FolderPath = "folder1", Recurse = true })).ToArray();
       }

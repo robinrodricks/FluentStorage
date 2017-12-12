@@ -12,6 +12,8 @@ using MeSE = Storage.Net.StorageException;
 using Storage.Net.Table;
 using System.Threading.Tasks;
 using NetBox;
+using NetBox.Extensions;
+using NetBox.Data;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Table
 {

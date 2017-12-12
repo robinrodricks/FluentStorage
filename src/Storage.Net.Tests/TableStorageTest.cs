@@ -7,6 +7,8 @@ using System.IO;
 using NetBox;
 using Config.Net;
 using System.Threading.Tasks;
+using NetBox.Extensions;
+using NetBox.Data;
 
 namespace Storage.Net.Tests.Integration
 {

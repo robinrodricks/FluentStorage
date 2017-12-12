@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 using NetBox;
+using NetBox.Data;
 using Storage.Net.Table;
 
 namespace Storage.Net.Mssql

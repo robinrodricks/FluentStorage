@@ -12,6 +12,8 @@ using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Rest.Azure;
 using System.Threading;
 using System.Text.RegularExpressions;
+using NetBox.Extensions;
+using NetBox;
 
 namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 {

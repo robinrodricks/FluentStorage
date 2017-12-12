@@ -7,6 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Config.Net;
 using NetBox;
+using NetBox.Extensions;
+using NetBox.Generator;
 using Storage.Net.Aws.Blob;
 using Storage.Net.Blob;
 using Storage.Net.Blob.Files;
@@ -136,17 +138,17 @@ namespace Storage.Net.Tests.Blobs
       [Fact]
       public async Task List_ByFlatPrefix_Filtered()
       {
-         string prefix = Generator.RandomString;
+         string prefix = RandomGenerator.RandomString;
 
          int countBefore = (await _provider.ListAsync(new ListOptions { Prefix = prefix })).Count();
 
-         string id1 = prefix + Generator.RandomString;
-         string id2 = prefix + Generator.RandomString;
-         string id3 = Generator.RandomString;
+         string id1 = prefix + RandomGenerator.RandomString;
+         string id2 = prefix + RandomGenerator.RandomString;
+         string id3 = RandomGenerator.RandomString;
 
-         await _bs.WriteTextAsync(id1, Generator.RandomString);
-         await _bs.WriteTextAsync(id2, Generator.RandomString);
-         await _bs.WriteTextAsync(id3, Generator.RandomString);
+         await _bs.WriteTextAsync(id1, RandomGenerator.RandomString);
+         await _bs.WriteTextAsync(id2, RandomGenerator.RandomString);
+         await _bs.WriteTextAsync(id3, RandomGenerator.RandomString);
 
          List<BlobId> items = (await _provider.ListAsync(new ListOptions { Prefix = prefix })).ToList();
          Assert.Equal(2 + countBefore, items.Count); //2 files + containing folder
@@ -155,9 +157,9 @@ namespace Storage.Net.Tests.Blobs
       [Fact]
       public async Task List_FilesInFolder_NonRecursive()
       {
-         string id = Generator.RandomString;
+         string id = RandomGenerator.RandomString;
 
-         await _bs.WriteTextAsync(id, Generator.RandomString);
+         await _bs.WriteTextAsync(id, RandomGenerator.RandomString);
 
          List<BlobId> items = (await _provider.ListAsync(new ListOptions { Recurse = false })).ToList();
 
@@ -171,15 +173,15 @@ namespace Storage.Net.Tests.Blobs
       [Fact]
       public async Task List_FilesInFolder_Recursive()
       {
-         string id1 = Generator.RandomString;
-         string id2 = StoragePath.Combine(Generator.RandomString, Generator.RandomString);
-         string id3 = StoragePath.Combine(Generator.RandomString, Generator.RandomString, Generator.RandomString);
+         string id1 = RandomGenerator.RandomString;
+         string id2 = StoragePath.Combine(RandomGenerator.RandomString, RandomGenerator.RandomString);
+         string id3 = StoragePath.Combine(RandomGenerator.RandomString, RandomGenerator.RandomString, RandomGenerator.RandomString);
 
          try
          {
-            await _bs.WriteTextAsync(id1, Generator.RandomString);
-            await _bs.WriteTextAsync(id2, Generator.RandomString);
-            await _bs.WriteTextAsync(id3, Generator.RandomString);
+            await _bs.WriteTextAsync(id1, RandomGenerator.RandomString);
+            await _bs.WriteTextAsync(id2, RandomGenerator.RandomString);
+            await _bs.WriteTextAsync(id3, RandomGenerator.RandomString);
 
             IEnumerable<BlobId> items = await _provider.ListAsync(new ListOptions { Recurse = true });
          }
@@ -192,17 +194,17 @@ namespace Storage.Net.Tests.Blobs
       [Fact]
       public async Task List_VeryLongPrefix_NoResultsNoCrash()
       {
-         await Assert.ThrowsAsync<ArgumentException>(async () => await _provider.ListAsync(new ListOptions { Prefix = Generator.GetRandomString(100000, false) }));
+         await Assert.ThrowsAsync<ArgumentException>(async () => await _provider.ListAsync(new ListOptions { Prefix = RandomGenerator.GetRandomString(100000, false) }));
       }
 
       [Fact]
       public async Task List_limited_number_of_results()
       {
-         string prefix = Generator.RandomString;
-         string id1 = prefix + Generator.RandomString;
-         string id2 = prefix + Generator.RandomString;
-         await _bs.WriteTextAsync(id1, Generator.RandomString);
-         await _bs.WriteTextAsync(id2, Generator.RandomString);
+         string prefix = RandomGenerator.RandomString;
+         string id1 = prefix + RandomGenerator.RandomString;
+         string id2 = prefix + RandomGenerator.RandomString;
+         await _bs.WriteTextAsync(id1, RandomGenerator.RandomString);
+         await _bs.WriteTextAsync(id2, RandomGenerator.RandomString);
 
          int countAll = (await _provider.ListAsync(new ListOptions { Prefix = prefix })).Count();
          int countOne = (await _provider.ListAsync(new ListOptions { Prefix = prefix, MaxResults = 1 })).Count();
@@ -214,8 +216,8 @@ namespace Storage.Net.Tests.Blobs
       [Fact]
       public async Task List_and_read_back()
       {
-         string id = Generator.RandomString;
-         await _bs.WriteTextAsync(id, Generator.RandomString);
+         string id = RandomGenerator.RandomString;
+         await _bs.WriteTextAsync(id, RandomGenerator.RandomString);
 
          BlobId bid = (await _provider.ListAsync(new ListOptions { Prefix = id })).First();
 
@@ -226,8 +228,8 @@ namespace Storage.Net.Tests.Blobs
       [Fact]
       public async Task GetMeta_for_one_file_succeeds()
       {
-         string content = Generator.GetRandomString(1000, false);
-         string id = Generator.RandomString;
+         string content = RandomGenerator.GetRandomString(1000, false);
+         string id = RandomGenerator.RandomString;
 
          await _bs.WriteTextAsync(id, content);
 
@@ -243,20 +245,6 @@ namespace Storage.Net.Tests.Blobs
       class TestDocument
       {
          public string M { get; set; }
-      }
-
-      [Fact]
-      public async Task Objects_Add_Retreives()
-      {
-         var td = new TestDocument() { M = "string" };
-
-         string id = Generator.GetRandomString(10, false);
-
-         await _bs.WriteObjectToJsonAsync(id, td);
-
-         TestDocument td2 = await _bs.ReadObjectFromJsonAsync<TestDocument>(id);
-
-         Assert.Equal("string", td2.M);
       }
 
       [Fact]

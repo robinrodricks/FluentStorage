@@ -6,6 +6,7 @@ using Microsoft.Azure.EventHubs;
 using Storage.Net.Blob;
 using System.Threading;
 using System.Linq;
+using NetBox.Extensions;
 
 namespace Storage.Net.Microsoft.Azure.EventHub
 {

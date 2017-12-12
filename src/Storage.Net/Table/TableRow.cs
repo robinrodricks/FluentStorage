@@ -1,4 +1,5 @@
 ﻿using NetBox;
+using NetBox.Data;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;

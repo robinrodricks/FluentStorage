@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.EventHubs;
+using NetBox.Extensions;
 using Storage.Net.Messaging;
 using System.Collections.Generic;
 using System.Linq;
