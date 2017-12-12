@@ -15,9 +15,11 @@ namespace Storage.Net.Mssql
          [typeof(DateTime)] = "DATETIME",
          [typeof(DateTimeOffset)] = "DATETIMEOFFSET",
          [typeof(int)] = "INT",
-         [typeof(long)] = "INT",
+         [typeof(long)] = "BIGINT",
          [typeof(double)] = "FLOAT",
          [typeof(Guid)] = "UNIQUEIDENTIFIER",
+         [typeof(decimal)] = "DECIMAL(18, 0)",
+         [typeof(TimeSpan)] = "TIME(7)"
       };
       private readonly SqlConnection _connection;
       private readonly SqlConfiguration _config;
