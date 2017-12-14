@@ -110,7 +110,8 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          }
          catch (CloudException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
          {
-            throw new StorageException(ErrorCode.NotFound, ex);
+            return null;
+            //throw new StorageException(ErrorCode.NotFound, ex);
          }
       }
 

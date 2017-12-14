@@ -66,7 +66,7 @@ namespace Storage.Net.Blob
       {
          GenericValidation.CheckBlobId(id);
 
-         if (!_idToData.TryGetValue(id, out MemoryStream ms)) return null;
+         if (!_idToData.TryGetValue(id, out MemoryStream ms)) return Task.FromResult<Stream>(null);
 
          ms.Seek(0, SeekOrigin.Begin);
          return Task.FromResult<Stream>(new NonCloseableStream(ms));

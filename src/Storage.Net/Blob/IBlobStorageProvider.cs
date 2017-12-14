@@ -31,7 +31,7 @@ namespace Storage.Net.Blob
       /// <returns>Writeable stream</returns>
       /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task WriteAsync(string id, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default(CancellationToken));
+      Task WriteAsync(string id, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Opens the blob stream to read.
@@ -42,7 +42,7 @@ namespace Storage.Net.Blob
       /// stream after use.</returns>
       /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default(CancellationToken));
+      Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Deletes a blob by id
@@ -51,7 +51,7 @@ namespace Storage.Net.Blob
       /// <param name="cancellationToken"></param>
       /// <exception cref="ArgumentNullException">Thrown when ID is null.</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken));
+      Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Checksi if blobs exists in the storage
@@ -59,7 +59,7 @@ namespace Storage.Net.Blob
       /// <param name="ids">List of ids</param>
       /// <param name="cancellationToken"></param>
       /// <returns>List of results of true and false indicating existence</returns>
-      Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken));
+      Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Gets basic blob metadata
@@ -67,7 +67,7 @@ namespace Storage.Net.Blob
       /// <param name="ids">Blob id</param>
       /// <param name="cancellationToken"></param>
       /// <returns>Blob metadata or null if blob doesn't exist</returns>
-      Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken));
+      Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Starts a new transaction

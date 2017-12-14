@@ -85,7 +85,10 @@ namespace Storage.Net.ZipFile
          id = StoragePath.Normalize(id, false);
 
          ZipArchive archive = GetArchive(false);
+         if (archive == null) return Task.FromResult<Stream>(null);
+
          ZipArchiveEntry entry = archive.GetEntry(id);
+         if (entry == null) return Task.FromResult<Stream>(null);
 
          return Task.FromResult(entry.Open());
       }
@@ -133,6 +136,8 @@ namespace Storage.Net.ZipFile
             }
             else
             {
+               if (!exists) return null;
+
                _fileStream = File.Open(_filePath, FileMode.Open, FileAccess.Read);
 
                _archive = new ZipArchive(_fileStream, ZipArchiveMode.Read, true);

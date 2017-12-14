@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2010
+VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{59E9D41F-BCD2-4A64-B62F-515B78986B63}"
 EndProject
@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\appveyor.ps1 = ..\appveyor.ps1
 		..\appveyor.yml = ..\appveyor.yml
 		..\build.ps1 = ..\build.ps1
+		JsonExtensions.cs = JsonExtensions.cs
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
@@ -75,7 +76,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{76FFA3B1-8
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.ZipFile", "Storage.Net.ZipFile\Storage.Net.ZipFile.csproj", "{47ED4188-BED7-44D1-93E9-E2B4B216F1A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Net.Mssql", "Storage.Net.Mssql\Storage.Net.Mssql.csproj", "{A3E297D9-1E7B-429E-81AC-6F8AE2F881E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Mssql", "Storage.Net.Mssql\Storage.Net.Mssql.csproj", "{A3E297D9-1E7B-429E-81AC-6F8AE2F881E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -100,6 +100,7 @@ namespace Storage.Net.Aws.Blob
 
          id = StoragePath.Normalize(id, false);
          GetObjectResponse response = await GetObjectAsync(id);
+         if (response == null) return null;
          return new AwsS3BlobStorageExternalStream(response);
       }
 
@@ -179,6 +180,8 @@ namespace Storage.Net.Aws.Blob
          }
          catch (AmazonS3Exception ex)
          {
+            if (IsDoesntExist(ex)) return null;
+
             TryHandleException(ex);
             throw;
          }
@@ -187,12 +190,17 @@ namespace Storage.Net.Aws.Blob
 
       private static bool TryHandleException(AmazonS3Exception ex)
       {
-         if(ex.ErrorCode == "NoSuchKey")
+         if(IsDoesntExist(ex))
          {
             throw new StorageException(ErrorCode.NotFound, ex);
          }
 
          return false;
+      }
+
+      private static bool IsDoesntExist(AmazonS3Exception ex)
+      {
+         return ex.ErrorCode == "NoSuchKey";
       }
 
       public void Dispose()

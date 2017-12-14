@@ -242,6 +242,14 @@ namespace Storage.Net.Tests.Blobs
          Assert.True(meta.MD5 == null || meta.MD5 == md5);
       }
 
+      [Fact]
+      public async Task Open_doesnt_exist_returns_null()
+      {
+         string id = RandomGenerator.RandomString;
+
+         Assert.Null(await _bs.Provider.OpenReadAsync(id));
+      }
+
       class TestDocument
       {
          public string M { get; set; }

@@ -202,6 +202,8 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          }
          catch (AzureStorageException ex)
          {
+            if (IsDoesntExist(ex)) return null;
+
             if (!TryHandleStorageException(ex)) throw;
          }
 
@@ -264,12 +266,17 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
       private static bool TryHandleStorageException(AzureStorageException ex)
       {
-         if (ex.RequestInformation?.HttpStatusCode == 404)
+         if (IsDoesntExist(ex))
          {
             throw new StorageException(ErrorCode.NotFound, ex);
          }
 
          return false;
+      }
+
+      private static bool IsDoesntExist(AzureStorageException ex)
+      {
+         return ex.RequestInformation?.HttpStatusCode == 404;
       }
 
       public void Dispose()

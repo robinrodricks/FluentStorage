@@ -87,6 +87,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
          }
          catch(KeyVaultErrorException ex)
          {
+            if (IsNotFound(ex)) return null;
             TryHandleException(ex);
             throw;
          }
@@ -172,12 +173,17 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
       private static bool TryHandleException(KeyVaultErrorException ex)
       {
-         if(ex.Body.Error.Code == "SecretNotFound")
+         if(IsNotFound(ex))
          {
             throw new StorageException(ErrorCode.NotFound, ex);
          }
 
          return false;
+      }
+
+      private static bool IsNotFound(KeyVaultErrorException ex)
+      {
+         return ex.Body.Error.Code == "SecretNotFound";
       }
 
       private static void ValidateSecretName(string id)
