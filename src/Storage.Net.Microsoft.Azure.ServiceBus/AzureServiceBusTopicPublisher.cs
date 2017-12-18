@@ -4,6 +4,7 @@ using System.Linq;
 using Storage.Net.Messaging;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
+using System.Threading;
 
 namespace Storage.Net.Microsoft.Azure.ServiceBus
 {
@@ -29,7 +30,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// <summary>
       /// Puts message to the queue with default options
       /// </summary>
-      public async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
+      public async Task PutMessagesAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken)
       {
          if (messages == null) return;
 

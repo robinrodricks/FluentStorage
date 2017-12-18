@@ -4,6 +4,7 @@ using System.Linq;
 using Storage.Net.Messaging;
 using Microsoft.Azure.EventHubs;
 using System;
+using System.Threading;
 
 namespace Storage.Net.Microsoft.Azure.EventHub
 {
@@ -72,7 +73,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <summary>
       /// See interface
       /// </summary>
-      public async Task PutMessagesAsync(IEnumerable<QueueMessage> messages)
+      public async Task PutMessagesAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken)
       {
          if (messages == null) return;
 

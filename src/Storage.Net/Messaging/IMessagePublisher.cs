@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Storage.Net.Messaging
@@ -13,6 +14,6 @@ namespace Storage.Net.Messaging
       /// Puts a new batch of messages to the back of the queue as quick and efficient as possible for
       /// a given queue implementation.
       /// </summary>
-      Task PutMessagesAsync(IEnumerable<QueueMessage> messages);
+      Task PutMessagesAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default);
    }
 }
