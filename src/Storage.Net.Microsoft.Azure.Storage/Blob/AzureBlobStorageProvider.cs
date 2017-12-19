@@ -44,6 +44,18 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       }
 
       /// <summary>
+      /// Create an instance from a SAS URL and container name
+      /// </summary>
+      /// <param name="sasUrl"></param>
+      /// <param name="containerName"></param>
+      public AzureBlobStorageProvider(Uri sasUrl, string containerName)
+      {
+         _client = new CloudBlobClient(sasUrl);
+
+         _blobContainer = _client.GetContainerReference(containerName);
+      }
+
+      /// <summary>
       /// Returns reference to the native Azure SD blob client.
       /// </summary>
       public CloudBlobClient NativeBlobClient => _client;

@@ -57,6 +57,13 @@ namespace Storage.Net
          return new AzureBlobStorageProvider(accountName, key, containerName);
       }
 
+      public static IBlobStorageProvider AzureBlobStorage(this IBlobStorageFactory factory,
+         Uri sasUri,
+         string containerName)
+      {
+         return new AzureBlobStorageProvider(sasUri, containerName);
+      }
+
       /// <summary>
       /// Creates a blob storage implementation based on Microsoft Azure Blob Storage using account name and key.
       /// </summary>

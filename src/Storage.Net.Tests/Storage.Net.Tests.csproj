@@ -25,8 +25,8 @@
     <ProjectReference Include="..\Storage.Net.Esent\Storage.Net.Esent.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="LogMagic" Version="2.5.61" />
-    <PackageReference Include="Config.Net" Version="4.3.1" />
+    <PackageReference Include="LogMagic" Version="2.5.70" />
+    <PackageReference Include="Config.Net" Version="4.4.2.75" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">

@@ -25,6 +25,11 @@ namespace Storage.Net.Tests.Blobs
       public AzureBlobStorageProviderTest() : base("azure") { }
    }
 
+   public class AzureBlobStorageProviderBySasTest : BlobStorageProviderTest
+   {
+      public AzureBlobStorageProviderBySasTest() : base("azure-sas") { }
+   }
+
    public class AzureDataLakeBlobStorageProviderTest : BlobStorageProviderTest
    {
       public AzureDataLakeBlobStorageProviderTest() : base("azure-datalakestore") { }
@@ -81,6 +86,9 @@ namespace Storage.Net.Tests.Blobs
                   _settings.AzureStorageName,
                   _settings.AzureStorageKey,
                   "blobstoragetest");
+               break;
+            case "azure-sas":
+               _provider = StorageFactory.Blobs.AzureBlobStorage(_settings.AzureStorageSasUri, _settings.AzureStorageSasContainer);
                break;
             case "azure-datalakestore":
                //Console.WriteLine("ac: {0}, tid: {1}, pid: {2}, ps: {3}", _settings.AzureDataLakeStoreAccountName, _settings.AzureDataLakeTenantId, _settings.AzureDataLakePrincipalId, _settings.AzureDataLakePrincipalSecret);
