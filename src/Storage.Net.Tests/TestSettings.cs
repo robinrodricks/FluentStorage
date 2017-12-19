@@ -14,11 +14,8 @@ namespace Storage.Net.Tests
       [Option(Alias = "Azure.Storage.Key")]
       string AzureStorageKey { get; }
 
-      [Option(Alias = "Azure.Storage.SasUri")]
-      Uri AzureStorageSasUri { get; }
-
-      [Option(Alias = "Azure.Storage.SasContainer")]
-      string AzureStorageSasContainer { get; }
+      [Option(Alias = "Azure.Storage.ContainerSasUri")]
+      Uri AzureContainerSasUri { get; }
 
       [Option(Alias = "Azure.ServiceBus.ConnectionString")]
       string ServiceBusConnectionString { get; }

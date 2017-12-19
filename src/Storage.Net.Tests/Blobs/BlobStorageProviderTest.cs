@@ -88,7 +88,7 @@ namespace Storage.Net.Tests.Blobs
                   "blobstoragetest");
                break;
             case "azure-sas":
-               _provider = StorageFactory.Blobs.AzureBlobStorage(_settings.AzureStorageSasUri, _settings.AzureStorageSasContainer);
+               _provider = StorageFactory.Blobs.AzureBlobStorageByContainerSasUri(_settings.AzureContainerSasUri);
                break;
             case "azure-datalakestore":
                //Console.WriteLine("ac: {0}, tid: {1}, pid: {2}, ps: {3}", _settings.AzureDataLakeStoreAccountName, _settings.AzureDataLakeTenantId, _settings.AzureDataLakePrincipalId, _settings.AzureDataLakePrincipalSecret);
@@ -173,7 +173,8 @@ namespace Storage.Net.Tests.Blobs
 
          Assert.True(items.Count > 0);
 
-         BlobId tid = items.Where(i => i.Id == id).First();
+         BlobId tid = items.Where(i => i.Id == id).FirstOrDefault();
+         Assert.NotNull(tid);
          Assert.Equal(StoragePath.RootFolderPath, tid.FolderPath);
          Assert.Equal(id, tid.Id);
       }

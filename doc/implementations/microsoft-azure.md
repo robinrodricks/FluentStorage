@@ -32,7 +32,11 @@ IBlobStorage storage = StorageFactory.Blobs.AzureBlobStorage("connection_string"
 
 Alternatively, you can construct the blob storage client from the SAS signature token like this:
 
-> todo: create from SAS token
+```csharp
+_provider = StorageFactory.Blobs.AzureBlobStorageByContainerSasUri(containerSasUri);
+```
+
+Note that URI in this case should be a **container SAS URI**, and this is the only option supported.
 
 ## Tables
 

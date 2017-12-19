@@ -47,12 +47,15 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       /// Create an instance from a SAS URL and container name
       /// </summary>
       /// <param name="sasUrl"></param>
-      /// <param name="containerName"></param>
-      public AzureBlobStorageProvider(Uri sasUrl, string containerName)
+      public AzureBlobStorageProvider(Uri sasUrl)
       {
-         _client = new CloudBlobClient(sasUrl);
+         if (sasUrl == null)
+         {
+            throw new ArgumentNullException(nameof(sasUrl));
+         }
 
-         _blobContainer = _client.GetContainerReference(containerName);
+         _blobContainer = new CloudBlobContainer(sasUrl);
+         _client = _blobContainer.ServiceClient;
       }
 
       /// <summary>

@@ -57,11 +57,10 @@ namespace Storage.Net
          return new AzureBlobStorageProvider(accountName, key, containerName);
       }
 
-      public static IBlobStorageProvider AzureBlobStorage(this IBlobStorageFactory factory,
-         Uri sasUri,
-         string containerName)
+      public static IBlobStorageProvider AzureBlobStorageByContainerSasUri(this IBlobStorageFactory factory,
+         Uri sasUri)
       {
-         return new AzureBlobStorageProvider(sasUri, containerName);
+         return new AzureBlobStorageProvider(sasUri);
       }
 
       /// <summary>
