@@ -227,13 +227,15 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
       public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         foreach (string id in ids)
-         {
-            GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobId(ids);
 
-            CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(StoragePath.Normalize(id, false));
-            await blob.DeleteIfExistsAsync();
-         }
+         await Task.WhenAll(ids.Select(id => DeleteAsync(id, cancellationToken)));
+      }
+
+      private Task DeleteAsync(string id, CancellationToken cancellationToken)
+      {
+         CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(StoragePath.Normalize(id, false));
+         return blob.DeleteIfExistsAsync();
       }
 
       public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
