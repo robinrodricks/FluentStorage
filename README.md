@@ -28,7 +28,18 @@ Storage.Net defines three different storage types:
 - [**Messaging**](doc/messaging/index.md) is an asynchronous mechanism to send simple messages between disconnected systems.
 - [**Table Storage**](doc/table-storage/index.md) is a simplistic way to store non-relational tabular data.
 
-There are various implementations of storage types curated on a [separate page](doc/implementations/index.md)
+There are various implementations/providers of different storage types:
+
+- [Local Disk](doc/implementations/local-disk.md) 
+- **Microsoft Azure**
+  - [Azure Storage (blobs/tables/queues)](doc/implementations/microsoft-azure.md) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.Azure.Storage.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.Storage)
+  - Azure Event Hub [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.Azure.EventHub.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.EventHub)
+  - Azure Service Bus [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.Azure.ServiceBus.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.ServiceBus/)
+  - [Azure Key Vault](doc/implementations/microsoft-azure-key-vault.md) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.Azure.KeyVault.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.KeyVault)
+  - [Azure Data Lake Store](doc/implementations/microsoft-azure-datalakestore.md) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.Azure.DataLake.Store.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.DataLake.Store/)
+  - [Azure Service Fabric](doc/implementations/microsoft-servicefabric.md) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.ServiceFabric.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.ServiceFabric)
+- [Amazon S3](doc/implementations/amazon-aws.md) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Amazon.Aws.svg)](https://www.nuget.org/packages/Storage.Net.Amazon.Aws)
+- [Microsoft SQL Server](doc/implementations/microsoft-sql.md) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Mssql.svg)](https://www.nuget.org/packages/Storage.Net.Mssql)
 
 ## Installation
 
