@@ -100,7 +100,7 @@ namespace Storage.Net.Tests.Blobs
                   _settings.AzureDataLakePrincipalSecret);
                break;
             case "disk-directory":
-               _provider = new DiskDirectoryBlobStorageProvider(TestDir);
+               _provider = StorageFactory.Blobs.DirectoryFiles(TestDir);
                break;
             case "zip":
                _provider = StorageFactory.Blobs.ZipFile(Path.Combine(TestDir.FullName, "test.zip"));
