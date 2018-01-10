@@ -48,7 +48,7 @@ namespace Storage.Net.Mssql
 
                foreach (KeyValuePair<string, DynamicValue> cell in row)
                {
-                  dataRow[cell.Key] = cell.Value.OriginalValue;
+                  dataRow[cell.Key] = CleanValue(cell.Value);
                }
 
                dataTable.Rows.Add(dataRow);
@@ -85,6 +85,18 @@ namespace Storage.Net.Mssql
                throw new StorageException(ErrorCode.DuplicateKey, ex);
             }
          }
+      }
+
+      private static object CleanValue(DynamicValue dv)
+      {
+         if (dv == null || dv.OriginalValue == null) return null;
+
+         if(dv.OriginalType == typeof(string) && string.IsNullOrEmpty((string)dv.OriginalValue))
+         {
+            return null;
+         }
+
+         return dv.OriginalValue;
       }
 
       private async Task CreateTableAsync(List<TableRow> rowsList)
