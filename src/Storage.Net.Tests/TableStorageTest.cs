@@ -323,6 +323,18 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public async Task Insert_RowsWithMissingValues_Succeeds()
+      {
+         var row1 = new TableRow("p1", "k1");
+         var row2 = new TableRow("p1", "k2")
+         {
+            ["col1"] = "v1"
+         };
+
+         await _tables.InsertAsync(_tableName, new[] { row1, row2 });
+      }
+
+      [Fact]
       public async Task Insert_EmailRowKey_CanFetchBack()
       {
          //this only tests encoding problem
@@ -362,8 +374,8 @@ namespace Storage.Net.Tests.Integration
       [InlineData("test string", 100)]
       [InlineData(true, 1)]
       [InlineData(true, 100)]
-      //[InlineData(DateTime.UtcNow, 1)]
-      //[InlineData(DateTime.UtcNow, 100)]
+      [InlineData(1d, 1)]
+      [InlineData(3.5d, 100)]
       public async Task Insert_AllSupportedTypes_Without_Crashing(object value, int repeats)
       {
          var rows = Enumerable.Range(0, repeats)
