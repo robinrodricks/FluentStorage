@@ -88,7 +88,7 @@ namespace Storage.Net.Mssql
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
 
 #if NETFULL
-         if(rows.Count() > 10)
+         if(rows.Count() > _config.UseBulkCopyOnBatchesGreaterThan)
          {
             var sbc = new BulkCopyExecutor(_connection, _config, tableName);
             await sbc.InsertAsync(rows);

@@ -323,6 +323,18 @@ namespace Storage.Net.Tests.Integration
       }
 
       [Fact]
+      public async Task Insert_RowsWithMissingValues_Succeeds()
+      {
+         var row1 = new TableRow("p1", "k1");
+         var row2 = new TableRow("p1", "k2")
+         {
+            ["col1"] = "v1"
+         };
+
+         await _tables.InsertAsync(_tableName, new[] { row1, row2 });
+      }
+
+      [Fact]
       public async Task Insert_EmailRowKey_CanFetchBack()
       {
          //this only tests encoding problem

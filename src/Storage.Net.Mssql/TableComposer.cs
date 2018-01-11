@@ -48,7 +48,11 @@ namespace Storage.Net.Mssql
 
             if (!TypeToSqlTypeName.TryGetValue(t, out string typeName))
             {
-               typeName = "NVARCHAR(MAX)";
+               int length = cell.Value.OriginalValue == null ? 0 : cell.Value.OriginalValue.ToString().Length;
+               length *= 2;
+               string sLength = length == 0 ? "MAX" : length.ToString();
+
+               typeName = $"NVARCHAR({sLength})";
             }
 
             s.Append("[");

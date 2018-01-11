@@ -1,4 +1,4 @@
-version: 5.8.3.{build}
+version: 5.8.2.{build}
 image: Visual Studio 2017
 configuration: Release
 platform: Any CPU
@@ -7,9 +7,9 @@ before_build:
 build:
   project: src/storage.sln
   verbosity: minimal
-#test: off
-test_script:
-- ps: dotnet test .\src\Storage.Net.Tests\ -c debug
+test: off
+#test_script:
+#- ps: dotnet test .\src\Storage.Net.Tests\ -c debug
 artifacts:
 - path: src/**/*.nupkg
 deploy: off
