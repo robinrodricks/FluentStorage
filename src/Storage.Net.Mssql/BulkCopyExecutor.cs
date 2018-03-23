@@ -46,9 +46,11 @@ namespace Storage.Net.Mssql
                dataRow[_configuration.PartitionKeyColumnName] = row.PartitionKey;
                dataRow[_configuration.RowKeyColumnName] = row.RowKey;
 
-               foreach (KeyValuePair<string, DynamicValue> cell in row)
+               foreach (string key in row.Keys.OrderBy(kv => kv))
                {
-                  dataRow[cell.Key] = CleanValue(cell.Value);
+                  DynamicValue value;
+                  row.TryGetValue("key", out value);
+                  dataRow[key] = value;
                }
 
                dataTable.Rows.Add(dataRow);
@@ -114,10 +116,9 @@ namespace Storage.Net.Mssql
          dataTable.Columns.Add(_configuration.PartitionKeyColumnName);
          dataTable.Columns.Add(_configuration.RowKeyColumnName);
 
-         foreach(KeyValuePair<string, DynamicValue> cell in schemaRow)
+         foreach (string key in schemaRow.Keys.OrderBy(kv => kv))
          {
-            string name = cell.Key;
-            dataTable.Columns.Add(name);
+            dataTable.Columns.Add(key);
          }
       }
 
