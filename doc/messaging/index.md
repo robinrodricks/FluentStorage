@@ -53,7 +53,7 @@ This instance is an entry point to receiving messages and performing different o
 ```csharp
 await receiver.StartMessagePumpAsync(OnNewMessage);
 
-public async Task OnNewMessage(QueueMessage message)
+public async Task OnNewMessage(IEnumerable<QueueMessage> message)
 {
     Console.WriteLine($"message received, id: {message.Id}, content: '{message.StringContent}'");
 }
