@@ -1,9 +1,16 @@
-$bn = $env:APPVEYOR_BUILD_NUMBER
-$gv = $env:APPVEYOR_BUILD_VERSION
+$BuildNo = $env:APPVEYOR_BUILD_NUMBER
+$Major = 5
+$Minor = 8
+$Patch = 4
+$IsPrerelease = $true
+
+if($BuildNo -eq $null)
+{
+   $BuildNo = "1"
+}
 
 $vt = @{
-   "Storage.Net.Microsoft.ServiceFabric.csproj" = "2.6.204.$bn";
-   "Storage.Net.Mssql.csproj" = "1.1.$bn"
+   "Storage.Net.Microsoft.ServiceFabric.csproj" = (5, 6, $BuildNo);
 }
 
 $Copyright = "Copyright (c) 2015-2017 by Ivan Gavryliuk"
@@ -18,10 +25,18 @@ $SlnPath = "src\storage.sln"
 
 function Update-ProjectVersion($File)
 {
-   Write-Host "processing $File ..."
+   Write-Host "updating $File ..."
 
-   $v = $vt.($File.Name)
-   if($v -eq $null) { $v = $gv }
+   $over = $vt.($File.Name)
+   if($over -eq $null) {
+      $thisMajor = $Major
+      $thisMinor = $Minor
+      $thisPatch = $Patch
+   } else {
+      $thisMajor = $over[0]
+      $thisMinor = $over[1]
+      $thisPatch = $over[2]
+   }
 
    $xml = [xml](Get-Content $File.FullName)
 
@@ -34,14 +49,16 @@ function Update-ProjectVersion($File)
       $pg = $xml.Project.PropertyGroup[0]
    }
 
-   $parts = $v -split "\."
-   $bv = $parts[2]
-   if($bv.Contains("-")) { $bv = $bv.Substring(0, $bv.IndexOf("-"))}
-   $fv = "{0}.{1}.{2}.0" -f $parts[0], $parts[1], $bv
-   $av = "{0}.0.0.0" -f $parts[0]
-   $pv = $v
+   if($IsPrerelease) {
+      $suffix = "-ci-" + $BuildNo.PadLeft(5, '0')
+   } else {
+      $suffix = ""
+   }
 
-   #Write-Host "current settings - v: $($pg.Version), fv: $($pg.FileVersion), av: $($pg.AssemblyVersion)"
+   
+   [string] $fv = "{0}.{1}.{2}.{3}" -f $thisMajor, $thisMinor, $thisPatch, $BuildNo
+   [string] $av = "{0}.0.0.0" -f $thisMajor
+   [string] $pv = "{0}.{1}.{2}{3}" -f $thisMajor, $thisMinor, $thisPatch, $suffix
 
    $pg.Version = $pv
    $pg.FileVersion = $fv
