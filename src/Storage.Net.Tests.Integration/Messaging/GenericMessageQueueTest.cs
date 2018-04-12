@@ -127,7 +127,7 @@ namespace Storage.Net.Tests.Integration.Messaging
             prevCount = _receivedMessages.Count;
             await Task.Delay(TimeSpan.FromSeconds(1));
          }
-         while (prevCount != _receivedMessages.Count && prevCount != 0);
+         while (prevCount != _receivedMessages.Count && prevCount < 3);
 
          return _receivedMessages.LastOrDefault();
       }
