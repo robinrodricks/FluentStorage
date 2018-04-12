@@ -4,6 +4,8 @@ $Minor = 8
 $Patch = 5
 $IsPrerelease = $true
 
+# latest released version: 5.8.4
+
 if($BuildNo -eq $null)
 {
    $BuildNo = "1"
