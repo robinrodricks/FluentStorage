@@ -3,8 +3,9 @@
 ![](doc/slide.jpg)
 
 |Build|Unit Tests|Integration Tests|
-|------------------|-----------------|
+|-----|----------|-----------------|
 |[![Build status](https://ci.appveyor.com/api/projects/status/ymwk4hx0gb0dleyk?svg=true)](https://ci.appveyor.com/project/aloneguid/storage)|![AppVeyor tests](https://img.shields.io/appveyor/tests/aloneguid/storage.svg)|![Visual Studio Team services](https://img.shields.io/vso/build/aloneguid/0227dea8-0e2f-40c1-b170-2e8830087355/21.svg)|
+
 
 ## Intentions
 
