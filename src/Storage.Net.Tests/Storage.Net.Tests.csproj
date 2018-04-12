@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <VersionPrefix>3.5.0-alpha-4</VersionPrefix>
     <AssemblyName>Storage.Net.Tests</AssemblyName>
     <AssemblyOriginatorKeyFile>../storage.snk</AssemblyOriginatorKeyFile>
@@ -13,16 +13,7 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Storage.Net.Microsoft.Azure.DataLake.Store\Storage.Net.Microsoft.Azure.DataLake.Store.csproj" />
-    <ProjectReference Include="..\Storage.Net.Microsoft.Azure.EventHub\Storage.Net.Microsoft.Azure.EventHub.csproj" />
-    <ProjectReference Include="..\Storage.Net.Microsoft.Azure.KeyVault\Storage.Net.Microsoft.Azure.KeyVault.csproj" />
-    <ProjectReference Include="..\Storage.Net.Microsoft.Azure.ServiceBus\Storage.Net.Microsoft.Azure.ServiceBus.csproj" />
-    <ProjectReference Include="..\Storage.Net.Microsoft.Azure.Storage\Storage.Net.Microsoft.Azure.Storage.csproj" />
-    <ProjectReference Include="..\Storage.Net.Mssql\Storage.Net.Mssql.csproj" />
-    <ProjectReference Include="..\Storage.Net.ZipFile\Storage.Net.ZipFile.csproj" />
     <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
-    <ProjectReference Include="..\Storage.Net.Amazon.Aws\Storage.Net.Amazon.Aws.csproj" />
-    <ProjectReference Include="..\Storage.Net.Esent\Storage.Net.Esent.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="LogMagic" Version="2.5.70" />

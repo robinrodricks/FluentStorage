@@ -16,7 +16,7 @@ using Storage.Net.Microsoft.Azure.Storage.Blob;
 using Storage.Net.Tests.Integration;
 using Xunit;
 
-namespace Storage.Net.Tests.Blobs
+namespace Storage.Net.Tests.Integration.Blobs
 {
    #region [ Test Variations ]
 

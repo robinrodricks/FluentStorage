@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using NetBox.Extensions;
 using NetBox.Data;
 
-namespace Storage.Net.Tests.Integration
+namespace Storage.Net.Tests.Integration.Tables
 {
    public class CsvFilesTableStorageTest : TableStorageTest
    {

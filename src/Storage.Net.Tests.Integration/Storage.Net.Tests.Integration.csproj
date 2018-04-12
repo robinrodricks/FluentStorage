@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <AssemblyOriginatorKeyFile>../storage.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.0" />
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+    <PackageReference Include="LogMagic" Version="2.5.70" />
+    <PackageReference Include="Config.Net" Version="4.4.2.75" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
+    <ProjectReference Include="..\Storage.Net.Microsoft.Azure.DataLake.Store\Storage.Net.Microsoft.Azure.DataLake.Store.csproj" />
+    <ProjectReference Include="..\Storage.Net.Microsoft.Azure.EventHub\Storage.Net.Microsoft.Azure.EventHub.csproj" />
+    <ProjectReference Include="..\Storage.Net.Microsoft.Azure.KeyVault\Storage.Net.Microsoft.Azure.KeyVault.csproj" />
+    <ProjectReference Include="..\Storage.Net.Microsoft.Azure.ServiceBus\Storage.Net.Microsoft.Azure.ServiceBus.csproj" />
+    <ProjectReference Include="..\Storage.Net.Microsoft.Azure.Storage\Storage.Net.Microsoft.Azure.Storage.csproj" />
+    <ProjectReference Include="..\Storage.Net.Mssql\Storage.Net.Mssql.csproj" />
+    <ProjectReference Include="..\Storage.Net.ZipFile\Storage.Net.ZipFile.csproj" />
+    <ProjectReference Include="..\Storage.Net.Amazon.Aws\Storage.Net.Amazon.Aws.csproj" />
+    <ProjectReference Include="..\Storage.Net.Esent\Storage.Net.Esent.csproj" />
+  </ItemGroup>
+
+</Project>

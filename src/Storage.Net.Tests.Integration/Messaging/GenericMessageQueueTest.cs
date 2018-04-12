@@ -1,4 +1,4 @@
-﻿/*using Xunit;
+﻿using Xunit;
 using Storage.Net.Messaging;
 using System;
 using LogMagic;
@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using NetBox;
 using System.Linq;
 using Config.Net;
+using NetBox.Generator;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
@@ -171,7 +172,7 @@ namespace Storage.Net.Tests.Integration.Messaging
       [Fact]
       public async Task SendMessage_SimpleOne_Received()
       {
-         string content = Generator.RandomString;
+         string content = RandomGenerator.RandomString;
 
          await _publisher.PutMessagesAsync(new[] { new QueueMessage(content) });
 
@@ -184,7 +185,7 @@ namespace Storage.Net.Tests.Integration.Messaging
       //[Fact]
       public async Task SendMessage_WithProperties_Received()
       {
-         string content = Generator.RandomString;
+         string content = RandomGenerator.RandomString;
 
          var msg = new QueueMessage(content);
          msg.Properties["one"] = "v1";
@@ -201,7 +202,7 @@ namespace Storage.Net.Tests.Integration.Messaging
       [Fact]
       public async Task CleanQueue_SendMessage_ReceiveAndConfirm()
       {
-         string content = Generator.RandomString;
+         string content = RandomGenerator.RandomString;
          var msg = new QueueMessage(content);
          await _publisher.PutMessagesAsync(new[] { msg });
 
@@ -224,4 +225,3 @@ namespace Storage.Net.Tests.Integration.Messaging
       }
    }
 }
-*/
