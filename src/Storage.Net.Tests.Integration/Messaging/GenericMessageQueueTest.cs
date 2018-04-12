@@ -33,6 +33,11 @@ namespace Storage.Net.Tests.Integration.Messaging
       public AzureEventHubMessageQeueueTest() : base("azure-eventhub") { }
    }
 
+   public class InMemoryMessageQeueueTest : GenericMessageQueueTest
+   {
+      public InMemoryMessageQeueueTest() : base("inmemory") { }
+   }
+
    #endregion
 
    public abstract class GenericMessageQueueTest : AbstractTestFixture
@@ -99,6 +104,10 @@ namespace Storage.Net.Tests.Integration.Messaging
                _publisher = StorageFactory.Messages.AzureEventHubPublisher(
                   _settings.EventHubConnectionString,
                   _settings.EventHubPath);
+               break;
+            case "inmemory":
+               _receiver = StorageFactory.Messages.InMemoryReceiver("inmemory");
+               _publisher = StorageFactory.Messages.InMemoryPublisher("inmemory");
                break;
          }
 
