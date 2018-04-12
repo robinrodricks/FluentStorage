@@ -18,6 +18,25 @@ To publish messages you will usually construct an instance of `IMessagePublisher
 
 Similarly, to receive messages you can use factory methods to create receivers which all implement `IMessageReceiver` interface.
 
+## Serialising/deserialising `QueueMessage`
+
+`QueueMessage` class itself is not a serialisable entity when we talk about JSON or built-in .NET binary serialisation due to the fact it is a functionally rich structure. However, you might want to transfer the whole `QueueMessage` across the wire sometimes. For these purposes you can use built-in binary methods:
+
+```csharp
+var qm = new QueueMessage("id", "content");
+qm.DequeueCount = 4;
+qm.Properties.Add("key", "value");
+
+byte[] wireData = qm.ToByteArray();
+
+//transfer the bytes
+
+QueueMessage receivedMessage = QueueMessage.FromByteArray(wireData);
+```
+
+These methods make sure that *all* of the message data is preserved, and also are backward compatible between any changes to this class.
+
+
 ## Use Cases
 
 These example use cases simulate some most common messaging operations which should help you to get started.
