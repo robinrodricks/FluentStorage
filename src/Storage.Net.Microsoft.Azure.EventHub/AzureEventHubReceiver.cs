@@ -19,9 +19,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       private readonly HashSet<string> _partitionIds;
       private readonly string _consumerGroupName;
       private readonly EventHubStateAdapter _state;
-      private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
-      private static readonly TimeSpan WaitTime = TimeSpan.FromSeconds(1);
-      private readonly List<PartitionReceiver> _partitonReceivers = new List<PartitionReceiver>();
+      private static readonly TimeSpan _waitTime = TimeSpan.FromSeconds(1);
       private bool _isReady;
 
       /// <summary>
@@ -73,8 +71,10 @@ namespace Storage.Net.Microsoft.Azure.EventHub
          _isReady = true;
       }
 
-      private async Task CreateReceivers()
+      private async Task<IEnumerable<PartitionReceiver>> CreateReceivers()
       {
+         var receivers = new List<PartitionReceiver>();
+
          EventHubRuntimeInformation runtimeInfo = await _hubClient.GetRuntimeInformationAsync();
 
          foreach (string partitionId in runtimeInfo.PartitionIds)
@@ -87,9 +87,11 @@ namespace Storage.Net.Microsoft.Azure.EventHub
                   (await _state.GetPartitionOffset(partitionId)),
                   false);
 
-               _partitonReceivers.Add(receiver);
+               receivers.Add(receiver);
             }
          }
+
+         return receivers;
       }
 
 
@@ -116,9 +118,9 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// </summary>
       public async Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessageAsync, int maxBatchSize, CancellationToken cancellationToken)
       {
-         await CheckReady();
+         IEnumerable<PartitionReceiver> receivers = await CreateReceivers();
 
-         foreach(PartitionReceiver receiver in _partitonReceivers)
+         foreach(PartitionReceiver receiver in receivers)
          {
             Task pump = ReceiverPump(receiver, onMessageAsync, maxBatchSize, cancellationToken);
          }
@@ -128,9 +130,9 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       {
          while (true)
          {
-            IEnumerable<EventData> events = await receiver.ReceiveAsync(maxBatchSize, WaitTime);
+            IEnumerable<EventData> events = await receiver.ReceiveAsync(maxBatchSize, _waitTime);
 
-            if(events != null)
+            if (events != null && !cancellationToken.IsCancellationRequested)
             {
                List<QueueMessage> qms = events.Select(ed => Converter.ToQueueMessage(ed, receiver.PartitionId)).ToList();
                await onMessage(qms);
@@ -138,12 +140,12 @@ namespace Storage.Net.Microsoft.Azure.EventHub
                QueueMessage lastMessage = qms.LastOrDefault();
 
                //save state
-               if(lastMessage != null)
+               if (lastMessage != null)
                {
                   const string sequenceNumberPropertyName = "x-opt-sequence-number";
                   const string offsetPropertyName = "x-opt-offset";
 
-                  if(lastMessage.Properties.TryGetValue(offsetPropertyName, out string offset))
+                  if (lastMessage.Properties.TryGetValue(offsetPropertyName, out string offset))
                   {
                      lastMessage.Properties.TryGetValue(sequenceNumberPropertyName, out string sequenceNumber);
 
@@ -152,7 +154,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
                }
             }
 
-            if (_tokenSource.IsCancellationRequested)
+            if (cancellationToken.IsCancellationRequested)
             {
                await receiver.CloseAsync();
                return;
@@ -165,7 +167,6 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// </summary>
       public void Dispose()
       {
-         _tokenSource.Cancel();
       }
 
       public async Task<ITransaction> OpenTransactionAsync()

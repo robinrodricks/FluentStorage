@@ -8,6 +8,7 @@ using NetBox;
 using System.Linq;
 using Config.Net;
 using NetBox.Generator;
+using System.Threading;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
@@ -48,6 +49,7 @@ namespace Storage.Net.Tests.Integration.Messaging
       private IMessageReceiver _receiver;
       private readonly List<QueueMessage> _receivedMessages = new List<QueueMessage>();
       private ITestSettings _settings;
+      private CancellationTokenSource _cts = new CancellationTokenSource();
 
       protected GenericMessageQueueTest(string name)
       {
@@ -112,7 +114,17 @@ namespace Storage.Net.Tests.Integration.Messaging
          }
 
          //start the pump
-         _receiver.StartMessagePumpAsync(ReceiverPump);
+         _receiver.StartMessagePumpAsync(ReceiverPump, cancellationToken: _cts.Token);
+      }
+
+      public override void Dispose()
+      {
+         _cts.Cancel();
+
+         if (_publisher != null) _publisher.Dispose();
+         if (_receiver != null) _receiver.Dispose();
+
+         base.Dispose();
       }
 
       private async Task ReceiverPump(IEnumerable<QueueMessage> messages)
@@ -127,6 +139,8 @@ namespace Storage.Net.Tests.Integration.Messaging
 
       private async Task<QueueMessage> WaitMessage()
       {
+         _receivedMessages.Clear();
+
          //wait for receiver to stabilize
 
          int prevCount;
@@ -136,17 +150,9 @@ namespace Storage.Net.Tests.Integration.Messaging
             prevCount = _receivedMessages.Count;
             await Task.Delay(TimeSpan.FromSeconds(1));
          }
-         while (prevCount != _receivedMessages.Count && prevCount < 3);
+         while (prevCount != _receivedMessages.Count);
 
          return _receivedMessages.LastOrDefault();
-      }
-
-      public override void Dispose()
-      {
-         if(_publisher != null) _publisher.Dispose();
-         if(_receiver != null) _receiver.Dispose();
-
-         base.Dispose();
       }
 
       [Fact]
@@ -222,11 +228,11 @@ namespace Storage.Net.Tests.Integration.Messaging
       [Fact]
       public async Task MessagePump_AddFewMessages_CanReceiveOneAndPumpClearsThemAll()
       {
-         for (int i = 0; i < 10; i++)
-         {
-            var qm = new QueueMessage(nameof(MessagePump_AddFewMessages_CanReceiveOneAndPumpClearsThemAll) + "#" + i);
-            await _publisher.PutMessagesAsync(new[] { qm });
-         }
+         QueueMessage[] messages = Enumerable.Range(0, 10)
+            .Select(i => new QueueMessage(nameof(MessagePump_AddFewMessages_CanReceiveOneAndPumpClearsThemAll) + "#" + i))
+            .ToArray();
+
+         await _publisher.PutMessagesAsync(messages);
 
          await WaitMessage();
 
