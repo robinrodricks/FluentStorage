@@ -30,6 +30,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "implementations", "implementations", "{350AFDCF-E871-40F2-8077-C730E95B5B4E}"
 	ProjectSection(SolutionItems) = preProject
 		..\doc\implementations\amazon-aws.md = ..\doc\implementations\amazon-aws.md
+		..\doc\implementations\inmemory.md = ..\doc\implementations\inmemory.md
 		..\doc\implementations\local-disk.md = ..\doc\implementations\local-disk.md
 		..\doc\implementations\microsoft-azure-datalakestore.md = ..\doc\implementations\microsoft-azure-datalakestore.md
 		..\doc\implementations\microsoft-azure-key-vault.md = ..\doc\implementations\microsoft-azure-key-vault.md
@@ -78,7 +79,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.ZipFile", "Stor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Mssql", "Storage.Net.Mssql\Storage.Net.Mssql.csproj", "{A3E297D9-1E7B-429E-81AC-6F8AE2F881E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Net.Tests.Integration", "Storage.Net.Tests.Integration\Storage.Net.Tests.Integration.csproj", "{0372FC4B-F81A-4826-8A69-4433FD3D19F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Tests.Integration", "Storage.Net.Tests.Integration\Storage.Net.Tests.Integration.csproj", "{0372FC4B-F81A-4826-8A69-4433FD3D19F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

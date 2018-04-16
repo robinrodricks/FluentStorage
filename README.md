@@ -30,6 +30,7 @@ Storage.Net defines three different storage types:
 
 There are various implementations/providers of different storage types:
 
+- [In-Memory](doc/implementations/inmemory.md)
 - [Local Disk](doc/implementations/local-disk.md) 
 - **Microsoft Azure**
   - [Azure Storage (blobs/tables/queues)](doc/implementations/microsoft-azure.md) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.Azure.Storage.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.Storage)

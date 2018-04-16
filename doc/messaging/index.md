@@ -80,4 +80,4 @@ public async Task OnNewMessage(IEnumerable<QueueMessage> message)
 
 The `StartMessagePumpAsync` method requires a method which it will call for any new message received, in our case `OnNewMessage`. And that's all you do to listen for messages.
 
-The message pump gets stopped when you dispose an instance of `IMessageReceiver`.
+The message pump gets stopped when you cancel the cancellation token passed in `StartMessagePump` method.
