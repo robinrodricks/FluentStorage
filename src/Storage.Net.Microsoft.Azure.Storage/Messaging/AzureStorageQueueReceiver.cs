@@ -22,8 +22,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       private readonly TimeSpan _messageVisibilityTimeout;
       private readonly TimeSpan _messagePumpPollingTimeout;
       private bool _disposed;
-      private Task _pollingTask;
-      private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
       /// <summary>
       /// Creates an instance of Azure Storage Queue receiver 
@@ -33,7 +31,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// <param name="queueName">Queue name</param>
       /// <param name="messageVisibilityTimeout">
       /// Timeout value passed in GetMessage call in the Storage Queue. The value indicates how long the message
-      /// will be hidden before it reappears in the queue. Therefore you must call <see cref="ConfirmMessageAsync(QueueMessage)"/>
+      /// will be hidden before it reappears in the queue. Therefore you must call <see cref="ConfirmMessageAsync(QueueMessage, CancellationToken)"/>
       /// to complete and delete it.
       /// </param>
       public AzureStorageQueueReceiver(string accountName, string storageKey, string queueName,
@@ -51,11 +49,11 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// <param name="queueName">Queue name</param>
       /// <param name="messageVisibilityTimeout">
       /// Timeout value passed in GetMessage call in the Storage Queue. The value indicates how long the message
-      /// will be hidden before it reappears in the queue. Therefore you must call <see cref="ConfirmMessageAsync(QueueMessage)"/>
+      /// will be hidden before it reappears in the queue. Therefore you must call <see cref="ConfirmMessageAsync(QueueMessage, CancellationToken)"/>
       /// to complete and delete it.
       /// </param>
       /// <param name="messagePumpPollingTimeout">
-      /// Used in conjunction with <see cref="StartMessagePumpAsync(Func{QueueMessage, Task})"/> and indicates how often message pump will ping for new
+      /// Used in conjunction with <see cref="StartMessagePumpAsync(Func{IEnumerable{QueueMessage}, Task}, int, CancellationToken)"/> and indicates how often message pump will ping for new
       /// messages in the queue.
       /// </param>
       public AzureStorageQueueReceiver(string accountName, string storageKey, string queueName,
@@ -85,10 +83,12 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// Deletes the message from the queue
       /// </summary>
       /// <param name="message"></param>
+      /// <param name="cancellationToken"></param>
       public async Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken)
       {
          Converter.SplitId(message.Id, out string id, out string popReceipt);
          if (popReceipt == null) throw new ArgumentException("cannot delete message by short id", id);
+
          await _queue.DeleteMessageAsync(id, popReceipt);
       }
 
@@ -112,19 +112,16 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// <summary>
       /// Due to the fact storage queues don't support notifications this method starts an internal thread to poll for messages.
       /// </summary>
-      public Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
+      public async Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
-         if (_pollingTask != null) throw new ArgumentException("polling already started", nameof(onMessage));
 
-         _pollingTask = PollTasks(onMessage, maxBatchSize, _cts.Token);
-
-         return Task.FromResult(true);
+         PollTasksAsync(onMessage, maxBatchSize, cancellationToken);
       }
 
-      private async Task PollTasks(Func<IEnumerable<QueueMessage>, Task> callback, int maxBatchSize, CancellationToken ct)
+      private async Task PollTasksAsync(Func<IEnumerable<QueueMessage>, Task> callback, int maxBatchSize, CancellationToken cancellationToken)
       {
-         if (ct.IsCancellationRequested) return;
+         if (cancellationToken.IsCancellationRequested) return;
 
          IEnumerable<QueueMessage> messages = await ReceiveMessagesAsync(maxBatchSize);
          while(messages != null)
@@ -133,9 +130,9 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
             messages = await ReceiveMessagesAsync(maxBatchSize);
          }
 
-         await Task.Delay(_messagePumpPollingTimeout, ct).ContinueWith(async (t) =>
+         await Task.Delay(_messagePumpPollingTimeout, cancellationToken).ContinueWith(async (t) =>
          {
-            await PollTasks(callback, maxBatchSize, ct);
+            await PollTasksAsync(callback, maxBatchSize, cancellationToken);
          });
       }
 
@@ -144,11 +141,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// </summary>
       public void Dispose()
       {
-         if (!_disposed)
-         {
-            _disposed = true;
-            _cts.Cancel();
-         }
       }
 
       /// <summary>
@@ -161,9 +153,9 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
          return batch.Select(Converter.ToQueueMessage).ToList();
       }
 
-      public async Task<ITransaction> OpenTransactionAsync()
+      public Task<ITransaction> OpenTransactionAsync()
       {
-         return EmptyTransaction.Instance;
+         return Task.FromResult(EmptyTransaction.Instance);
       }
    }
 }
