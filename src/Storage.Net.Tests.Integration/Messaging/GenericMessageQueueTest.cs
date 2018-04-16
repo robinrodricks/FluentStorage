@@ -69,11 +69,11 @@ namespace Storage.Net.Tests.Integration.Messaging
                _publisher = StorageFactory.Messages.AzureStorageQueuePublisher(
                   _settings.AzureStorageName,
                   _settings.AzureStorageKey,
-                  _settings.ServiceBusQueueName);
+                  _settings.AzureStorageQueueName);
                _receiver = StorageFactory.Messages.AzureStorageQueueReceiver(
                   _settings.AzureStorageName,
                   _settings.AzureStorageKey,
-                  _settings.ServiceBusQueueName,
+                  _settings.AzureStorageQueueName,
                   TimeSpan.FromMinutes(1),
                   TimeSpan.FromMilliseconds(500));
                break;
@@ -160,7 +160,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
             if(candidate != null)
             {
-               _receivedMessages.Clear();
+               //_receivedMessages.Clear();
                return candidate;
             }
 

@@ -14,6 +14,9 @@ namespace Storage.Net.Tests
       [Option(Alias = "Azure.Storage.Key")]
       string AzureStorageKey { get; }
 
+      [Option(Alias = "Azure.Storage.QueueName", DefaultValue = "local")]
+      string AzureStorageQueueName { get; }
+
       [Option(Alias = "Azure.Storage.ContainerSasUri")]
       Uri AzureContainerSasUri { get; }
 

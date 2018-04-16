@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Messaging
 {
@@ -123,17 +124,26 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       {
          if (cancellationToken.IsCancellationRequested) return;
 
-         IEnumerable<QueueMessage> messages = await ReceiveMessagesAsync(maxBatchSize);
-         while(messages != null)
+         try
          {
-            await callback(messages);
-            messages = await ReceiveMessagesAsync(maxBatchSize);
-         }
 
-         await Task.Delay(_messagePumpPollingTimeout, cancellationToken).ContinueWith(async (t) =>
+            IEnumerable<QueueMessage> messages = await ReceiveMessagesAsync(maxBatchSize, cancellationToken);
+            while (messages != null)
+            {
+               await callback(messages);
+
+               messages = await ReceiveMessagesAsync(maxBatchSize, cancellationToken);
+            }
+
+            await Task.Delay(_messagePumpPollingTimeout, cancellationToken).ContinueWith(async (t) =>
+            {
+               await PollTasksAsync(callback, maxBatchSize, cancellationToken);
+            });
+         }
+         catch(TaskCanceledException)
          {
-            await PollTasksAsync(callback, maxBatchSize, cancellationToken);
-         });
+            return;
+         }
       }
 
       /// <summary>
@@ -146,11 +156,12 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// <summary>
       /// Calls .GetMessages on storage queue
       /// </summary>
-      private async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count)
+      private async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count, CancellationToken cancellationToken)
       {
-         IEnumerable<CloudQueueMessage> batch = await _queue.GetMessagesAsync(count, _messageVisibilityTimeout, null, null);
+         IEnumerable<CloudQueueMessage> batch = await _queue.GetMessagesAsync(count, _messageVisibilityTimeout, null, null, cancellationToken);
          if(batch == null) return null;
-         return batch.Select(Converter.ToQueueMessage).ToList();
+         List<QueueMessage> result = batch.Select(Converter.ToQueueMessage).ToList();
+         return result.Count == 0 ? null : result;
       }
 
       public Task<ITransaction> OpenTransactionAsync()
