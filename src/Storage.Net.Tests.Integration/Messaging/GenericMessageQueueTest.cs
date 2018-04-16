@@ -9,6 +9,7 @@ using System.Linq;
 using Config.Net;
 using NetBox.Generator;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
@@ -110,13 +111,14 @@ namespace Storage.Net.Tests.Integration.Messaging
                   _settings.EventHubPath);
                break;
             case "inmemory":
-               _receiver = StorageFactory.Messages.InMemoryReceiver("inmemory");
-               _publisher = StorageFactory.Messages.InMemoryPublisher("inmemory");
+               string inMemoryTag = RandomGenerator.RandomString;
+               _receiver = StorageFactory.Messages.InMemoryReceiver(inMemoryTag);
+               _publisher = StorageFactory.Messages.InMemoryPublisher(inMemoryTag);
                break;
          }
 
          //start the pump
-         _receiver.StartMessagePumpAsync(ReceiverPump, cancellationToken: _cts.Token);
+         _receiver.StartMessagePumpAsync(ReceiverPump, cancellationToken: _cts.Token, maxBatchSize: 5);
       }
 
       public override void Dispose()
@@ -132,6 +134,8 @@ namespace Storage.Net.Tests.Integration.Messaging
       private async Task ReceiverPump(IEnumerable<QueueMessage> messages)
       {
          _receivedMessages.AddRange(messages);
+
+         Trace.WriteLine($"total received: {_receivedMessages.Count}");
 
          foreach (QueueMessage qm in messages)
          {

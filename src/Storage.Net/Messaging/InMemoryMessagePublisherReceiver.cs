@@ -21,12 +21,12 @@ namespace Storage.Net.Messaging
 
       public Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default)
       {
-         throw new NotImplementedException();
+         throw new NotSupportedException();
       }
 
       public Task<ITransaction> OpenTransactionAsync()
       {
-         throw new NotImplementedException();
+         return Task.FromResult(EmptyTransaction.Instance);
       }
 
       public Task PutMessagesAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
@@ -75,7 +75,9 @@ namespace Storage.Net.Messaging
             result.Add(message);
          }
 
-         return result.Count == 0 ? null : Task.FromResult((IEnumerable<QueueMessage>)result);
+         return result.Count == 0
+            ? Task.FromResult((IEnumerable<QueueMessage>)null)
+            : Task.FromResult((IEnumerable<QueueMessage>)result);
       }
 
       public void Dispose()
