@@ -4,9 +4,9 @@ Microsoft Azure implementations reside in a separate package hosted on [NuGet](h
 
 This package implements reading and writing to tables.
 
-### Creating the blob client
+### Creating a table client
 
-The easiest way to create a blob storage is to use the factory method
+The easiest way to create a table storage is to use the factory method
 
 ```csharp
 using Storage.Net;
