@@ -11,6 +11,8 @@ if($BuildNo -eq $null)
    $BuildNo = "1"
 }
 
+Invoke-Expression "appveyor UpdateBuild -Version ""$Major.$Minor.$Patch-$BuildNo"
+
 $vt = @{
    "Storage.Net.Microsoft.ServiceFabric.csproj" = (5, 6, $BuildNo);
 }

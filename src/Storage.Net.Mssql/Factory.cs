@@ -1,4 +1,5 @@
 ﻿using System;
+using Storage.Net.Messaging;
 using Storage.Net.Mssql;
 using Storage.Net.Table;
 
@@ -17,6 +18,13 @@ namespace Storage.Net
          SqlConfiguration config = null)
       {
          return new MssqlTableStorageProvider(connectionString, config);
+      }
+
+      public static IMessagePublisher MssqlServerPublisher(this IMessagingFactory factory,
+         string connectionString,
+         string tableName)
+      {
+         throw new NotImplementedException();
       }
    }
 }
