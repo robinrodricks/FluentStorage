@@ -18,6 +18,22 @@ To publish messages you will usually construct an instance of `IMessagePublisher
 
 Similarly, to receive messages you can use factory methods to create receivers which all implement `IMessageReceiver` interface.
 
+The primary method of this interface
+
+```csharp
+Task StartMessagePumpAsync(
+	Func<IEnumerable<QueueMessage>, Task> onMessageAsync,
+	int maxBatchSize = 1,
+	CancellationToken cancellationToken = default);
+```
+
+starts a message pump that listens for incoming queue messages and calls `Func<IEnumerable<QueueMessage>, Task>` as a call back to pass those messages to your code.
+
+`maxBatchSize` is a number specifying how many messages you are ready to handle at once in your callback. Choose this number carefully as specifying number too low will result in slower message processing, whereas number too large will increase RAM requirements for your software.
+
+`cancellationToken` is used to signal the message pump to stop. Not passing any parameter there will result in never stopping message pump. See example below in Use Cases for a pattern on how to use this parameter.
+
+
 ## Serialising/deserialising `QueueMessage`
 
 `QueueMessage` class itself is not a serialisable entity when we talk about JSON or built-in .NET binary serialisation due to the fact it is a functionally rich structure. However, you might want to transfer the whole `QueueMessage` across the wire sometimes. For these purposes you can use built-in binary methods:
@@ -70,14 +86,23 @@ IMessageReceiver receiver = StorageFactory.Messages.AzureEventHubReceiver("conne
 This instance is an entry point to receiving messages and performing different operations on the message. To listen for the message you'll have to start the message pump first as follows:
 
 ```csharp
-await receiver.StartMessagePumpAsync(OnNewMessage);
+var cts = new CancellationTokenSource();
 
-public async Task OnNewMessage(IEnumerable<QueueMessage> message)
+await receiver.StartMessagePumpAsync(OnNewMessage, 10, cts.Token);
+
+public async Task OnNewMessage(IEnumerable<QueueMessage> messages)
 {
+  foreach(QueueMessage message in messages)
+  {
     Console.WriteLine($"message received, id: {message.Id}, content: '{message.StringContent}'");
+  }
 }
+
+// listen for program termination
+
+cts.Cancel();	// cancel the message pump token
 ```
 
-The `StartMessagePumpAsync` method requires a method which it will call for any new message received, in our case `OnNewMessage`. And that's all you do to listen for messages.
+The `StartMessagePumpAsync` method requires a method which it will call for any new message received, in our case `OnNewMessages`. And that's all you do to listen for messages.
 
 The message pump gets stopped when you cancel the cancellation token passed in `StartMessagePump` method.
