@@ -21,7 +21,7 @@ namespace Storage.Net.Messaging
          return Task.FromResult(true);
       }
 
-      protected override Task<IReadOnlyCollection<QueueMessage>> ReceiveMessagesAsync(int maxBatchSize)
+      protected override Task<IReadOnlyCollection<QueueMessage>> ReceiveMessagesAsync(int maxBatchSize, CancellationToken cancellationToken)
       {
          var result = new List<QueueMessage>();
 

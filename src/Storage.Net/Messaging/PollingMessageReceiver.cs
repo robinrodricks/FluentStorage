@@ -37,12 +37,12 @@ namespace Storage.Net.Messaging
 
       private async Task PollTasks(Func<IEnumerable<QueueMessage>, Task> callback, int maxBatchSize, CancellationToken cancellationToken)
       {
-         IReadOnlyCollection<QueueMessage> messages = await ReceiveMessagesAsync(maxBatchSize);
+         IReadOnlyCollection<QueueMessage> messages = await ReceiveMessagesAsync(maxBatchSize, cancellationToken);
          while (messages != null && messages.Count > 0)
          {
             await callback(messages);
 
-            messages = await ReceiveMessagesAsync(maxBatchSize);
+            messages = await ReceiveMessagesAsync(maxBatchSize, cancellationToken);
          }
 
          await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ContinueWith(async (t) =>
@@ -51,6 +51,6 @@ namespace Storage.Net.Messaging
          });
       }
 
-      protected abstract Task<IReadOnlyCollection<QueueMessage>> ReceiveMessagesAsync(int maxBatchSize);
+      protected abstract Task<IReadOnlyCollection<QueueMessage>> ReceiveMessagesAsync(int maxBatchSize, CancellationToken cancellationToken);
    }
 }

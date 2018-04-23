@@ -14,7 +14,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
    /// <summary>
    /// Queue receiver based on Azure Storage Queues
    /// </summary>
-   class AzureStorageQueueReceiver : IMessageReceiver
+   class AzureStorageQueueReceiver : PollingMessageReceiver
    {
       private readonly CloudQueueClient _client;
       private readonly string _queueName;
@@ -54,8 +54,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// to complete and delete it.
       /// </param>
       /// <param name="messagePumpPollingTimeout">
-      /// Used in conjunction with <see cref="StartMessagePumpAsync(Func{IEnumerable{QueueMessage}, Task}, int, CancellationToken)"/> and indicates how often message pump will ping for new
-      /// messages in the queue.
+      /// Indicates how often message pump will ping for new messages in the queue.
       /// </param>
       public AzureStorageQueueReceiver(string accountName, string storageKey, string queueName,
          TimeSpan messageVisibilityTimeout, TimeSpan messagePumpPollingTimeout)
@@ -85,7 +84,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// </summary>
       /// <param name="message"></param>
       /// <param name="cancellationToken"></param>
-      public async Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken)
+      public override async Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken)
       {
          Converter.SplitId(message.Id, out string id, out string popReceipt);
          if (popReceipt == null) throw new ArgumentException("cannot delete message by short id", id);
@@ -97,7 +96,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// Moves message to a dead letter queue which has the same name as original queue prefixed with "-deadletter". This is done because 
       /// Azure Storage queues do not support deadlettering directly.
       /// </summary>
-      public async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken)
+      public override async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken)
       {
          var dead = (QueueMessage)message.Clone();
          dead.Properties["deadLetterReason"] = reason;
@@ -111,62 +110,14 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       }
 
       /// <summary>
-      /// Due to the fact storage queues don't support notifications this method starts an internal thread to poll for messages.
-      /// </summary>
-      public async Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
-      {
-         if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
-
-         PollTasksAsync(onMessage, maxBatchSize, cancellationToken);
-      }
-
-      private async Task PollTasksAsync(Func<IEnumerable<QueueMessage>, Task> callback, int maxBatchSize, CancellationToken cancellationToken)
-      {
-         if (cancellationToken.IsCancellationRequested) return;
-
-         try
-         {
-
-            IEnumerable<QueueMessage> messages = await ReceiveMessagesAsync(maxBatchSize, cancellationToken);
-            while (messages != null)
-            {
-               await callback(messages);
-
-               messages = await ReceiveMessagesAsync(maxBatchSize, cancellationToken);
-            }
-
-            await Task.Delay(_messagePumpPollingTimeout, cancellationToken).ContinueWith(async (t) =>
-            {
-               await PollTasksAsync(callback, maxBatchSize, cancellationToken);
-            });
-         }
-         catch(TaskCanceledException)
-         {
-            return;
-         }
-      }
-
-      /// <summary>
-      /// Stops message pump if any.
-      /// </summary>
-      public void Dispose()
-      {
-      }
-
-      /// <summary>
       /// Calls .GetMessages on storage queue
       /// </summary>
-      private async Task<IEnumerable<QueueMessage>> ReceiveMessagesAsync(int count, CancellationToken cancellationToken)
+      protected override async Task<IReadOnlyCollection<QueueMessage>> ReceiveMessagesAsync(int count, CancellationToken cancellationToken)
       {
          IEnumerable<CloudQueueMessage> batch = await _queue.GetMessagesAsync(count, _messageVisibilityTimeout, null, null, cancellationToken);
          if(batch == null) return null;
          List<QueueMessage> result = batch.Select(Converter.ToQueueMessage).ToList();
          return result.Count == 0 ? null : result;
-      }
-
-      public Task<ITransaction> OpenTransactionAsync()
-      {
-         return Task.FromResult(EmptyTransaction.Instance);
       }
    }
 }
