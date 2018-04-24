@@ -11,8 +11,7 @@ if($BuildNo -eq $null)
    $BuildNo = "1"
 }
 
-$VDisplay = Get-DisplayVersion
-Invoke-Expression "appveyor UpdateBuild -Version $VDisplay"
+
 
 $vt = @{
    "Storage.Net.Microsoft.ServiceFabric.csproj" = (5, 6, $BuildNo);
@@ -27,18 +26,6 @@ $PackageLicenseUrl = "https://github.com/aloneguid/storage/blob/master/LICENSE"
 $RepositoryType = "GitHub"
 
 $SlnPath = "src\storage.sln"
-
-function Get-DisplayVersion()
-{
-   $v = "$Major.$Minor.$Patch"
-   
-   if($IsPrerelease)
-   {
-      $v = "$v-ci-$BuildNo"
-   }
-
-   $v
-}
 
 function Update-ProjectVersion($File)
 {
@@ -115,3 +102,18 @@ Get-ChildItem *.csproj -Recurse | Where-Object {-not(($_.Name -like "*test*") -o
 
 # Restore packages
 Exec "dotnet restore $SlnPath"
+
+function Get-DisplayVersion()
+{
+   $v = "$Major.$Minor.$Patch"
+   
+   if($IsPrerelease)
+   {
+      $v = "$v-ci-$BuildNo"
+   }
+
+   $v
+}
+
+$VDisplay = Get-DisplayVersion
+Invoke-Expression "appveyor UpdateBuild -Version $VDisplay"
