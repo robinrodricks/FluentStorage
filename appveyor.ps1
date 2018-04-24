@@ -2,7 +2,7 @@ $BuildNo = $env:APPVEYOR_BUILD_NUMBER
 $Major = 5
 $Minor = 9
 $Patch = 2
-$IsPrerelease = $false
+$IsPrerelease = $true
 
 # latest released version: 5.9.2
 

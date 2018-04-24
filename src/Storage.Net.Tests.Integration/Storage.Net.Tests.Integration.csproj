@@ -12,7 +12,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
     <PackageReference Include="LogMagic" Version="2.5.70" />
-    <PackageReference Include="Config.Net" Version="4.4.2.75" />
+    <PackageReference Include="Config.Net" Version="4.8.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
 
