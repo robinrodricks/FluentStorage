@@ -11,7 +11,8 @@ if($BuildNo -eq $null)
    $BuildNo = "1"
 }
 
-Invoke-Expression "appveyor UpdateBuild -Version $Major.$Minor.$Patch-$BuildNo"
+$VDisplay = Get-DisplayVersion
+Invoke-Expression "appveyor UpdateBuild -Version $VDisplay"
 
 $vt = @{
    "Storage.Net.Microsoft.ServiceFabric.csproj" = (5, 6, $BuildNo);
@@ -26,6 +27,18 @@ $PackageLicenseUrl = "https://github.com/aloneguid/storage/blob/master/LICENSE"
 $RepositoryType = "GitHub"
 
 $SlnPath = "src\storage.sln"
+
+function Get-DisplayVersion()
+{
+   $v = "$Major.$Minor.$Patch"
+   
+   if($IsPrerelease)
+   {
+      $v = "$v-ci-$BuildNo"
+   }
+
+   $v
+}
 
 function Update-ProjectVersion($File)
 {
