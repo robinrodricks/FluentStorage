@@ -29,10 +29,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "blob-storage", "blob-storag
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "implementations", "implementations", "{350AFDCF-E871-40F2-8077-C730E95B5B4E}"
 	ProjectSection(SolutionItems) = preProject
-		..\doc\implementations\amazon-aws.md = ..\doc\implementations\amazon-aws.md
 		..\doc\implementations\inmemory.md = ..\doc\implementations\inmemory.md
 		..\doc\implementations\local-disk.md = ..\doc\implementations\local-disk.md
 		..\doc\implementations\microsoft-azure-datalakestore.md = ..\doc\implementations\microsoft-azure-datalakestore.md
+		..\doc\implementations\microsoft-azure-eventhub.md = ..\doc\implementations\microsoft-azure-eventhub.md
 		..\doc\implementations\microsoft-azure-key-vault.md = ..\doc\implementations\microsoft-azure-key-vault.md
 		..\doc\implementations\microsoft-azure.md = ..\doc\implementations\microsoft-azure.md
 		..\doc\implementations\microsoft-servicefabric.md = ..\doc\implementations\microsoft-servicefabric.md
