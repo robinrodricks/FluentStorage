@@ -94,6 +94,13 @@ namespace Storage.Net.Microsoft.Azure.EventHub
          return receivers;
       }
 
+      /// <summary>
+      /// See interface
+      /// </summary>
+      public Task<int> GetMessageCountAsync()
+      {
+         throw new NotSupportedException();
+      }
 
       /// <summary>
       /// See interface

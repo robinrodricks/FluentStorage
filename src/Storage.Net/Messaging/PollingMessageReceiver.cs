@@ -9,25 +9,48 @@ namespace Storage.Net.Messaging
 {
    public abstract class PollingMessageReceiver : IMessageReceiver
    {
+      /// <summary>
+      /// See interface
+      /// </summary>
+      public Task<int> GetMessageCountAsync()
+      {
+         throw new NotSupportedException();
+      }
+
+      /// <summary>
+      /// See interface
+      /// </summary>
       public virtual Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken = default)
       {
          throw new NotSupportedException();
       }
 
+      /// <summary>
+      /// See interface
+      /// </summary>
       public virtual Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default)
       {
          throw new NotSupportedException();
       }
 
+      /// <summary>
+      /// See interface
+      /// </summary>
       public virtual void Dispose()
       {
       }
 
+      /// <summary>
+      /// See interface
+      /// </summary>
       public virtual Task<ITransaction> OpenTransactionAsync()
       {
          return Task.FromResult(EmptyTransaction.Instance);
       }
 
+      /// <summary>
+      /// See interface
+      /// </summary>
       public async Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessageAsync, int maxBatchSize = 1, CancellationToken cancellationToken = default)
       {
          if (onMessageAsync == null) throw new ArgumentNullException(nameof(onMessageAsync));
@@ -51,6 +74,9 @@ namespace Storage.Net.Messaging
          });
       }
 
+      /// <summary>
+      /// See interface
+      /// </summary>
       protected abstract Task<IReadOnlyCollection<QueueMessage>> ReceiveMessagesAsync(int maxBatchSize, CancellationToken cancellationToken);
    }
 }

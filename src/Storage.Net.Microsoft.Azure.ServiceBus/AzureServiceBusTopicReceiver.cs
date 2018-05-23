@@ -33,6 +33,11 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
          _peekLock = peekLock;
       }
 
+      public Task<int> GetMessageCountAsync()
+      {
+         throw new NotSupportedException();
+      }
+
       /// <summary>
       /// Calls .DeadLetter explicitly
       /// </summary>

@@ -35,6 +35,15 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       }
 
       /// <summary>
+      /// See interface
+      /// </summary>
+      /// <returns></returns>
+      public Task<int> GetMessageCountAsync()
+      {
+         throw new NotSupportedException();
+      }
+
+      /// <summary>
       /// Calls .DeadLetter explicitly
       /// </summary>
       public async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken)

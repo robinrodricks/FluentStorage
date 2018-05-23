@@ -26,6 +26,21 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
          _scanInterval = scanInterval;
       }
 
+      /// <summary>
+      /// See interface
+      /// </summary>
+      public async Task<int> GetMessageCountAsync()
+      {
+         using (var tx = new ServiceFabricTransaction(_stateManager, null))
+         {
+            IReliableQueue<byte[]> collection = await GetCollectionAsync();
+
+            long count = await collection.GetCountAsync(tx.Tx);
+
+            return (int)count;
+         }
+      }
+
       public async Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
       {
          Task.Run(() => ReceiveMessagesAsync(onMessage, maxBatchSize, cancellationToken));

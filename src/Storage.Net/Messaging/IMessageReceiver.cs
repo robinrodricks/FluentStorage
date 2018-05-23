@@ -11,6 +11,13 @@ namespace Storage.Net.Messaging
    public interface IMessageReceiver : IDisposable
    {
       /// <summary>
+      /// Fetches count of messages currently in the queue.
+      /// </summary>
+      /// <returns></returns>
+      /// <exception cref="NotSupportedException">Thrown when this implementation doesn't support counting.</exception>
+      Task<int> GetMessageCountAsync();
+
+      /// <summary>
       /// Confirmation call that the message was acknowledged and processed by the receiver.
       /// Client must call this when message processing has succeeded, otherwise the message will reappear,
       /// however this depends on implementation details when and how.
