@@ -8,7 +8,7 @@ using Storage.Net.Table;
 
 namespace Storage.Net.Mssql
 {
-   public class MssqlTableStorageProvider : ITableStorageProvider
+   public class MssqlTableStorageProvider : ITableStorage
    {
       private readonly SqlConnection _connection;
       private readonly CommandBuilder _cb;

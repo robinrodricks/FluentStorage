@@ -9,7 +9,7 @@ In Storage.Net blobs map to Azure Service Fabric [Reliable Dictionaries](https:/
 To initialise a reliable dictionary you would normally write the following code:
 
 ```csharp
-IBlobStorageProvider = StorageFactory.Blobs.AzureServiceFabricReliableStorage(this.StateManager, "collection_name");
+IBlobStorage = StorageFactory.Blobs.AzureServiceFabricReliableStorage(this.StateManager, "collection_name");
 ``` 
 
 where `collection_name` maps to the name of the collection when obtained via `IReliableStateManager.GetOrAddAsync()`. 

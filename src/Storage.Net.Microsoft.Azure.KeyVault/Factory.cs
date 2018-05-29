@@ -15,7 +15,7 @@ namespace Storage.Net
       /// <param name="azureAadClientId">The azure aad client identifier.</param>
       /// <param name="azureAadClientSecret">The azure aad client secret.</param>
       /// <returns></returns>
-      public static IBlobStorageProvider AzureKeyVault(this IBlobStorageFactory factory,
+      public static IBlobStorage AzureKeyVault(this IBlobStorageFactory factory,
          Uri vaultUri, string azureAadClientId, string azureAadClientSecret)
       {
          return new AzureKeyVaultBlobStorageProvider(vaultUri, azureAadClientId, azureAadClientSecret);
@@ -28,7 +28,7 @@ namespace Storage.Net
       /// <param name="vaultUri">The vault URI.</param>
       /// <param name="cred">The cred.</param>
       /// <returns></returns>
-      public static IBlobStorageProvider AzureKeyVault(this IBlobStorageFactory factory,
+      public static IBlobStorage AzureKeyVault(this IBlobStorageFactory factory,
          Uri vaultUri, NetworkCredential cred)
       {
          return new AzureKeyVaultBlobStorageProvider(vaultUri, cred.UserName, cred.Password);

@@ -41,7 +41,7 @@ namespace Storage.Net.Tests
 
          IMessageReceiver receiver = StorageFactory.Messages.InMemoryReceiver("name");
 
-         IBlobStorageProvider storage = StorageFactory.Blobs.AmazonS3BlobStorage(
+         IBlobStorage storage = StorageFactory.Blobs.AmazonS3BlobStorage(
             _settings.AwsAccessKeyId,
             _settings.AwsSecretAccessKey,
             _settings.AwsTestBucketName);
@@ -55,7 +55,7 @@ namespace Storage.Net.Tests
 
       public async Task BlobStorage_sample1()
       {
-         IBlobStorageProvider storage = StorageFactory.Blobs.AzureBlobStorage(
+         IBlobStorage storage = StorageFactory.Blobs.AzureBlobStorage(
             _settings.AzureStorageName,
             _settings.AzureStorageKey,
             "container name");
@@ -82,11 +82,10 @@ namespace Storage.Net.Tests
 
       public async Task BlobStorage_sample2()
       {
-         IBlobStorageProvider provider = StorageFactory.Blobs.AzureBlobStorage(
+         IBlobStorage storage = StorageFactory.Blobs.AzureBlobStorage(
             _settings.AzureStorageName,
             _settings.AzureStorageKey,
             "container name");
-         BlobStorage storage = new BlobStorage(provider);
 
          //upload it
          await storage.WriteTextAsync("someid", "test content");
@@ -98,8 +97,7 @@ namespace Storage.Net.Tests
       public async Task Blobs_save_file_to_a_specific_folder()
       {
          //create the storage over a specific local directory
-         IBlobStorageProvider provider = StorageFactory.Blobs.DirectoryFiles(new DirectoryInfo("c:\\tmp\\files"));
-         var storage = new BlobStorage(provider);
+         IBlobStorage storage = StorageFactory.Blobs.DirectoryFiles(new DirectoryInfo("c:\\tmp\\files"));
 
          //write to the root folder
          await storage.WriteTextAsync("text.txt", "test content");
@@ -110,8 +108,7 @@ namespace Storage.Net.Tests
 
       public async Task List_all_files_in_a_folder()
       {
-         IBlobStorageProvider provider = StorageFactory.Blobs.DirectoryFiles(new DirectoryInfo("c:\\tmp\\files"));
-         var storage = new BlobStorage(provider);
+         IBlobStorage storage = StorageFactory.Blobs.DirectoryFiles(new DirectoryInfo("c:\\tmp\\files"));
 
          await storage.ListAsync(new ListOptions { Recurse = true });
          await storage.ListAsync(new ListOptions { FolderPath = "/folder1", Recurse = false });

@@ -16,7 +16,7 @@ using System.Threading;
 
 namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 {
-   public class AzureDataLakeStoreBlobStorageProvider : IBlobStorageProvider
+   public class AzureDataLakeStoreBlobStorageProvider : IBlobStorage
    {
       private readonly string _accountName;
       private readonly string _domain;

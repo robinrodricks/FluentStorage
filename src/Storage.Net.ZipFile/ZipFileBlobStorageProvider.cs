@@ -9,7 +9,7 @@ using Storage.Net.Blob;
 
 namespace Storage.Net.ZipFile
 {
-   class ZipFileBlobStorageProvider : IBlobStorageProvider
+   class ZipFileBlobStorageProvider : IBlobStorage
    {
       private Stream _fileStream;
       private ZipArchive _archive;

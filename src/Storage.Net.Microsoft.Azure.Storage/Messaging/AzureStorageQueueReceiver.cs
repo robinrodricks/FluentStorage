@@ -22,7 +22,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       private CloudQueue _deadLetterQueue;
       private readonly TimeSpan _messageVisibilityTimeout;
       private readonly TimeSpan _messagePumpPollingTimeout;
-      private bool _disposed;
 
       /// <summary>
       /// Creates an instance of Azure Storage Queue receiver 

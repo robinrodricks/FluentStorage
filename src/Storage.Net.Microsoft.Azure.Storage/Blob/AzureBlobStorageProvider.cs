@@ -17,7 +17,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
    /// <summary>
    /// Azure Blob Storage
    /// </summary>
-   public class AzureBlobStorageProvider : IBlobStorageProvider
+   public class AzureBlobStorageProvider : IBlobStorage
    {
       private readonly CloudBlobClient _client;
       private readonly CloudBlobContainer _blobContainer;

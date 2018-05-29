@@ -17,7 +17,7 @@ using NetBox;
 
 namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 {
-   class AzureKeyVaultBlobStorageProvider : IBlobStorageProvider
+   class AzureKeyVaultBlobStorageProvider : IBlobStorage
    {
       private KeyVaultClient _vaultClient;
       private ClientCredential _credential;

@@ -11,9 +11,9 @@ namespace Storage.Net.Microsoft.Azure.EventHub
 {
    class EventHubStateAdapter
    {
-      private readonly BlobStorage _blobStorage;
+      private readonly IBlobStorage _blobStorage;
 
-      public EventHubStateAdapter(BlobStorage blobStorage)
+      public EventHubStateAdapter(IBlobStorage blobStorage)
       {
          _blobStorage = blobStorage;
       }

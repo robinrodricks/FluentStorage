@@ -9,11 +9,9 @@ Blob Storage is really simple abstraction - you read or write file data by it's 
 
 ## Using
 
-The entry point to a blog storage is [IBlobStorageProvider](../../src/Storage.Net/Blob/IBlobStorageProvider.cs) interface. This interface is small but contains all possible methods to work with blobs, such as uploading and downloading data, listing storage contents, deleting files etc. The interface is kept small so that new storage providers can be added easily, without implementing a plethora of interface methods.
+The entry point to a blog storage is [IBlobStorage](../../src/Storage.Net/Blob/IBlobStorage.cs) interface. This interface is small but contains all possible methods to work with blobs, such as uploading and downloading data, listing storage contents, deleting files etc. The interface is kept small so that new storage providers can be added easily, without implementing a plethora of interface methods.
 
-Although, normally you wouldn't use this interface directly in your code, and insted make use of [BlobStorage](../../src/Storage.Net/Blob/BlobStorage.cs) class, which accepts `IBlobStorageProvider` in it's constructor and exposes a lot of useful and functionality rich methods to work with storage. For instance, `IBlobStorageProvider` upload functionality only works with streams, however `BlobStorage` allows you to upload text, stream, file or even a class as a blob. This is because `BlobStorage` is built on top of it and simply uses streaming underneach to achieve this rich feature set. `BlobStorage` is also provider agnostic, therefore all the rich functionality just works and doesn't have to be reimplemented in underlying data provider.
-
-Usually, first you would instantiate `IBlobStorageProvider` with a specific instance implementing it, for instance Amazon S3 or Microsoft Azure Blob Storage, or even a local file system. The framework makes it trivial to create one.
+In addition to this interface, there are plency of extension methods which enrich the functionality, therefore you will see more methods than this interface actually declares. They add a lot of useful and functionality rich methods to work with storage. For instance, `IBlobStorage` upload functionality only works with streams, however extension methods allows you to upload text, stream, file or even a class as a blob. Extension methods are also provider agnostic, therefore all the rich functionality just works and doesn't have to be reimplemented in underlying data provider.
 
 All the storage implementations can be created either directly or using factory methods available in the `Storage.Net.StorageFactory.Blobs` class. More methods appear in that class as you reference an assembly containing specific implementations.
 
@@ -71,11 +69,10 @@ This is really simple, right? However, the code looks really long and boring. If
 ```csharp
 public async Task BlobStorage_sample2()
 {
-    IBlobStorageProvider provider = StorageFactory.Blobs.AzureBlobStorage(
+    IBlobStorage storage = StorageFactory.Blobs.AzureBlobStorage(
 		TestSettings.Instance.AzureStorageName,
 		TestSettings.Instance.AzureStorageKey,
 		"container name");
-	BlobStorage storage = new BlobStorage(provider);
 
     //upload it
     await storage.WriteTextAsync("someid", "test content");
@@ -85,15 +82,12 @@ public async Task BlobStorage_sample2()
 }
 ```
 
-What's happening here? Instead of using a low-leve `IBlobStorageProvider` API we create a `BlobStorage` instance, which has a lot of nice utility methods, and one of them is working with text directly. Note that all of the methods are `async` promoting you to use the async programming achieving the best performance and less resource utilization.
-
 ### Save file to a specific folder
 
-This scenario demonstrates how to save files to a folder on local disk. Notice that we are still using `IBlobStorageProvider` interface and don't really care where we are writing to. Here is how we create an instance of `IBlobStorageProvider` which is mapped to `c:\tmp\files` folder:
+This scenario demonstrates how to save files to a folder on local disk. Notice that we are still using `IBlobStorage` interface and don't really care where we are writing to. Here is how we create an instance of `IBlobStorage` which is mapped to `c:\tmp\files` folder:
 
 ```csharp
-IBlobStorageProvider provider = StorageFactory.Blobs.DirectoryFiles(new DirectoryInfo("c:\\tmp\\files"));
-var storage = new BlobStorage(provider);
+IBlobStorage storage = StorageFactory.Blobs.DirectoryFiles(new DirectoryInfo("c:\\tmp\\files"));
 ```
 
 Now let's create a blob called `test.txt` with sample content and see what happened to that folder:
@@ -154,7 +148,3 @@ await storage.ListAsync(new ListOptions { FolderPath = "/folder1", Recurse = fal
 This sample is useful if you want to transfer files between two storage providers like from Microsot Azure to Amazon S3 or vice versa. Or copy files from the local disk to one of the cloud providers, it doesn't matter as we are using the same interface. You can even build your own blob transfer utility which supports all of the cloud providers.
 
 > todo
-
-## Why BlobStorage?
-
-If all of the examples are using `BlobStorage` and not `IBlobStorageProvider` why do we need the provider at all? Wouldn't it be easier if all factory methods would just return `BlobStorage`? Yes and no. The thing is, `IBlobStorageProvider` is extremely useful in IoC patterns, and when you do dependency injection and testing it's nice to have an interface instead of a fat class. If your code doesn't need it, adding one more line is not that of a big deal, right?

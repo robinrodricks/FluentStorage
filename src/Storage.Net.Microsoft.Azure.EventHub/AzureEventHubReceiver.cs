@@ -34,7 +34,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       public AzureEventHubReceiver(string connectionString, string hubPath,
          IEnumerable<string> partitionIds = null,
          string consumerGroupName = null,
-         IBlobStorageProvider stateStorage = null)
+         IBlobStorage stateStorage = null)
       {
          if (connectionString == null)
             throw new ArgumentNullException(nameof(connectionString));
@@ -48,7 +48,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
          _hubClient = EventHubClient.CreateFromConnectionString(builder.ToString());
          if (partitionIds != null) _partitionIds.AddRange(_partitionIds);
          _consumerGroupName = consumerGroupName;
-         _state = new EventHubStateAdapter(new BlobStorage(stateStorage ?? StorageFactory.Blobs.InMemory()));
+         _state = new EventHubStateAdapter(stateStorage ?? StorageFactory.Blobs.InMemory());
       }
 
       /// <summary>

@@ -65,7 +65,7 @@ namespace Storage.Net
          string connectionString, string hubPath,
          IEnumerable<string> partitionIds = null,
          string consumerGroupName = null,
-         IBlobStorageProvider stateStorage = null
+         IBlobStorage stateStorage = null
          )
       {
          return new AzureEventHubReceiver(connectionString, hubPath, partitionIds, consumerGroupName, stateStorage);

@@ -23,7 +23,7 @@ namespace Storage.Net
       /// </summary>
       /// <param name="factory"></param>
       /// <param name="rootDir"></param>
-      public static ITableStorageProvider CsvFiles(this ITableStorageFactory factory,
+      public static ITableStorage CsvFiles(this ITableStorageFactory factory,
          DirectoryInfo rootDir)
       {
          return new CsvFileTableStorageProvider(rootDir);
@@ -34,10 +34,10 @@ namespace Storage.Net
       /// <param name="factory"></param>
       /// <param name="directory">Root directory</param>
       /// </summary>
-      public static IBlobStorageProvider DirectoryFiles(this IBlobStorageFactory factory,
+      public static IBlobStorage DirectoryFiles(this IBlobStorageFactory factory,
          DirectoryInfo directory)
       {
-         return new DiskDirectoryBlobStorageProvider(directory);
+         return new DiskDirectoryBlobStorage(directory);
       }
 
       /// <summary>
@@ -46,9 +46,9 @@ namespace Storage.Net
       /// </summary>
       /// <param name="factory">Factory reference</param>
       /// <returns>In-memory blob storage instance</returns>
-      public static IBlobStorageProvider InMemory(this IBlobStorageFactory factory)
+      public static IBlobStorage InMemory(this IBlobStorageFactory factory)
       {
-         return new InMemoryBlobStorageProvider();
+         return new InMemoryBlobStorage();
       }
 
       /// <summary>

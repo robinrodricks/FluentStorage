@@ -11,7 +11,7 @@ using NetBox;
 
 namespace Storage.Net.Blob
 {
-   class InMemoryBlobStorageProvider : IBlobStorageProvider
+   class InMemoryBlobStorage : IBlobStorage
    {
       private readonly Dictionary<BlobId, MemoryStream> _idToData = new Dictionary<BlobId, MemoryStream>();
 

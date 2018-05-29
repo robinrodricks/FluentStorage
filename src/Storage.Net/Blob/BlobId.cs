@@ -23,8 +23,16 @@ namespace Storage.Net.Blob
       /// </summary>
       public string Id { get; private set; }
 
+      /// <summary>
+      /// Gets full path to this blob which is a combination of folder path and blob name
+      /// </summary>
       public string FullPath => StoragePath.Combine(FolderPath, Id);
 
+      /// <summary>
+      /// Create a new instance
+      /// </summary>
+      /// <param name="fullId"></param>
+      /// <param name="kind"></param>
       public BlobId(string fullId, BlobItemKind kind = BlobItemKind.File)
       {
          string path = StoragePath.Normalize(fullId);
@@ -38,6 +46,12 @@ namespace Storage.Net.Blob
          Kind = kind;
       }
 
+      /// <summary>
+      /// Creates a new instance
+      /// </summary>
+      /// <param name="folderPath"></param>
+      /// <param name="id"></param>
+      /// <param name="kind"></param>
       public BlobId(string folderPath, string id, BlobItemKind kind)
       {
          Id = id ?? throw new ArgumentNullException(nameof(id));

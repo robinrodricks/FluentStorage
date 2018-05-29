@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Storage.Net.Microsoft.ServiceFabric.Blob
 {
-   class ServiceFabricReliableDictionaryBlobStorageProvider : IBlobStorageProvider
+   class ServiceFabricReliableDictionaryBlobStorageProvider : IBlobStorage
    {
       private readonly IReliableStateManager _stateManager;
       private readonly string _collectionName;

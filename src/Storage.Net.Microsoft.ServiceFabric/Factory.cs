@@ -11,7 +11,7 @@ namespace Storage.Net
    {
       private const string DefaultQueueName = "$default$";
 
-      public static IBlobStorageProvider AzureServiceFabricReliableStorage(this IBlobStorageFactory factory,
+      public static IBlobStorage AzureServiceFabricReliableStorage(this IBlobStorageFactory factory,
          IReliableStateManager stateManager,
          string collectionName)
       {

@@ -9,7 +9,7 @@ This document assumes you are already familiar [how blobs are implemented in Sto
 To create the in-memory provider simply use
 
 ```csharp
-IBlobStorageProvider provider = StorageFactory.Blobs.InMemory();
+IBlobStorage provider = StorageFactory.Blobs.InMemory();
 ```
 
 ## Queues

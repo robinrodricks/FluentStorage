@@ -17,7 +17,7 @@ namespace Storage.Net.Aws.Blob
    /// <summary>
    /// Amazon S3 storage adapter for blobs
    /// </summary>
-   public class AwsS3BlobStorageProvider : IBlobStorageProvider
+   public class AwsS3BlobStorageProvider : IBlobStorage
    {
       private readonly string _bucketName;
       private readonly AmazonS3Client _client;

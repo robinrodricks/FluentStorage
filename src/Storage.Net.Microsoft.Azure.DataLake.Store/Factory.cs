@@ -17,7 +17,7 @@ namespace Storage.Net
       /// <param name="accountName">Data Lake account name</param>
       /// <param name="credential">Credential object where username is Principal ID and password is Principal Secret, and Domain is set to Tenant ID</param>
       /// <returns></returns>
-      public static IBlobStorageProvider AzureDataLakeStoreByClientSecret(this IBlobStorageFactory factory,
+      public static IBlobStorage AzureDataLakeStoreByClientSecret(this IBlobStorageFactory factory,
          string accountName,
          NetworkCredential credential)
       {
@@ -33,7 +33,7 @@ namespace Storage.Net
       /// <param name="principalId">Principal ID</param>
       /// <param name="principalSecret">Principal Secret</param>
       /// <returns></returns>
-      public static IBlobStorageProvider AzureDataLakeStoreByClientSecret(this IBlobStorageFactory factory,
+      public static IBlobStorage AzureDataLakeStoreByClientSecret(this IBlobStorageFactory factory,
          string accountName,
          string tenantId,
          string principalId,

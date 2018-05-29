@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 namespace Storage.Net.Table.Files
 {
    /// <summary>
-   /// Creates an abstaction of <see cref="ITableStorageProvider"/> in a CSV file structure.
+   /// Creates an abstaction of <see cref="ITableStorage"/> in a CSV file structure.
    /// Works relative to the root directory specified in the constructor.
    /// Each table will be a separate subfolder, where files are partitions.
    /// </summary>
-   public class CsvFileTableStorageProvider : ITableStorageProvider
+   public class CsvFileTableStorageProvider : ITableStorage
    {
       private const string TablePartitionFormat = "{0}.partition.csv";
       private const string TablePartitionSearchFilter = "*.partition.csv";

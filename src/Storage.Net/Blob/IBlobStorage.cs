@@ -9,7 +9,7 @@ namespace Storage.Net.Blob
    /// <summary>
    /// Slim interface providing access to blob storage.
    /// </summary>
-   public interface IBlobStorageProvider : IDisposable
+   public interface IBlobStorage : IDisposable
    {
       /// <summary>
       /// Returns the list of available blobs

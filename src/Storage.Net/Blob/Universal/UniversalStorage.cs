@@ -11,23 +11,23 @@ namespace Storage.Net.Blob.Universal
    /// <summary>
    /// Universal storage provider, in preview.
    /// </summary>
-   public class UniversalStorageProvider : IBlobStorageProvider
+   public class UniversalStorage : IBlobStorage
    {
-      private readonly ConcurrentDictionary<string, IBlobStorageProvider> _prefixToProvider = new ConcurrentDictionary<string, IBlobStorageProvider>();
+      private readonly ConcurrentDictionary<string, IBlobStorage> _prefixToProvider = new ConcurrentDictionary<string, IBlobStorage>();
 
-      public UniversalStorageProvider()
+      public UniversalStorage()
       {
 
       }
 
-      public void Register(string prefix, IBlobStorageProvider storage)
+      public void Register(string prefix, IBlobStorage storage)
       {
          _prefixToProvider[prefix] = storage;
       }
 
-      private IBlobStorageProvider GetProvider(string id, out string nativeId)
+      private IBlobStorage GetProvider(string id, out string nativeId)
       {
-         foreach(KeyValuePair<string, IBlobStorageProvider> kvp in _prefixToProvider)
+         foreach(KeyValuePair<string, IBlobStorage> kvp in _prefixToProvider)
          {
             if(id.StartsWith(kvp.Key))
             {
@@ -40,7 +40,7 @@ namespace Storage.Net.Blob.Universal
          return null;
       }
 
-      #region [ IBlobStorageProvider ]
+      #region [ IBlobStorage ]
 
       public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken))
       {

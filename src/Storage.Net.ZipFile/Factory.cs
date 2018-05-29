@@ -13,7 +13,7 @@ namespace Storage.Net
    /// </summary>
    public static class Factory
    {
-      public static IBlobStorageProvider ZipFile(this IBlobStorageFactory blobStorageFactory, string filePath)
+      public static IBlobStorage ZipFile(this IBlobStorageFactory blobStorageFactory, string filePath)
       {
          return new ZipFileBlobStorageProvider(filePath);
       }

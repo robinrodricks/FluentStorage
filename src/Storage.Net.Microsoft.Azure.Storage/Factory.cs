@@ -21,7 +21,7 @@ namespace Storage.Net
       /// <param name="accountName">Account name</param>
       /// <param name="storageKey">Account key</param>
       /// <returns></returns>
-      public static ITableStorageProvider AzureTableStorage(this ITableStorageFactory factory,
+      public static ITableStorage AzureTableStorage(this ITableStorageFactory factory,
          string accountName,
          string storageKey)
       {
@@ -34,7 +34,7 @@ namespace Storage.Net
       /// <param name="factory">Factory reference</param>
       /// <param name="credential">Credential structure cotnaining account name in username and account key in password.</param>
       /// <returns></returns>
-      public static ITableStorageProvider AzureTableStorage(this ITableStorageFactory factory,
+      public static ITableStorage AzureTableStorage(this ITableStorageFactory factory,
          NetworkCredential credential)
       {
          return new AzureTableStorageProvider(credential.UserName, credential.Password);
@@ -49,7 +49,7 @@ namespace Storage.Net
       /// <param name="containerName">Container name in the blob storage. If the container doesn't exist it will be automatically
       /// created for you.</param>
       /// <returns>Generic blob storage interface</returns>
-      public static IBlobStorageProvider AzureBlobStorage(this IBlobStorageFactory factory,
+      public static IBlobStorage AzureBlobStorage(this IBlobStorageFactory factory,
          string accountName,
          string key,
          string containerName)
@@ -57,7 +57,7 @@ namespace Storage.Net
          return new AzureBlobStorageProvider(accountName, key, containerName);
       }
 
-      public static IBlobStorageProvider AzureBlobStorageByContainerSasUri(this IBlobStorageFactory factory,
+      public static IBlobStorage AzureBlobStorageByContainerSasUri(this IBlobStorageFactory factory,
          Uri sasUri)
       {
          return new AzureBlobStorageProvider(sasUri);
@@ -71,7 +71,7 @@ namespace Storage.Net
       /// <param name="containerName">Container name in the blob storage. If the container doesn't exist it will be automatically
       /// created for you.</param>
       /// <returns>Generic blob storage interface</returns>
-      public static IBlobStorageProvider AzureBlobStorage(this IBlobStorageFactory factory,
+      public static IBlobStorage AzureBlobStorage(this IBlobStorageFactory factory,
          NetworkCredential credential,
          string containerName)
       {
@@ -86,7 +86,7 @@ namespace Storage.Net
       /// <param name="containerName">Container name in the blob storage. If the container doesn't exist it will be automatically
       /// create for you.</param>
       /// <returns>Generic blob storage  interface</returns>
-      public static IBlobStorageProvider AzureBlobStorage(this IBlobStorageFactory factory,
+      public static IBlobStorage AzureBlobStorage(this IBlobStorageFactory factory,
          string connectionString,
          string containerName)
       {

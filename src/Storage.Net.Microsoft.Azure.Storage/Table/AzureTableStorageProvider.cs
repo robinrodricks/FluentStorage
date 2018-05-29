@@ -20,7 +20,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
    /// <summary>
    /// Microsoft Azure Table storage
    /// </summary>
-   public class AzureTableStorageProvider : ITableStorageProvider
+   public class AzureTableStorageProvider : ITableStorage
    {
       private const int MaxInsertLimit = 100;
       private const string PartitionKeyName = "PartitionKey";

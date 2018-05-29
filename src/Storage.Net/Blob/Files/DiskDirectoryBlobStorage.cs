@@ -13,7 +13,7 @@ namespace Storage.Net.Blob.Files
    /// <summary>
    /// Blob storage implementation which uses local file system directory
    /// </summary>
-   public class DiskDirectoryBlobStorageProvider : IBlobStorageProvider
+   public class DiskDirectoryBlobStorage : IBlobStorage
    {
       private readonly DirectoryInfo _directory;
 
@@ -21,7 +21,7 @@ namespace Storage.Net.Blob.Files
       /// Creates an instance in a specific disk directory
       /// <param name="directory">Root directory</param>
       /// </summary>
-      public DiskDirectoryBlobStorageProvider(DirectoryInfo directory)
+      public DiskDirectoryBlobStorage(DirectoryInfo directory)
       {
          _directory = directory;
       }

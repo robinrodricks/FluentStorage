@@ -4,10 +4,10 @@ Local disk implementation is baked into the Storage.Net library itself as local 
 
 ## Blobs
 
-You can map a local directory as `IBlobStorageProvider`
+You can map a local directory as `IBlobStorage`
 
 ```csharp
-IBlobStorageProvider provider = StorageFactory.Blobs.DirectoryFiles(TestDir);
+IBlobStorage provider = StorageFactory.Blobs.DirectoryFiles(TestDir);
 ```
 
 which simply stores them as local files. Subfolders are created on demand, as soon as you start introducing path separators into blob IDs.
@@ -15,10 +15,10 @@ which simply stores them as local files. Subfolders are created on demand, as so
 
 ## Tables
 
-As for tables, you can map a local directory to `ITableStorageProvider`
+As for tables, you can map a local directory to `ITableStorage`
 
 ```csharp
-ITableStorageProvider tables = StorageFactory.Tables.CsvFiles(TestDir);
+ITableStorage tables = StorageFactory.Tables.CsvFiles(TestDir);
 ```
 
 and data will be stored in CSV files in that directory. 
