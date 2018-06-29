@@ -1,4 +1,5 @@
-﻿using Storage.Net.Aws.Blob;
+﻿using Amazon;
+using Storage.Net.Aws.Blob;
 using Storage.Net.Blob;
 
 namespace Storage.Net
@@ -16,13 +17,15 @@ namespace Storage.Net
       /// <param name="accessKeyId">Access key ID</param>
       /// <param name="secretAccessKey">Secret access key</param>
       /// <param name="bucketName">Bucket name</param>
+      /// <param name="regionEndpoint">Optionally set region endpoint. When not specified defaults to EU West</param>
       /// <returns>A reference to the created storage</returns>
       public static IBlobStorage AmazonS3BlobStorage(this IBlobStorageFactory factory,
          string accessKeyId,
          string secretAccessKey,
-         string bucketName)
+         string bucketName,
+         RegionEndpoint regionEndpoint = null)
       {
-         return new AwsS3BlobStorageProvider(accessKeyId, secretAccessKey, bucketName);
+         return new AwsS3BlobStorageProvider(accessKeyId, secretAccessKey, bucketName, regionEndpoint);
       }
    }
 }

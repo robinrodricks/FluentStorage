@@ -28,15 +28,14 @@ namespace Storage.Net.Aws.Blob
       /// <summary>
       /// Creates a new instance of <see cref="AwsS3BlobStorageProvider"/>
       /// </summary>
-      /// <param name="accessKeyId"></param>
-      /// <param name="secretAccessKey"></param>
-      /// <param name="bucketName"></param>
-      public AwsS3BlobStorageProvider(string accessKeyId, string secretAccessKey, string bucketName)
+      public AwsS3BlobStorageProvider(string accessKeyId, string secretAccessKey, string bucketName, RegionEndpoint regionEndpoint)
       {
          if(accessKeyId == null) throw new ArgumentNullException(nameof(accessKeyId));
          if(secretAccessKey == null) throw new ArgumentNullException(nameof(secretAccessKey));
-         //_client = new AmazonS3Client(new BasicAWSCredentials(accessKeyId, secretAccessKey), RegionEndpoint.EUWest1);
-         _client = new AmazonS3Client(accessKeyId, secretAccessKey);
+
+         if (regionEndpoint == null) regionEndpoint = RegionEndpoint.EUWest1;
+         _client = new AmazonS3Client(new BasicAWSCredentials(accessKeyId, secretAccessKey), regionEndpoint);
+         //_client = new AmazonS3Client(accessKeyId, secretAccessKey);
          _fileTransferUtility = new TransferUtility(_client);
          _bucketName = bucketName ?? throw new ArgumentNullException(nameof(bucketName));
 

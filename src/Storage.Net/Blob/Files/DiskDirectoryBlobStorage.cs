@@ -165,10 +165,16 @@ namespace Storage.Net.Blob.Files
          return path.UrlDecode();
       }
 
+      /// <summary>
+      /// dispose
+      /// </summary>
       public void Dispose()
       {
       }
 
+      /// <summary>
+      /// Streams into file
+      /// </summary>
       public Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
@@ -183,6 +189,9 @@ namespace Storage.Net.Blob.Files
          return Task.FromResult(true);
       }
 
+      /// <summary>
+      /// Opens file and returns the open stream
+      /// </summary>
       public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
@@ -193,6 +202,9 @@ namespace Storage.Net.Blob.Files
          return Task.FromResult(result);
       }
 
+      /// <summary>
+      /// Deletes files if they exist
+      /// </summary>
       public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          if (ids == null) return null;
@@ -208,6 +220,9 @@ namespace Storage.Net.Blob.Files
          return Task.FromResult(true);
       }
 
+      /// <summary>
+      /// Checks if files exist on disk
+      /// </summary>
       public Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          var result = new List<bool>();
@@ -226,6 +241,9 @@ namespace Storage.Net.Blob.Files
          return Task.FromResult((IEnumerable<bool>)result);
       }
 
+      /// <summary>
+      /// Gets file metadata
+      /// </summary>
       public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          if (ids == null) return null;
@@ -263,6 +281,9 @@ namespace Storage.Net.Blob.Files
          return Task.FromResult((IEnumerable<BlobMeta>) result);
       }
 
+      /// <summary>
+      /// Returns empty transaction as filesystem has no transaction support
+      /// </summary>
       public Task<ITransaction> OpenTransactionAsync()
       {
          return Task.FromResult(EmptyTransaction.Instance);

@@ -105,7 +105,7 @@ namespace Storage.Net.Tests.Integration.Blobs
                _storage = StorageFactory.Blobs.ZipFile(Path.Combine(TestDir.FullName, "test.zip"));
                break;
             case "aws-s3":
-               _storage = new AwsS3BlobStorageProvider(
+               _storage = StorageFactory.Blobs.AmazonS3BlobStorage(
                   _settings.AwsAccessKeyId,
                   _settings.AwsSecretAccessKey,
                   _settings.AwsTestBucketName);
