@@ -35,7 +35,8 @@ namespace Storage.Net.Aws.Blob
       {
          if(accessKeyId == null) throw new ArgumentNullException(nameof(accessKeyId));
          if(secretAccessKey == null) throw new ArgumentNullException(nameof(secretAccessKey));
-         _client = new AmazonS3Client(new BasicAWSCredentials(accessKeyId, secretAccessKey), RegionEndpoint.EUWest1);
+         //_client = new AmazonS3Client(new BasicAWSCredentials(accessKeyId, secretAccessKey), RegionEndpoint.EUWest1);
+         _client = new AmazonS3Client(accessKeyId, secretAccessKey);
          _fileTransferUtility = new TransferUtility(_client);
          _bucketName = bucketName ?? throw new ArgumentNullException(nameof(bucketName));
 

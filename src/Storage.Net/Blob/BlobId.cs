@@ -59,6 +59,9 @@ namespace Storage.Net.Blob
          Kind = kind;
       }
 
+      /// <summary>
+      /// Full blob info, i.e type, id and path
+      /// </summary>
       public override string ToString()
       {
          string k = Kind == BlobItemKind.File ? "file" : "folder";
@@ -66,6 +69,10 @@ namespace Storage.Net.Blob
          return $"{k}: {Id}@{FolderPath}";
       }
 
+      /// <summary>
+      /// Equality check
+      /// </summary>
+      /// <param name="other"></param>
       public bool Equals(BlobId other)
       {
          if (ReferenceEquals(other, null)) return false;
@@ -75,7 +82,10 @@ namespace Storage.Net.Blob
             other.Kind == Kind;
       }
 
-      // override object.Equals
+      /// <summary>
+      /// Equality check
+      /// </summary>
+      /// <param name="other"></param>
       public override bool Equals(object other)
       {
          if (ReferenceEquals(other, null)) return false;
@@ -85,15 +95,20 @@ namespace Storage.Net.Blob
          return Equals((BlobId)other);
       }
 
+      /// <summary>
+      /// Hash code calculation
+      /// </summary>
       public override int GetHashCode()
       {
          return FullPath.GetHashCode() * Kind.GetHashCode();
       }
 
+      /// <summary>
+      /// Constructs a file blob by full ID
+      /// </summary>
       public static implicit operator BlobId(string fileId)
       {
          return new BlobId(fileId, BlobItemKind.File);
       }
-
    }
 }

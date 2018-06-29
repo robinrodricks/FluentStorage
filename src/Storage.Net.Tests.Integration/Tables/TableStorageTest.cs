@@ -568,7 +568,7 @@ namespace Storage.Net.Tests.Integration.Tables
          IEnumerable<TableRow> rows = await _tables.GetAsync(_tableName, Guid.NewGuid().ToString());
 
          Assert.NotNull(rows);
-         Assert.Equal(0, rows.Count());
+         Assert.Empty(rows);
       }
 
       [Fact]
