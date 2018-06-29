@@ -46,7 +46,13 @@ namespace Storage.Net.Aws.Blob
       {
          try
          {
-            _client.PutBucket(new PutBucketRequest { BucketName = _bucketName });
+            var request = new PutBucketRequest { BucketName = _bucketName };
+
+#if NETSTANDARD
+            _client.PutBucketAsync(request).Wait();
+#else
+            _client.PutBucket(request);
+#endif
          }
          catch(AmazonS3Exception ex)
          {

@@ -46,6 +46,7 @@
     <PackageReference Include="NetBox" Version="2.0.0.35" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Blob\Extensions\" />
     <Folder Include="Properties\" />
   </ItemGroup>
    <ItemGroup>

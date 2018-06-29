@@ -11,7 +11,7 @@ namespace Storage.Net.Blob.Universal
    /// <summary>
    /// Universal storage provider, in preview.
    /// </summary>
-   public class UniversalStorage : IBlobStorage
+   class UniversalStorage : IBlobStorage
    {
       private readonly ConcurrentDictionary<string, IBlobStorage> _prefixToProvider = new ConcurrentDictionary<string, IBlobStorage>();
 

@@ -57,10 +57,12 @@ namespace Storage.Net.Aws.Blob
          set { throw new NotSupportedException(); }
       }
 
+#if NETFULL
       public override void Close()
       {
          _stream.Close();
       }
+#endif
 
       protected override void Dispose(bool disposing)
       {

@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
     <AssemblyTitle>Storage.Net.Amazon.Aws</AssemblyTitle>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>netstandard1.6;net452</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Storage.Net.Amazon.Aws</AssemblyName>
     <AssemblyOriginatorKeyFile>../storage.snk</AssemblyOriginatorKeyFile>
@@ -24,15 +24,23 @@
     <RepositoryType>GitHub</RepositoryType>
     <Description>Extension to Storage.Net providing integration with Amazon S3 blobs.</Description>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+      <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
+   </PropertyGroup>
+   <PropertyGroup Condition=" '$(TargetFramework)' == 'net452' ">
+      <DefineConstants>$(DefineConstants);NETFULL</DefineConstants>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
+   <ItemGroup>
+      <PackageReference Include="AWSSDK.Core" Version="3.3.21.4" />
+      <PackageReference Include="AWSSDK.S3" Version="3.3.16.1" />
+   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <PackageReference Include="AWSSDK.Core" Version="3.3.21.4" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.16.1" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
