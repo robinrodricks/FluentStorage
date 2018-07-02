@@ -66,7 +66,7 @@ namespace Storage.Net
 
          try
          {
-            var l = inputStream.Length;
+            long l = inputStream.Length;
          }
          catch(NotSupportedException ex)
          {
