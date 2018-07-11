@@ -175,7 +175,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Streams into file
       /// </summary>
-      public Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
+      public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
          GenericValidation.CheckSourceStream(sourceStream);
@@ -183,10 +183,8 @@ namespace Storage.Net.Blob.Files
          id = StoragePath.Normalize(id, false);
          using (Stream dest = CreateStream(id, !append))
          {
-            sourceStream.CopyTo(dest);
+           await sourceStream.CopyToAsync(dest);
          }
-
-         return Task.FromResult(true);
       }
 
       /// <summary>
