@@ -42,7 +42,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
    #endregion
 
-   public abstract class GenericMessageQueueTest : AbstractTestFixture
+   public abstract class GenericMessageQueueTest : AbstractTestFixture, IAsyncLifetime
    {
       private readonly ILog _log = L.G();
       private readonly string _name;
@@ -116,10 +116,16 @@ namespace Storage.Net.Tests.Integration.Messaging
                _publisher = StorageFactory.Messages.InMemoryPublisher(inMemoryTag);
                break;
          }
-
-         //start the pump
-         _receiver.StartMessagePumpAsync(ReceiverPump, cancellationToken: _cts.Token, maxBatchSize: 5);
       }
+
+      public async Task InitializeAsync()
+      {
+         //start the pump
+         await _receiver.StartMessagePumpAsync(ReceiverPump, cancellationToken: _cts.Token, maxBatchSize: 5);
+
+      }
+
+      public Task DisposeAsync() => Task.CompletedTask;
 
       public override void Dispose()
       {
@@ -150,7 +156,7 @@ namespace Storage.Net.Tests.Integration.Messaging
          await _publisher.PutMessagesAsync(new[] { message });
       }
 
-      private async Task<QueueMessage> WaitMessage(string tag, TimeSpan? maxWaitTime = null)
+      private async Task<QueueMessage> WaitMessage(string tag, TimeSpan? maxWaitTime = null, int minCount = 1)
       {
          DateTime start = DateTime.UtcNow;
 
@@ -158,7 +164,7 @@ namespace Storage.Net.Tests.Integration.Messaging
          {
             QueueMessage candidate = _receivedMessages.FirstOrDefault(m => m.Properties.ContainsKey("tag") && m.Properties["tag"] == tag);
 
-            if(candidate != null)
+            if(candidate != null && _receivedMessages.Count >= minCount)
             {
                //_receivedMessages.Clear();
                return candidate;
@@ -236,7 +242,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          await _publisher.PutMessagesAsync(messages);
 
-         await WaitMessage(null, TimeSpan.FromSeconds(5));
+         await WaitMessage(null, TimeSpan.FromSeconds(5), 10);
 
          Assert.True(_receivedMessages.Count >= 9, _receivedMessages.Count.ToString());
       }

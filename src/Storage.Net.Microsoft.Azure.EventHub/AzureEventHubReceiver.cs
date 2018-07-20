@@ -137,33 +137,54 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       {
          while (true)
          {
-            IEnumerable<EventData> events = await receiver.ReceiveAsync(maxBatchSize, _waitTime);
-
-            if (events != null && !cancellationToken.IsCancellationRequested)
+            try
             {
-               List<QueueMessage> qms = events.Select(ed => Converter.ToQueueMessage(ed, receiver.PartitionId)).ToList();
-               await onMessage(qms);
 
-               QueueMessage lastMessage = qms.LastOrDefault();
+               IEnumerable<EventData> events = await receiver.ReceiveAsync(maxBatchSize, _waitTime);
 
-               //save state
-               if (lastMessage != null)
+               if (events != null && !cancellationToken.IsCancellationRequested)
                {
-                  const string sequenceNumberPropertyName = "x-opt-sequence-number";
-                  const string offsetPropertyName = "x-opt-offset";
+                  List<QueueMessage> qms = events.Select(ed => Converter.ToQueueMessage(ed, receiver.PartitionId)).ToList();
+                  await onMessage(qms);
 
-                  if (lastMessage.Properties.TryGetValue(offsetPropertyName, out string offset))
+                  QueueMessage lastMessage = qms.LastOrDefault();
+
+                  //save state
+                  if (lastMessage != null)
                   {
-                     lastMessage.Properties.TryGetValue(sequenceNumberPropertyName, out string sequenceNumber);
+                     const string sequenceNumberPropertyName = "x-opt-sequence-number";
+                     const string offsetPropertyName = "x-opt-offset";
 
-                     await _state.SetPartitionState(receiver.PartitionId, offset, sequenceNumber);
+                     if (lastMessage.Properties.TryGetValue(offsetPropertyName, out string offset))
+                     {
+                        lastMessage.Properties.TryGetValue(sequenceNumberPropertyName, out string sequenceNumber);
+
+                        await _state.SetPartitionStateAsync(receiver.PartitionId, offset, sequenceNumber);
+                     }
                   }
                }
-            }
 
-            if (cancellationToken.IsCancellationRequested)
+               if (cancellationToken.IsCancellationRequested)
+               {
+                  await receiver.CloseAsync();
+                  return;
+               }
+
+            }
+            catch(ArgumentException ex)
             {
-               await receiver.CloseAsync();
+               Console.WriteLine("failed with message: '{0}', clearing partition state.", ex);
+
+               await _state.SetPartitionStateAsync(receiver.PartitionId, PartitionReceiver.StartOfStream, null);
+            }
+            catch(OperationCanceledException)
+            {
+               return;
+            }
+            catch (Exception ex)
+            {
+               Console.WriteLine("receiver stopped: {0}", ex);
+
                return;
             }
          }

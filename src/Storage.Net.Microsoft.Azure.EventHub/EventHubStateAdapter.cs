@@ -43,7 +43,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
          return token.Offset;
       }
 
-      public async Task SetPartitionState(string partitionId, string offset, string sequenceNumber)
+      public async Task SetPartitionStateAsync(string partitionId, string offset, string sequenceNumber)
       {
          if (partitionId == null)
             throw new ArgumentNullException(nameof(partitionId));

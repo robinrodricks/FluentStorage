@@ -35,7 +35,6 @@ namespace Storage.Net.Aws.Blob
 
          if (regionEndpoint == null) regionEndpoint = RegionEndpoint.EUWest1;
          _client = new AmazonS3Client(new BasicAWSCredentials(accessKeyId, secretAccessKey), regionEndpoint);
-         //_client = new AmazonS3Client(accessKeyId, secretAccessKey);
          _fileTransferUtility = new TransferUtility(_client);
          _bucketName = bucketName ?? throw new ArgumentNullException(nameof(bucketName));
 
