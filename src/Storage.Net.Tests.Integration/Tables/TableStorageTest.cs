@@ -22,10 +22,11 @@ namespace Storage.Net.Tests.Integration.Tables
       public AzureTableStorageTest() : base("azure") { }
    }
 
-   public class MssqlTableStorageTest : TableStorageTest
+   //we dont' have an open test instance of mssql anymore :(
+   /*public class MssqlTableStorageTest : TableStorageTest
    {
       public MssqlTableStorageTest() : base("mssql") { }
-   }
+   }*/
 
    //bored of maintaining ESENT tests when I don't really use ESENT anymore for a long time
    /*public class EsentTableStorageTest : TableStorageTest
