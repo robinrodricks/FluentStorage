@@ -249,6 +249,16 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
+      public async Task GetMeta_doesnt_exist_returns_null()
+      {
+         string id = RandomGenerator.RandomString;
+
+         BlobMeta meta = (await _storage.GetMetaAsync(new[] { id })).First();
+
+         Assert.Null(meta);
+      }
+
+      [Fact]
       public async Task Open_doesnt_exist_returns_null()
       {
          string id = RandomGenerator.RandomString;

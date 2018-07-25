@@ -26,20 +26,40 @@ namespace Storage.Net.Aws.Blob
       //https://github.com/awslabs/aws-sdk-net-samples/blob/master/ConsoleSamples/AmazonS3Sample/AmazonS3Sample/S3Sample.cs
 
       /// <summary>
-      /// Creates a new instance of <see cref="AwsS3BlobStorageProvider"/>
+      /// Creates a new instance of <see cref="AwsS3BlobStorageProvider"/> for a given region endpoint/>
       /// </summary>
       public AwsS3BlobStorageProvider(string accessKeyId, string secretAccessKey, string bucketName, RegionEndpoint regionEndpoint)
+         : this(accessKeyId, secretAccessKey, bucketName, new AmazonS3Config { RegionEndpoint = regionEndpoint ?? RegionEndpoint.EUWest1 })
+      {
+      }
+
+      /// <summary>
+      /// Creates a new instance of <see cref="AwsS3BlobStorageProvider"/> for an S3-compatible storage provider hosted on an alternative service URL/>
+      /// </summary>
+      public AwsS3BlobStorageProvider(string accessKeyId, string secretAccessKey, string bucketName, string serviceUrl)
+         : this(accessKeyId, secretAccessKey, bucketName, new AmazonS3Config
+         {
+            RegionEndpoint = RegionEndpoint.USEast1,
+            ServiceURL = serviceUrl
+         })
+      {
+      }
+
+      /// <summary>
+      /// Creates a new instance of <see cref="AwsS3BlobStorageProvider"/> for a given S3 client configuration/>
+      /// </summary>
+      public AwsS3BlobStorageProvider(string accessKeyId, string secretAccessKey, string bucketName, AmazonS3Config clientConfig)
       {
          if(accessKeyId == null) throw new ArgumentNullException(nameof(accessKeyId));
          if(secretAccessKey == null) throw new ArgumentNullException(nameof(secretAccessKey));
-
-         if (regionEndpoint == null) regionEndpoint = RegionEndpoint.EUWest1;
-         _client = new AmazonS3Client(new BasicAWSCredentials(accessKeyId, secretAccessKey), regionEndpoint);
-         _fileTransferUtility = new TransferUtility(_client);
          _bucketName = bucketName ?? throw new ArgumentNullException(nameof(bucketName));
+
+         _client = new AmazonS3Client(new BasicAWSCredentials(accessKeyId, secretAccessKey), clientConfig);
+         _fileTransferUtility = new TransferUtility(_client);
 
          Initialise();
       }
+
 
       private void Initialise()
       {
@@ -163,9 +183,9 @@ namespace Storage.Net.Aws.Blob
             {
                //ETag contains actual MD5 hash, not sure why!
    
-               return new BlobMeta(
-                  obj.ContentLength,
-                  obj.ETag.Trim('\"'));  
+               return (obj != null) 
+                  ? new BlobMeta(obj.ContentLength, obj.ETag.Trim('\"')) 
+                  : null;  
             }
          }
          catch (StorageException ex) when (ex.ErrorCode == ErrorCode.NotFound)
