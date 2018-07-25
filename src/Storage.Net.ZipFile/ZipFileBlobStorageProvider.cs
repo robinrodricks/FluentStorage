@@ -52,15 +52,22 @@ namespace Storage.Net.ZipFile
          var result = new List<BlobMeta>();
          ZipArchive zipArchive = GetArchive(false);
 
-         foreach(string id in ids)
+         foreach (string id in ids)
          {
             string nid = StoragePath.Normalize(id, false);
 
-            ZipArchiveEntry entry = zipArchive.GetEntry(id);
+            try
+            {
+               ZipArchiveEntry entry = zipArchive.GetEntry(nid);
 
-            long originalLength = entry.Length;
+               long originalLength = entry.Length;
 
-            result.Add(new BlobMeta(originalLength, null));
+               result.Add(new BlobMeta(originalLength, null));
+            }
+            catch (NullReferenceException)
+            {
+               result.Add(null);
+            }
          }
 
          return Task.FromResult<IEnumerable<BlobMeta>>(result);
