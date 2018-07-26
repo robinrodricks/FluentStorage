@@ -1,4 +1,5 @@
 ﻿using Storage.Net.Blob;
+using Storage.Net.Microsoft.Azure.DataLake.Store;
 using Storage.Net.Microsoft.Azure.DataLake.Store.Blob;
 using System;
 using System.Net;
@@ -10,6 +11,11 @@ namespace Storage.Net
    /// </summary>
    public static class Factory
    {
+      public static IModulesFactory UseAzureDataLakeStore(this IModulesFactory factory)
+      {
+         return factory.Use(new ExternalModule());
+      }
+
       /// <summary>
       /// Creates and instance of Azure Data Lake Store client
       /// </summary>

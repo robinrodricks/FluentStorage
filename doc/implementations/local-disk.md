@@ -7,10 +7,16 @@ Local disk implementation is baked into the Storage.Net library itself as local 
 You can map a local directory as `IBlobStorage`
 
 ```csharp
-IBlobStorage provider = StorageFactory.Blobs.DirectoryFiles(TestDir);
+IBlobStorage storage = StorageFactory.Blobs.DirectoryFiles(TestDir);
 ```
 
 which simply stores them as local files. Subfolders are created on demand, as soon as you start introducing path separators into blob IDs.
+
+alternatively, you can create it with a connection string:
+
+```csharp
+IBlobStorage storage = StorageFactory.Blobs.FromConnectionString("disk://path=path_to_directory");
+```
 
 
 ## Tables

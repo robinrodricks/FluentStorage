@@ -38,6 +38,18 @@ _provider = StorageFactory.Blobs.AzureBlobStorageByContainerSasUri(containerSasU
 
 Note that URI in this case should be a **container SAS URI**, and this is the only option supported.
 
+Alternatively, you can create it with a storage.net connection string:
+
+```csharp
+// do not forget to initialise azure module before your application uses connection strings:
+StorageFactory.Modules.UseAzureStorage();
+
+// create the storage
+IBlobStorage storage = StorageFactory.Blobs.FromConnectionString("azure.blob://account=account_name;container=container_name;key=storage_key;createIfNotExists=false/true");
+```
+
+The last parameter *createIfNotExists* is optional.
+
 ## Tables
 
 > todo

@@ -24,6 +24,16 @@ where:
 
 see appendix below on how to obtain this information.
 
+Alternatively, you can create the storage using connection string:
+
+```csharp
+// do not forget to initialise azure module before your application uses connection strings:
+StorageFactory.Modules.UseAzureDataLakeStorage();
+
+// create the storage
+IBlobStorage storage = StorageFactory.Blobs.FromConnectionString("azure.datalakestore://accountName=...;tenantId=...;principalId=...;principalSecret=...");
+```
+
 ### Important Implementation Notes
 
 - Uploading a file always overwrites existing file if it exists, otherwise a new file is created. This still takes one network call.

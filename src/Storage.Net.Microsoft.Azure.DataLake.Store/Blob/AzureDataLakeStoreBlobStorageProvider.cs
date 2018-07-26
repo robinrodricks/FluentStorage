@@ -48,6 +48,10 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       /// </summary>
       public DataLakeStoreFileSystemManagementClient FsClient => _fsClient;
 
+      public static AzureDataLakeStoreBlobStorageProvider CreateByClientSecret(string accountName, string tenantId, string principalId, string principalSecret)
+      {
+         return CreateByClientSecret(accountName, new NetworkCredential(principalId, principalSecret, tenantId));
+      }
 
       public static AzureDataLakeStoreBlobStorageProvider CreateByClientSecret(string accountName, NetworkCredential credential)
       {
