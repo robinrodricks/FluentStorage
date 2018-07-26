@@ -100,6 +100,7 @@ namespace Storage.Net.Tests.Integration.Blobs
                break;
             case "disk-directory":
                _storage = StorageFactory.Blobs.DirectoryFiles(TestDir);
+               _storage = StorageFactory.Blobs.FromConnectionString("disk:///" + TestDir.FullName);
                break;
             case "zip":
                _storage = StorageFactory.Blobs.ZipFile(Path.Combine(TestDir.FullName, "test.zip"));

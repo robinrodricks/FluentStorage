@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Storage.Net
 {
-   interface IDataTransform
+   public enum StorageType
    {
-
+      Blob
    }
 }

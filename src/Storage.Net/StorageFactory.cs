@@ -8,6 +8,7 @@
       private static ITableStorageFactory _tables = new InternalTablesFactory();
       private static IBlobStorageFactory _blobs = new InternalBlobsFactory();
       private static IMessagingFactory _messages = new InternalMessagingFactory();
+      private static IModulesFactory _moduleInit = new InternalModuleInitFactory();
 
       /// <summary>
       /// Access to creating tables
@@ -24,6 +25,11 @@
       /// </summary>
       public static IMessagingFactory Messages => _messages;
 
+      /// <summary>
+      /// Module initialisation
+      /// </summary>
+      public static IModulesFactory Modules => _moduleInit;
+
       class InternalTablesFactory : ITableStorageFactory
       {
       }
@@ -36,6 +42,40 @@
       {
 
       }
+
+      class InternalModuleInitFactory : IModulesFactory
+      {
+
+      }
+   }
+
+   /// <summary>
+   /// Crates blob storage implementations
+   /// </summary>
+   public interface IBlobStorageFactory
+   {
+   }
+
+   /// <summary>
+   /// Creates messaging implementations
+   /// </summary>
+   public interface IMessagingFactory
+   {
+   }
+
+   /// <summary>
+   /// Crates table storage implementations
+   /// </summary>
+   public interface ITableStorageFactory
+   {
+   }
+
+   /// <summary>
+   /// Module initialisation primitives
+   /// </summary>
+   public interface IModulesFactory
+   {
+
    }
 
 }

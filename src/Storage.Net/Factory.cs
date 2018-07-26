@@ -7,6 +7,7 @@ using Storage.Net.Messaging;
 using Storage.Net.Table;
 using Storage.Net.Table.Files;
 using NetBox.Extensions;
+using Storage.Net.ConnectionString;
 
 namespace Storage.Net
 {
@@ -15,8 +16,26 @@ namespace Storage.Net
    /// </summary>
    public static class Factory
    {
-      private static readonly Dictionary<string, InMemoryMessagePublisherReceiver> _inMemoryMessagingNameToInstance =
-         new Dictionary<string, InMemoryMessagePublisherReceiver>();
+      public static IModulesFactory Use(this IModulesFactory factory, IExternalModule module)
+      {
+         if (module == null)
+         {
+            throw new ArgumentNullException(nameof(module));
+         }
+
+         IConnectionFactory connectionFactory = module.ConnectionFactory;
+         if (connectionFactory != null)
+         {
+            ConnectionStringFactory.Register(connectionFactory);
+         }
+
+         return factory;
+      }
+
+      public static IBlobStorage FromConnectionString(this IBlobStorageFactory factory, string connectionString)
+      {
+         return ConnectionStringFactory.CreateBlobStorage(connectionString);
+      }
 
       /// <summary>
       /// Creates a new instance of CSV file storage
@@ -59,9 +78,7 @@ namespace Storage.Net
       /// with the same name returns an identical publisher. To create a receiver for this memory bufffer use the same name.</param>
       public static IMessagePublisher InMemoryPublisher(this IMessagingFactory factory, string name)
       {
-         if (name == null) throw new ArgumentNullException(nameof(name));
-
-         return _inMemoryMessagingNameToInstance.GetOrAdd(name, () => new InMemoryMessagePublisherReceiver());
+         return InMemoryMessagePublisherReceiver.CreateOrGet(name);
       }
 
       /// <summary>
@@ -71,9 +88,7 @@ namespace Storage.Net
       /// <param name="name">Memory buffer name. Use the name used when you've created a publisher to receive messages from that buffer.</param>
       public static IMessageReceiver InMemoryReceiver(this IMessagingFactory factory, string name)
       {
-         if (name == null) throw new ArgumentNullException(nameof(name));
-
-         return _inMemoryMessagingNameToInstance.GetOrAdd(name, () => new InMemoryMessagePublisherReceiver());
+         return InMemoryMessagePublisherReceiver.CreateOrGet(name);
       }
    }
 }

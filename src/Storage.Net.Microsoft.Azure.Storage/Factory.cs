@@ -6,6 +6,8 @@ using Storage.Net.Microsoft.Azure.Storage.Messaging;
 using Storage.Net.Microsoft.Azure.Storage.Table;
 using Storage.Net.Table;
 using System.Net;
+using Storage.Net.ConnectionString;
+using Storage.Net.Microsoft.Azure.Storage;
 
 namespace Storage.Net
 {
@@ -14,6 +16,12 @@ namespace Storage.Net
    /// </summary>
    public static class Factory
    {
+
+      public static IModulesFactory UseAzureStorage(this IModulesFactory factory)
+      {
+         return factory.Use(new AzureStorageModule());
+      }
+
       /// <summary>
       /// Creates an instance of Azure Table Storage using account name and key.
       /// </summary>

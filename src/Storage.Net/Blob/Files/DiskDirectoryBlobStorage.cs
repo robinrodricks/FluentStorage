@@ -27,6 +27,11 @@ namespace Storage.Net.Blob.Files
       }
 
       /// <summary>
+      /// Original root directory this storage is mapped to
+      /// </summary>
+      public DirectoryInfo RootDirectory => _directory;
+
+      /// <summary>
       /// Returns the list of blob names in this storage, optionally filtered by prefix
       /// </summary>
       public Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)

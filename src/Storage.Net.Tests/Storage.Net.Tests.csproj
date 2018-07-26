@@ -15,6 +15,7 @@
     <None Remove="Azure\**" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Storage.Net.Microsoft.Azure.Storage\Storage.Net.Microsoft.Azure.Storage.csproj" />
     <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
   </ItemGroup>
   <ItemGroup>
