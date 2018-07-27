@@ -14,6 +14,7 @@ using System.Threading;
 using System.Text.RegularExpressions;
 using NetBox.Extensions;
 using NetBox;
+using System.Net;
 
 namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 {
@@ -136,7 +137,18 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
       private async Task<BlobMeta> GetMetaAsync(string id)
       {
-         SecretBundle secret = await _vaultClient.GetSecretAsync(_vaultUri, id);
+         SecretBundle secret;
+
+         try
+         {
+            secret = await _vaultClient.GetSecretAsync(_vaultUri, id);
+         }
+         catch(KeyVaultErrorException ex) when(ex.Response.StatusCode == HttpStatusCode.NotFound)
+         {
+            return null;
+         }
+
+
          byte[] data = Encoding.UTF8.GetBytes(secret.Value);
 
          return new BlobMeta(data.Length, secret.Value.GetHash(HashType.Md5));

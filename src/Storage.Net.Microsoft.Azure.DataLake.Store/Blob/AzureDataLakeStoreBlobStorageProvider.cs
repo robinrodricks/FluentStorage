@@ -164,7 +164,16 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
       private async Task<BlobMeta> GetMetaAsync(string id, DataLakeStoreFileSystemManagementClient client)
       {
-         FileStatusResult fsr = await client.FileSystem.GetFileStatusAsync(_accountName, id);
+         FileStatusResult fsr;
+
+         try
+         {
+            fsr = await client.FileSystem.GetFileStatusAsync(_accountName, id);
+         }
+         catch(AdlsErrorException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
+         {
+            return null;
+         }
 
          var meta = new BlobMeta(fsr.FileStatus.Length.Value, null);
 
