@@ -181,7 +181,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
                }
                else
                {
-                  var meta = new BlobMeta(value.Value.Length, null);
+                  var meta = new BlobMeta(value.Value.Length, null, null);
                   result.Add(meta);
                }
             }

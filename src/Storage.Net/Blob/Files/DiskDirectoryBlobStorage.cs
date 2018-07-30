@@ -275,7 +275,8 @@ namespace Storage.Net.Blob.Files
 
                var meta = new BlobMeta(
                   fi.Length,
-                  md5);
+                  md5,
+                  fi.CreationTimeUtc);
 
                result.Add(meta);
             }

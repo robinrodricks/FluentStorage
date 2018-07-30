@@ -87,15 +87,27 @@ namespace Storage.Net.Blob
       /// <summary>
       /// Deletes a single blob
       /// </summary>
-      /// <param name="provider"></param>
+      /// <param name="storage"></param>
       /// <param name="id"></param>
       /// <param name="cancellationToken"></param>
       /// <returns></returns>
       public static Task DeleteAsync(
-         this IBlobStorage provider,
+         this IBlobStorage storage,
          string id, CancellationToken cancellationToken = default)
       {
-         return provider.DeleteAsync(new[] {id}, cancellationToken);
+         return storage.DeleteAsync(new[] {id}, cancellationToken);
+      }
+
+      /// <summary>
+      /// Gets basic blob metadata
+      /// </summary>
+      /// <param name="id">Blob id</param>
+      /// <param name="cancellationToken"></param>
+      /// <returns>Blob metadata or null if blob doesn't exist</returns>
+      public static Task GetMetaAsync(this IBlobStorage storage,
+         string id, CancellationToken cancellationToken = default)
+      {
+         return storage.GetMetaAsync(new[] { id }, cancellationToken);
       }
 
       #endregion

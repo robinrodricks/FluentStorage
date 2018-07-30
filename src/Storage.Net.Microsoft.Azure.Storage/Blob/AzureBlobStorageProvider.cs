@@ -276,7 +276,8 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          var meta = new BlobMeta(
             blob.Properties.Length,
-            md5);
+            md5,
+            blob.Properties.LastModified);
 
          return meta;
       }

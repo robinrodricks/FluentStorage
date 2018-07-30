@@ -25,6 +25,8 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       private ServiceClientCredentials _credential;
       private DataLakeStoreFileSystemManagementClient _fsClient;
 
+      private static readonly DateTime UnixEpoch = new DateTime(1970, 01, 01, 00, 00, 00, DateTimeKind.Utc);
+
       //some info on how to use sdk here: https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-get-started-net-sdk
 
       private AzureDataLakeStoreBlobStorageProvider(string accountName, string domain, string clientId, string clientSecret, string clientCert)
@@ -175,9 +177,18 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
             return null;
          }
 
-         var meta = new BlobMeta(fsr.FileStatus.Length.Value, null);
+         var meta = new BlobMeta(fsr.FileStatus.Length.Value, null, GetLastModifiedDate(fsr));
 
          return meta;
+      }
+
+      private static DateTimeOffset? GetLastModifiedDate(FileStatusResult fsr)
+      {
+         if (fsr.FileStatus.ModificationTime == null) return null;
+
+         long ticks = fsr.FileStatus.ModificationTime.Value;
+         DateTime result = UnixEpoch.AddMilliseconds(ticks);
+         return result;
       }
 
       private async Task<DataLakeStoreFileSystemManagementClient> GetFsClient()

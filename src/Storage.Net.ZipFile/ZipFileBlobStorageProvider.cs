@@ -62,7 +62,7 @@ namespace Storage.Net.ZipFile
 
                long originalLength = entry.Length;
 
-               result.Add(new BlobMeta(originalLength, null));
+               result.Add(new BlobMeta(originalLength, null, entry.LastWriteTime));
             }
             catch (NullReferenceException)
             {

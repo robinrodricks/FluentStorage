@@ -151,7 +151,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
          byte[] data = Encoding.UTF8.GetBytes(secret.Value);
 
-         return new BlobMeta(data.Length, secret.Value.GetHash(HashType.Md5));
+         return new BlobMeta(data.Length, secret.Value.GetHash(HashType.Md5), secret.Attributes.Updated);
       }
 
       #endregion

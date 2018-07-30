@@ -1,4 +1,6 @@
-﻿namespace Storage.Net.Blob
+﻿using System;
+
+namespace Storage.Net.Blob
 {
    /// <summary>
    /// Contains basic metadata about a blob
@@ -10,10 +12,12 @@
       /// </summary>
       /// <param name="size">Blob size</param>
       /// <param name="md5">MD5 hash of the blob</param>
-      public BlobMeta(long size, string md5)
+      /// <param name="lastModificationTime">Last modifiacation time when known</param>
+      public BlobMeta(long size, string md5, DateTimeOffset? lastModificationTime)
       {
          this.Size = size;
          this.MD5 = md5;
+         LastModificationTime = lastModificationTime;
       }
 
       /// <summary>
@@ -26,5 +30,10 @@
       /// no information about the hash.
       /// </summary>
       public string MD5 { get; }
+
+      /// <summary>
+      /// Last modification time when known
+      /// </summary>
+      public DateTimeOffset? LastModificationTime { get; }
    }
 }

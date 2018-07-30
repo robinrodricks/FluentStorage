@@ -112,7 +112,7 @@ namespace Storage.Net.Blob
             {
                ms.Seek(0, SeekOrigin.Begin);
 
-               var meta = new BlobMeta(ms.Length, ms.GetHash(HashType.Md5));
+               var meta = new BlobMeta(ms.Length, ms.GetHash(HashType.Md5), null);
 
                result.Add(meta);
             }

@@ -241,11 +241,13 @@ namespace Storage.Net.Tests.Integration.Blobs
 
          BlobMeta meta = (await _storage.GetMetaAsync(new[] { id })).First();
 
+
          long size = Encoding.UTF8.GetBytes(content).Length;
          string md5 = content.GetHash(HashType.Md5);
 
          Assert.Equal(size, meta.Size);
          Assert.True(meta.MD5 == null || meta.MD5 == md5);
+         Assert.True(meta.LastModificationTime == null || meta.LastModificationTime.Value.Date.IsToday());
       }
 
       [Fact]

@@ -184,7 +184,7 @@ namespace Storage.Net.Aws.Blob
                //ETag contains actual MD5 hash, not sure why!
    
                return (obj != null) 
-                  ? new BlobMeta(obj.ContentLength, obj.ETag.Trim('\"')) 
+                  ? new BlobMeta(obj.ContentLength, obj.ETag.Trim('\"'), obj.LastModified.ToUniversalTime())
                   : null;  
             }
          }
