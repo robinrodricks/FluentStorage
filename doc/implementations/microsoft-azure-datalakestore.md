@@ -39,6 +39,7 @@ IBlobStorage storage = StorageFactory.Blobs.FromConnectionString("azure.datalake
 - Uploading a file always overwrites existing file if it exists, otherwise a new file is created. This still takes one network call.
 - Appending to a file checks if a file exists first, so this operation results in two network calls.
 - List operation supports folder hierary, folders, recursion, and limiting by number of items, i.e. no limitations whatsoever.
+- Application that creates an instance of IBlobStorage is highly recomended to set `ServicePointManager.DefaultConnectionLimit` to the number of threads application wants the sdk to use before creating any instance of IBlobStorage. By default ServicePointManager.DefaultConnectionLimit is set to 2 by .NET runtime which might be a small number.
 
 
 ## Appendix. Creating a Service Principal
