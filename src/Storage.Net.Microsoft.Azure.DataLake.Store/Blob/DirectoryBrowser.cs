@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.DataLake.Store;
 using Microsoft.Azure.Management.DataLake.Store;
 using Microsoft.Azure.Management.DataLake.Store.Models;
 using Storage.Net.Blob;
@@ -13,13 +14,11 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 {
    class DirectoryBrowser
    {
-      private readonly DataLakeStoreFileSystemManagementClient _client;
-      private readonly string _accountName;
+      private readonly AdlsClient _client;
 
-      public DirectoryBrowser(DataLakeStoreFileSystemManagementClient client, string accountName)
+      public DirectoryBrowser(AdlsClient client)
       {
-         _client = client;
-         _accountName = accountName;
+         _client = client ?? throw new ArgumentNullException(nameof(client));
       }
 
       public async Task<IEnumerable<BlobId>> Browse(ListOptions options, CancellationToken token)
@@ -34,24 +33,22 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
       private async Task Browse(string path, ListOptions options, ICollection<BlobId> container, CancellationToken token)
       {
-         FileStatusesResult statuses;
+         List<DirectoryEntry> dirEntries;
 
          try
          {
-            statuses = await _client.FileSystem.ListFileStatusAsync(_accountName, path,
-               null, null, null, null,
-               token);
+            dirEntries = _client.EnumerateDirectory(path, UserGroupRepresentation.ObjectID, token).ToList();
          }
          //skip files with forbidden access
          catch (AdlsErrorException ex) when (ex.Response.StatusCode == HttpStatusCode.Forbidden)
          {
-            statuses = null;
+            dirEntries = null;
          }
 
-         if (statuses == null) return;
+         if (dirEntries == null) return;
 
          List<BlobId> batch =
-            statuses.FileStatuses.FileStatus
+            dirEntries
                .Select(p => ToBlobId(path, p))
                .Where(options.IsMatch)
                .ToList();
@@ -60,25 +57,27 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
          if(options.Recurse)
          {
-            int folderCount = batch.Count(b => b.Kind == BlobItemKind.Folder);
-            if(folderCount > 0)
+            List<BlobId> folders = batch.Where(b => b.Kind == BlobItemKind.Folder).ToList();
+
+            if(folders.Count > 0)
             {
-               await Task.WhenAll(batch.Select(bid => Browse(
-                  StoragePath.Combine(path, bid.Id),
-                  options,
-                  container,
-                  token
+               await Task.WhenAll(
+                  folders.Select(bid => Browse(
+                     StoragePath.Combine(path, bid.Id),
+                     options,
+                     container,
+                     token
                   )));
             }
          }
       }
 
-      private static BlobId ToBlobId(string path, FileStatusProperties properties)
+      private static BlobId ToBlobId(string path, DirectoryEntry entry)
       {
-         if (properties.Type == FileType.FILE)
-            return new BlobId(path, properties.PathSuffix, BlobItemKind.File);
+         if (entry.Type == DirectoryEntryType.FILE)
+            return new BlobId(path, entry.Name, BlobItemKind.File);
          else
-            return new BlobId(path, properties.PathSuffix, BlobItemKind.Folder);
+            return new BlobId(path, entry.Name, BlobItemKind.Folder);
       }
    }
 }

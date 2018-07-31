@@ -13,6 +13,7 @@ using NetBox.IO;
 using Microsoft.Rest.Azure;
 using System.Linq;
 using System.Threading;
+using Microsoft.Azure.DataLake.Store;
 
 namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 {
@@ -24,6 +25,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       private readonly string _clientSecret;
       private ServiceClientCredentials _credential;
       private DataLakeStoreFileSystemManagementClient _fsClient;
+      private AdlsClient _client;
 
       private static readonly DateTime UnixEpoch = new DateTime(1970, 01, 01, 00, 00, 00, DateTimeKind.Utc);
 
@@ -75,9 +77,9 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          if (options == null) options = new ListOptions();
 
-         DataLakeStoreFileSystemManagementClient client = await GetFsClient();
+         AdlsClient client = await GetAdlsClient();
 
-         var browser = new DirectoryBrowser(client, _accountName);
+         var browser = new DirectoryBrowser(client);
          return await browser.Browse(options, cancellationToken);
       }
 
@@ -85,22 +87,23 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          GenericValidation.CheckBlobId(id);
 
-         DataLakeStoreFileSystemManagementClient client = await GetFsClient();
+         DataLakeStoreFileSystemManagementClient managementClient = await GetFsClient();
+         AdlsClient client = await GetAdlsClient();
 
          if (append)
          {
             if ((await ExistsAsync(new[] { id }, cancellationToken)).First())
             {
-               await client.FileSystem.AppendAsync(_accountName, id, new NonCloseableStream(sourceStream));
+               await managementClient.FileSystem.AppendAsync(_accountName, id, new NonCloseableStream(sourceStream));
             }
             else
             {
-               await client.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(sourceStream), true);
+               await managementClient.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(sourceStream), true);
             }
          }
          else
          {
-            await client.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(sourceStream), true);
+            await managementClient.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(sourceStream), true);
          }
       }
 
@@ -108,11 +111,11 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          GenericValidation.CheckBlobId(id);
 
-         DataLakeStoreFileSystemManagementClient client = await GetFsClient();
+         DataLakeStoreFileSystemManagementClient managementClient = await GetFsClient();
 
          try
          {
-            return await client.FileSystem.OpenAsync(_accountName, id);
+            return await managementClient.FileSystem.OpenAsync(_accountName, id);
          }
          catch (CloudException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
          {
@@ -200,6 +203,17 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          _fsClient = new DataLakeStoreFileSystemManagementClient(creds);
 
          return _fsClient;
+      }
+
+      private async Task<AdlsClient> GetAdlsClient()
+      {
+         if (_client != null) return _client;
+
+         ServiceClientCredentials creds = await GetCreds();
+
+         _client = AdlsClient.CreateClient($"{_accountName}.azuredatalakestore.net", creds);
+
+         return _client;
       }
 
       private async Task<ServiceClientCredentials> GetCreds()
