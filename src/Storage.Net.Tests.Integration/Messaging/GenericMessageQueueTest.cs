@@ -44,7 +44,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
    public abstract class GenericMessageQueueTest : AbstractTestFixture, IAsyncLifetime
    {
-      private readonly ILog _log = L.G();
+      private readonly ILog _log = L.G<GenericMessageQueueTest>();
       private readonly string _name;
       private IMessagePublisher _publisher;
       private IMessageReceiver _receiver;

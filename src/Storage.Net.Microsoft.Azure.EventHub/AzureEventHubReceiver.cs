@@ -84,8 +84,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
                PartitionReceiver receiver = _hubClient.CreateReceiver(
                   _consumerGroupName ?? PartitionReceiver.DefaultConsumerGroupName,
                   partitionId,
-                  (await _state.GetPartitionOffset(partitionId)),
-                  false);
+                  (await _state.GetPartitionPosition(partitionId)));
 
                receivers.Add(receiver);
             }
@@ -153,13 +152,16 @@ namespace Storage.Net.Microsoft.Azure.EventHub
                   if (lastMessage != null)
                   {
                      const string sequenceNumberPropertyName = "x-opt-sequence-number";
-                     const string offsetPropertyName = "x-opt-offset";
 
-                     if (lastMessage.Properties.TryGetValue(offsetPropertyName, out string offset))
+                     if (lastMessage.Properties.TryGetValue(sequenceNumberPropertyName, out string sequenceNumber))
                      {
-                        lastMessage.Properties.TryGetValue(sequenceNumberPropertyName, out string sequenceNumber);
+                        long? sequenceNumberLong = null;
+                        if(long.TryParse(sequenceNumber, out long seqenceNumberNonNullable))
+                        {
+                           sequenceNumberLong = seqenceNumberNonNullable;
+                        }
 
-                        await _state.SetPartitionStateAsync(receiver.PartitionId, offset, sequenceNumber);
+                        await _state.SetPartitionStateAsync(receiver.PartitionId, sequenceNumberLong);
                      }
                   }
                }
@@ -175,7 +177,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
             {
                Console.WriteLine("failed with message: '{0}', clearing partition state.", ex);
 
-               await _state.SetPartitionStateAsync(receiver.PartitionId, PartitionReceiver.StartOfStream, null);
+               await _state.SetPartitionStateAsync(receiver.PartitionId, EventPosition.FromStart().SequenceNumber);
             }
             catch(OperationCanceledException)
             {
