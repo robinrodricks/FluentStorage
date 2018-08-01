@@ -106,6 +106,8 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
 
             await Task.Delay(_scanInterval);
          }
+
+         Trace.TraceInformation("queue '{0}' scanner exited", _queueName);
       }
 
       public void Dispose()
