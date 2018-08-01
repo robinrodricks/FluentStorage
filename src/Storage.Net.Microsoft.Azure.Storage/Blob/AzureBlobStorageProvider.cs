@@ -271,6 +271,11 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          await blob.FetchAttributesAsync();
 
+         return GetblobMeta(blob);
+      }
+
+      internal static BlobMeta GetblobMeta(CloudBlob blob)
+      {
          //ContentMD5 is base64-encoded hash, whereas we work with HEX encoded ones
          string md5 = blob.Properties.ContentMD5.Base64DecodeAsBytes().ToHexString();
 

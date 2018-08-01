@@ -44,16 +44,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
             foreach (IListBlobItem blob in segment.Results)
             {
-               BlobId id;
-
-               if (blob is CloudBlockBlob blockBlob)
-                  id = new BlobId(blockBlob.Name, BlobItemKind.File);
-               else if (blob is CloudAppendBlob appendBlob)
-                  id = new BlobId(appendBlob.Name, BlobItemKind.File);
-               else if (blob is CloudBlobDirectory dirBlob)
-                  id = new BlobId(dirBlob.Prefix, BlobItemKind.Folder);
-               else
-                  throw new InvalidOperationException($"unknown item type {blob.GetType()}");
+               BlobId id = ToBlobId(blob, options.IncludeMetaWhenKnown);
 
                if (options.IsMatch(id))
                {
@@ -88,6 +79,37 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          CloudBlobDirectory dir = _container.GetDirectoryReference(path);
 
          return dir;
+      }
+
+      private BlobId ToBlobId(IListBlobItem blob, bool attachMetadata)
+      {
+         BlobId id;
+
+         if (blob is CloudBlockBlob blockBlob)
+         {
+            id = new BlobId(blockBlob.Name, BlobItemKind.File);
+         }
+         else if (blob is CloudAppendBlob appendBlob)
+         {
+            id = new BlobId(appendBlob.Name, BlobItemKind.File);
+         }
+         else if (blob is CloudBlobDirectory dirBlob)
+         {
+            id = new BlobId(dirBlob.Prefix, BlobItemKind.Folder);
+         }
+         else
+         {
+            throw new InvalidOperationException($"unknown item type {blob.GetType()}");
+         }
+
+         //attach metadata if we can
+         if(attachMetadata && blob is CloudBlob cloudBlob)
+         {
+            id.Meta = AzureBlobStorageProvider.GetblobMeta(cloudBlob);
+         }
+
+         return id;
+
       }
 
    }
