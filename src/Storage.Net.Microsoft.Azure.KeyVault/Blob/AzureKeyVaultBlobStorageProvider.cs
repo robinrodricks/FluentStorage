@@ -42,6 +42,8 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
          GenericValidation.CheckBlobPrefix(options.Prefix);
 
+         if (options.FolderPath != null) return Enumerable.Empty<BlobId>();
+
          var secretNames = new List<BlobId>();
          IPage<SecretItem> page = await _vaultClient.GetSecretsAsync(_vaultUri);
 

@@ -40,7 +40,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
             dirEntries = _client.EnumerateDirectory(path, UserGroupRepresentation.ObjectID, token).ToList();
          }
          //skip files with forbidden access
-         catch (AdlsErrorException ex) when (ex.Response.StatusCode == HttpStatusCode.Forbidden)
+         catch (AdlsException ex) when (ex.HttpStatus == HttpStatusCode.Forbidden || ex.HttpStatus == HttpStatusCode.NotFound)
          {
             dirEntries = null;
          }

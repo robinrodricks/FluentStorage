@@ -198,6 +198,14 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
+      public async Task List_FileInNonExistingFolder_EmptyCollection()
+      {
+         IEnumerable<BlobId> objects = await _storage.ListAsync(new ListOptions { FolderPath = "/" + Guid.NewGuid() });
+
+         Assert.True(objects.Count() == 0);
+      }
+
+      [Fact]
       public async Task List_VeryLongPrefix_NoResultsNoCrash()
       {
          await Assert.ThrowsAsync<ArgumentException>(async () => await _storage.ListAsync(new ListOptions { Prefix = RandomGenerator.GetRandomString(100000, false) }));
