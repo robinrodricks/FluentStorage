@@ -111,13 +111,15 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          GenericValidation.CheckBlobId(id);
 
-         DataLakeStoreFileSystemManagementClient managementClient = await GetFsClient();
+         AdlsClient client = await GetAdlsClient();
 
          try
          {
-            return await managementClient.FileSystem.OpenAsync(_accountName, id);
+            AdlsInputStream response = await client.GetReadStreamAsync(id, cancellationToken);
+
+            return response;
          }
-         catch (CloudException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
+         catch (AdlsException ex) when (ex.HttpStatus == HttpStatusCode.NotFound)
          {
             return null;
             //throw new StorageException(ErrorCode.NotFound, ex);

@@ -121,7 +121,7 @@ namespace Storage.Net.Tests.Integration.Blobs
          }
       }
 
-      private async Task<string> GetRandomStreamId(string prefix = null)
+      private async Task<string> GetRandomStreamIdAsync(string prefix = null)
       {
          string id = Guid.NewGuid().ToString();
          if (prefix != null) id = prefix + "/" + id;
@@ -274,6 +274,16 @@ namespace Storage.Net.Tests.Integration.Blobs
          string id = RandomGenerator.RandomString;
 
          Assert.Null(await _storage.OpenReadAsync(id));
+      }
+
+      [Fact]
+      public async Task Open_copy_to_memory_stream_succeeds()
+      {
+         string id = await GetRandomStreamIdAsync();
+         IBlobStorage ms = StorageFactory.Blobs.InMemory();
+
+         //if this doesn't crash it means the returned stream is compatible with usual .net streaming
+         await _storage.CopyToAsync(id, ms, id);
       }
 
       class TestDocument

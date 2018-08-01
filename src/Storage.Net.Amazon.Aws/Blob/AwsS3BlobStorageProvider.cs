@@ -11,6 +11,7 @@ using Amazon.S3.Transfer;
 using NetBox;
 using System.Threading.Tasks;
 using System.Threading;
+using Storage.Net.Streaming;
 
 namespace Storage.Net.Aws.Blob
 {
@@ -128,7 +129,8 @@ namespace Storage.Net.Aws.Blob
          id = StoragePath.Normalize(id, false);
          GetObjectResponse response = await GetObjectAsync(id);
          if (response == null) return null;
-         return new AwsS3BlobStorageExternalStream(response);
+
+         return new FixedStream(response.ResponseStream, length: response.ContentLength);
       }
 
       public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
