@@ -49,7 +49,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
          List<BlobId> batch =
             dirEntries
-               .Select(p => ToBlobId(path, p))
+               .Select(p => ToBlobId(path, p, options.IncludeMetaWhenKnown))
                .Where(options.IsMatch)
                .ToList();
 
@@ -72,12 +72,14 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          }
       }
 
-      private static BlobId ToBlobId(string path, DirectoryEntry entry)
+      private static BlobId ToBlobId(string path, DirectoryEntry entry, bool includeMeta)
       {
+         BlobMeta meta = includeMeta ? new BlobMeta(entry.Length, null, entry.LastModifiedTime) : null;
+
          if (entry.Type == DirectoryEntryType.FILE)
-            return new BlobId(path, entry.Name, BlobItemKind.File);
+            return new BlobId(path, entry.Name, BlobItemKind.File) { Meta = meta };
          else
-            return new BlobId(path, entry.Name, BlobItemKind.Folder);
+            return new BlobId(path, entry.Name, BlobItemKind.Folder) { Meta = meta };
       }
    }
 }

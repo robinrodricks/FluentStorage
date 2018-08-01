@@ -40,6 +40,11 @@ namespace Storage.Net.Blob
       public int? MaxResults { get; set; }
 
       /// <summary>
+      /// When set, includes blob metadata in the response if the provider supports it.
+      /// </summary>
+      public bool IncludeMetaWhenKnown { get; set; } = false;
+
+      /// <summary>
       /// Helper method that returns true if a <see cref="BlobId"/> matches these list options.
       /// </summary>
       public bool IsMatch(BlobId id)

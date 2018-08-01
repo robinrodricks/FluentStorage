@@ -24,6 +24,11 @@ namespace Storage.Net.Blob
       public string Id { get; private set; }
 
       /// <summary>
+      /// Contains blob metadata when known, optional.
+      /// </summary>
+      public BlobMeta Meta { get; set; }
+
+      /// <summary>
       /// Gets full path to this blob which is a combination of folder path and blob name
       /// </summary>
       public string FullPath => StoragePath.Combine(FolderPath, Id);
