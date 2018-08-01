@@ -175,7 +175,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       /// <summary>
       /// Gets all the blob names, then filters by prefix optionally
       /// </summary>
-      public async Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
          if (options == null) options = new ListOptions();
 

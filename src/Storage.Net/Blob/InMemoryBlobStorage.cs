@@ -15,7 +15,7 @@ namespace Storage.Net.Blob
    {
       private readonly Dictionary<BlobId, MemoryStream> _idToData = new Dictionary<BlobId, MemoryStream>();
 
-      public Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
+      public Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
          if (options == null) options = new ListOptions();
 
@@ -32,7 +32,7 @@ namespace Storage.Net.Blob
             .Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value)
             .ToList();
 
-         return Task.FromResult((IEnumerable<BlobId>)matches);
+         return Task.FromResult((IReadOnlyCollection<BlobId>)matches);
       }
 
       public Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)

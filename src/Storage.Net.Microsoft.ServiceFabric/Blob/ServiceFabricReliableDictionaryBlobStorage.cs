@@ -22,7 +22,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          _collectionName = collectionName ?? throw new ArgumentNullException(nameof(collectionName));
       }
 
-      public async Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
          if (options == null) options = new ListOptions();
 

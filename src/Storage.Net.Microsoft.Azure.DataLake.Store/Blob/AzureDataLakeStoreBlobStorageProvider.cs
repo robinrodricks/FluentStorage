@@ -73,7 +73,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          return new AzureDataLakeStoreBlobStorageProvider(accountName, credential.Domain, credential.UserName, credential.Password, null);
       }
 
-      public async Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
          if (options == null) options = new ListOptions();
 

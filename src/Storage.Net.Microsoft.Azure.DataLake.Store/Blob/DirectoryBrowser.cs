@@ -21,7 +21,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          _client = client ?? throw new ArgumentNullException(nameof(client));
       }
 
-      public async Task<IEnumerable<BlobId>> Browse(ListOptions options, CancellationToken token)
+      public async Task<IReadOnlyCollection<BlobId>> Browse(ListOptions options, CancellationToken token)
       {
          string path = StoragePath.Normalize(options.FolderPath);
          var result = new List<BlobId>();

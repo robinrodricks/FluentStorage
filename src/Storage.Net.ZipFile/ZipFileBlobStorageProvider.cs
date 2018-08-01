@@ -73,9 +73,9 @@ namespace Storage.Net.ZipFile
          return Task.FromResult<IEnumerable<BlobMeta>>(result);
       }
 
-      public Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken = default(CancellationToken))
+      public Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken = default(CancellationToken))
       {
-         if (!File.Exists(_filePath)) return Task.FromResult(Enumerable.Empty<BlobId>());
+         if (!File.Exists(_filePath)) return Task.FromResult<IReadOnlyCollection<BlobId>>(new List<BlobId>());
 
          ZipArchive archive = GetArchive(false);
 
@@ -84,7 +84,7 @@ namespace Storage.Net.ZipFile
          if (options.MaxResults != null) ids = ids.Take(options.MaxResults.Value);
          if (options.Prefix != null) ids = ids.Where(id => id.Id.StartsWith(options.Prefix));
 
-         return Task.FromResult<IEnumerable<BlobId>>(ids.ToList());
+         return Task.FromResult<IReadOnlyCollection<BlobId>>(ids.ToList());
       }
 
       public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default(CancellationToken))

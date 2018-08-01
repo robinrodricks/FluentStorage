@@ -86,7 +86,7 @@ namespace Storage.Net.Aws.Blob
       /// <summary>
       /// Lists all buckets, optionaly filtering by prefix. Prefix filtering happens on client side.
       /// </summary>
-      public async Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
          if (options == null) options = new ListOptions();
 
@@ -106,7 +106,8 @@ namespace Storage.Net.Aws.Blob
          return response.S3Objects
             .Select(s3Obj => new BlobId(StoragePath.RootFolderPath, s3Obj.Key, BlobItemKind.File))
             .Where(options.IsMatch)
-            .Where(bid => (options.FolderPath == null || bid.FolderPath == options.FolderPath));
+            .Where(bid => (options.FolderPath == null || bid.FolderPath == options.FolderPath))
+            .ToList();
       }
 
       public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)

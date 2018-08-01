@@ -36,13 +36,13 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
       #region [ IBlobStorage ]
 
-      public async Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
          if (options == null) options = new ListOptions();
 
          GenericValidation.CheckBlobPrefix(options.Prefix);
 
-         if (options.FolderPath != null) return Enumerable.Empty<BlobId>();
+         if (options.FolderPath != null) return new List<BlobId>();
 
          var secretNames = new List<BlobId>();
          IPage<SecretItem> page = await _vaultClient.GetSecretsAsync(_vaultUri);
@@ -57,7 +57,8 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
          return secretNames
             .Where(options.IsMatch)
-            .Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value);
+            .Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value)
+            .ToList();
       }
 
       private static BlobId ToBlobId(SecretItem item)

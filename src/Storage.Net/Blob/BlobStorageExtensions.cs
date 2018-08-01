@@ -26,13 +26,13 @@ namespace Storage.Net.Blob
       /// <param name="options"></param>
       /// <param name="cancellationToken"></param>
       /// <returns>List of blob IDs</returns>
-      public static async Task<IEnumerable<BlobId>> ListFilesAsync(this IBlobStorage provider,
+      public static async Task<IReadOnlyCollection<BlobId>> ListFilesAsync(this IBlobStorage provider,
          ListOptions options,
          CancellationToken cancellationToken = default)
       {
          IEnumerable<BlobId> all = await provider.ListAsync(options, cancellationToken);
 
-         return all.Where(i => i.Kind == BlobItemKind.File);
+         return all.Where(i => i.Kind == BlobItemKind.File).ToList();
       }
 
       #endregion

@@ -34,7 +34,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Returns the list of blob names in this storage, optionally filtered by prefix
       /// </summary>
-      public Task<IEnumerable<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
+      public Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
          if (options == null) options = new ListOptions();
 
@@ -43,7 +43,7 @@ namespace Storage.Net.Blob.Files
          if(!_directory.Exists) return null;
 
          string fullPath = GetFolder(options?.FolderPath, false);
-         if (fullPath == null) return Task.FromResult(Enumerable.Empty<BlobId>());
+         if (fullPath == null) return Task.FromResult<IReadOnlyCollection<BlobId>>(new List<BlobId>());
 
          string[] fileIds = Directory.GetFiles(
             fullPath,
@@ -63,7 +63,7 @@ namespace Storage.Net.Blob.Files
          result.AddRange(directoryIds.Select(id => ToBlobItem(id, BlobItemKind.Folder)));
          result.AddRange(fileIds.Select(id => ToBlobItem(id, BlobItemKind.File)));
          result = result.Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value).ToList();
-         return Task.FromResult<IEnumerable<BlobId>>(result);
+         return Task.FromResult<IReadOnlyCollection<BlobId>>(result);
       }
 
       private string ToId(FileInfo fi)

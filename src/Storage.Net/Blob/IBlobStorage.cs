@@ -17,8 +17,8 @@ namespace Storage.Net.Blob
       /// <param name="options"></param>
       /// <param name="cancellationToken"></param>
       /// <returns>List of blob IDs</returns>
-      Task<IEnumerable<BlobId>> ListAsync(ListOptions options,
-         CancellationToken cancellationToken = default(CancellationToken));
+      Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options,
+         CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Creates a new blob and returns a writeable stream to it. If the blob already exists it will be
