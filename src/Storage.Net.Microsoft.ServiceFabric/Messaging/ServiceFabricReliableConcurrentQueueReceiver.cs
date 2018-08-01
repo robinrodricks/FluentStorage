@@ -17,6 +17,8 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
       public ServiceFabricReliableConcurrentQueueReceiver(IReliableStateManager stateManager, string queueName, TimeSpan scanInterval)
          : base(stateManager, queueName, scanInterval)
       {
+         _stateManager = stateManager;
+         _queueName = queueName;
       }
 
       protected override async Task<int> GetMessageCountAsync(IReliableState reliableState, ServiceFabricTransaction transaction)
