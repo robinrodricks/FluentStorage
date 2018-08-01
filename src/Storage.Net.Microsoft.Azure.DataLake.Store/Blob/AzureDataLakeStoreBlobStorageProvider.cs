@@ -162,27 +162,25 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          GenericValidation.CheckBlobId(ids);
 
-         DataLakeStoreFileSystemManagementClient client = await GetFsClient();
+         AdlsClient client = await GetAdlsClient();
 
-         return await Task.WhenAll(ids.Select(id => GetMetaAsync(id, client)));
+         return await Task.WhenAll(ids.Select(id => GetMetaAsync(id, client, cancellationToken)));
       }
 
-      private async Task<BlobMeta> GetMetaAsync(string id, DataLakeStoreFileSystemManagementClient client)
+      private async Task<BlobMeta> GetMetaAsync(string id, AdlsClient client, CancellationToken cancellationToken)
       {
-         FileStatusResult fsr;
+         DirectoryEntry entry;
 
          try
          {
-            fsr = await client.FileSystem.GetFileStatusAsync(_accountName, id);
+            entry = await client.GetDirectoryEntryAsync(id, cancelToken: cancellationToken);
          }
-         catch(AdlsErrorException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
+         catch(AdlsException ex) when (ex.HttpStatus == HttpStatusCode.NotFound)
          {
             return null;
          }
 
-         var meta = new BlobMeta(fsr.FileStatus.Length.Value, null, GetLastModifiedDate(fsr));
-
-         return meta;
+         return new BlobMeta(entry.Length, null, entry.LastModifiedTime);
       }
 
       private static DateTimeOffset? GetLastModifiedDate(FileStatusResult fsr)
