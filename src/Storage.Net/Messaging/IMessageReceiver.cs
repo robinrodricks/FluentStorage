@@ -35,7 +35,7 @@ namespace Storage.Net.Messaging
       /// Starts automatic message pumping trying to use native features as much as possible. Message pump stops when you dispose the instance.
       /// Disposing the instance will also stop message pump for you.
       /// </summary>
-      Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessageAsync, int maxBatchSize = 1, CancellationToken cancellationToken = default);
+      Task StartMessagePumpAsync(Func<IReadOnlyCollection<QueueMessage>, Task> onMessageAsync, int maxBatchSize = 1, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Starts a new transaction

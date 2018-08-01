@@ -51,14 +51,14 @@ namespace Storage.Net.Messaging
       /// <summary>
       /// See interface
       /// </summary>
-      public async Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessageAsync, int maxBatchSize = 1, CancellationToken cancellationToken = default)
+      public async Task StartMessagePumpAsync(Func<IReadOnlyCollection<QueueMessage>, Task> onMessageAsync, int maxBatchSize = 1, CancellationToken cancellationToken = default)
       {
          if (onMessageAsync == null) throw new ArgumentNullException(nameof(onMessageAsync));
 
          PollTasks(onMessageAsync, maxBatchSize, cancellationToken).Forget();
       }
 
-      private async Task PollTasks(Func<IEnumerable<QueueMessage>, Task> callback, int maxBatchSize, CancellationToken cancellationToken)
+      private async Task PollTasks(Func<IReadOnlyCollection<QueueMessage>, Task> callback, int maxBatchSize, CancellationToken cancellationToken)
       {
          IReadOnlyCollection<QueueMessage> messages = await ReceiveMessagesAsync(maxBatchSize, cancellationToken);
          while (messages != null && messages.Count > 0)

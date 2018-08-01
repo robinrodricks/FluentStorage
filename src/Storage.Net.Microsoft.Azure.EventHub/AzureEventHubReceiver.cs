@@ -122,7 +122,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <summary>
       /// See interface
       /// </summary>
-      public async Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessageAsync, int maxBatchSize, CancellationToken cancellationToken)
+      public async Task StartMessagePumpAsync(Func<IReadOnlyCollection<QueueMessage>, Task> onMessageAsync, int maxBatchSize, CancellationToken cancellationToken)
       {
          IEnumerable<PartitionReceiver> receivers = await CreateReceivers();
 
@@ -132,7 +132,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
          }
       }
 
-      private async Task ReceiverPump(PartitionReceiver receiver, Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
+      private async Task ReceiverPump(PartitionReceiver receiver, Func<IReadOnlyCollection<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
       {
          while (true)
          {

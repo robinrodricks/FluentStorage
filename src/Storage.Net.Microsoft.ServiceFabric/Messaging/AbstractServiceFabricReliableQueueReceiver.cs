@@ -42,7 +42,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
       protected abstract Task<int> GetMessageCountAsync(IReliableState reliableState, ServiceFabricTransaction transaction);
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-      public async Task StartMessagePumpAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
+      public async Task StartMessagePumpAsync(Func<IReadOnlyCollection<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
       {
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
@@ -62,7 +62,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
 
       protected abstract Task<ConditionalValue<byte[]>> TryDequeueAsync(ServiceFabricTransaction tx, IReliableState collectionBase, CancellationToken cancellationToken);
 
-      private async Task ReceiveMessagesAsync(Func<IEnumerable<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
+      private async Task ReceiveMessagesAsync(Func<IReadOnlyCollection<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
       {
 
          while (!cancellationToken.IsCancellationRequested && !_disposed)
