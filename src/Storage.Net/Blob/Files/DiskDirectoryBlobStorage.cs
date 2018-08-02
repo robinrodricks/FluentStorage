@@ -60,8 +60,8 @@ namespace Storage.Net.Blob.Files
                options.Recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
          var result = new List<BlobId>();
-         result.AddRange(directoryIds.Select(id => ToBlobItem(id, BlobItemKind.Folder)));
-         result.AddRange(fileIds.Select(id => ToBlobItem(id, BlobItemKind.File)));
+         result.AddRange(directoryIds.Select(id => ToBlobItem(id, BlobItemKind.Folder, options.IncludeMetaWhenKnown)));
+         result.AddRange(fileIds.Select(id => ToBlobItem(id, BlobItemKind.File, options.IncludeMetaWhenKnown)));
          result = result.Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value).ToList();
          return Task.FromResult<IReadOnlyCollection<BlobId>>(result);
       }
@@ -77,7 +77,7 @@ namespace Storage.Net.Blob.Files
          return string.Join(StoragePath.PathStrSeparator, parts.Select(DecodePathPart));
       }
 
-      private BlobId ToBlobItem(string fullPath, BlobItemKind kind)
+      private BlobId ToBlobItem(string fullPath, BlobItemKind kind, bool includeMeta)
       {
          string id = Path.GetFileName(fullPath);
 
@@ -86,7 +86,14 @@ namespace Storage.Net.Blob.Files
          fullPath = fullPath.Trim(StoragePath.PathSeparator);
          fullPath = StoragePath.PathStrSeparator + fullPath;
 
-         return new BlobId(fullPath, kind);
+         var blobId = new BlobId(fullPath, kind);
+
+         if(includeMeta)
+         {
+            blobId.Meta = BlobMetaFromId(blobId.FullPath);
+         }
+
+         return blobId;
       }
 
       private string GetFolder(string path, bool createIfNotExists)
@@ -257,32 +264,32 @@ namespace Storage.Net.Blob.Files
 
          foreach (string id in ids)
          {
-            string path = GetFilePath(StoragePath.Normalize(id, false));
-
-            if (!File.Exists(path))
-            {
-               result.Add(null);
-            }
-            else
-            {
-               var fi = new FileInfo(path);
-
-               string md5;
-               using (Stream fs = File.OpenRead(fi.FullName))
-               {
-                  md5 = fs.GetHash(HashType.Md5);
-               }
-
-               var meta = new BlobMeta(
-                  fi.Length,
-                  md5,
-                  fi.CreationTimeUtc);
-
-               result.Add(meta);
-            }
+            result.Add(BlobMetaFromId(id));
          }
 
          return Task.FromResult((IEnumerable<BlobMeta>) result);
+      }
+
+      private BlobMeta BlobMetaFromId(string id)
+      {
+         string path = GetFilePath(StoragePath.Normalize(id, false));
+
+         if (!File.Exists(path)) return null;
+
+         var fi = new FileInfo(path);
+
+         string md5;
+         using (Stream fs = File.OpenRead(fi.FullName))
+         {
+            md5 = fs.GetHash(HashType.Md5);
+         }
+
+         var meta = new BlobMeta(
+            fi.Length,
+            md5,
+            fi.CreationTimeUtc);
+
+         return meta;
       }
 
       /// <summary>
