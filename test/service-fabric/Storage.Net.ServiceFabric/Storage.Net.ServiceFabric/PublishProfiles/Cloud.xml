@@ -22,4 +22,5 @@
   -->
   <ClusterConnectionParameters ConnectionEndpoint="" />
   <ApplicationParameterFile Path="..\ApplicationParameters\Cloud.xml" />
+  <CopyPackageParameters CompressPackage="true" />
 </PublishProfile>
