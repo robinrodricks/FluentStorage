@@ -101,8 +101,6 @@ namespace Storage.Net.Blob
       /// <summary>
       /// Gets basic blob metadata
       /// </summary>
-      /// <param name="id">Blob id</param>
-      /// <param name="cancellationToken"></param>
       /// <returns>Blob metadata or null if blob doesn't exist</returns>
       public static Task GetMetaAsync(this IBlobStorage storage,
          string id, CancellationToken cancellationToken = default)
@@ -199,7 +197,7 @@ namespace Storage.Net.Blob
       /// <param name="cancellationToken"></param>
       public static async Task CopyToAsync(
          this IBlobStorage provider,
-         string blobId, IBlobStorage targetStorage, string newId, CancellationToken cancellationToken = default(CancellationToken))
+         string blobId, IBlobStorage targetStorage, string newId, CancellationToken cancellationToken = default)
       {
          Stream src = await provider.OpenReadAsync(blobId, cancellationToken);
          if (src == null) return;

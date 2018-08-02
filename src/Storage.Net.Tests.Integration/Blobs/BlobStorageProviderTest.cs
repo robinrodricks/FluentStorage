@@ -198,10 +198,20 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
-      public async Task List_FileInNonExistingFolder_EmptyCollection()
+      public async Task List_InNonExistingFolder_EmptyCollection()
       {
          IEnumerable<BlobId> objects = await _storage.ListAsync(new ListOptions { FolderPath = "/" + Guid.NewGuid() });
 
+         Assert.NotNull(objects);
+         Assert.True(objects.Count() == 0);
+      }
+
+      [Fact]
+      public async Task List_FilesInNonExistingFolder_EmptyCollection()
+      {
+         IEnumerable<BlobId> objects = await _storage.ListFilesAsync(new ListOptions { FolderPath = "/" + Guid.NewGuid() });
+
+         Assert.NotNull(objects);
          Assert.True(objects.Count() == 0);
       }
 

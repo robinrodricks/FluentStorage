@@ -40,7 +40,7 @@ namespace Storage.Net.Blob.Files
 
          GenericValidation.CheckBlobPrefix(options.Prefix);
 
-         if(!_directory.Exists) return null;
+         if (!_directory.Exists) return Task.FromResult<IReadOnlyCollection<BlobId>>(new List<BlobId>());
 
          string fullPath = GetFolder(options?.FolderPath, false);
          if (fullPath == null) return Task.FromResult<IReadOnlyCollection<BlobId>>(new List<BlobId>());
