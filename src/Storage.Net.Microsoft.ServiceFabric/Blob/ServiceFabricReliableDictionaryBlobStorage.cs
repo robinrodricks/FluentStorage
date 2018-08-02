@@ -1,5 +1,6 @@
 ﻿using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
+using NetBox;
 using NetBox.Extensions;
 using Storage.Net.Blob;
 using System;
@@ -75,7 +76,16 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          using (ServiceFabricTransaction tx = GetTransaction())
          {
             IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync();
+            IReliableDictionary<string, BlobMetaTag> metaColl = await OpenMetaCollectionAsync();
 
+            var meta = new BlobMetaTag
+            {
+               LastModificationTime = DateTimeOffset.UtcNow,
+               Length = value.LongLength,
+               Md = value.GetHash(HashType.Md5).ToHexString()
+            };
+
+            await metaColl.AddOrUpdateAsync(tx.Tx, id, meta, (k, v) => meta);
             await coll.AddOrUpdateAsync(tx.Tx, id, value, (k, v) => value);
 
             await tx.CommitAsync();
@@ -193,6 +203,14 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
       {
          IReliableDictionary<string, byte[]> collection = 
             await _stateManager.GetOrAddAsync<IReliableDictionary<string, byte[]>>(_collectionName);
+
+         return collection;
+      }
+
+      private async Task<IReliableDictionary<string, BlobMetaTag>> OpenMetaCollectionAsync()
+      {
+         IReliableDictionary<string, BlobMetaTag> collection =
+            await _stateManager.GetOrAddAsync<IReliableDictionary<string, BlobMetaTag>>(_collectionName + "_meta");
 
          return collection;
       }

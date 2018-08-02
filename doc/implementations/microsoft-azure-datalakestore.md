@@ -2,7 +2,7 @@
 
 Microsoft Azure implementations reside in a separate package hosted on [NuGet](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.DataLake.Store/). Follow the link for installation instructions.
 
-This package tries to abstract access to [Azure Data Lake Store](https://azure.microsoft.com/en-gb/services/data-lake-store/) and making them available as `IBlobStorage`.
+This package tries to abstract access to [Azure Data Lake Store](https://azure.microsoft.com/en-gb/services/data-lake-store/) and making them available as `IBlobStorage`. It's internals are heavily optimised for performance and includes a lot of workarounds in order to make the official ADLS SDK actually be useful to a user without spending weeks on StackOverflow. 
 
 ## Using
 
