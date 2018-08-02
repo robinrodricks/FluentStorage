@@ -67,6 +67,11 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          }
       }
 
+      public Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
+      {
+         throw new NotImplementedException();
+      }
+
       private async Task WriteAsync(string id, Stream sourceStream, CancellationToken cancellationToken)
       {
          id = ToId(id);

@@ -205,6 +205,27 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          }
       }
 
+      public async Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         id = StoragePath.Normalize(id, false);
+
+         if (append)
+         {
+            CloudAppendBlob cab = _blobContainer.GetAppendBlobReference(id);
+   
+            return await cab.OpenWriteAsync(!append);
+         }
+         else
+         {
+            CloudBlockBlob cab = _blobContainer.GetBlockBlobReference(id);
+
+            return await cab.OpenWriteAsync();
+
+         }
+      }
+
       public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
@@ -310,5 +331,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       {
          return Task.FromResult(EmptyTransaction.Instance);
       }
+
    }
 }

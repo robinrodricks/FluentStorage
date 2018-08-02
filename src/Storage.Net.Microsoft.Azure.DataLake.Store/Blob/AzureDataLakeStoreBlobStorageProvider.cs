@@ -90,6 +90,8 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          DataLakeStoreFileSystemManagementClient managementClient = await GetFsClient();
          AdlsClient client = await GetAdlsClient();
 
+         //AdlsOutputStream x = await client.CreateFileAsync(null, IfExists.Overwrite);
+
          if (append)
          {
             if ((await ExistsAsync(new[] { id }, cancellationToken)).First())
@@ -105,6 +107,28 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          {
             await managementClient.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(sourceStream), true);
          }
+      }
+
+      public async Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         AdlsClient client = await GetAdlsClient();
+
+         AdlsOutputStream stream;
+
+         if(append)
+         {
+            stream = await client.GetAppendStreamAsync(id, cancellationToken);
+         }
+         else
+         {
+            stream = await client.CreateFileAsync(id, IfExists.Overwrite,
+               createParent: true,
+               cancelToken: cancellationToken);
+         }
+
+         return new AdlsWriteableStream(stream);
       }
 
       public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)

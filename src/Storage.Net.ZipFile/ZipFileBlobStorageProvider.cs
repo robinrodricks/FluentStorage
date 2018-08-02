@@ -117,6 +117,11 @@ namespace Storage.Net.ZipFile
          }
       }
 
+      public Task<Stream> OpenWriteAsync(string id, bool append = false, CancellationToken cancellationToken = default(CancellationToken))
+      {
+         throw new NotImplementedException();
+      }
+
       private ZipArchive GetArchive(bool? forWriting)
       {
          if (_fileStream == null || _isWriteMode == null || _isWriteMode.Value != forWriting)

@@ -62,6 +62,11 @@ namespace Storage.Net.Blob
          return Task.FromResult(true);
       }
 
+      public Task<Stream> OpenWriteAsync(string id, bool append = false, CancellationToken cancellationToken = default)
+      {
+         throw new NotImplementedException();
+      }
+
       public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);

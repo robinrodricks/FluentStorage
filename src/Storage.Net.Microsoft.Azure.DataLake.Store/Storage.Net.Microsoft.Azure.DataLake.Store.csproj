@@ -14,6 +14,7 @@
     <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
     <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
     <Description>Provides Azure Data Lake Store integration for Storage.Net library</Description>
+     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>

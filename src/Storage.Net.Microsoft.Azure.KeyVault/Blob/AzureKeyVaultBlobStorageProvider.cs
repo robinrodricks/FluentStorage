@@ -79,6 +79,11 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
          await _vaultClient.SetSecretAsync(_vaultUri, id, value);
       }
 
+      public Task<Stream> OpenWriteAsync(string id, bool append = false, CancellationToken cancellationToken = default(CancellationToken))
+      {
+         throw new NotImplementedException();
+      }
+
       public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
@@ -217,5 +222,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
       {
          return Task.FromResult(EmptyTransaction.Instance);
       }
+
+
    }
 }

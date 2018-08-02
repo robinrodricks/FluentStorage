@@ -23,6 +23,7 @@
     <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>GitHub</RepositoryType>
     <Description>Extension to Storage.Net providing integration with Amazon S3 blobs.</Description>
+     <LangVersion>latest</LangVersion>
   </PropertyGroup>
    <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
       <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>

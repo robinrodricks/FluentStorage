@@ -200,6 +200,18 @@ namespace Storage.Net.Blob.Files
       }
 
       /// <summary>
+      /// 
+      /// </summary>
+      public Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         id = StoragePath.Normalize(id, false);
+
+         return Task.FromResult(CreateStream(id, !append));
+      }
+
+      /// <summary>
       /// Opens file and returns the open stream
       /// </summary>
       public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)

@@ -123,6 +123,11 @@ namespace Storage.Net.Aws.Blob
          await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, id, cancellationToken);
       }
 
+      public Task<Stream> OpenWriteAsync(string id, bool append = false, CancellationToken cancellationToken = default)
+      {
+         throw new NotImplementedException();
+      }
+
       public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);

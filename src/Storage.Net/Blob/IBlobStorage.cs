@@ -21,7 +21,7 @@ namespace Storage.Net.Blob
          CancellationToken cancellationToken = default);
 
       /// <summary>
-      /// Creates a new blob and returns a writeable stream to it. If the blob already exists it will be
+      /// Creates a new blob and uploads data intor it. If the blob already exists it will be
       /// overwritten.
       /// </summary>
       /// <param name="id">Blob ID</param>
@@ -32,6 +32,19 @@ namespace Storage.Net.Blob
       /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
       Task WriteAsync(string id, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default);
+
+      /// <summary>
+      /// Creates a new blob and opens a writeable stream for it. If the blob already exists it will be
+      /// overwritten.
+      /// </summary>
+      /// <param name="id">Blob ID</param>
+      /// <param name="sourceStream">Source stream, must be readable and support Length</param>
+      /// <param name="cancellationToken"></param>
+      /// <param name="append">When true, appends to the file instead of writing a new one.</param>
+      /// <returns>Writeable stream</returns>
+      /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
+      /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
+      Task<Stream> OpenWriteAsync(string id, bool append = false, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Opens the blob stream to read.

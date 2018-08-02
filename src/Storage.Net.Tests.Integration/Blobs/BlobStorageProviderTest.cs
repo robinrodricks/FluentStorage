@@ -296,6 +296,30 @@ namespace Storage.Net.Tests.Integration.Blobs
          await _storage.CopyToAsync(id, ms, id);
       }
 
+      [Fact]
+      public async Task Write_with_openwrite_succeeds()
+      {
+         string id = Guid.NewGuid().ToString();
+         byte[] data = Encoding.UTF8.GetBytes("oh my");
+
+         try
+         {
+            using (Stream dest = await _storage.OpenWriteAsync(id))
+            {
+               await dest.WriteAsync(data, 0, data.Length);
+            }
+         }
+         catch(NotImplementedException)
+         {
+            //that's cool, not all of them implement this yet
+            return;
+         }
+
+         //read and check
+         string result = await _storage.ReadTextAsync(id);
+         Assert.Equal("oh my", result);
+      }
+
       class TestDocument
       {
          public string M { get; set; }
