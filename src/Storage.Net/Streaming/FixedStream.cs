@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Storage.Net.Streaming
 {
@@ -12,13 +10,21 @@ namespace Storage.Net.Streaming
    {
       private readonly Stream _parent;
       private readonly long? _length;
+      private readonly Action<FixedStream> _disposeCallback;
       private long _position;
 
-      public FixedStream(Stream parent, long? length = null)
+      public FixedStream(Stream parent,
+         long? length = null,
+         Action<FixedStream> disposeCallback = null)
       {
          _parent = parent ?? throw new ArgumentNullException(nameof(parent));
          _length = length;
+         _disposeCallback = disposeCallback;
       }
+
+      public Stream Parent => _parent;
+
+      public object Tag { get; set; }
 
       public override bool CanRead => _parent.CanRead;
 
@@ -64,6 +70,16 @@ namespace Storage.Net.Streaming
          _parent.Write(buffer, offset, count);
 
          _position += count;
+      }
+
+      protected override void Dispose(bool disposing)
+      {
+         if(_disposeCallback != null)
+         {
+            _disposeCallback(this);
+         }
+
+         base.Dispose(disposing);
       }
    }
 }

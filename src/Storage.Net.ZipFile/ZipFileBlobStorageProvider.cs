@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Storage.Net.Blob;
+using Storage.Net.Streaming;
 
 namespace Storage.Net.ZipFile
 {
@@ -105,7 +106,7 @@ namespace Storage.Net.ZipFile
          return Task.FromResult(EmptyTransaction.Instance);
       }
 
-      public async Task WriteAsync(string id, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default(CancellationToken))
+      public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
          id = StoragePath.Normalize(id, false);
          ZipArchive archive = GetArchive(true);
@@ -117,9 +118,22 @@ namespace Storage.Net.ZipFile
          }
       }
 
-      public Task<Stream> OpenWriteAsync(string id, bool append = false, CancellationToken cancellationToken = default(CancellationToken))
+      public Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
       {
-         throw new NotImplementedException();
+         var callbackStream = new FixedStream(new MemoryStream(), null, fx =>
+         {
+            id = StoragePath.Normalize(id, false);
+            ZipArchive archive = GetArchive(true);
+
+            ZipArchiveEntry entry = archive.CreateEntry(id, CompressionLevel.Optimal);
+            using (Stream dest = entry.Open())
+            {
+               fx.Parent.Position = 0;
+               fx.Parent.CopyTo(dest);
+            }
+         });
+
+         return Task.FromResult<Stream>(callbackStream);
       }
 
       private ZipArchive GetArchive(bool? forWriting)

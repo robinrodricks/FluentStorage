@@ -35,10 +35,11 @@ namespace Storage.Net.Blob
 
       /// <summary>
       /// Creates a new blob and opens a writeable stream for it. If the blob already exists it will be
-      /// overwritten.
+      /// overwritten. Please note that <see cref="WriteAsync(string, Stream, bool, CancellationToken)"/> is always
+      /// more effective than this method, because not all of the providers support holding a write stream natively and
+      /// some will incur workaround options to support this.
       /// </summary>
       /// <param name="id">Blob ID</param>
-      /// <param name="sourceStream">Source stream, must be readable and support Length</param>
       /// <param name="cancellationToken"></param>
       /// <param name="append">When true, appends to the file instead of writing a new one.</param>
       /// <returns>Writeable stream</returns>

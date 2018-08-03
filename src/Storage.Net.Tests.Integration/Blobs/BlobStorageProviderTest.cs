@@ -257,15 +257,15 @@ namespace Storage.Net.Tests.Integration.Blobs
 
          await _storage.WriteTextAsync(id, content);
 
-         BlobMeta meta = (await _storage.GetMetaAsync(new[] { id })).First();
+         BlobMeta meta = await _storage.GetMetaAsync(id);
 
 
          long size = Encoding.UTF8.GetBytes(content).Length;
          string md5 = content.GetHash(HashType.Md5);
 
          Assert.Equal(size, meta.Size);
-         Assert.True(meta.MD5 == null || meta.MD5 == md5);
-         Assert.True(meta.LastModificationTime == null || meta.LastModificationTime.Value.Date.IsToday());
+         if (meta.MD5 != null) Assert.Equal(md5, meta.MD5);
+         if (meta.LastModificationTime != null) Assert.Equal(DateTime.UtcNow.RoundToDay(), meta.LastModificationTime.Value.DateTime.RoundToDay());
       }
 
       [Fact]
@@ -302,17 +302,9 @@ namespace Storage.Net.Tests.Integration.Blobs
          string id = Guid.NewGuid().ToString();
          byte[] data = Encoding.UTF8.GetBytes("oh my");
 
-         try
+         using (Stream dest = await _storage.OpenWriteAsync(id))
          {
-            using (Stream dest = await _storage.OpenWriteAsync(id))
-            {
-               await dest.WriteAsync(data, 0, data.Length);
-            }
-         }
-         catch(NotImplementedException)
-         {
-            //that's cool, not all of them implement this yet
-            return;
+            await dest.WriteAsync(data, 0, data.Length);
          }
 
          //read and check

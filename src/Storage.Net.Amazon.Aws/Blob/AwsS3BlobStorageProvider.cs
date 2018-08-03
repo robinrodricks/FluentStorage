@@ -123,9 +123,24 @@ namespace Storage.Net.Aws.Blob
          await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, id, cancellationToken);
       }
 
-      public Task<Stream> OpenWriteAsync(string id, bool append = false, CancellationToken cancellationToken = default)
+      /// <summary>
+      /// S3 doesnt support this natively and will cache everything in MemoryStream until disposed.
+      /// </summary>
+      public Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
       {
-         throw new NotImplementedException();
+         if (append) throw new NotSupportedException();
+         GenericValidation.CheckBlobId(id);
+         id = StoragePath.Normalize(id, false);
+
+         var callbackStream = new FixedStream(new MemoryStream(), null, fx =>
+         {
+            var ms = (MemoryStream)fx.Parent;
+            ms.Position = 0;
+
+            _fileTransferUtility.UploadAsync(ms, _bucketName, id, cancellationToken).Wait();
+         });
+
+         return Task.FromResult<Stream>(callbackStream);
       }
 
       public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)

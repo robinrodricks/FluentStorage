@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using NetBox.Extensions;
 using NetBox;
 using System.Net;
+using Storage.Net.Streaming;
 
 namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 {
@@ -79,9 +80,21 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
          await _vaultClient.SetSecretAsync(_vaultUri, id, value);
       }
 
-      public Task<Stream> OpenWriteAsync(string id, bool append = false, CancellationToken cancellationToken = default(CancellationToken))
+      public Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
       {
-         throw new NotImplementedException();
+         GenericValidation.CheckBlobId(id);
+         ValidateSecretName(id);
+         if (append) throw new ArgumentException("appending to secrets is not supported", nameof(append));
+
+         var callbackStream = new FixedStream(new MemoryStream(), null, fx =>
+         {
+            string value = Encoding.UTF8.GetString(((MemoryStream)fx.Parent).ToArray());
+
+            _vaultClient.SetSecretAsync(_vaultUri, id, value).Wait();
+         });
+
+         return Task.FromResult<Stream>(callbackStream);
+         
       }
 
       public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
