@@ -85,6 +85,16 @@ namespace Storage.Net.Blob
       #region [ Singletons ]
 
       /// <summary>
+      /// Checksi if blobs exists in the storage
+      /// </summary>
+      public static async Task<bool> ExistsAsync(this IBlobStorage blobStorage,
+         string id, CancellationToken cancellationToken = default)
+      {
+         IEnumerable<bool> r = await blobStorage.ExistsAsync(new[] { id }, cancellationToken);
+         return r.First();
+      }
+
+      /// <summary>
       /// Deletes a single blob
       /// </summary>
       /// <param name="storage"></param>

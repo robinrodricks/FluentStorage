@@ -159,7 +159,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          await Task.WhenAll(ids.Select(id => client.FileSystem.DeleteAsync(_accountName, id)));
       }
 
-      public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 

@@ -43,7 +43,7 @@ namespace Storage.Net.ZipFile
          }
       }
 
-      public Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken))
+      public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken))
       {
          throw new NotImplementedException();
       }

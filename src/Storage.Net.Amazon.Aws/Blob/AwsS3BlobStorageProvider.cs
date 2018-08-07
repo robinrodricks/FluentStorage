@@ -167,7 +167,7 @@ namespace Storage.Net.Aws.Blob
          return _client.DeleteObjectAsync(_bucketName, id, cancellationToken);
       }
 
-      public async Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          return await Task.WhenAll(ids.Select(ExistsAsync));
       }

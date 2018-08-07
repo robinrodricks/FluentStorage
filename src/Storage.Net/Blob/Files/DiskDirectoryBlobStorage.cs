@@ -245,7 +245,7 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Checks if files exist on disk
       /// </summary>
-      public Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          var result = new List<bool>();
 
@@ -260,7 +260,7 @@ namespace Storage.Net.Blob.Files
             }
          }
 
-         return Task.FromResult((IEnumerable<bool>)result);
+         return Task.FromResult((IReadOnlyCollection<bool>)result);
       }
 
       /// <summary>

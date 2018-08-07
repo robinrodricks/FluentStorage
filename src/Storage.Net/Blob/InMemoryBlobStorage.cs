@@ -104,7 +104,7 @@ namespace Storage.Net.Blob
          return Task.FromResult(true);
       }
 
-      public Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          var result = new List<bool>();
 
@@ -113,7 +113,7 @@ namespace Storage.Net.Blob
             result.Add(_idToData.ContainsKey(id));
          }
 
-         return Task.FromResult<IEnumerable<bool>>(result);
+         return Task.FromResult<IReadOnlyCollection<bool>>(result);
       }
 
       public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken)

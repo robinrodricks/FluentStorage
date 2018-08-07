@@ -73,7 +73,7 @@ namespace Storage.Net.Blob
       /// <param name="ids">List of ids</param>
       /// <param name="cancellationToken"></param>
       /// <returns>List of results of true and false indicating existence</returns>
-      Task<IEnumerable<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default);
+      Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Gets basic blob metadata
