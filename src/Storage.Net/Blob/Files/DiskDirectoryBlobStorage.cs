@@ -99,7 +99,7 @@ namespace Storage.Net.Blob.Files
       private string GetFolder(string path, bool createIfNotExists)
       {
          if (path == null) return _directory.FullName;
-         string[] parts = StoragePath.GetParts(path);
+         string[] parts = StoragePath.Split(path);
 
          string fullPath = _directory.FullName;
 

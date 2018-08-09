@@ -25,6 +25,11 @@ namespace Storage.Net.Tests.Integration.Blobs
       public AzureBlobStorageProviderTest() : base("azure") { }
    }
 
+   public class AzureUniversalBlobStorageProviderTest : BlobStorageProviderTest
+   {
+      public AzureUniversalBlobStorageProviderTest() : base("azure2") { }
+   }
+
    public class AzureBlobStorageProviderBySasTest : BlobStorageProviderTest
    {
       public AzureBlobStorageProviderBySasTest() : base("azure-sas") { }
@@ -85,6 +90,9 @@ namespace Storage.Net.Tests.Integration.Blobs
                   _settings.AzureStorageName,
                   _settings.AzureStorageKey,
                   "blobstoragetest");
+               break;
+            case "azure2":
+               _storage = StorageFactory.Blobs.AzureBlobStorageExperimental(_settings.AzureStorageName, _settings.AzureStorageKey);
                break;
             case "azure-sas":
                _storage = StorageFactory.Blobs.AzureBlobStorageByContainerSasUri(_settings.AzureContainerSasUri);

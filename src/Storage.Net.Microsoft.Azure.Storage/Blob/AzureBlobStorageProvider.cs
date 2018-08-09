@@ -27,7 +27,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       /// </summary>
       public AzureBlobStorageProvider(string accountName, string key, string containerName, bool createIfNotExists = true)
       {
-         ValidateContainerName(containerName);
+         AzureStorageValidation.ValidateContainerName(containerName);
 
          var account = new CloudStorageAccount(
             new StorageCredentials(accountName, key),
@@ -124,7 +124,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       public AzureBlobStorageProvider(string connectionString, string containerName)
       {
          if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
-         ValidateContainerName(containerName);
+         AzureStorageValidation.ValidateContainerName(containerName);
 
          if (!CloudStorageAccount.TryParse(connectionString, out CloudStorageAccount account))
          {
@@ -135,41 +135,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          _blobContainer = blobClient.GetContainerReference(containerName);
          _blobContainer.CreateIfNotExistsAsync().Wait();
-      }
-
-      private void ValidateContainerName(string containerName)
-      {
-         if (containerName == null) throw new ArgumentNullException(nameof(containerName));
-
-         /* from MSDN:
-          *
-          A container name must be a valid DNS name, conforming to the following naming rules:
-          1. Container names must start with a letter or number, and can contain only letters, numbers, and the dash (-) character.
-          2. Every dash (-) character must be immediately preceded and followed by a letter or number; consecutive dashes are not permitted in container names.
-          3. All letters in a container name must be lowercase.
-          4. Container names must be from 3 through 63 characters long.
-         */
-
-         //1. todo
-
-         //2. todo
-
-         //3. check that all characters are lowercase
-         for (int i = 0; i < containerName.Length; i++)
-         {
-            if (char.IsLetter(containerName[i]) && !char.IsLower(containerName, i))
-            {
-               throw new ArgumentOutOfRangeException(nameof(containerName),
-                  $"container [{containerName}] has uppercase character at position {i}");
-            }
-         }
-
-         //4. check for length
-         if (containerName.Length < 3 || containerName.Length > 63)
-         {
-            throw new ArgumentOutOfRangeException(nameof(containerName),
-               $"container [{containerName}] length must be between 3 and 63 but it's {containerName.Length}");
-         }
       }
 
       /// <summary>

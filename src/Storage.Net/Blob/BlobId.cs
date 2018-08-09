@@ -41,7 +41,7 @@ namespace Storage.Net.Blob
       public BlobId(string fullId, BlobItemKind kind = BlobItemKind.File)
       {
          string path = StoragePath.Normalize(fullId);
-         string[] parts = StoragePath.GetParts(path);
+         string[] parts = StoragePath.Split(path);
 
          Id = parts.Last();
          FolderPath = parts.Length > 1
