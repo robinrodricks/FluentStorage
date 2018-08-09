@@ -61,17 +61,30 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          throw new NotImplementedException();
       }
 
-      public Task<Stream> OpenWriteAsync(string id, bool append = false, CancellationToken cancellationToken = default)
+      public async Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
       {
-         throw new NotImplementedException();
+         (CloudBlobContainer container, string path) = await GetPartsAsync(id);
+
+         if (append)
+         {
+            CloudAppendBlob cab = container.GetAppendBlobReference(path);
+
+            return await cab.OpenWriteAsync(!append);
+         }
+         else
+         {
+            CloudBlockBlob cab = container.GetBlockBlobReference(path);
+
+            return await cab.OpenWriteAsync();
+
+         }
       }
 
-      public async Task WriteAsync(string id, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
+      public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(id);
          GenericValidation.CheckSourceStream(sourceStream);
-         CloudBlobContainer container = await GetContainerAsync(id);
-         id = GetRelativePath(id);
+
+         (CloudBlobContainer container, string path) = await GetPartsAsync(id);
 
          if (append)
          {
@@ -91,21 +104,26 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
       #region [ Path forking ]
 
-      private async Task<CloudBlobContainer> GetContainerAsync(string path)
+      private async Task<(CloudBlobContainer, string)> GetPartsAsync(string path)
       {
+         GenericValidation.CheckBlobId(path);
+
+         path = StoragePath.Normalize(path);
          if (path == null) throw new ArgumentNullException(nameof(path));
+         int idx = path.IndexOf(StoragePath.PathSeparator);
+         if (idx == -1) throw new ArgumentException("blob path must contain container name", nameof(path));
 
-         string[] parts = StoragePath.Split(path);
-         if (parts.Length < 2) throw new ArgumentException("blob path must contain container name", nameof(path));
+         string containerName = path.Substring(0, idx);
+         string relativePath = path.Substring(idx + 1);
 
-         string containerName = parts[0];
+         if (!_containerNameToContainer.TryGetValue(containerName, out CloudBlobContainer container))
+         {
+            container = _client.GetContainerReference(containerName);
+            await container.CreateIfNotExistsAsync();
+            _containerNameToContainer[containerName] = container;
+         }
 
-         if (_containerNameToContainer.TryGetValue(containerName, out CloudBlobContainer container)) return container;
-
-         container = _client.GetContainerReference(containerName);
-         await container.CreateIfNotExistsAsync();
-         _containerNameToContainer[containerName] = container;
-         return container;
+         return (container, relativePath);
       }
 
       private string GetRelativePath(string path)
