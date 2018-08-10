@@ -179,9 +179,9 @@ namespace Storage.Net.Aws.Blob
          try
          {
             id = StoragePath.Normalize(id, false);
-            using (await GetObjectAsync(id))
+            using (GetObjectResponse response = await GetObjectAsync(id))
             {
-
+               if (response == null) return false;
             }
          }
          catch (StorageException ex)

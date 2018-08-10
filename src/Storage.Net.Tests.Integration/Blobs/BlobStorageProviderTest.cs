@@ -245,22 +245,6 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
-      public async Task List_and_read_back()
-      {
-         string id = Guid.NewGuid().ToString();
-         string idWithPath = StoragePath.Combine(Guid.NewGuid().ToString(), id);
-         string fullPath = _blobPrefix + idWithPath;
-
-         await _storage.WriteTextAsync(fullPath, RandomGenerator.RandomString);
-
-         BlobId bid = (await _storage.ListFilesAsync(new ListOptions { FilePrefix = id, Recurse = true })).FirstOrDefault();
-         Assert.NotNull(bid);
-
-         string text = await _storage.ReadTextAsync(bid.FullPath);
-         Assert.NotNull(text);
-      }
-
-      [Fact]
       public async Task GetMeta_for_one_file_succeeds()
       {
          string content = RandomGenerator.GetRandomString(1000, false);
