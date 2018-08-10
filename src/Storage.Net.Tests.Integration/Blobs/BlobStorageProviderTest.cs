@@ -150,15 +150,15 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
-      public async Task List_ByFlatPrefix_Filtered()
+      public async Task List_ByFilePrefix_Filtered()
       {
          string prefix = RandomGenerator.RandomString;
 
          int countBefore = (await _storage.ListAsync(new ListOptions { FilePrefix = prefix })).Count();
 
-         string id1 = prefix + RandomGenerator.RandomString;
-         string id2 = prefix + RandomGenerator.RandomString;
-         string id3 = RandomGenerator.RandomString;
+         string id1 = RandomBlobId(prefix);
+         string id2 = RandomBlobId(prefix);
+         string id3 = RandomBlobId();
 
          await _storage.WriteTextAsync(id1, RandomGenerator.RandomString);
          await _storage.WriteTextAsync(id2, RandomGenerator.RandomString);
@@ -171,7 +171,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task List_FilesInFolder_NonRecursive()
       {
-         string id = RandomGenerator.RandomString;
+         string id = RandomBlobId();
 
          await _storage.WriteTextAsync(id, RandomGenerator.RandomString);
 
@@ -179,18 +179,16 @@ namespace Storage.Net.Tests.Integration.Blobs
 
          Assert.True(items.Count > 0);
 
-         BlobId tid = items.Where(i => i.Id == id).FirstOrDefault();
+         BlobId tid = items.Where(i => i.FullPath == id).FirstOrDefault();
          Assert.NotNull(tid);
-         Assert.Equal(StoragePath.RootFolderPath, tid.FolderPath);
-         Assert.Equal(id, tid.Id);
       }
 
       [Fact]
       public async Task List_FilesInFolder_Recursive()
       {
-         string id1 = RandomGenerator.RandomString;
-         string id2 = StoragePath.Combine(RandomGenerator.RandomString, RandomGenerator.RandomString);
-         string id3 = StoragePath.Combine(RandomGenerator.RandomString, RandomGenerator.RandomString, RandomGenerator.RandomString);
+         string id1 = RandomBlobId();
+         string id2 = StoragePath.Combine(RandomBlobId(), RandomGenerator.RandomString);
+         string id3 = StoragePath.Combine(RandomBlobId(), RandomGenerator.RandomString, RandomGenerator.RandomString);
 
          try
          {
@@ -209,7 +207,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task List_InNonExistingFolder_EmptyCollection()
       {
-         IEnumerable<BlobId> objects = await _storage.ListAsync(new ListOptions { FolderPath = "/" + Guid.NewGuid() });
+         IEnumerable<BlobId> objects = await _storage.ListAsync(new ListOptions { FolderPath = RandomBlobId() });
 
          Assert.NotNull(objects);
          Assert.True(objects.Count() == 0);
@@ -218,7 +216,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task List_FilesInNonExistingFolder_EmptyCollection()
       {
-         IEnumerable<BlobId> objects = await _storage.ListFilesAsync(new ListOptions { FolderPath = "/" + Guid.NewGuid() });
+         IEnumerable<BlobId> objects = await _storage.ListFilesAsync(new ListOptions { FolderPath = RandomBlobId() });
 
          Assert.NotNull(objects);
          Assert.True(objects.Count() == 0);
@@ -234,12 +232,12 @@ namespace Storage.Net.Tests.Integration.Blobs
       public async Task List_limited_number_of_results()
       {
          string prefix = RandomGenerator.RandomString;
-         string id1 = prefix + RandomGenerator.RandomString;
-         string id2 = prefix + RandomGenerator.RandomString;
+         string id1 = RandomBlobId(prefix);
+         string id2 = RandomBlobId(prefix);
          await _storage.WriteTextAsync(id1, RandomGenerator.RandomString);
          await _storage.WriteTextAsync(id2, RandomGenerator.RandomString);
 
-         int countAll = (await _storage.ListAsync(new ListOptions { FilePrefix = prefix })).Count();
+         int countAll = (await _storage.ListFilesAsync(new ListOptions { FilePrefix = prefix })).Count();
          int countOne = (await _storage.ListAsync(new ListOptions { FilePrefix = prefix, MaxResults = 1 })).Count();
 
          Assert.Equal(2, countAll);
@@ -351,9 +349,11 @@ namespace Storage.Net.Tests.Integration.Blobs
 
       }
 
-      private string RandomBlobId()
+      private string RandomBlobId(string prefix = null)
       {
-         return _blobPrefix + Guid.NewGuid().ToString();
+         return _blobPrefix +
+            (prefix == null ? string.Empty : prefix) +
+            Guid.NewGuid().ToString();
       }
 
       class TestDocument
