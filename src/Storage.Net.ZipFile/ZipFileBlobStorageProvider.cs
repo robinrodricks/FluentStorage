@@ -22,11 +22,6 @@ namespace Storage.Net.ZipFile
          _filePath = filePath;
       }
 
-      public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken))
-      {
-         throw new NotImplementedException();
-      }
-
       public void Dispose()
       {
          if(_archive != null)
@@ -128,12 +123,38 @@ namespace Storage.Net.ZipFile
          id = StoragePath.Normalize(id, false);
          ZipArchive archive = GetArchive(true);
 
+
          ZipArchiveEntry entry = archive.CreateEntry(id, CompressionLevel.Optimal);
          using (Stream dest = entry.Open())
          {
             await sourceStream.CopyToAsync(dest);
          }
       }
+
+      public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      {
+         ZipArchive archive = GetArchive(true);
+
+         foreach(string id in ids)
+         {
+            string nid = StoragePath.Normalize(id, false);
+
+            ZipArchiveEntry entry = archive.GetEntry(nid);
+            if (entry == null) continue;
+
+            try
+            {
+               entry.Delete();
+            }
+            catch(NotSupportedException)
+            {
+
+            }
+         }
+
+         return Task.FromResult(true);
+      }
+
 
       public Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
       {
@@ -173,8 +194,19 @@ namespace Storage.Net.ZipFile
             {
                _fileStream = File.Open(_filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
 
+               if (!exists)
+               {
+                  //create archive, then reopen in Update mode as certain operations only work in update mode
+
+                  using (var archive = new ZipArchive(_fileStream, ZipArchiveMode.Create, true))
+                  {
+
+                  }
+
+               }
+
                _archive = new ZipArchive(_fileStream,
-                  exists ? ZipArchiveMode.Update : ZipArchiveMode.Create,
+                  ZipArchiveMode.Update,
                   true);
             }
             else
