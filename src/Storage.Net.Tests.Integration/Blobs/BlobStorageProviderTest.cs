@@ -87,13 +87,10 @@ namespace Storage.Net.Tests.Integration.Blobs
          switch (_type)
          {
             case "azure":
-               _storage = new AzureBlobStorageProvider(
-                  _settings.AzureStorageName,
-                  _settings.AzureStorageKey,
-                  "blobstoragetest");
+               _storage = StorageFactory.Blobs.AzureBlobStorage(_settings.AzureStorageName, _settings.AzureStorageKey, "blobstoragetest");
                break;
             case "azure2":
-               _storage = StorageFactory.Blobs.AzureBlobStorageExperimental(_settings.AzureStorageName, _settings.AzureStorageKey);
+               _storage = StorageFactory.Blobs.AzureBlobStorage(_settings.AzureStorageName, _settings.AzureStorageKey);
                break;
             case "azure-sas":
                _storage = StorageFactory.Blobs.AzureBlobStorageByContainerSasUri(_settings.AzureContainerSasUri);

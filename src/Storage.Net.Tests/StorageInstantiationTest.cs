@@ -35,7 +35,7 @@ namespace Storage.Net.Tests
       {
          IBlobStorage storage = StorageFactory.Blobs.FromConnectionString("azure.blob://account=test;container=rrr;key=0RlOLDEu8Zn0HmfQ3hnODdAUqEwLOOKq0njK/TaKuYM4LTpyBDozq2LgmD/O9i/0yVP3S/7+sKNYJqmN9+ME9A==;createIfNotExists=false");
 
-         Assert.IsType<AzureBlobStorageProvider>(storage);
+         Assert.IsType<AzureUniversalBlobStorageProvider>(storage);
       }
    }
 }

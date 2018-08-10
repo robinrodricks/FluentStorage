@@ -14,18 +14,43 @@ using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blob
 {
-   class AzureBlobStorageProvider2 : IBlobStorage
+   class AzureUniversalBlobStorageProvider : IBlobStorage, IAzureBlobStorageNativeOperations
    {
       private readonly CloudBlobClient _client;
       private readonly Dictionary<string, CloudBlobContainer> _containerNameToContainer = new Dictionary<string, CloudBlobContainer>();
+      private readonly CloudBlobContainer _fixedContainer;
 
-      public AzureBlobStorageProvider2(string accountName, string key)
+      public CloudBlobClient NativeBlobClient => _client;
+
+      public AzureUniversalBlobStorageProvider(string accountName, string key, string containerName = null)
       {
          var account = new CloudStorageAccount(
             new StorageCredentials(accountName, key),
             true);
 
          _client = account.CreateCloudBlobClient();
+
+         if(containerName != null)
+         {
+            _fixedContainer = _client.GetContainerReference(containerName);
+            _fixedContainer.CreateIfNotExistsAsync().Wait();
+         }
+      }
+
+      private AzureUniversalBlobStorageProvider(Uri sasUri)
+      {
+         if (sasUri == null)
+         {
+            throw new ArgumentNullException(nameof(sasUri));
+         }
+
+         _fixedContainer = new CloudBlobContainer(sasUri);
+         _client = _fixedContainer.ServiceClient;
+      }
+
+      public static AzureUniversalBlobStorageProvider CreateWithContainerSasUri(Uri sasUri)
+      {
+         return new AzureUniversalBlobStorageProvider(sasUri);
       }
 
       public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
@@ -135,7 +160,14 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             IReadOnlyCollection<BlobId> containerBlobs = await browser.ListFolderAsync(options, cancellationToken);
             if (containerBlobs.Count > 0)
             {
-               result.AddRange(containerBlobs.Select(bid => new BlobId(StoragePath.Combine(container.Name, bid.FullPath), bid.Kind)));
+               if (_fixedContainer == null)
+               {
+                  result.AddRange(containerBlobs.Select(bid => new BlobId(StoragePath.Combine(container.Name, bid.FullPath), bid.Kind)));
+               }
+               else
+               {
+                  result.AddRange(containerBlobs);
+               }
             }
 
             if (options.MaxResults != null && result.Count >= options.MaxResults.Value)
@@ -237,6 +269,12 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          path = StoragePath.Normalize(path);
          if (path == null) throw new ArgumentNullException(nameof(path));
+
+         if(_fixedContainer != null)
+         {
+            return (_fixedContainer, path);
+         }
+
          int idx = path.IndexOf(StoragePath.PathSeparator);
          if (idx == -1) throw new ArgumentException("blob path must contain container name", nameof(path));
 
