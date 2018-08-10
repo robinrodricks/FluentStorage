@@ -45,7 +45,24 @@ namespace Storage.Net.ZipFile
 
       public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken))
       {
-         throw new NotImplementedException();
+         ZipArchive zipArchive = GetArchive(false);
+         if(zipArchive == null)
+         {
+            return Task.FromResult<IReadOnlyCollection<bool>>(new bool[ids.Count()]);
+         }
+
+         var result = new List<bool>();
+
+         foreach(string id in ids)
+         {
+            string nid = StoragePath.Normalize(id, false);
+
+            ZipArchiveEntry entry = zipArchive.GetEntry(nid);
+
+            result.Add(entry != null);
+         }
+
+         return Task.FromResult<IReadOnlyCollection<bool>>(result);
       }
 
       public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken))
