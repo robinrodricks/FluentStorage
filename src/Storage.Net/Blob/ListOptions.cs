@@ -12,12 +12,12 @@ namespace Storage.Net.Blob
       private string _prefix;
 
       /// <summary>
-      /// Folder path to start browsing from
+      /// Folder path to start browsing from. When not set scanning starts from the root folder.
       /// </summary>
       public string FolderPath { get; set; }
 
       /// <summary>
-      /// Prefix to filter the name by
+      /// Prefix to filter the name by inside the folder.
       /// </summary>
       public string Prefix
       {
@@ -30,7 +30,7 @@ namespace Storage.Net.Blob
       }
 
       /// <summary>
-      /// When true, operation will recursively navigate down the folders
+      /// When true, operation will recursively navigate down the folders.
       /// </summary>
       public bool Recurse { get; set; }
 
@@ -40,7 +40,9 @@ namespace Storage.Net.Blob
       public int? MaxResults { get; set; }
 
       /// <summary>
-      /// When set, includes blob metadata in the response if the provider supports it.
+      /// When set, includes blob metadata in the response if the provider supports it. False by default
+      /// only because metadata consumes more memory in response object, although most of the providers do not
+      /// have any overhead in creating this metadata.
       /// </summary>
       public bool IncludeMetaWhenKnown { get; set; } = false;
 
@@ -49,7 +51,7 @@ namespace Storage.Net.Blob
       /// </summary>
       public bool IsMatch(BlobId id)
       {
-         return _prefix == null || id.Id.StartsWith(_prefix);
+         return _prefix == null || id.Kind != BlobItemKind.File || id.Id.StartsWith(_prefix);
       }
 
       /// <summary>

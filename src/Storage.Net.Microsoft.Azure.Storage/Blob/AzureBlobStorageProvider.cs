@@ -146,7 +146,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          var browser = new AzureBlobDirectoryBrowser(_blobContainer);
 
-         return await browser.ListFolder(options, cancellationToken); 
+         return await browser.ListFolderAsync(options, cancellationToken); 
       }
 
       public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)

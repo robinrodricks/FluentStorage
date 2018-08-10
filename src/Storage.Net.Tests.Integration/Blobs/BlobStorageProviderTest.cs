@@ -249,10 +249,14 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task List_and_read_back()
       {
-         string id = RandomGenerator.RandomString;
-         await _storage.WriteTextAsync(id, RandomGenerator.RandomString);
+         string id = Guid.NewGuid().ToString();
+         string idWithPath = StoragePath.Combine(Guid.NewGuid().ToString(), id);
+         string fullPath = _blobPrefix + idWithPath;
 
-         BlobId bid = (await _storage.ListAsync(new ListOptions { Prefix = id })).First();
+         await _storage.WriteTextAsync(fullPath, RandomGenerator.RandomString);
+
+         BlobId bid = (await _storage.ListFilesAsync(new ListOptions { Prefix = id, Recurse = true })).FirstOrDefault();
+         Assert.NotNull(bid);
 
          string text = await _storage.ReadTextAsync(bid.FullPath);
          Assert.NotNull(text);

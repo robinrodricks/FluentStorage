@@ -18,7 +18,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          _container = container;
       }
 
-      public async Task<IReadOnlyCollection<BlobId>> ListFolder(ListOptions options, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<BlobId>> ListFolderAsync(ListOptions options, CancellationToken cancellationToken)
       {
          var result = new List<BlobId>();
 

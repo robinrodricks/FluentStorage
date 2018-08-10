@@ -109,9 +109,54 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          return meta;
       }
 
-      public Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken = default)
+      public async Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken = default)
       {
-         throw new NotImplementedException();
+         if (options == null) options = new ListOptions();
+
+         var result = new List<BlobId>();
+         var containers = new List<CloudBlobContainer>();
+
+         if(options.FolderPath == null)
+         {
+            // list all of the containers
+            containers.AddRange(await GetCloudBlobContainersAsync(cancellationToken));
+         }
+         else
+         {
+            (CloudBlobContainer container, string path) = await GetPartsAsync(options.FolderPath, false);
+            if (container == null) return new List<BlobId>();
+            options.FolderPath = path; //scan from subpath now
+            containers.Add(container);
+         }
+
+         foreach(CloudBlobContainer container in containers)
+         {
+            var browser = new AzureBlobDirectoryBrowser(container);
+            IReadOnlyCollection<BlobId> containerBlobs = await browser.ListFolderAsync(options, cancellationToken);
+            if (containerBlobs.Count > 0)
+            {
+               result.AddRange(containerBlobs.Select(bid => new BlobId(StoragePath.Combine(container.Name, bid.FullPath), bid.Kind)));
+            }
+
+            if (options.MaxResults != null && result.Count >= options.MaxResults.Value)
+            {
+               break;
+            }
+         }
+
+         return result;
+      }
+
+      private async Task<List<CloudBlobContainer>> GetCloudBlobContainersAsync(CancellationToken cancellationToken)
+      {
+         var result = new List<CloudBlobContainer>();
+
+         ContainerResultSegment firstPage = await _client.ListContainersSegmentedAsync(null);
+         result.AddRange(firstPage.Results);
+
+         //todo: list more containers
+
+         return result;
       }
 
       public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default)
