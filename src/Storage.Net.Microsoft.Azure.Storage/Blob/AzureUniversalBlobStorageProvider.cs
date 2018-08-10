@@ -141,7 +141,11 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          var result = new List<BlobId>();
          var containers = new List<CloudBlobContainer>();
 
-         if(options.FolderPath == null)
+         if(_fixedContainer != null)
+         {
+            containers.Add(_fixedContainer);
+         }
+         else if(options.FolderPath == null)
          {
             // list all of the containers
             containers.AddRange(await GetCloudBlobContainersAsync(cancellationToken));
