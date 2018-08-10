@@ -38,7 +38,7 @@ namespace Storage.Net.Blob.Files
       {
          if (options == null) options = new ListOptions();
 
-         GenericValidation.CheckBlobPrefix(options.Prefix);
+         GenericValidation.CheckBlobPrefix(options.FilePrefix);
 
          if (!_directory.Exists) return Task.FromResult<IReadOnlyCollection<BlobId>>(new List<BlobId>());
 
@@ -47,16 +47,16 @@ namespace Storage.Net.Blob.Files
 
          string[] fileIds = Directory.GetFiles(
             fullPath,
-            string.IsNullOrEmpty(options.Prefix)
+            string.IsNullOrEmpty(options.FilePrefix)
                ? "*"
-               : options.Prefix + "*",
+               : options.FilePrefix + "*",
             options.Recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
          string[] directoryIds = Directory.GetDirectories(
                fullPath,
-               string.IsNullOrEmpty(options.Prefix)
+               string.IsNullOrEmpty(options.FilePrefix)
                   ? "*"
-                  : options.Prefix + "*",
+                  : options.FilePrefix + "*",
                options.Recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
          var result = new List<BlobId>();

@@ -90,12 +90,12 @@ namespace Storage.Net.Aws.Blob
       {
          if (options == null) options = new ListOptions();
 
-         GenericValidation.CheckBlobPrefix(options.Prefix);
+         GenericValidation.CheckBlobPrefix(options.FilePrefix);
 
          var request = new ListObjectsV2Request()
          {
             BucketName = _bucketName,
-            Prefix = options.Prefix ?? null
+            Prefix = options.FilePrefix ?? null
          };
          if (options.MaxResults.HasValue) request.MaxKeys = options.MaxResults.Value;
 

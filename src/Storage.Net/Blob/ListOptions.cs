@@ -17,9 +17,10 @@ namespace Storage.Net.Blob
       public string FolderPath { get; set; }
 
       /// <summary>
-      /// Prefix to filter the name by inside the folder.
+      /// Prefix to filter file name by. Folders are not affected by this filter. If you list files recursively
+      /// the prefix is applied in every folder.
       /// </summary>
-      public string Prefix
+      public string FilePrefix
       {
          get => _prefix;
          set

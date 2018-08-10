@@ -154,7 +154,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       {
          string prefix = RandomGenerator.RandomString;
 
-         int countBefore = (await _storage.ListAsync(new ListOptions { Prefix = prefix })).Count();
+         int countBefore = (await _storage.ListAsync(new ListOptions { FilePrefix = prefix })).Count();
 
          string id1 = prefix + RandomGenerator.RandomString;
          string id2 = prefix + RandomGenerator.RandomString;
@@ -164,7 +164,7 @@ namespace Storage.Net.Tests.Integration.Blobs
          await _storage.WriteTextAsync(id2, RandomGenerator.RandomString);
          await _storage.WriteTextAsync(id3, RandomGenerator.RandomString);
 
-         List<BlobId> items = (await _storage.ListAsync(new ListOptions { Prefix = prefix })).ToList();
+         List<BlobId> items = (await _storage.ListAsync(new ListOptions { FilePrefix = prefix })).ToList();
          Assert.Equal(2 + countBefore, items.Count); //2 files + containing folder
       }
 
@@ -227,7 +227,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task List_VeryLongPrefix_NoResultsNoCrash()
       {
-         await Assert.ThrowsAsync<ArgumentException>(async () => await _storage.ListAsync(new ListOptions { Prefix = RandomGenerator.GetRandomString(100000, false) }));
+         await Assert.ThrowsAsync<ArgumentException>(async () => await _storage.ListAsync(new ListOptions { FilePrefix = RandomGenerator.GetRandomString(100000, false) }));
       }
 
       [Fact]
@@ -239,8 +239,8 @@ namespace Storage.Net.Tests.Integration.Blobs
          await _storage.WriteTextAsync(id1, RandomGenerator.RandomString);
          await _storage.WriteTextAsync(id2, RandomGenerator.RandomString);
 
-         int countAll = (await _storage.ListAsync(new ListOptions { Prefix = prefix })).Count();
-         int countOne = (await _storage.ListAsync(new ListOptions { Prefix = prefix, MaxResults = 1 })).Count();
+         int countAll = (await _storage.ListAsync(new ListOptions { FilePrefix = prefix })).Count();
+         int countOne = (await _storage.ListAsync(new ListOptions { FilePrefix = prefix, MaxResults = 1 })).Count();
 
          Assert.Equal(2, countAll);
          Assert.Equal(1, countOne);
@@ -255,7 +255,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 
          await _storage.WriteTextAsync(fullPath, RandomGenerator.RandomString);
 
-         BlobId bid = (await _storage.ListFilesAsync(new ListOptions { Prefix = id, Recurse = true })).FirstOrDefault();
+         BlobId bid = (await _storage.ListFilesAsync(new ListOptions { FilePrefix = id, Recurse = true })).FirstOrDefault();
          Assert.NotNull(bid);
 
          string text = await _storage.ReadTextAsync(bid.FullPath);

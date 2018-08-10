@@ -83,7 +83,7 @@ namespace Storage.Net.ZipFile
          if (options == null) options = new ListOptions();
          IEnumerable<BlobId> ids = archive.Entries.Select(ze => new BlobId(ze.FullName, BlobItemKind.File));
          if (options.MaxResults != null) ids = ids.Take(options.MaxResults.Value);
-         if (options.Prefix != null) ids = ids.Where(id => id.Id.StartsWith(options.Prefix));
+         if (options.FilePrefix != null) ids = ids.Where(id => id.Id.StartsWith(options.FilePrefix));
 
          return Task.FromResult<IReadOnlyCollection<BlobId>>(ids.ToList());
       }

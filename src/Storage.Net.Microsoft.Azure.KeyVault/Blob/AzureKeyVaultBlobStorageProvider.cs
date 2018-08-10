@@ -41,7 +41,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
       {
          if (options == null) options = new ListOptions();
 
-         GenericValidation.CheckBlobPrefix(options.Prefix);
+         GenericValidation.CheckBlobPrefix(options.FilePrefix);
 
          if (options.FolderPath != null) return new List<BlobId>();
 
@@ -54,7 +54,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
          }
          while (page.NextPageLink != null && (page = await _vaultClient.GetSecretsNextAsync(page.NextPageLink)) != null);
 
-         if (options.Prefix == null) return secretNames;
+         if (options.FilePrefix == null) return secretNames;
 
          return secretNames
             .Where(options.IsMatch)

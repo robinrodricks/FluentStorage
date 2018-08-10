@@ -42,7 +42,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
                {
                   KeyValuePair<string, byte[]> current = enumerator.Current;
 
-                  if (options.Prefix == null || current.Key.StartsWith(options.Prefix))
+                  if (options.FilePrefix == null || current.Key.StartsWith(options.FilePrefix))
                   {
                      result.Add(new BlobId(current.Key, BlobItemKind.File));
                   }
