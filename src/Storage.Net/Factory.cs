@@ -16,6 +16,9 @@ namespace Storage.Net
    /// </summary>
    public static class Factory
    {
+      /// <summary>
+      /// Call to initialise a module
+      /// </summary>
       public static IModulesFactory Use(this IModulesFactory factory, IExternalModule module)
       {
          if (module == null)

@@ -203,9 +203,9 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          }
          catch (AzureStorageException ex)
          {
-            if (IsDoesntExist(ex)) return null;
+            if (AzureStorageValidation.IsDoesntExist(ex)) return null;
 
-            if (!TryHandleStorageException(ex)) throw;
+            if (!AzureStorageValidation.TryHandleStorageException(ex)) throw;
          }
 
          throw new Exception("must not be here");
@@ -271,21 +271,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             blob.Properties.LastModified);
 
          return meta;
-      }
-
-      private static bool TryHandleStorageException(AzureStorageException ex)
-      {
-         if (IsDoesntExist(ex))
-         {
-            throw new StorageException(ErrorCode.NotFound, ex);
-         }
-
-         return false;
-      }
-
-      private static bool IsDoesntExist(AzureStorageException ex)
-      {
-         return ex.RequestInformation?.HttpStatusCode == 404;
       }
 
       public void Dispose()

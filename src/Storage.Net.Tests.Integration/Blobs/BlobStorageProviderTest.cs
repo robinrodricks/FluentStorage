@@ -27,7 +27,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 
    public class AzureUniversalBlobStorageProviderTest : BlobStorageProviderTest
    {
-      public AzureUniversalBlobStorageProviderTest() : base("azure2") { }
+      public AzureUniversalBlobStorageProviderTest() : base("azure2", "testcontainer/") { }
    }
 
    public class AzureBlobStorageProviderBySasTest : BlobStorageProviderTest
@@ -71,10 +71,11 @@ namespace Storage.Net.Tests.Integration.Blobs
    public abstract class BlobStorageProviderTest : AbstractTestFixture
    {
       private readonly string _type;
+      private readonly string _blobPrefix;
       private IBlobStorage _storage;
       private ITestSettings _settings;
 
-      public BlobStorageProviderTest(string type)
+      public BlobStorageProviderTest(string type, string blobPrefix = null)
       {
          _settings = new ConfigurationBuilder<ITestSettings>()
             .UseIniFile("c:\\tmp\\integration-tests.ini")
@@ -82,7 +83,7 @@ namespace Storage.Net.Tests.Integration.Blobs
             .Build();
 
          _type = type;
-
+         _blobPrefix = blobPrefix ?? string.Empty;
          switch (_type)
          {
             case "azure":
@@ -131,7 +132,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 
       private async Task<string> GetRandomStreamIdAsync(string prefix = null)
       {
-         string id = Guid.NewGuid().ToString();
+         string id = RandomBlobId();
          if (prefix != null) id = prefix + "/" + id;
 
          using (Stream s = "kjhlkhlkhlkhlkh".ToMemoryStream())
@@ -261,7 +262,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       public async Task GetMeta_for_one_file_succeeds()
       {
          string content = RandomGenerator.GetRandomString(1000, false);
-         string id = RandomGenerator.RandomString;
+         string id = RandomBlobId();
 
          await _storage.WriteTextAsync(id, content);
 
@@ -279,7 +280,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task GetMeta_doesnt_exist_returns_null()
       {
-         string id = RandomGenerator.RandomString;
+         string id = RandomBlobId();
 
          BlobMeta meta = (await _storage.GetMetaAsync(new[] { id })).First();
 
@@ -289,7 +290,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task Open_doesnt_exist_returns_null()
       {
-         string id = RandomGenerator.RandomString;
+         string id = RandomBlobId();
 
          Assert.Null(await _storage.OpenReadAsync(id));
       }
@@ -307,7 +308,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task Write_with_openwrite_succeeds()
       {
-         string id = Guid.NewGuid().ToString();
+         string id = RandomBlobId();
          byte[] data = Encoding.UTF8.GetBytes("oh my");
 
          using (Stream dest = await _storage.OpenWriteAsync(id))
@@ -318,6 +319,37 @@ namespace Storage.Net.Tests.Integration.Blobs
          //read and check
          string result = await _storage.ReadTextAsync(id);
          Assert.Equal("oh my", result);
+      }
+
+      [Fact]
+      public async Task Exists_non_existing_blob_returns_false()
+      {
+         Assert.False(await _storage.ExistsAsync(RandomBlobId()));
+      }
+
+      [Fact]
+      public async Task Exists_existing_blob_returns_true()
+      {
+         string id = RandomBlobId();
+         await _storage.WriteTextAsync(id, "test");
+
+         Assert.True(await _storage.ExistsAsync(id));
+      }
+
+      [Fact]
+      public async Task Delete_create_and_delete_doesnt_exist()
+      {
+         string id = RandomBlobId();
+         await _storage.WriteTextAsync(id, "test");
+         await _storage.DeleteAsync(id);
+
+         Assert.False(await _storage.ExistsAsync(id));
+
+      }
+
+      private string RandomBlobId()
+      {
+         return _blobPrefix + Guid.NewGuid().ToString();
       }
 
       class TestDocument

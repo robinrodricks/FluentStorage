@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage;
+using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blob
 {
@@ -41,6 +43,21 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             throw new ArgumentOutOfRangeException(nameof(containerName),
                $"container [{containerName}] length must be between 3 and 63 but it's {containerName.Length}");
          }
+      }
+
+      public static bool IsDoesntExist(AzureStorageException ex)
+      {
+         return ex.RequestInformation?.HttpStatusCode == 404;
+      }
+
+      public static bool TryHandleStorageException(AzureStorageException ex)
+      {
+         if (IsDoesntExist(ex))
+         {
+            throw new StorageException(ErrorCode.NotFound, ex);
+         }
+
+         return false;
       }
 
    }

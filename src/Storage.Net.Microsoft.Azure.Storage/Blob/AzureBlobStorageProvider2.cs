@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
+using NetBox.Extensions;
 using Storage.Net.Blob;
+using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blob
 {
@@ -26,9 +28,19 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          _client = account.CreateCloudBlobClient();
       }
 
-      public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         throw new NotImplementedException();
+         GenericValidation.CheckBlobId(ids);
+
+         await Task.WhenAll(ids.Select(id => DeleteAsync(id, cancellationToken)));
+      }
+
+      private async Task DeleteAsync(string id, CancellationToken cancellationToken)
+      {
+         (CloudBlobContainer container, string path) = await GetPartsAsync(id, false);
+
+         CloudBlockBlob blob = container.GetBlockBlobReference(StoragePath.Normalize(path, false));
+         await blob.DeleteIfExistsAsync();
       }
 
       public void Dispose()
@@ -36,14 +48,65 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          
       }
 
-      public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         throw new NotImplementedException();
+         var result = new List<bool>();
+
+         foreach (string id in ids)
+         {
+            GenericValidation.CheckBlobId(id);
+
+            (CloudBlobContainer container, string path) = await GetPartsAsync(id, false);
+            if (container == null)
+            {
+               result.Add(false);
+            }
+            else
+            {
+               CloudBlockBlob blob = container.GetBlockBlobReference(StoragePath.Normalize(path, false));
+               bool exists = await blob.ExistsAsync();
+               result.Add(exists);
+            }
+         }
+
+         return result;
       }
 
-      public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         throw new NotImplementedException();
+         var result = new List<BlobMeta>();
+         foreach (string id in ids)
+         {
+            GenericValidation.CheckBlobId(id);
+         }
+
+         return await Task.WhenAll(ids.Select(id => GetMetaAsync(id, cancellationToken)));
+      }
+
+      private async Task<BlobMeta> GetMetaAsync(string id, CancellationToken cancellationToken)
+      {
+         (CloudBlobContainer container, string path) = await GetPartsAsync(id, false);
+         if (container == null) return null;
+
+         CloudBlob blob = container.GetBlobReference(StoragePath.Normalize(path, false));
+         if (!(await blob.ExistsAsync())) return null;
+
+         await blob.FetchAttributesAsync();
+
+         return GetblobMeta(blob);
+      }
+
+      internal static BlobMeta GetblobMeta(CloudBlob blob)
+      {
+         //ContentMD5 is base64-encoded hash, whereas we work with HEX encoded ones
+         string md5 = blob.Properties.ContentMD5.Base64DecodeAsBytes().ToHexString();
+
+         var meta = new BlobMeta(
+            blob.Properties.Length,
+            md5,
+            blob.Properties.LastModified);
+
+         return meta;
       }
 
       public Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken = default)
@@ -51,14 +114,33 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          throw new NotImplementedException();
       }
 
-      public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default)
+      public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default)
       {
-         throw new NotImplementedException();
+         GenericValidation.CheckBlobId(id);
+
+         (CloudBlobContainer container, string path) = await GetPartsAsync(id, false);
+
+         if (container == null) return null;
+
+         CloudBlockBlob blob = container.GetBlockBlobReference(StoragePath.Normalize(path, false));
+
+         try
+         {
+            return await blob.OpenReadAsync();
+         }
+         catch (AzureStorageException ex)
+         {
+            if (AzureStorageValidation.IsDoesntExist(ex)) return null;
+
+            if (!AzureStorageValidation.TryHandleStorageException(ex)) throw;
+         }
+
+         throw new Exception("must not be here");
       }
 
       public Task<ITransaction> OpenTransactionAsync()
       {
-         throw new NotImplementedException();
+         return Task.FromResult(EmptyTransaction.Instance);
       }
 
       public async Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
@@ -88,7 +170,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          if (append)
          {
-            CloudAppendBlob cab = container.GetAppendBlobReference(StoragePath.Normalize(id, false));
+            CloudAppendBlob cab = container.GetAppendBlobReference(StoragePath.Normalize(path, false));
             if (!(await cab.ExistsAsync())) await cab.CreateOrReplaceAsync();
 
             await cab.AppendFromStreamAsync(sourceStream);
@@ -96,7 +178,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          }
          else
          {
-            CloudBlockBlob blob = container.GetBlockBlobReference(StoragePath.Normalize(id, false));
+            CloudBlockBlob blob = container.GetBlockBlobReference(StoragePath.Normalize(path, false));
 
             await blob.UploadFromStreamAsync(sourceStream);
          }
@@ -104,7 +186,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
       #region [ Path forking ]
 
-      private async Task<(CloudBlobContainer, string)> GetPartsAsync(string path)
+      private async Task<(CloudBlobContainer, string)> GetPartsAsync(string path, bool createContainer = true)
       {
          GenericValidation.CheckBlobId(path);
 
@@ -118,6 +200,8 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          if (!_containerNameToContainer.TryGetValue(containerName, out CloudBlobContainer container))
          {
+            if (!createContainer) return (null, null);
+
             container = _client.GetContainerReference(containerName);
             await container.CreateIfNotExistsAsync();
             _containerNameToContainer[containerName] = container;
