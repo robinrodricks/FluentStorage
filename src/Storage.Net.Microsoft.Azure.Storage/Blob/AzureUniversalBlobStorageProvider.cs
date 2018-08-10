@@ -149,6 +149,9 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          {
             // list all of the containers
             containers.AddRange(await GetCloudBlobContainersAsync(cancellationToken));
+
+            //represent containers as folders in the result
+            result.AddRange(containers.Select(c => new BlobId(c.Name, BlobItemKind.Folder)));
          }
          else
          {
@@ -156,6 +159,9 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             if (container == null) return new List<BlobId>();
             options.FolderPath = path; //scan from subpath now
             containers.Add(container);
+
+            //add container as search result
+            result.Add(new BlobId(container.Name, BlobItemKind.Folder));
          }
 
          foreach(CloudBlobContainer container in containers)
