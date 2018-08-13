@@ -8,7 +8,6 @@ using Amazon.S3;
 using Amazon.Runtime;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
-using NetBox;
 using System.Threading.Tasks;
 using System.Threading;
 using Storage.Net.Streaming;
@@ -18,7 +17,7 @@ namespace Storage.Net.Aws.Blob
    /// <summary>
    /// Amazon S3 storage adapter for blobs
    /// </summary>
-   public class AwsS3BlobStorageProvider : IBlobStorage
+   class AwsS3BlobStorageProvider : IBlobStorage
    {
       private readonly string _bucketName;
       private readonly AmazonS3Client _client;

@@ -25,8 +25,6 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// <summary>
       /// Creates an instance of Azure Service Bus receiver with connection
       /// </summary>
-      /// <param name="connectionString">Service Bus connection string</param>
-      /// <param name="topicName">Queue name in Service Bus</param>
       public AzureServiceBusTopicReceiver(string connectionString, string topicName, string subscriptionName, bool peekLock = true)
       {
          _client = new SubscriptionClient(connectionString, topicName, subscriptionName, peekLock ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete);

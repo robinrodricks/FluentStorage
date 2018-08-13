@@ -65,7 +65,6 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// <summary>
       /// Call at the end when done with the message.
       /// </summary>
-      /// <param name="message"></param>
       public async Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken)
       {
          if(!_peekLock) return;

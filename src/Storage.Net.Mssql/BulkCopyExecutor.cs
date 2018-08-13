@@ -72,14 +72,7 @@ namespace Storage.Net.Mssql
                   await CreateTableAsync(rowsList);
 
                   //run it again
-                  try
-                  {
-                     await sbc.WriteToServerAsync(dataTable);
-                  }
-                  catch(Exception ex1)
-                  {
-                     throw;
-                  }
+                  await sbc.WriteToServerAsync(dataTable);
                }
             }
             catch(SqlException ex) when (ex.Number == SqlCodes.DuplicateKey)
