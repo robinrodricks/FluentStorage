@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.DataLake.Store;
-using Microsoft.Azure.Management.DataLake.Store;
-using Microsoft.Azure.Management.DataLake.Store.Models;
 using Storage.Net.Blob;
 
 namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
@@ -33,25 +30,29 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
       private async Task Browse(string path, ListOptions options, ICollection<BlobId> container, CancellationToken token)
       {
-         List<DirectoryEntry> dirEntries;
+         List<BlobId> batch;
 
          try
          {
-            dirEntries = _client.EnumerateDirectory(path, UserGroupRepresentation.ObjectID, token).ToList();
+            IEnumerable<BlobId> entries = _client
+               .EnumerateDirectory(path, UserGroupRepresentation.ObjectID)
+               .Select(n => ToBlobId(path, n, options.IncludeMetaWhenKnown))
+               .Where(options.IsMatch);
+
+            if(options.BrowseFilter != null)
+            {
+               entries = entries.Where(options.BrowseFilter);
+            }
+
+            batch = entries.ToList();
          }
          //skip files with forbidden access
          catch (AdlsException ex) when (ex.HttpStatus == HttpStatusCode.Forbidden || ex.HttpStatus == HttpStatusCode.NotFound)
          {
-            dirEntries = null;
+            batch = null;
          }
 
-         if (dirEntries == null) return;
-
-         List<BlobId> batch =
-            dirEntries
-               .Select(p => ToBlobId(path, p, options.IncludeMetaWhenKnown))
-               .Where(options.IsMatch)
-               .ToList();
+         if (batch == null) return;
 
          if (options.Add(container, batch)) return;
 

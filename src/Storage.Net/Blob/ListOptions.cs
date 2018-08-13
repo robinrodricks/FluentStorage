@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NetBox.Extensions;
 
@@ -15,6 +16,14 @@ namespace Storage.Net.Blob
       /// Folder path to start browsing from. When not set scanning starts from the root folder.
       /// </summary>
       public string FolderPath { get; set; }
+
+      /// <summary>
+      /// Gets or sets a browsing filter used by some implementations which can filter out results before returning it to you.
+      /// This is useful to minimise amount of RAM taken when returning the results and then filtering them on client side.
+      /// Note that filtering will be happening on the client side, therefore this is the least efficient filter and should
+      /// only be used when you're concerned about RAM usage.
+      /// </summary>
+      public Func<BlobId, bool> BrowseFilter { get; set; }
 
       /// <summary>
       /// Prefix to filter file name by. Folders are not affected by this filter. If you list files recursively
