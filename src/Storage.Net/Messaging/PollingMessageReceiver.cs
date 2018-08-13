@@ -7,12 +7,15 @@ using NetBox.Extensions;
 
 namespace Storage.Net.Messaging
 {
+   /// <summary>
+   /// Base class for implementing a polling message receiver for those providers that do not support polling natively.
+   /// </summary>
    public abstract class PollingMessageReceiver : IMessageReceiver
    {
       /// <summary>
       /// See interface
       /// </summary>
-      public Task<int> GetMessageCountAsync()
+      public virtual Task<int> GetMessageCountAsync()
       {
          throw new NotSupportedException();
       }
@@ -48,10 +51,12 @@ namespace Storage.Net.Messaging
          return Task.FromResult(EmptyTransaction.Instance);
       }
 
-      /// <summary>
-      /// See interface
-      /// </summary>
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+                              /// <summary>
+                              /// See interface
+                              /// </summary>
       public async Task StartMessagePumpAsync(Func<IReadOnlyCollection<QueueMessage>, Task> onMessageAsync, int maxBatchSize = 1, CancellationToken cancellationToken = default)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
       {
          if (onMessageAsync == null) throw new ArgumentNullException(nameof(onMessageAsync));
 

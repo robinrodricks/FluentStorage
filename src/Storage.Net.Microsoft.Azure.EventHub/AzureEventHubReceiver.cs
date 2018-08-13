@@ -13,7 +13,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
    /// <summary>
    /// Microsoft Azure Event Hub receiver
    /// </summary>
-   public class AzureEventHubReceiver : IMessageReceiver
+   class AzureEventHubReceiver : IMessageReceiver
    {
       private readonly EventHubClient _hubClient;
       private readonly HashSet<string> _partitionIds;
@@ -199,7 +199,9 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       {
       }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
       public async Task<ITransaction> OpenTransactionAsync()
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
       {
          return EmptyTransaction.Instance;
       }

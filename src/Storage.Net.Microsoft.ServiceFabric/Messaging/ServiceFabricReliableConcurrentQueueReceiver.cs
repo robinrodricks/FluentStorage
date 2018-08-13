@@ -21,11 +21,11 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
          _queueName = queueName;
       }
 
-      protected override async Task<int> GetMessageCountAsync(IReliableState reliableState, ServiceFabricTransaction transaction)
+      protected override Task<int> GetMessageCountAsync(IReliableState reliableState, ServiceFabricTransaction transaction)
       {
          IReliableConcurrentQueue<byte[]> collection = (IReliableConcurrentQueue<byte[]>)reliableState;
 
-         return (int)collection.Count;
+         return Task.FromResult((int)collection.Count);
       }
 
       protected override async Task<ConditionalValue<byte[]>> TryDequeueAsync(ServiceFabricTransaction tx, IReliableState collectionBase, CancellationToken cancellationToken)
