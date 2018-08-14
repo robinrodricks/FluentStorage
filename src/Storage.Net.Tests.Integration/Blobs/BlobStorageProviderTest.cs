@@ -147,6 +147,18 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
+      public async Task List_RootFolder_HasAtLeastOne()
+      {
+         string targetId = StoragePath.Combine("root", RandomBlobId());
+
+         await _storage.WriteTextAsync(targetId, "test");
+
+         IReadOnlyCollection<BlobId> rootContent = await _storage.ListAsync(new ListOptions { Recurse = false });
+
+         Assert.NotEmpty(rootContent);
+      }
+
+      [Fact]
       public async Task List_ByFilePrefix_Filtered()
       {
          string prefix = RandomGenerator.RandomString;

@@ -22,12 +22,12 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       {
          var result = new List<BlobId>();
 
-         await ListFolder(result, options.FolderPath, options, cancellationToken);
+         await ListFolderAsync(result, options.FolderPath, options, cancellationToken);
 
          return result;
       }
 
-      public async Task ListFolder(List<BlobId> container, string path, ListOptions options, CancellationToken cancellationToken)
+      private async Task ListFolderAsync(List<BlobId> container, string path, ListOptions options, CancellationToken cancellationToken)
       {
          CloudBlobDirectory dir = GetCloudBlobDirectory(path);
 
@@ -63,7 +63,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             List<BlobId> folderIds = batch.Where(r => r.Kind == BlobItemKind.Folder).ToList();
             foreach (BlobId folderId in folderIds)
             {
-               await ListFolder(
+               await ListFolderAsync(
                   container,
                   StoragePath.Combine(path, folderId.Id),
                   options,
