@@ -25,7 +25,7 @@ namespace Storage.Net.Tests.Integration
             {
                Recurse = true,
                IncludeMetaWhenKnown = true,
-               BrowseFilter = (bid) => !bid.FullPath.Contains("F00")
+               FolderPath = "/perftest/archiving/F000000"
             });
 
       }

@@ -34,12 +34,17 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
          try
          {
-            IEnumerable<BlobId> entries = _client
+            /*IEnumerable<BlobId> entries = _client
                .EnumerateDirectory(path, UserGroupRepresentation.ObjectID)
+               .Select(n => ToBlobId(path, n, options.IncludeMetaWhenKnown))
+               .Where(options.IsMatch);*/
+
+            IEnumerable<BlobId> entries = 
+               EnumerateDirectory(path, UserGroupRepresentation.ObjectID)
                .Select(n => ToBlobId(path, n, options.IncludeMetaWhenKnown))
                .Where(options.IsMatch);
 
-            if(options.BrowseFilter != null)
+            if (options.BrowseFilter != null)
             {
                entries = entries.Where(options.BrowseFilter);
             }
@@ -71,6 +76,22 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
                   )));
             }
          }
+      }
+
+
+      public virtual IEnumerable<DirectoryEntry> EnumerateDirectory(string path, UserGroupRepresentation userIdFormat = UserGroupRepresentation.ObjectID, CancellationToken cancelToken = default(CancellationToken))
+      {
+         return EnumerateDirectory(path, -1, "", "", userIdFormat, cancelToken);
+      }
+
+      internal IEnumerable<DirectoryEntry> EnumerateDirectory(string path, int maxEntries, string listAfter, string listBefore, UserGroupRepresentation userIdFormat = UserGroupRepresentation.ObjectID, CancellationToken cancelToken = default(CancellationToken))
+      {
+         if (string.IsNullOrEmpty(path))
+         {
+            throw new ArgumentException("Path is null");
+         }
+
+         return new FileStatusOutput(listBefore, listAfter, maxEntries, userIdFormat, _client, path);
       }
 
       private static BlobId ToBlobId(string path, DirectoryEntry entry, bool includeMeta)
