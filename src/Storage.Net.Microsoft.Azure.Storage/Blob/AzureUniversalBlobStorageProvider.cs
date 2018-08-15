@@ -19,6 +19,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       private readonly CloudBlobClient _client;
       private readonly Dictionary<string, CloudBlobContainer> _containerNameToContainer = new Dictionary<string, CloudBlobContainer>();
       private readonly CloudBlobContainer _fixedContainer;
+      private readonly string _fixedContainerName;
 
       public CloudBlobClient NativeBlobClient => _client;
 
@@ -29,12 +30,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             true);
 
          _client = account.CreateCloudBlobClient();
-
-         if(containerName != null)
-         {
-            _fixedContainer = _client.GetContainerReference(containerName);
-            _fixedContainer.CreateIfNotExistsAsync().Wait();
-         }
+         _fixedContainerName = containerName;
       }
 
       private AzureUniversalBlobStorageProvider(Uri sasUri)
@@ -283,6 +279,13 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          if(_fixedContainer != null)
          {
             return (_fixedContainer, path);
+         }
+
+         if(_fixedContainerName != null)
+         {
+            CloudBlobContainer fxc = _client.GetContainerReference(_fixedContainerName);
+            await fxc.CreateIfNotExistsAsync();
+            return (fxc, path);
          }
 
          int idx = path.IndexOf(StoragePath.PathSeparator);
