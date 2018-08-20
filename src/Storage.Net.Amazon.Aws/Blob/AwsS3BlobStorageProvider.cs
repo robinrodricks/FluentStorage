@@ -79,6 +79,10 @@ namespace Storage.Net.Aws.Blob
             {
                //ignore this error as bucket already exists
             }
+            else
+            {
+               throw;
+            }
          }
       }
 
