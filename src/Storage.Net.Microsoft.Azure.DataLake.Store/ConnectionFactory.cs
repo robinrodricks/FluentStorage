@@ -27,6 +27,8 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store
             {
                client.ListBatchSize = listBatchSize;
             }
+
+            return client;
          }
 
          return null;

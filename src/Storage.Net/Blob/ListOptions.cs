@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using NetBox.Extensions;
 
 namespace Storage.Net.Blob
@@ -55,6 +56,12 @@ namespace Storage.Net.Blob
       /// have any overhead in creating this metadata.
       /// </summary>
       public bool IncludeMetaWhenKnown { get; set; } = false;
+
+      /// <summary>
+      /// When set, an implementing provider might be able to send notification on progress callback if it supports them.
+      /// First parameter indicates number of items already listed, second - total number of items (if known).
+      /// </summary>
+      public Func<long, long, Task> ListProgressCallback { get; set; }
 
       /// <summary>
       /// Helper method that returns true if a <see cref="BlobId"/> matches these list options.
