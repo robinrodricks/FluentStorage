@@ -6,10 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
 using System.Net;
-using Microsoft.Azure.Management.DataLake.Store;
 using System.Collections.Generic;
-using Microsoft.Azure.Management.DataLake.Store.Models;
-using NetBox.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.Azure.DataLake.Store;
@@ -23,10 +20,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       private readonly string _clientId;
       private readonly string _clientSecret;
       private ServiceClientCredentials _credential;
-      private DataLakeStoreFileSystemManagementClient _fsClient;
       private AdlsClient _client;
-
-      private static readonly DateTime UnixEpoch = new DateTime(1970, 01, 01, 00, 00, 00, DateTimeKind.Utc);
 
       //some info on how to use sdk here: https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-get-started-net-sdk
 
@@ -196,26 +190,6 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          }
 
          return new BlobMeta(entry.Length, null, entry.LastModifiedTime);
-      }
-
-      private static DateTimeOffset? GetLastModifiedDate(FileStatusResult fsr)
-      {
-         if (fsr.FileStatus.ModificationTime == null) return null;
-
-         long ticks = fsr.FileStatus.ModificationTime.Value;
-         DateTime result = UnixEpoch.AddMilliseconds(ticks);
-         return result;
-      }
-
-      private async Task<DataLakeStoreFileSystemManagementClient> GetFsClient()
-      {
-         if (_fsClient != null) return _fsClient;
-
-         ServiceClientCredentials creds = await GetCreds();
-
-         _fsClient = new DataLakeStoreFileSystemManagementClient(creds);
-
-         return _fsClient;
       }
 
       private async Task<AdlsClient> GetAdlsClient()
