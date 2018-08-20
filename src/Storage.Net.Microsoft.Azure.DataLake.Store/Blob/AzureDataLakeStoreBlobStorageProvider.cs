@@ -10,14 +10,13 @@ using Microsoft.Azure.Management.DataLake.Store;
 using System.Collections.Generic;
 using Microsoft.Azure.Management.DataLake.Store.Models;
 using NetBox.IO;
-using Microsoft.Rest.Azure;
 using System.Linq;
 using System.Threading;
 using Microsoft.Azure.DataLake.Store;
 
 namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 {
-   public class AzureDataLakeStoreBlobStorageProvider : IBlobStorage
+   class AzureDataLakeStoreBlobStorageProvider : IBlobStorage
    {
       private readonly string _accountName;
       private readonly string _domain;
@@ -46,11 +45,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       /// </summary>
       public ServiceClientCredentials Credentials => _credential;
 
-      /// <summary>
-      /// Returns the actual file system management object. Note that this will only be populated once you make at least one
-      /// successful call.
-      /// </summary>
-      public DataLakeStoreFileSystemManagementClient FsClient => _fsClient;
+      public int ListBatchSize { get; set; } = 5000;
 
       public static AzureDataLakeStoreBlobStorageProvider CreateByClientSecret(string accountName, string tenantId, string principalId, string principalSecret)
       {
@@ -79,7 +74,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
          AdlsClient client = await GetAdlsClient();
 
-         var browser = new DirectoryBrowser(client);
+         var browser = new DirectoryBrowser(client, ListBatchSize);
          return await browser.Browse(options, cancellationToken);
       }
 
@@ -87,25 +82,26 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          GenericValidation.CheckBlobId(id);
 
-         DataLakeStoreFileSystemManagementClient managementClient = await GetFsClient();
          AdlsClient client = await GetAdlsClient();
 
-         //AdlsOutputStream x = await client.CreateFileAsync(null, IfExists.Overwrite);
-
-         if (append)
+         if (append && (await ExistsAsync(new[] { id }, cancellationToken)).First())
          {
-            if ((await ExistsAsync(new[] { id }, cancellationToken)).First())
+            AdlsOutputStream adlsStream = await client.GetAppendStreamAsync(id, cancellationToken);
+            using (var writeStream = new AdlsWriteableStream(adlsStream))
             {
-               await managementClient.FileSystem.AppendAsync(_accountName, id, new NonCloseableStream(sourceStream));
-            }
-            else
-            {
-               await managementClient.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(sourceStream), true);
+               await sourceStream.CopyToAsync(writeStream);
             }
          }
          else
          {
-            await managementClient.FileSystem.CreateAsync(_accountName, id, new NonCloseableStream(sourceStream), true);
+            AdlsOutputStream adlsStream = await client.CreateFileAsync(id, IfExists.Overwrite,
+               createParent:true,
+               cancelToken: cancellationToken);
+
+            using (var writeStream = new AdlsWriteableStream(adlsStream))
+            {
+               await sourceStream.CopyToAsync(writeStream);
+            }
          }
       }
 
@@ -154,31 +150,24 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          GenericValidation.CheckBlobId(ids);
 
-         DataLakeStoreFileSystemManagementClient client = await GetFsClient();
+         AdlsClient client = await GetAdlsClient();
 
-         await Task.WhenAll(ids.Select(id => client.FileSystem.DeleteAsync(_accountName, id)));
+         await Task.WhenAll(ids.Select(id => client.DeleteAsync(id, cancellationToken)));
       }
 
       public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 
-         DataLakeStoreFileSystemManagementClient client = await GetFsClient();
+         AdlsClient client = await GetAdlsClient();
 
          var result = new List<bool>();
 
          foreach (string id in ids)
          {
-            try
-            {
-               await client.FileSystem.GetFileStatusAsync(_accountName, id);
+            bool exists = client.CheckExists(id);
 
-               result.Add(true);
-            }
-            catch (AdlsErrorException ex) when (ex.Response.StatusCode == HttpStatusCode.NotFound)
-            {
-               result.Add(false);
-            }
+            result.Add(exists);
          }
 
          return result;

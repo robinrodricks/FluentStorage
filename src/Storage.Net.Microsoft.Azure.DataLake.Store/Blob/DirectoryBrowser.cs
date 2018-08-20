@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.DataLake.Store;
+using Microsoft.Azure.DataLake.Store.RetryPolicies;
 using Storage.Net.Blob;
 
 namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
@@ -12,10 +13,12 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
    class DirectoryBrowser
    {
       private readonly AdlsClient _client;
+      private readonly int _listBatchSize;
 
-      public DirectoryBrowser(AdlsClient client)
+      public DirectoryBrowser(AdlsClient client, int listBatchSize)
       {
          _client = client ?? throw new ArgumentNullException(nameof(client));
+         _listBatchSize = listBatchSize;
       }
 
       public async Task<IReadOnlyCollection<BlobId>> Browse(ListOptions options, CancellationToken token)
@@ -40,8 +43,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
                .Where(options.IsMatch);*/
 
             IEnumerable<BlobId> entries = 
-               EnumerateDirectory(path, UserGroupRepresentation.ObjectID)
-               .Select(n => ToBlobId(path, n, options.IncludeMetaWhenKnown))
+               (await EnumerateDirectoryAsync(path, options, UserGroupRepresentation.ObjectID))
                .Where(options.IsMatch);
 
             if (options.BrowseFilter != null)
@@ -77,21 +79,46 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
             }
          }
       }
-
-
-      public virtual IEnumerable<DirectoryEntry> EnumerateDirectory(string path, UserGroupRepresentation userIdFormat = UserGroupRepresentation.ObjectID, CancellationToken cancelToken = default(CancellationToken))
+      private async Task<IReadOnlyCollection<BlobId>> EnumerateDirectoryAsync(
+         string path,
+         ListOptions options,
+         UserGroupRepresentation userIdFormat = UserGroupRepresentation.ObjectID,
+         CancellationToken cancelToken = default)
       {
-         return EnumerateDirectory(path, -1, "", "", userIdFormat, cancelToken);
-      }
+         var result = new List<BlobId>();
 
-      internal IEnumerable<DirectoryEntry> EnumerateDirectory(string path, int maxEntries, string listAfter, string listBefore, UserGroupRepresentation userIdFormat = UserGroupRepresentation.ObjectID, CancellationToken cancelToken = default(CancellationToken))
-      {
-         if (string.IsNullOrEmpty(path))
+         string listAfter = "";
+
+         while(options.MaxResults == null || result.Count < options.MaxResults.Value)
          {
-            throw new ArgumentException("Path is null");
+            List<DirectoryEntry> page = await EnumerateDirectoryAsync(path, _listBatchSize, listAfter, "", userIdFormat, cancelToken);
+
+            //no more results
+            if(page == null || page.Count == 0)
+            {
+               break;
+            }
+
+            //set pointer to next page
+            listAfter = page[page.Count - 1].Name;
+
+            result.AddRange(page.Select(p => ToBlobId(path, p, options.IncludeMetaWhenKnown)));
          }
 
-         return new FileStatusOutput(listBefore, listAfter, maxEntries, userIdFormat, _client, path);
+         return result;
+      }
+
+      internal async Task<List<DirectoryEntry>> EnumerateDirectoryAsync(string path,
+         int maxEntries, string listAfter, string listBefore, UserGroupRepresentation userIdFormat = UserGroupRepresentation.ObjectID, CancellationToken cancelToken = default(CancellationToken))
+      {
+         if (string.IsNullOrEmpty(path)) throw new ArgumentException("Path is null");
+
+         var resp = new OperationResponse();
+         List<DirectoryEntry> page = await Core.ListStatusAsync(path, listAfter, listBefore, maxEntries, userIdFormat, _client,
+            new RequestOptions(new ExponentialRetryPolicy()),
+            resp);
+         return page;
+         //return new FileStatusOutput(listBefore, listAfter, maxEntries, userIdFormat, _client, path);
       }
 
       private static BlobId ToBlobId(string path, DirectoryEntry entry, bool includeMeta)

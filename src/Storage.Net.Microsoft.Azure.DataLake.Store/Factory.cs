@@ -21,29 +21,17 @@ namespace Storage.Net
       /// </summary>
       /// <param name="factory">Factory reference</param>
       /// <param name="accountName">Data Lake account name</param>
-      /// <param name="credential">Credential object where username is Principal ID and password is Principal Secret, and Domain is set to Tenant ID</param>
-      /// <returns></returns>
-      public static IBlobStorage AzureDataLakeStoreByClientSecret(this IBlobStorageFactory factory,
-         string accountName,
-         NetworkCredential credential)
-      {
-         return AzureDataLakeStoreBlobStorageProvider.CreateByClientSecret(accountName, credential);
-      }
-
-      /// <summary>
-      /// Creates and instance of Azure Data Lake Store client
-      /// </summary>
-      /// <param name="factory">Factory reference</param>
-      /// <param name="accountName">Data Lake account name</param>
       /// <param name="tenantId">Tenant ID</param>
       /// <param name="principalId">Principal ID</param>
       /// <param name="principalSecret">Principal Secret</param>
+      /// <param name="listBatchSize">Batch size for list operation for this storage connection. If not set defaults to 5000.</param>
       /// <returns></returns>
       public static IBlobStorage AzureDataLakeStoreByClientSecret(this IBlobStorageFactory factory,
          string accountName,
          string tenantId,
          string principalId,
-         string principalSecret)
+         string principalSecret,
+         int listBatchSize = 5000)
       {
          if (accountName == null)
             throw new ArgumentNullException(nameof(accountName));
@@ -57,7 +45,9 @@ namespace Storage.Net
          if (principalSecret == null)
             throw new ArgumentNullException(nameof(principalSecret));
 
-         return AzureDataLakeStoreBlobStorageProvider.CreateByClientSecret(accountName, new NetworkCredential(principalId, principalSecret, tenantId));
+         var client = AzureDataLakeStoreBlobStorageProvider.CreateByClientSecret(accountName, new NetworkCredential(principalId, principalSecret, tenantId));
+         client.ListBatchSize = listBatchSize;
+         return client;
       }
    }
 }

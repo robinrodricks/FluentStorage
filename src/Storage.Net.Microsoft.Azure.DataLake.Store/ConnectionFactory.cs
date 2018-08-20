@@ -18,7 +18,15 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store
             connectionString.GetRequired("principalId", true, out string principalId);
             connectionString.GetRequired("principalSecret", true, out string principalSecret);
 
-            return AzureDataLakeStoreBlobStorageProvider.CreateByClientSecret(accountName, tenantId, principalId, principalSecret);
+            int.TryParse(connectionString.Get("listBatchSize"), out int listBatchSize);
+
+            AzureDataLakeStoreBlobStorageProvider client = AzureDataLakeStoreBlobStorageProvider.CreateByClientSecret(
+               accountName, tenantId, principalId, principalSecret);
+
+            if(listBatchSize != 0)
+            {
+               client.ListBatchSize = listBatchSize;
+            }
          }
 
          return null;
