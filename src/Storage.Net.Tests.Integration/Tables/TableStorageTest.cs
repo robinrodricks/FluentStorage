@@ -28,12 +28,6 @@ namespace Storage.Net.Tests.Integration.Tables
       public MssqlTableStorageTest() : base("mssql") { }
    }*/
 
-   //bored of maintaining ESENT tests when I don't really use ESENT anymore for a long time
-   /*public class EsentTableStorageTest : TableStorageTest
-   {
-      public EsentTableStorageTest() : base("esent") { }
-   }*/
-
    public abstract class TableStorageTest : AbstractTestFixture
    {
       private readonly string _name;
