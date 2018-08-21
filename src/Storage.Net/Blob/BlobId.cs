@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Storage.Net.Blob
@@ -32,6 +33,11 @@ namespace Storage.Net.Blob
       /// Gets full path to this blob which is a combination of folder path and blob name
       /// </summary>
       public string FullPath => StoragePath.Combine(FolderPath, Id);
+
+      /// <summary>
+      /// Custom provider-specific properties
+      /// </summary>
+      public Dictionary<string, string> Properties { get; set; }
 
       /// <summary>
       /// Create a new instance

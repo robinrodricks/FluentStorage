@@ -85,5 +85,10 @@ namespace Storage.Net.Blob
          dest.AddRange(src.Take(MaxResults.Value - dest.Count));
          return true;
       }
+
+      public ListOptions Clone()
+      {
+         return (ListOptions)(MemberwiseClone());
+      }
    }
 }

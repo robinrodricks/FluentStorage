@@ -91,5 +91,13 @@ namespace Storage.Net
 
          return path.Split(new[] { PathSeparator }, StringSplitOptions.RemoveEmptyEntries).Select(NormalizePart).ToArray();
       }
+
+      /// <summary>
+      /// Checks if path is root folder path
+      /// </summary>
+      public static bool IsRootPath(string path)
+      {
+         return string.IsNullOrEmpty(path) || path == RootFolderPath;
+      }
    }
 }

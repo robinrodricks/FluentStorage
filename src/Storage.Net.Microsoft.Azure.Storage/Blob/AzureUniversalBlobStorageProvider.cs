@@ -141,18 +141,21 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          {
             containers.Add(_fixedContainer);
          }
-         else if(options.FolderPath == null)
+         else if(StoragePath.IsRootPath(options.FolderPath))
          {
             // list all of the containers
             containers.AddRange(await GetCloudBlobContainersAsync(cancellationToken));
 
             //represent containers as folders in the result
             result.AddRange(containers.Select(c => new BlobId(c.Name, BlobItemKind.Folder)));
+
+            return result;
          }
          else
          {
             (CloudBlobContainer container, string path) = await GetPartsAsync(options.FolderPath, false);
             if (container == null) return new List<BlobId>();
+            options = options.Clone();
             options.FolderPath = path; //scan from subpath now
             containers.Add(container);
 
