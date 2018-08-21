@@ -155,6 +155,8 @@ namespace Storage.Net.Tests.Integration.Blobs
 
          IReadOnlyCollection<BlobId> rootContent = await _storage.ListAsync(new ListOptions { Recurse = false });
 
+         //rootContent = await _storage.ListAsync(new ListOptions { FolderPath = "blobstoragetest", Recurse = false });
+
          Assert.NotEmpty(rootContent);
       }
 

@@ -160,7 +160,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             containers.Add(container);
 
             //add container as search result
-            result.Add(new BlobId(container.Name, BlobItemKind.Folder));
+            //result.Add(new BlobId(container.Name, BlobItemKind.Folder));
          }
 
          foreach(CloudBlobContainer container in containers)
@@ -292,17 +292,33 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          }
 
          int idx = path.IndexOf(StoragePath.PathSeparator);
-         if (idx == -1) throw new ArgumentException("blob path must contain container name", nameof(path));
-
-         string containerName = path.Substring(0, idx);
-         string relativePath = path.Substring(idx + 1);
+         string containerName, relativePath;
+         if (idx == -1)
+         {
+            containerName = path;
+            relativePath = string.Empty;
+         }
+         else
+         {
+            containerName = path.Substring(0, idx);
+            relativePath = path.Substring(idx + 1);
+         }
 
          if (!_containerNameToContainer.TryGetValue(containerName, out CloudBlobContainer container))
          {
-            if (!createContainer) return (null, null);
-
             container = _client.GetContainerReference(containerName);
-            await container.CreateIfNotExistsAsync();
+            if(!(await container.ExistsAsync()))
+            {
+               if(createContainer)
+               {
+                  await container.CreateIfNotExistsAsync();
+               }
+               else
+               {
+                  return (null, null);
+               }
+            }
+
             _containerNameToContainer[containerName] = container;
          }
 
