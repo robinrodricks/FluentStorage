@@ -17,7 +17,8 @@ namespace Storage.Net.Blob
       /// <param name="options"></param>
       /// <param name="cancellationToken"></param>
       /// <returns>List of blob IDs</returns>
-      Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options,
+      Task<IReadOnlyCollection<BlobId>> ListAsync(
+         ListOptions options = null,
          CancellationToken cancellationToken = default);
 
       /// <summary>

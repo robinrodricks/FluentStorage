@@ -77,6 +77,8 @@ namespace Storage.Net.Tests.Integration.Blobs
 
       public BlobStorageProviderTest(string type, string blobPrefix = null)
       {
+         StorageFactory.Modules.UseAzureStorage();
+
          _settings = new ConfigurationBuilder<ITestSettings>()
             .UseIniFile("c:\\tmp\\integration-tests.ini")
             .UseEnvironmentVariables()
@@ -154,8 +156,6 @@ namespace Storage.Net.Tests.Integration.Blobs
          await _storage.WriteTextAsync(targetId, "test");
 
          IReadOnlyCollection<BlobId> rootContent = await _storage.ListAsync(new ListOptions { Recurse = false });
-
-         //rootContent = await _storage.ListAsync(new ListOptions { FolderPath = "blobstoragetest", Recurse = false });
 
          Assert.NotEmpty(rootContent);
       }

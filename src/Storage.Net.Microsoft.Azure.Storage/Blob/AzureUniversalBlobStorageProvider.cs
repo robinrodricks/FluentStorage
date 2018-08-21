@@ -18,7 +18,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
    {
       private readonly CloudBlobClient _client;
       private readonly Dictionary<string, CloudBlobContainer> _containerNameToContainer = new Dictionary<string, CloudBlobContainer>();
-      private readonly CloudBlobContainer _fixedContainer;
+      private CloudBlobContainer _fixedContainer;
       private readonly string _fixedContainerName;
 
       public CloudBlobClient NativeBlobClient => _client;
@@ -136,10 +136,11 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          var result = new List<BlobId>();
          var containers = new List<CloudBlobContainer>();
+         CloudBlobContainer fixedContainer = await GetFixedContainerAsync();
 
-         if(_fixedContainer != null)
+         if(fixedContainer != null)
          {
-            containers.Add(_fixedContainer);
+            containers.Add(fixedContainer);
          }
          else if(StoragePath.IsRootPath(options.FolderPath))
          {
@@ -169,7 +170,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             IReadOnlyCollection<BlobId> containerBlobs = await browser.ListFolderAsync(options, cancellationToken);
             if (containerBlobs.Count > 0)
             {
-               if (_fixedContainer == null)
+               if (fixedContainer == null)
                {
                   result.AddRange(containerBlobs.Select(bid => new BlobId(StoragePath.Combine(container.Name, bid.FullPath), bid.Kind)));
                }
@@ -272,6 +273,21 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
       #region [ Path forking ]
 
+      private async Task<CloudBlobContainer> GetFixedContainerAsync()
+      {
+         if (_fixedContainer != null)
+            return _fixedContainer;
+
+         if (_fixedContainerName != null)
+         {
+            _fixedContainer = _client.GetContainerReference(_fixedContainerName);
+            await _fixedContainer.CreateIfNotExistsAsync();
+            return _fixedContainer;
+         }
+
+         return null;
+      }
+
       private async Task<(CloudBlobContainer, string)> GetPartsAsync(string path, bool createContainer = true)
       {
          GenericValidation.CheckBlobId(path);
@@ -279,16 +295,11 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          path = StoragePath.Normalize(path);
          if (path == null) throw new ArgumentNullException(nameof(path));
 
-         if(_fixedContainer != null)
+         CloudBlobContainer fixedContainer = await GetFixedContainerAsync();
+
+         if(fixedContainer != null)
          {
             return (_fixedContainer, path);
-         }
-
-         if(_fixedContainerName != null)
-         {
-            CloudBlobContainer fxc = _client.GetContainerReference(_fixedContainerName);
-            await fxc.CreateIfNotExistsAsync();
-            return (fxc, path);
          }
 
          int idx = path.IndexOf(StoragePath.PathSeparator);
