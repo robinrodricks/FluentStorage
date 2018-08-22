@@ -37,6 +37,7 @@ namespace Storage.Net.Blob
 
             .Select(e => e.Key)
             .Where(options.IsMatch)
+            .Where(e => options.BrowseFilter == null || options.BrowseFilter(e))
             .Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value)
             .ToList();
 

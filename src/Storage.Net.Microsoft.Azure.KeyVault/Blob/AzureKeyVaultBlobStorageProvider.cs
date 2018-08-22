@@ -50,16 +50,21 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
          do
          {
-            secretNames.AddRange(page.Select(ToBlobId));
+            List<BlobId> ids = page
+               .Select(ToBlobId)
+               .Where(options.IsMatch)
+               .Where(s => options.BrowseFilter == null || options.BrowseFilter(s))
+               .ToList();
+            secretNames.AddRange(ids);
+
+            if(options.MaxResults != null && secretNames.Count >= options.MaxResults.Value)
+            {
+               return secretNames.Take(options.MaxResults.Value).ToList();
+            }
          }
          while (page.NextPageLink != null && (page = await _vaultClient.GetSecretsNextAsync(page.NextPageLink)) != null);
 
-         if (options.FilePrefix == null) return secretNames;
-
-         return secretNames
-            .Where(options.IsMatch)
-            .Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value)
-            .ToList();
+         return secretNames;
       }
 
       private static BlobId ToBlobId(SecretItem item)

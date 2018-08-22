@@ -110,6 +110,7 @@ namespace Storage.Net.Aws.Blob
             .Select(s3Obj => new BlobId(StoragePath.RootFolderPath, s3Obj.Key, BlobItemKind.File))
             .Where(options.IsMatch)
             .Where(bid => (options.FolderPath == null || bid.FolderPath == options.FolderPath))
+            .Where(bid => options.BrowseFilter == null || options.BrowseFilter(bid))
             .ToList();
       }
 

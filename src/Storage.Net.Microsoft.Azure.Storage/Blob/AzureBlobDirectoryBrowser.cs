@@ -12,10 +12,12 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
    class AzureBlobDirectoryBrowser
    {
       private readonly CloudBlobContainer _container;
+      private readonly bool _prependContainerName;
 
-      public AzureBlobDirectoryBrowser(CloudBlobContainer container)
+      public AzureBlobDirectoryBrowser(CloudBlobContainer container, bool prependContainerName)
       {
          _container = container;
+         _prependContainerName = prependContainerName;
       }
 
       public async Task<IReadOnlyCollection<BlobId>> ListFolderAsync(ListOptions options, CancellationToken cancellationToken)
@@ -46,7 +48,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             {
                BlobId id = ToBlobId(blob, options.IncludeMetaWhenKnown);
 
-               if (options.IsMatch(id))
+               if (options.IsMatch(id) && (options.BrowseFilter == null || options.BrowseFilter(id)))
                {
                   batch.Add(id);
                }
@@ -87,15 +89,27 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          if (blob is CloudBlockBlob blockBlob)
          {
-            id = new BlobId(blockBlob.Name, BlobItemKind.File);
+            string fullName = _prependContainerName
+               ? StoragePath.Combine(_container.Name, blockBlob.Name)
+               : blockBlob.Name;
+
+            id = new BlobId(fullName, BlobItemKind.File);
          }
          else if (blob is CloudAppendBlob appendBlob)
          {
-            id = new BlobId(appendBlob.Name, BlobItemKind.File);
+            string fullName = _prependContainerName
+               ? StoragePath.Combine(_container.Name, appendBlob.Name)
+               : appendBlob.Name;
+
+            id = new BlobId(fullName, BlobItemKind.File);
          }
          else if (blob is CloudBlobDirectory dirBlob)
          {
-            id = new BlobId(dirBlob.Prefix, BlobItemKind.Folder);
+            string fullName = _prependContainerName
+               ? StoragePath.Combine(_container.Name, dirBlob.Prefix)
+               : dirBlob.Prefix;
+
+            id = new BlobId(fullName, BlobItemKind.Folder);
          }
          else
          {

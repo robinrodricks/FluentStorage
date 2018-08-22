@@ -62,7 +62,10 @@ namespace Storage.Net.Blob.Files
          var result = new List<BlobId>();
          result.AddRange(directoryIds.Select(id => ToBlobItem(id, BlobItemKind.Folder, options.IncludeMetaWhenKnown)));
          result.AddRange(fileIds.Select(id => ToBlobItem(id, BlobItemKind.File, options.IncludeMetaWhenKnown)));
-         result = result.Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value).ToList();
+         result = result
+            .Where(i => options.BrowseFilter == null || options.BrowseFilter(i))
+            .Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value)
+            .ToList();
          return Task.FromResult<IReadOnlyCollection<BlobId>>(result);
       }
 

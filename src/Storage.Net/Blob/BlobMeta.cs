@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Storage.Net.Blob
 {
@@ -35,5 +36,11 @@ namespace Storage.Net.Blob
       /// Last modification time when known
       /// </summary>
       public DateTimeOffset? LastModificationTime { get; }
+
+      /// <summary>
+      /// Extra properties that are implementation specific and have no specification. Take an extra care when using these are they are not
+      /// guaranteed to be present at all or change between implementaitons.
+      /// </summary>
+      public Dictionary<string, object> Properties { get; } = new Dictionary<string, object>();
    }
 }

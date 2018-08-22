@@ -20,9 +20,9 @@ namespace Storage.Net.Tests.Integration.Blobs
 {
    #region [ Test Variations ]
 
-   public class AzureBlobStorageProviderTest : BlobStorageProviderTest
+   public class AzureBlobStorageContainerProviderTest : BlobStorageProviderTest
    {
-      public AzureBlobStorageProviderTest() : base("azure") { }
+      public AzureBlobStorageContainerProviderTest() : base("azure") { }
    }
 
    public class AzureUniversalBlobStorageProviderTest : BlobStorageProviderTest
@@ -129,6 +129,12 @@ namespace Storage.Net.Tests.Integration.Blobs
          }
       }
 
+      public override void Dispose()
+      {
+         IReadOnlyCollection<BlobId> allFiles = _storage.ListFilesAsync(null).Result;
+         _storage.DeleteAsync(allFiles.Select(id => id.FullPath)).Wait();
+      }
+
       private async Task<string> GetRandomStreamIdAsync(string prefix = null)
       {
          string id = RandomBlobId();
@@ -155,7 +161,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 
          await _storage.WriteTextAsync(targetId, "test");
 
-         IReadOnlyCollection<BlobId> rootContent = await _storage.ListAsync(new ListOptions { Recurse = false });
+         IReadOnlyCollection<BlobId> rootContent = await _storage.ListAsync(new ListOptions { Recurse = false, IncludeMetaWhenKnown = true });
 
          Assert.NotEmpty(rootContent);
       }
@@ -253,6 +259,33 @@ namespace Storage.Net.Tests.Integration.Blobs
 
          Assert.Equal(2, countAll);
          Assert.Equal(1, countOne);
+      }
+
+      [Fact]
+      public async Task List_with_browsefilter_calls_filter()
+      {
+         string id1 = RandomBlobId();
+         string id2 = RandomBlobId();
+         await _storage.WriteTextAsync(id1, RandomGenerator.RandomString);
+         await _storage.WriteTextAsync(id2, RandomGenerator.RandomString);
+
+         //dump compare
+         IReadOnlyCollection<BlobId> files = await _storage.ListFilesAsync(new ListOptions
+         {
+            Recurse = true
+         });
+         Assert.Contains(files, f => f.FullPath == id1 && f.Kind == BlobItemKind.File);
+
+         //server-side filtering
+         files = await _storage.ListFilesAsync(new ListOptions
+         {
+            Recurse = true,
+            BrowseFilter = id => (id.Kind != BlobItemKind.File || id.FullPath == id1)
+         });
+
+
+         Assert.Equal(1, files.Count);
+         Assert.Equal(id1, files.First().FullPath);
       }
 
       [Fact]

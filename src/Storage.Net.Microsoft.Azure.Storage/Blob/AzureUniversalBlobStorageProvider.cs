@@ -127,6 +127,14 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             md5,
             blob.Properties.LastModified);
 
+         /*meta.Properties["BlobType"] = blob.BlobType.ToString();
+         meta.Properties["IsDeleted"] = blob.IsDeleted;
+         meta.Properties["IsSnapshot"] = blob.IsSnapshot;
+         meta.Properties["ContentDisposition"] = blob.Properties.ContentDisposition;
+         meta.Properties["ContentEncoding"] = blob.Properties.ContentEncoding;
+         meta.Properties["ContentLanguage"] = blob.Properties.ContentLanguage;
+         meta.Properties["ContentType"] = blob.Properties.ContentType;*/
+
          return meta;
       }
 
@@ -150,7 +158,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             //represent containers as folders in the result
             result.AddRange(containers.Select(c => new BlobId(c.Name, BlobItemKind.Folder)));
 
-            return result;
+            if(!options.Recurse) return result;
          }
          else
          {
@@ -164,29 +172,27 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             //result.Add(new BlobId(container.Name, BlobItemKind.Folder));
          }
 
-         foreach(CloudBlobContainer container in containers)
-         {
-            var browser = new AzureBlobDirectoryBrowser(container);
-            IReadOnlyCollection<BlobId> containerBlobs = await browser.ListFolderAsync(options, cancellationToken);
-            if (containerBlobs.Count > 0)
-            {
-               if (fixedContainer == null)
-               {
-                  result.AddRange(containerBlobs.Select(bid => new BlobId(StoragePath.Combine(container.Name, bid.FullPath), bid.Kind)));
-               }
-               else
-               {
-                  result.AddRange(containerBlobs);
-               }
-            }
+         await Task.WhenAll(containers.Select(c => ListAsync(c, fixedContainer, result, options, cancellationToken)));
 
-            if (options.MaxResults != null && result.Count >= options.MaxResults.Value)
-            {
-               break;
-            }
+         if(options.MaxResults != null)
+         {
+            result = result.Take(options.MaxResults.Value).ToList();
          }
 
          return result;
+      }
+
+      private async Task ListAsync(CloudBlobContainer container, CloudBlobContainer fixedContainer,
+         List<BlobId> result,
+         ListOptions options,
+         CancellationToken cancellationToken)
+      {
+         var browser = new AzureBlobDirectoryBrowser(container, _fixedContainer == null);
+         IReadOnlyCollection<BlobId> containerBlobs = await browser.ListFolderAsync(options, cancellationToken);
+         if (containerBlobs.Count > 0)
+         {
+            result.AddRange(containerBlobs);
+         }
       }
 
       private async Task<List<CloudBlobContainer>> GetCloudBlobContainersAsync(CancellationToken cancellationToken)
