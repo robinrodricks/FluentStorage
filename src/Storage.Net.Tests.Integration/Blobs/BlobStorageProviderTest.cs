@@ -157,7 +157,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task List_RootFolder_HasAtLeastOne()
       {
-         string targetId = StoragePath.Combine("root", RandomBlobId());
+         string targetId = RandomBlobId();
 
          await _storage.WriteTextAsync(targetId, "test");
 

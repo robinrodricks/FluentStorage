@@ -37,6 +37,10 @@ namespace Storage.Net.Tests
 
       public async Task Blobs_list_files_in_a_folder()
       {
+
+         IBlobStorage s = StorageFactory.Blobs.FromConnectionString("azure.blobs://...parameters...");
+
+
          IMessagePublisher publisher = StorageFactory.Messages.InMemoryPublisher("name");
 
          IMessageReceiver receiver = StorageFactory.Messages.InMemoryReceiver("name");
