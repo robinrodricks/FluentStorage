@@ -6,25 +6,25 @@ This package tries to abstract access to [Azure Data Lake Store](https://azure.m
 
 ## Using
 
-This library supports service-to-service authentication either with a **client secret** or a **client certificate** (not supported in preview yet).
+This library supports service-to-service authentication with **client secret**. This authentication requires the following parts:
 
-To create an instance of the client:
+- **Account name** is the name of the ADLS account as displayed in the portal: ![Adl 04](adl-04.png)
+- **TenantId** is active directory __tenant id__
+- **PrincipalId** is active directory principal's __client id__ (application id)
+- **PrincipalSecret** is active directory principal's __secret__
+
+Please see appendix at the end of this page which helps to set this up for the first time.
+
+## Connecting
+
+### With code
 
 ```csharp
 IBlobStorage storage = StorageFactory.Blobs.AzureDataLakeStoreByClientSecret(
-	"account_name", credentials);
+	"account_name", "tenantId", "principalId", "principalSecret");
 ```
 
-where:
-- **Account name** is the name of the ADLS account as displayed in the portal: ![Adl 04](adl-04.png)
-- **Credentials** is an instance of `NetworkCredential` class where:
-  - **domain** is active directory __tenant id__
-  - **username** is active directory principal's __client id__ (application id)
-  - **password** is active directory principal's __secret__
-
-see appendix below on how to obtain this information.
-
-Alternatively, you can create the storage using connection string:
+### With connection string
 
 ```csharp
 // do not forget to initialise azure module before your application uses connection strings:
