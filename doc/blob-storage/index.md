@@ -31,6 +31,8 @@ You can also use connection strings to create blob storage instances. Connection
 IBlobStorage storage = StorageFactory.Blobs.FromConnectionString("azure.blobs://...parameters...");
 ```
 
+See the [full list of supported connection strings](../cs.md).
+
 ## Operations
 
 todo
