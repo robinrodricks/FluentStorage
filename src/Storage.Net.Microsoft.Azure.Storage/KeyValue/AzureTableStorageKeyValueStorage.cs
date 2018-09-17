@@ -9,18 +9,18 @@ using Microsoft.WindowsAzure.Storage.Table;
 using IAzTableEntity = Microsoft.WindowsAzure.Storage.Table.ITableEntity;
 using AzSE = Microsoft.WindowsAzure.Storage.StorageException;
 using MeSE = Storage.Net.StorageException;
-using Storage.Net.Table;
+using Storage.Net.KeyValue;
 using System.Threading.Tasks;
 using NetBox;
 using NetBox.Extensions;
 using NetBox.Data;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Table
+namespace Storage.Net.Microsoft.Azure.Storage.KeyValue
 {
    /// <summary>
    /// Microsoft Azure Table storage
    /// </summary>
-   public class AzureTableStorageProvider : ITableStorage
+   class AzureTableStorageKeyValueStorage : IKeyValueStorage
    {
       private const int MaxInsertLimit = 100;
       private const string PartitionKeyName = "PartitionKey";
@@ -41,7 +41,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// </summary>
       /// <param name="accountName"></param>
       /// <param name="storageKey"></param>
-      public AzureTableStorageProvider(string accountName, string storageKey)
+      public AzureTableStorageKeyValueStorage(string accountName, string storageKey)
       {
          if (accountName == null) throw new ArgumentNullException(nameof(accountName));
          if (storageKey == null) throw new ArgumentNullException(nameof(storageKey));
@@ -62,7 +62,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// Returns the list of table names in this storage
       /// </summary>
       /// <returns></returns>
-      public async Task<IEnumerable<string>> ListTableNamesAsync()
+      public async Task<IReadOnlyCollection<string>> ListTableNamesAsync()
       {
          var result = new List<string>();
 
@@ -99,51 +99,42 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       }
 
       /// <summary>
-      /// Gets the list of rows in a specified partition
-      /// </summary>
-      public async Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey)
-      {
-         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
-         if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
-
-         return await InternalGetAsync(tableName, partitionKey, null, -1);
-      }
-
-      /// <summary>
       /// Gets the list of rows in a table by partition and row key
       /// </summary>
-      public async Task<TableRow> GetAsync(string tableName, string partitionKey, string rowKey)
+      public async Task<IReadOnlyCollection<Value>> GetAsync(string tableName, Key key)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
-         if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
-         if (rowKey == null) throw new ArgumentNullException(nameof(rowKey));
+         if (key == null) throw new ArgumentNullException(nameof(key));
 
-         return (await InternalGetAsync(tableName, partitionKey, rowKey, -1))?.FirstOrDefault();
+         return await InternalGetAsync(tableName, key, -1);
       }
 
-      private async Task<IEnumerable<TableRow>> InternalGetAsync(string tableName, string partitionKey, string rowKey, int maxRecords)
+      private async Task<IReadOnlyCollection<Value>> InternalGetAsync(string tableName, Key key, int maxRecords)
       {
          CloudTable table = await GetTableAsync(tableName, false);
-         if (table == null) return Enumerable.Empty<TableRow>();
+         if (table == null)
+         {
+            return new List<Value>();
+         }
 
          var query = new TableQuery();
 
          var filters = new List<string>();
 
-         if (partitionKey != null)
+         if (key.PartitionKey != null)
          {
             filters.Add(TableQuery.GenerateFilterCondition(
                PartitionKeyName,
                QueryComparisons.Equal,
-               EncodeKey(partitionKey)));
+               EncodeKey(key.PartitionKey)));
          }
 
-         if (rowKey != null)
+         if (key.RowKey != null)
          {
             filters.Add(TableQuery.GenerateFilterCondition(
                RowKeyName,
                QueryComparisons.Equal,
-               EncodeKey(rowKey)));
+               EncodeKey(key.RowKey)));
          }
 
          if (filters.Count > 0)
@@ -172,20 +163,20 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
             token = queryResults.ContinuationToken;
          } while (token != null);
 
-         return entities.Select(ToTableRow);
+         return entities.Select(ToTableRow).ToList();
       }
 
       /// <summary>
       /// As per interface
       /// </summary>
-      public async Task InsertAsync(string tableName, IEnumerable<TableRow> rows)
+      public async Task InsertAsync(string tableName, IReadOnlyCollection<Value> rows)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
 
          var rowsList = rows.ToList();
          if (rowsList.Count == 0) return;
-         if(!TableRow.AreDistinct(rowsList))
+         if(!Value.AreDistinct(rowsList))
          {
             throw new MeSE(ErrorCode.DuplicateKey, null);
          }
@@ -198,14 +189,14 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// <summary>
       /// See interface
       /// </summary>
-      public async Task InsertOrReplaceAsync(string tableName, IEnumerable<TableRow> rows)
+      public async Task InsertOrReplaceAsync(string tableName, IReadOnlyCollection<Value> rows)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
 
          var rowsList = rows.ToList();
          if (rowsList.Count == 0) return;
-         if (!TableRow.AreDistinct(rowsList))
+         if (!Value.AreDistinct(rowsList))
          {
             throw new MeSE(ErrorCode.DuplicateKey, null);
          }
@@ -218,7 +209,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// <summary>
       /// As per interface
       /// </summary>
-      public async Task UpdateAsync(string tableName, IEnumerable<TableRow> rows)
+      public async Task UpdateAsync(string tableName, IReadOnlyCollection<Value> rows)
       {
          await BatchedOperationAsync(tableName, false,
             (b, te) => b.Replace(te),
@@ -228,7 +219,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// <summary>
       /// As per interface
       /// </summary>
-      public async Task MergeAsync(string tableName, IEnumerable<TableRow> rows)
+      public async Task MergeAsync(string tableName, IReadOnlyCollection<Value> rows)
       {
          await BatchedOperationAsync(tableName, true,
             (b, te) => b.InsertOrMerge(te),
@@ -238,7 +229,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
       /// <summary>
       /// As per interface
       /// </summary>
-      public async Task DeleteAsync(string tableName, IEnumerable<TableRowId> rowIds)
+      public async Task DeleteAsync(string tableName, IReadOnlyCollection<Key> rowIds)
       {
          if (rowIds == null) return;
 
@@ -249,7 +240,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
 
       private async Task BatchedOperationAsync(string tableName, bool createTable,
          Action<TableBatchOperation, IAzTableEntity> azAction,
-         IEnumerable<TableRow> rows)
+         IEnumerable<Value> rows)
       {
          if (tableName == null) throw new ArgumentNullException("tableName");
          if (rows == null) return;
@@ -257,34 +248,35 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
          CloudTable table = await GetTableAsync(tableName, createTable);
          if (table == null) return;
 
-         foreach (IGrouping<string, TableRow> group in rows.GroupBy(e => e.PartitionKey))
+         await Task.WhenAll(rows.GroupBy(e => e.PartitionKey).Select(g => BatchedOperationAsync(table, g, azAction)));
+      }
+
+      private async Task BatchedOperationAsync(CloudTable table, IGrouping<string, Value> group, Action<TableBatchOperation, IAzTableEntity> azAction)
+      {
+         foreach (IEnumerable<Value> chunk in group.Chunk(MaxInsertLimit))
          {
-            foreach (IEnumerable<TableRow> chunk in group.Chunk(MaxInsertLimit))
+            if (chunk == null)
+               break;
+
+            var chunkLst = new List<Value>(chunk);
+            var batch = new TableBatchOperation();
+            foreach (Value row in chunkLst)
             {
-               if (chunk == null) break;
+               azAction(batch, new EntityAdapter(row));
+            }
 
-               var chunkLst = new List<TableRow>(chunk);
-               var batch = new TableBatchOperation();
-               foreach (TableRow row in chunkLst)
-               {
-                  azAction(batch, new EntityAdapter(row));
-               }
-
-               List<TableResult> result = await ExecOrThrowAsync(table, batch);
-               for (int i = 0; i < result.Count && i < chunkLst.Count; i++)
-               {
-                  TableResult tr = result[i];
-                  TableRow row = chunkLst[i];
-
-                  row.Id.ConcurrencyKey = tr.Etag;
-               }
+            List<TableResult> result = await ExecOrThrowAsync(table, batch);
+            for (int i = 0; i < result.Count && i < chunkLst.Count; i++)
+            {
+               TableResult tr = result[i];
+               Value row = chunkLst[i];
             }
          }
       }
 
       private async Task BatchedOperationAsync(string tableName, bool createTable,
          Action<TableBatchOperation, IAzTableEntity> azAction,
-         IEnumerable<TableRowId> rowIds)
+         IEnumerable<Key> rowIds)
       {
          if (tableName == null) throw new ArgumentNullException("tableName");
          if (rowIds == null) return;
@@ -292,14 +284,14 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
          CloudTable table = await GetTableAsync(tableName, createTable);
          if (table == null) return;
 
-         foreach (IGrouping<string, TableRowId> group in rowIds.GroupBy(e => e.PartitionKey))
+         foreach (IGrouping<string, Key> group in rowIds.GroupBy(e => e.PartitionKey))
          {
-            foreach (IEnumerable<TableRowId> chunk in group.Chunk(MaxInsertLimit))
+            foreach (IEnumerable<Key> chunk in group.Chunk(MaxInsertLimit))
             {
                if (chunk == null) break;
 
                var batch = new TableBatchOperation();
-               foreach (TableRowId row in chunk)
+               foreach (Key row in chunk)
                {
                   azAction(batch, new EntityAdapter(row));
                }
@@ -353,109 +345,9 @@ namespace Storage.Net.Microsoft.Azure.Storage.Table
          }
       }
 
-      private class EntityAdapter : IAzTableEntity
+      private static Value ToTableRow(DynamicTableEntity az)
       {
-         private readonly TableRow _row;
-
-         public EntityAdapter(TableRow row)
-         {
-            _row = row;
-
-            Init(row?.Id, true);
-         }
-
-         public EntityAdapter(TableRowId rowId)
-         {
-            Init(rowId, true);
-         }
-
-         private void Init(TableRowId rowId, bool useConcurencyKey)
-         {
-            if (rowId == null) throw new ArgumentNullException("rowId");
-
-            PartitionKey = ToInternalId(rowId.PartitionKey);
-            RowKey = ToInternalId(rowId.RowKey);
-            if(useConcurencyKey && rowId.ConcurrencyKey != null)
-            {
-               ETag = rowId.ConcurrencyKey;
-            }
-            else
-            {
-               ETag = "*";
-            }
-            Timestamp = rowId.LastModified;
-         }
-
-         public void ReadEntity(IDictionary<string, EntityProperty> properties, OperationContext operationContext)
-         {
-            throw new NotSupportedException();
-         }
-
-         public IDictionary<string, EntityProperty> WriteEntity(OperationContext operationContext)
-         {
-            //Azure Lib calls this when it wants to transform this entity to a writeable one
-
-            var dic = new Dictionary<string, EntityProperty>();
-            foreach (KeyValuePair<string, DynamicValue> cell in _row)
-            {
-               EntityProperty ep;
-
-               Type t = cell.Value.OriginalType;
-
-               if (t == typeof(bool))
-               {
-                  ep = EntityProperty.GeneratePropertyForBool(cell.Value);
-               }
-               else if (t == typeof(DateTime) || t == typeof(DateTimeOffset))
-               {
-                  ep = EntityProperty.GeneratePropertyForDateTimeOffset(((DateTime)cell.Value).ToUniversalTime());
-               }
-               else if (t == typeof(int))
-               {
-                  ep = EntityProperty.GeneratePropertyForInt(cell.Value);
-               }
-               else if (t == typeof(long))
-               {
-                  ep = EntityProperty.GeneratePropertyForLong(cell.Value);
-               }
-               else if (t == typeof(double))
-               {
-                  ep = EntityProperty.GeneratePropertyForDouble(cell.Value);
-               }
-               else if (t == typeof(Guid))
-               {
-                  ep = EntityProperty.GeneratePropertyForGuid(cell.Value);
-               }
-               else if (t == typeof(byte[]))
-               {
-                  ep = EntityProperty.GeneratePropertyForByteArray(cell.Value);
-               }
-               else
-               {
-                  ep = EntityProperty.GeneratePropertyForString(cell.Value);
-               }
-
-               dic[cell.Key] = ep;
-            }
-            return dic;
-         }
-
-         public string PartitionKey { get; set; }
-         public string RowKey { get; set; }
-         public DateTimeOffset Timestamp { get; set; }
-         public string ETag { get; set; }
-
-         private static string ToInternalId(string userId)
-         {
-            return userId.UrlEncode();
-         }
-      }
-
-      private static TableRow ToTableRow(DynamicTableEntity az)
-      {
-         var result = new TableRow(az.PartitionKey, az.RowKey);
-         result.Id.ConcurrencyKey = az.ETag;
-         result.Id.LastModified = az.Timestamp;
+         var result = new Value(az.PartitionKey, az.RowKey);
          foreach (KeyValuePair<string, EntityProperty> pair in az.Properties)
          {
             switch(pair.Value.PropertyType)

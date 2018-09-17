@@ -1,21 +1,20 @@
 ﻿using System;
 
-namespace Storage.Net.Table
+namespace Storage.Net.KeyValue
 {
    /// <summary>
-   /// ID structure of the <see cref="TableRow"/>
+   /// ID structure of the <see cref="Value"/>
    /// </summary>
-   public class TableRowId : IEquatable<TableRowId>
+   public class Key : IEquatable<Key>
    {
       /// <summary>
-      /// Constructs an instance of <see cref="TableRowId"/>
+      /// Constructs an instance of <see cref="Key"/>
       /// </summary>
       /// <param name="partitionKey">Partition key</param>
       /// <param name="rowKey">Row key</param>
-      public TableRowId(string partitionKey, string rowKey)
+      public Key(string partitionKey, string rowKey)
       {
          if(partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
-         if(rowKey == null) throw new ArgumentNullException(nameof(rowKey));
 
          PartitionKey = partitionKey;
          RowKey = rowKey;
@@ -32,19 +31,9 @@ namespace Storage.Net.Table
       public string RowKey { get; private set; }
 
       /// <summary>
-      /// Optimistic concurrency key, optional
-      /// </summary>
-      public string ConcurrencyKey { get; set; }
-
-      /// <summary>
-      /// Last modified date, optional
-      /// </summary>
-      public DateTimeOffset LastModified { get; set; }
-
-      /// <summary>
       /// Equals
       /// </summary>
-      public bool Equals(TableRowId other)
+      public bool Equals(Key other)
       {
          if (ReferenceEquals(other, null)) return false;
          if (ReferenceEquals(other, this)) return true;
@@ -58,7 +47,7 @@ namespace Storage.Net.Table
       /// </summary>
       public override bool Equals(object obj)
       {
-         return Equals(obj as TableRowId);
+         return Equals(obj as Key);
       }
 
       /// <summary>

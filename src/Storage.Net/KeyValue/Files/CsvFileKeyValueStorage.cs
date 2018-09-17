@@ -1,6 +1,4 @@
-﻿using NetBox;
-using NetBox.Data;
-using NetBox.Extensions;
+﻿using NetBox.Extensions;
 using NetBox.FileFormats;
 using System;
 using System.Collections.Generic;
@@ -9,14 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Storage.Net.Table.Files
+namespace Storage.Net.KeyValue.Files
 {
    /// <summary>
-   /// Creates an abstaction of <see cref="ITableStorage"/> in a CSV file structure.
+   /// Creates an abstaction of <see cref="IKeyValueStorage"/> in a CSV file structure.
    /// Works relative to the root directory specified in the constructor.
    /// Each table will be a separate subfolder, where files are partitions.
    /// </summary>
-   public class CsvFileTableStorageProvider : ITableStorage
+   public class CsvFileKeyValueStorage : IKeyValueStorage
    {
       private const string TablePartitionFormat = "{0}.partition.csv";
       private const string TablePartitionSearchFilter = "*.partition.csv";
@@ -33,7 +31,7 @@ namespace Storage.Net.Table.Files
       /// </summary>
       /// <param name="rootDir"></param>
       /// <exception cref="ArgumentNullException"></exception>
-      public CsvFileTableStorageProvider(DirectoryInfo rootDir)
+      public CsvFileKeyValueStorage(DirectoryInfo rootDir)
       {
          _rootDir = rootDir ?? throw new ArgumentNullException(nameof(rootDir));
          _rootDirPath = rootDir.FullName;
@@ -47,11 +45,12 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public Task<IEnumerable<string>> ListTableNamesAsync()
+      public Task<IReadOnlyCollection<string>> ListTableNamesAsync()
       {
-         return Task.FromResult(_rootDir
+         return Task.FromResult<IReadOnlyCollection<string>>(_rootDir
             .GetDirectories(TableNamesSearchPattern, SearchOption.TopDirectoryOnly)
-            .Select(d => d.Name.Substring(0, d.Name.Length - TableNamesSuffix.Length)));
+            .Select(d => d.Name.Substring(0, d.Name.Length - TableNamesSuffix.Length))
+            .ToList());
       }
 
       /// <summary>
@@ -70,44 +69,32 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public Task<IEnumerable<TableRow>> GetAsync(string tableName, string partitionKey)
+      public Task<IReadOnlyCollection<Value>> GetAsync(string tableName, Key key)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
-         if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
+         if (key == null) throw new ArgumentNullException(nameof(key));
 
-         return Task.FromResult(InternalGet(tableName, partitionKey, null));
+         return Task.FromResult(InternalGet(tableName, key));
       }
 
-      /// <summary>
-      /// See interface documentation
-      /// </summary>
-      public Task<TableRow> GetAsync(string tableName, string partitionKey, string rowKey)
-      {
-         if (tableName == null) throw new ArgumentNullException(nameof(tableName));
-         if (partitionKey == null) throw new ArgumentNullException(nameof(partitionKey));
-         if (rowKey == null) throw new ArgumentNullException(nameof(rowKey));
-
-         return Task.FromResult(InternalGet(tableName, partitionKey, rowKey)?.FirstOrDefault());
-      }
-
-      private IEnumerable<TableRow> InternalGet(string tableName, string partitionKey, string rowKey)
+      private IReadOnlyCollection<Value> InternalGet(string tableName, Key key)
       {
          if(tableName == null) throw new ArgumentNullException(nameof(tableName));
 
-         IEnumerable<string> partitions = partitionKey == null
+         IEnumerable<string> partitions = key.PartitionKey == null
             ? GetAllPartitionNames(tableName)
-            : new List<string> { partitionKey };
+            : new List<string> { key.PartitionKey };
 
-         var result = new List<TableRow>();
+         var result = new List<Value>();
 
          foreach(string partition in partitions)
          {
-            Dictionary<string, TableRow> rows = ReadPartition(tableName, partition, rowKey);
+            Dictionary<string, Value> rows = ReadPartition(tableName, partition, key.RowKey);
             if(rows == null) continue;
 
-            if(rowKey != null)
+            if(key.RowKey != null)
             {
-               if (rows.TryGetValue(rowKey, out TableRow row))
+               if (rows.TryGetValue(key.RowKey, out Value row))
                {
                   result.Add(row);
                   break;
@@ -125,7 +112,7 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public Task InsertAsync(string tableName, IEnumerable<TableRow> rows)
+      public Task InsertAsync(string tableName, IReadOnlyCollection<Value> rows)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
@@ -138,7 +125,7 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface
       /// </summary>
-      public Task InsertOrReplaceAsync(string tableName, IEnumerable<TableRow> rows)
+      public Task InsertOrReplaceAsync(string tableName, IReadOnlyCollection<Value> rows)
       {
          if (tableName == null) throw new ArgumentNullException(nameof(tableName));
          if (rows == null) throw new ArgumentNullException(nameof(rows));
@@ -150,7 +137,7 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public Task UpdateAsync(string tableName, IEnumerable<TableRow> rows)
+      public Task UpdateAsync(string tableName, IReadOnlyCollection<Value> rows)
       {
          throw new NotImplementedException();
       }
@@ -158,17 +145,17 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public Task MergeAsync(string tableName, IEnumerable<TableRow> rows)
+      public Task MergeAsync(string tableName, IReadOnlyCollection<Value> rows)
       {
          if(tableName == null) throw new ArgumentNullException(nameof(tableName));
          if(rows == null) return Task.FromResult(true);
 
-         foreach(IGrouping<string, TableRow> group in rows.GroupBy(r => r.PartitionKey))
+         foreach(IGrouping<string, Value> group in rows.GroupBy(r => r.PartitionKey))
          {
             string partitionKey = group.Key;
 
-            Dictionary<string, TableRow> partition = ReadPartition(tableName, partitionKey);
-            if(partition == null) partition = new Dictionary<string, TableRow>();
+            Dictionary<string, Value> partition = ReadPartition(tableName, partitionKey);
+            if(partition == null) partition = new Dictionary<string, Value>();
             Merge(partition, group);
             WritePartition(tableName, partitionKey, partition.Values);
          }
@@ -179,17 +166,17 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public Task DeleteAsync(string tableName, IEnumerable<TableRowId> rowIds)
+      public Task DeleteAsync(string tableName, IReadOnlyCollection<Key> rowIds)
       {
          if(tableName == null) throw new ArgumentNullException(nameof(tableName));
          if(rowIds == null) return Task.FromResult(true);
 
-         foreach(IGrouping<string, TableRowId> group in rowIds.GroupBy(r => r.PartitionKey))
+         foreach(IGrouping<string, Key> group in rowIds.GroupBy(r => r.PartitionKey))
          {
             string partitionKey = group.Key;
 
-            Dictionary<string, TableRow> partition = ReadPartition(tableName, partitionKey);
-            if(partition == null) partition = new Dictionary<string, TableRow>();
+            Dictionary<string, Value> partition = ReadPartition(tableName, partitionKey);
+            if(partition == null) partition = new Dictionary<string, Value>();
             Delete(partition, group);
             WritePartition(tableName, partitionKey, partition.Values);
          }
@@ -200,34 +187,34 @@ namespace Storage.Net.Table.Files
       /// <summary>
       /// See interface documentation
       /// </summary>
-      public IEnumerable<TableRow> Get(string tableName, string partitionKey, string rowKey, int maxRecords)
+      public IEnumerable<Value> Get(string tableName, string partitionKey, string rowKey, int maxRecords)
       {
          throw new NotImplementedException();
       }
 
       #region [ Big Data Processing ]
 
-      private void OperateRows(string tableName, IEnumerable<TableRow> rows,
-         Action<Dictionary<string, TableRow>, IEnumerable<TableRow>> partitionAction)
+      private void OperateRows(string tableName, IEnumerable<Value> rows,
+         Action<Dictionary<string, Value>, IEnumerable<Value>> partitionAction)
       {
-         foreach (IGrouping<string, TableRow> group in rows.GroupBy(r => r.PartitionKey))
+         foreach (IGrouping<string, Value> group in rows.GroupBy(r => r.PartitionKey))
          {
             string partitionKey = group.Key;
 
-            Dictionary<string, TableRow> partition = ReadPartition(tableName, partitionKey) ??
-                                                     new Dictionary<string, TableRow>();
+            Dictionary<string, Value> partition = ReadPartition(tableName, partitionKey) ??
+                                                     new Dictionary<string, Value>();
             partitionAction(partition, group);
             WritePartition(tableName, partitionKey, partition.Values);
          }
       }
 
-      private void Insert(Dictionary<string, TableRow> data, IEnumerable<TableRow> rows,
+      private void Insert(Dictionary<string, Value> data, IEnumerable<Value> rows,
          bool detectInputDuplicates, bool detectDataDuplicates)
       {
          var rowsList = rows.ToList();
          if (rowsList.Count == 0) return;
 
-         if (detectInputDuplicates && !TableRow.AreDistinct(rowsList))
+         if (detectInputDuplicates && !Value.AreDistinct(rowsList))
          {
             throw new StorageException(ErrorCode.DuplicateKey, null);
          }
@@ -237,23 +224,23 @@ namespace Storage.Net.Table.Files
             throw new StorageException(ErrorCode.DuplicateKey, null);
          }
 
-         foreach (TableRow row in rowsList)
+         foreach (Value row in rowsList)
          {
             data[row.RowKey] = row;
          }
       }
 
-      private void Merge(Dictionary<string, TableRow> data, IEnumerable<TableRow> rows)
+      private void Merge(Dictionary<string, Value> data, IEnumerable<Value> rows)
       {
-         foreach(TableRow row in rows)
+         foreach(Value row in rows)
          {
-            if (!data.TryGetValue(row.RowKey, out TableRow prow))
+            if (!data.TryGetValue(row.RowKey, out Value prow))
             {
                data[row.RowKey] = row;
             }
             else
             {
-               foreach (KeyValuePair<string, DynamicValue> line in row)
+               foreach (KeyValuePair<string, object> line in row)
                {
                   prow[line.Key] = line.Value;
                }
@@ -261,9 +248,9 @@ namespace Storage.Net.Table.Files
          }
       }
 
-      private void Delete(Dictionary<string, TableRow> data, IEnumerable<TableRowId> rows)
+      private void Delete(Dictionary<string, Value> data, IEnumerable<Key> rows)
       {
-         foreach(TableRowId row in rows)
+         foreach(Key row in rows)
          {
             data.Remove(row.RowKey);
          }
@@ -322,13 +309,13 @@ namespace Storage.Net.Table.Files
 
       #region [ CSV Read & Write ]
 
-      private void WritePartition(string tableName, string partitionName, IEnumerable<TableRow> rows)
+      private void WritePartition(string tableName, string partitionName, IEnumerable<Value> rows)
       {
          if(tableName == null) throw new ArgumentNullException(nameof(tableName));
          if(partitionName == null) throw new ArgumentNullException(nameof(partitionName));
          if(rows == null) throw new ArgumentNullException(nameof(rows));
 
-         var rowsList = new List<TableRow>(rows);
+         var rowsList = new List<Value>(rows);
 
          using(Stream s = OpenTablePartition(tableName, partitionName, true))
          {
@@ -344,7 +331,7 @@ namespace Storage.Net.Table.Files
             //write data
             var writeableRow = new List<string>(columnNames.Length);
             writeableRow.AddRange(Enumerable.Repeat(string.Empty, columnNames.Length));
-            foreach(TableRow row in rowsList)
+            foreach(Value row in rowsList)
             {
                FillWriteableRow(row, writeableRow, columnNames);
                writer.Write(writeableRow);
@@ -352,16 +339,27 @@ namespace Storage.Net.Table.Files
          }
       }
 
-      private static void FillWriteableRow(TableRow row, List<string> writeableRow, string[] allColumnNames)
+      private static void FillWriteableRow(Value row, List<string> writeableRow, string[] allColumnNames)
       {
          writeableRow[0] = row.RowKey;
 
          for(int i = 1; i < allColumnNames.Length; i++)
          {
             string name = allColumnNames[i];
-            if (row.TryGetValue(name, out DynamicValue cell))
+            if (row.TryGetValue(name, out object cell))
             {
-               writeableRow[i] = cell;
+               string s;
+
+               if (cell is DateTime dt)
+               {
+                  s = dt.ToUniversalTime().ToString("s") + "Z";
+               }
+               else
+               {
+                  s = cell?.ToString();
+               }
+
+               writeableRow[i] = s;
             }
             else
             {
@@ -370,11 +368,11 @@ namespace Storage.Net.Table.Files
          }
       }
 
-      private static string[] GetAllColumnNames(List<TableRow> rows)
+      private static string[] GetAllColumnNames(List<Value> rows)
       {
          //collect all possible column names
          var allColumns = new HashSet<string>();
-         foreach(TableRow row in rows)
+         foreach(Value row in rows)
          {
             foreach(string col in row.Keys)
             {
@@ -388,20 +386,20 @@ namespace Storage.Net.Table.Files
          return columns.ToArray();
       }
 
-      private Dictionary<string, TableRow> ReadPartition(string tableName, string partitionName, string stopOnRowKey = null)
+      private Dictionary<string, Value> ReadPartition(string tableName, string partitionName, string stopOnRowKey = null)
       {
          using(Stream s = OpenTablePartition(tableName, partitionName, false))
          {
             if(s == null) return null;
 
-            var result = new Dictionary<string, TableRow>();
+            var result = new Dictionary<string, Value>();
 
             var reader = new CsvReader(s, Encoding.UTF8);
             string[] allColumns = reader.ReadNextRow()?.ToArray();
             if(allColumns == null) return null;
             allColumns = allColumns.Select(c => c.Trim('\r')).ToArray();
 
-            TableRow row;
+            Value row;
             while((row = ReadNextRow(reader, partitionName, allColumns)) != null)
             {
                result[row.RowKey] = row;
@@ -412,12 +410,12 @@ namespace Storage.Net.Table.Files
          }
       }
 
-      private static TableRow ReadNextRow(CsvReader reader, string partitionKey, string[] allColumns)
+      private static Value ReadNextRow(CsvReader reader, string partitionKey, string[] allColumns)
       {
          string[] values = reader.ReadNextRow()?.ToArray();
          if(values == null || values.Length == 0) return null;
 
-         var row = new TableRow(partitionKey, values[0]);
+         var row = new Value(partitionKey, values[0]);
 
          for(int i = 1; i < values.Length; i++)
          {

@@ -1,32 +1,29 @@
-﻿using NetBox;
-using NetBox.Data;
-using System;
+﻿using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Storage.Net.Table
+namespace Storage.Net.KeyValue
 {
    /// <summary>
    /// Represents a table row in table data structure.
    /// </summary>
-   public class TableRow : IDictionary<string, DynamicValue>, IEquatable<TableRow>
+   public class Value : IDictionary<string, object>, IEquatable<Value>
    {
-      private readonly ConcurrentDictionary<string, DynamicValue> _keyToValue = new ConcurrentDictionary<string, DynamicValue>(); 
+      private readonly Dictionary<string, object> _keyToValue = new Dictionary<string, object>(); 
 
       /// <summary>
       /// Creates a new instance from partition key and row key
       /// </summary>
-      public TableRow(string partitionKey, string rowKey) : this(new TableRowId(partitionKey, rowKey))
+      public Value(string partitionKey, string rowKey) : this(new Key(partitionKey, rowKey))
       {
       }
 
       /// <summary>
-      /// Creates a new instance from <see cref="TableRowId"/>
+      /// Creates a new instance from <see cref="Key"/>
       /// </summary>
       /// <param name="id"></param>
-      public TableRow(TableRowId id)
+      public Value(Key id)
       {
          Id = id ?? throw new ArgumentNullException(nameof(id));
       }
@@ -34,7 +31,7 @@ namespace Storage.Net.Table
       /// <summary>
       /// Row ID
       /// </summary>
-      public TableRowId Id { get; private set; }
+      public Key Id { get; private set; }
 
       /// <summary>
       /// Partition key
@@ -49,7 +46,7 @@ namespace Storage.Net.Table
       /// <summary>
       /// Checks row equality
       /// </summary>
-      public bool Equals(TableRow other)
+      public bool Equals(Value other)
       {
          if(ReferenceEquals(other, null)) return false;
          if(ReferenceEquals(other, this)) return true;
@@ -63,7 +60,7 @@ namespace Storage.Net.Table
       /// <summary>
       /// Get enumerator for cells inside the row
       /// </summary>
-      public IEnumerator<KeyValuePair<string, DynamicValue>> GetEnumerator()
+      public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
       {
          return _keyToValue.GetEnumerator();
       }
@@ -79,7 +76,7 @@ namespace Storage.Net.Table
       /// <summary>
       /// IDictionary.Add
       /// </summary>
-      public void Add(KeyValuePair<string, DynamicValue> item)
+      public void Add(KeyValuePair<string, object> item)
       {
          Add(item.Key, item.Value);
       }
@@ -95,7 +92,7 @@ namespace Storage.Net.Table
       /// <summary>
       /// IDictionary.Contains
       /// </summary>
-      public bool Contains(KeyValuePair<string, DynamicValue> item)
+      public bool Contains(KeyValuePair<string, object> item)
       {
          return _keyToValue.ContainsKey(item.Key);
       }
@@ -103,7 +100,7 @@ namespace Storage.Net.Table
       /// <summary>
       /// IDictionary.CopyTo
       /// </summary>
-      public void CopyTo(KeyValuePair<string, DynamicValue>[] array, int arrayIndex)
+      public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
       {
          throw new NotSupportedException();
       }
@@ -111,9 +108,11 @@ namespace Storage.Net.Table
       /// <summary>
       /// IDictionary.Remove
       /// </summary>
-      public bool Remove(KeyValuePair<string, DynamicValue> item)
+      public bool Remove(KeyValuePair<string, object> item)
       {
-         return _keyToValue.TryRemove(item.Key, out DynamicValue value);
+         _keyToValue.Remove(item.Key);
+
+         return true;
       }
 
       /// <summary>
@@ -135,11 +134,11 @@ namespace Storage.Net.Table
       /// <summary>
       /// IDictionary.Add
       /// </summary>
-      public void Add(string key, DynamicValue value)
+      public void Add(string key, object value)
       {
          if(value == null)
          {
-            _keyToValue.TryRemove(key, out value);
+            Remove(key);
          }
          else
          {
@@ -160,13 +159,13 @@ namespace Storage.Net.Table
       /// </summary>
       public bool Remove(string key)
       {
-         return _keyToValue.TryRemove(key, out DynamicValue value);
+         return _keyToValue.Remove(key);
       }
 
       /// <summary>
       /// IDictionary.TryGetValue
       /// </summary>
-      public bool TryGetValue(string key, out DynamicValue value)
+      public bool TryGetValue(string key, out object value)
       {
          return _keyToValue.TryGetValue(key, out value);
       }
@@ -174,11 +173,11 @@ namespace Storage.Net.Table
       /// <summary>
       /// IDictionary.this
       /// </summary>
-      public DynamicValue this[string key]
+      public object this[string key]
       {
          get
          {
-            if (!_keyToValue.TryGetValue(key, out DynamicValue value)) return null;
+            if (!_keyToValue.TryGetValue(key, out object value)) return null;
             return value;
          }
          set { Add(key, value); }
@@ -195,7 +194,7 @@ namespace Storage.Net.Table
       /// <summary>
       /// IDictionary.Values
       /// </summary>
-      public ICollection<DynamicValue> Values
+      public ICollection<object> Values
       {
          get { return _keyToValue.Values; }
       }
@@ -208,10 +207,10 @@ namespace Storage.Net.Table
       /// <param name="rowKey">When specified, the clone receives this value for the Row Key</param>
       /// <param name="partitionKey">When speified, the clone receives this value for the Partition Key</param>
       /// <returns></returns>
-      public TableRow Clone(string rowKey = null, string partitionKey = null)
+      public Value Clone(string rowKey = null, string partitionKey = null)
       {
-         var clone = new TableRow(partitionKey ?? PartitionKey, rowKey ?? RowKey);
-         foreach(KeyValuePair<string, DynamicValue> pair in _keyToValue)
+         var clone = new Value(partitionKey ?? PartitionKey, rowKey ?? RowKey);
+         foreach(KeyValuePair<string, object> pair in _keyToValue)
          {
             clone._keyToValue[pair.Key] = pair.Value;
          }
@@ -230,20 +229,20 @@ namespace Storage.Net.Table
       /// <summary>
       /// Checks if all rows have uniqueue keys
       /// </summary>
-      public static bool AreDistinct(IEnumerable<TableRow> rows)
+      public static bool AreDistinct(IEnumerable<Value> rows)
       {
          if (rows == null) return true;
 
-         IEnumerable<IGrouping<TableRowId, TableRow>> groups = rows.GroupBy(r => r.Id);
+         IEnumerable<IGrouping<Key, Value>> groups = rows.GroupBy(r => r.Id);
          IEnumerable<int> counts = groups.Select(g => g.Count());
          return counts.OrderByDescending(c => c).First() == 1;
       }
 
-      public static TableRow Merge(IEnumerable<TableRow> rows)
+      public static Value Merge(IEnumerable<Value> rows)
       {
-         TableRow masterRow = null;
+         Value masterRow = null;
 
-         foreach (TableRow row in rows)
+         foreach (Value row in rows)
          {
             if (masterRow == null)
             {
@@ -251,7 +250,7 @@ namespace Storage.Net.Table
             }
             else
             {
-               foreach (KeyValuePair<string, DynamicValue> cell in row)
+               foreach (KeyValuePair<string, object> cell in row)
                {
                   if (!masterRow.ContainsKey(cell.Key))
                   {
