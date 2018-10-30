@@ -78,7 +78,6 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// <summary>
       /// Starts message pump with AutoComplete = false, 1 minute session renewal and 1 concurrent call.
       /// </summary>
-      /// <param name="onMessage"></param>
       public Task StartMessagePumpAsync(Func<IReadOnlyCollection<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
@@ -117,9 +116,12 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
          _client.CloseAsync().Wait();  //this also stops the message pump
       }
 
-      public async Task<ITransaction> OpenTransactionAsync()
+      /// <summary>
+      /// Transactions are not supported, returns empty transation
+      /// </summary>
+      public Task<ITransaction> OpenTransactionAsync()
       {
-         return EmptyTransaction.Instance;
+         return Task.FromResult(EmptyTransaction.Instance);
       }
    }
 }

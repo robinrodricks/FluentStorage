@@ -52,7 +52,17 @@ The last parameter *createIfNotExists* is optional.
 
 ## Tables
 
-> todo
+Create using factory:
+
+```csharp
+IKeyValueStorage storage = StorageFactory.KeyValue.AzureTableStorage("account_name", "account_key");
+```
+
+Create using connection string:
+
+```csharp
+IKeyValueStorage storage = StorageFactory.KeyValue.FromConnectionString("azure.table://account=account_name;key=storage_key");
+```
 
 ## Messaging
 

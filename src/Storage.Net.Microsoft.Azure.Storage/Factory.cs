@@ -6,7 +6,6 @@ using Storage.Net.Microsoft.Azure.Storage.Messaging;
 using Storage.Net.Microsoft.Azure.Storage.KeyValue;
 using Storage.Net.KeyValue;
 using System.Net;
-using Storage.Net.ConnectionString;
 using Storage.Net.Microsoft.Azure.Storage;
 
 namespace Storage.Net
@@ -17,6 +16,9 @@ namespace Storage.Net
    public static class Factory
    {
 
+      /// <summary>
+      /// Register Azure module.
+      /// </summary>
       public static IModulesFactory UseAzureStorage(this IModulesFactory factory)
       {
          return factory.Use(new AzureStorageModule());

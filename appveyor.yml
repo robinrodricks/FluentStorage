@@ -18,4 +18,9 @@ test_script:
 - ps: dotnet test .\src\Storage.Net.Tests\ -c release
 artifacts:
 - path: src/**/*.nupkg
-deploy: off
+deploy:
+- provider: NuGet
+  api_key:
+    secure: hQlxhZb6uDjtZz4V+DZyAqjxnGjXqEokO/tckU14RDUP/AxTkFnX869pNsXCv+Ab
+  on:
+    branch: master

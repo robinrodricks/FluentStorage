@@ -86,6 +86,10 @@ namespace Storage.Net.Blob
          return true;
       }
 
+      /// <summary>
+      /// Clones list options
+      /// </summary>
+      /// <returns></returns>
       public ListOptions Clone()
       {
          return (ListOptions)(MemberwiseClone());

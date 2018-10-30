@@ -238,6 +238,9 @@ namespace Storage.Net.KeyValue
          return counts.OrderByDescending(c => c).First() == 1;
       }
 
+      /// <summary>
+      /// Merge
+      /// </summary>
       public static Value Merge(IEnumerable<Value> rows)
       {
          Value masterRow = null;

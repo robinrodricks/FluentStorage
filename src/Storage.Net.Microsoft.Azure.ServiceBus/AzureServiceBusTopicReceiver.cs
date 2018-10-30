@@ -58,7 +58,6 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// <summary>
       /// Call at the end when done with the message.
       /// </summary>
-      /// <param name="message"></param>
       public async Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken)
       {
          if(!_peekLock) return;
@@ -72,7 +71,6 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// <summary>
       /// Starts message pump with AutoComplete = false, 1 minute session renewal and 1 concurrent call.
       /// </summary>
-      /// <param name="onMessage"></param>
       public Task StartMessagePumpAsync(Func<IReadOnlyCollection<QueueMessage>, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken)
       {
          if (onMessage == null) throw new ArgumentNullException(nameof(onMessage));
@@ -111,9 +109,12 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
          _client.CloseAsync().Wait();  //this also stops the message pump
       }
 
-      public async Task<ITransaction> OpenTransactionAsync()
+      /// <summary>
+      /// Empty transaction
+      /// </summary>
+      public Task<ITransaction> OpenTransactionAsync()
       {
-         return EmptyTransaction.Instance;
+         return Task.FromResult(EmptyTransaction.Instance);
       }
    }
 }

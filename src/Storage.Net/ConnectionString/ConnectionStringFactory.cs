@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Storage.Net.Blob;
 using NetBox.Extensions;
 using System.Linq;
+using Storage.Net.KeyValue;
 
 namespace Storage.Net.ConnectionString
 {
@@ -25,6 +26,16 @@ namespace Storage.Net.ConnectionString
 
       public static IBlobStorage CreateBlobStorage(string connectionString)
       {
+         return Create(connectionString, (factory, cs) => factory.CreateBlobStorage(cs));
+      }
+
+      public static IKeyValueStorage CreateKeyValueStorage(string connectionString)
+      {
+         return Create(connectionString, (factory, cs) => factory.CreateKeyValueStorage(cs));
+      }
+
+      private static TInstance Create<TInstance>(string connectionString, Func<IConnectionFactory, StorageConnectionString, TInstance> createAction)
+      {
          if (connectionString == null)
          {
             throw new ArgumentNullException(nameof(connectionString));
@@ -32,8 +43,8 @@ namespace Storage.Net.ConnectionString
 
          var pcs = new StorageConnectionString(connectionString);
 
-         IBlobStorage instance = Factories
-            .Select(f => f.CreateBlobStorage(pcs))
+         TInstance instance = Factories
+            .Select(f => createAction(f, pcs))
             .Where(b => b != null)
             .FirstOrDefault();
 

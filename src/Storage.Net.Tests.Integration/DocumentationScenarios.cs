@@ -131,8 +131,9 @@ namespace Storage.Net.Tests
          await receiver.StartMessagePumpAsync(OnNewMessage);
       }
 
-      public async Task OnNewMessage(IEnumerable<QueueMessage> message)
+      public Task OnNewMessage(IEnumerable<QueueMessage> message)
       {
+         return Task.FromResult(true);
          //Console.WriteLine($"message received, id: {message.Id}, content: '{message.StringContent}'");
       }
    }
