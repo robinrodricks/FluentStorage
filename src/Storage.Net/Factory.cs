@@ -44,7 +44,7 @@ namespace Storage.Net
       /// <summary>
       /// Creates a key-value storage instance from a connections tring
       /// </summary>
-      public static IKeyValueStorage FromConnectionString(this IKeyValueStorage factory, string connectionString)
+      public static IKeyValueStorage FromConnectionString(this IKeyValueStorageFactory factory, string connectionString)
       {
          return ConnectionStringFactory.CreateKeyValueStorage(connectionString);
       }
