@@ -1,5 +1,6 @@
 ﻿using Storage.Net.Blob;
 using Storage.Net.KeyValue;
+using Storage.Net.Messaging;
 
 namespace Storage.Net.ConnectionString
 {
@@ -20,5 +21,15 @@ namespace Storage.Net.ConnectionString
       /// string it returns null.
       /// </summary>
       IKeyValueStorage CreateKeyValueStorage(StorageConnectionString connectionString);
+
+      /// <summary>
+      /// Creates a message publisher
+      /// </summary>
+      IMessagePublisher CreateMessagePublisher(StorageConnectionString connectionString);
+
+      /// <summary>
+      /// Creates a message receiver
+      /// </summary>
+      IMessageReceiver CreateMessageReceiver(StorageConnectionString connectionString);
    }
 }
