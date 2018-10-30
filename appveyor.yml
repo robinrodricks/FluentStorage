@@ -8,7 +8,7 @@ before_build:
 
     housework setbuildnumber %FileVersion% -s build.ini
 
-    housework author src/*.csproj -s build.ini
+    housework author src/*.csproj -s build.ini -r
 
     dotnet restore src/storage.sln
 build:
