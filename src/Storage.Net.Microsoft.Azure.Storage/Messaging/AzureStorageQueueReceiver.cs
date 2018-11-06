@@ -38,7 +38,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
          TimeSpan messageVisibilityTimeout) :
          this(accountName, storageKey, queueName, messageVisibilityTimeout, TimeSpan.FromMinutes(1))
       {
-         
       }
 
       /// <summary>

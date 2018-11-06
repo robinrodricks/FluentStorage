@@ -63,14 +63,13 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          if (options.Recurse)
          {
             List<BlobId> folderIds = batch.Where(r => r.Kind == BlobItemKind.Folder).ToList();
-            foreach (BlobId folderId in folderIds)
-            {
-               await ListFolderAsync(
+
+            await Task.WhenAll(
+               folderIds.Select(folderId => ListFolderAsync(
                   container,
                   StoragePath.Combine(path, folderId.Id),
                   options,
-                  cancellationToken);
-            }
+                  cancellationToken)));
          }
       }
 

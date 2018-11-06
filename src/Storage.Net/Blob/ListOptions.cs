@@ -61,7 +61,7 @@ namespace Storage.Net.Blob
       /// When set, an implementing provider might be able to send notification on progress callback if it supports them.
       /// First parameter indicates number of items already listed, second - total number of items (if known).
       /// </summary>
-      public Func<long, long, Task> ListProgressCallback { get; set; }
+      public Action<long, long> ListProgressCallback { get; set; }
 
       /// <summary>
       /// Helper method that returns true if a <see cref="BlobId"/> matches these list options.
