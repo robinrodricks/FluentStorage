@@ -65,12 +65,18 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
       /// <summary>
       /// Call at the end when done with the message.
       /// </summary>
-      public async Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken)
+      public async Task ConfirmMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken)
       {
          if(!_peekLock) return;
 
+         await Task.WhenAll(messages.Select(m => ConfirmAsync(m)));
+      }
+
+      private async Task ConfirmAsync(QueueMessage message)
+      {
          //delete the message and get the deleted element, very nice method!
-         if (!_messageIdToBrokeredMessage.TryRemove(message.Id, out Message bm)) return;
+         if (!_messageIdToBrokeredMessage.TryRemove(message.Id, out Message bm))
+            return;
 
          await _client.CompleteAsync(bm.SystemProperties.LockToken);
       }

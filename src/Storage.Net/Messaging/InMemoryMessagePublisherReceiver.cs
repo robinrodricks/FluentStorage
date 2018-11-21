@@ -45,7 +45,7 @@ namespace Storage.Net.Messaging
          return Task.FromResult((IReadOnlyCollection<QueueMessage>)result);
       }
 
-      public override Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken = default)
+      public override Task ConfirmMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default)
       {
          return Task.FromResult(true);
       }

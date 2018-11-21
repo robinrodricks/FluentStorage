@@ -50,11 +50,5 @@ namespace Storage.Net.Queue.Files
 
          return now.ToString("yyyy-MM-dd-hh-mm-ss-ffff") + ".txt";
       }
-
-      public void Dispose()
-      {
-
-      }
-
    }
 }

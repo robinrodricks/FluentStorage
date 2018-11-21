@@ -31,7 +31,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// <param name="queueName">Queue name</param>
       /// <param name="messageVisibilityTimeout">
       /// Timeout value passed in GetMessage call in the Storage Queue. The value indicates how long the message
-      /// will be hidden before it reappears in the queue. Therefore you must call <see cref="ConfirmMessageAsync(QueueMessage, CancellationToken)"/>
+      /// will be hidden before it reappears in the queue. Therefore you must call <see cref="ConfirmMessagesAsync(IReadOnlyCollection{QueueMessage}, CancellationToken)"/>
       /// to complete and delete it.
       /// </param>
       public AzureStorageQueueReceiver(string accountName, string storageKey, string queueName,
@@ -48,7 +48,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// <param name="queueName">Queue name</param>
       /// <param name="messageVisibilityTimeout">
       /// Timeout value passed in GetMessage call in the Storage Queue. The value indicates how long the message
-      /// will be hidden before it reappears in the queue. Therefore you must call <see cref="ConfirmMessageAsync(QueueMessage, CancellationToken)"/>
+      /// will be hidden before it reappears in the queue. Therefore you must call <see cref="ConfirmMessagesAsync(IReadOnlyCollection{QueueMessage}, CancellationToken)"/>
       /// to complete and delete it.
       /// </param>
       /// <param name="messagePumpPollingTimeout">
@@ -91,12 +91,18 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// <summary>
       /// Deletes the message from the queue
       /// </summary>
-      /// <param name="message"></param>
+      /// <param name="messages"></param>
       /// <param name="cancellationToken"></param>
-      public override async Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken)
+      public override async Task ConfirmMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken)
+      {
+         await Task.WhenAll(messages.Select(m => ConfirmAsync(m)));
+      }
+
+      private async Task ConfirmAsync(QueueMessage message)
       {
          Converter.SplitId(message.Id, out string id, out string popReceipt);
-         if (popReceipt == null) throw new ArgumentException("cannot delete message by short id", id);
+         if (popReceipt == null)
+            throw new ArgumentException("cannot delete message by short id", id);
 
          await _queue.DeleteMessageAsync(id, popReceipt);
       }
@@ -115,7 +121,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
 
          await deadLetterQueue.AddMessageAsync(Converter.ToCloudQueueMessage(message));
 
-         await ConfirmMessageAsync(message, cancellationToken);
+         await ConfirmMessagesAsync(new[] { message }, cancellationToken);
       }
 
       /// <summary>

@@ -23,7 +23,7 @@ namespace Storage.Net.Messaging
       /// <summary>
       /// See interface
       /// </summary>
-      public virtual Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken = default)
+      public virtual Task ConfirmMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default)
       {
          throw new NotSupportedException();
       }

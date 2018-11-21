@@ -104,7 +104,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <summary>
       /// See interface
       /// </summary>
-      public Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken)
+      public Task ConfirmMessagesAsync(IReadOnlyCollection<QueueMessage> message, CancellationToken cancellationToken)
       {
          //nothing to confirm
          return Task.FromResult(true);

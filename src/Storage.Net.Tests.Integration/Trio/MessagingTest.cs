@@ -137,16 +137,13 @@ namespace Storage.Net.Tests.Integration.Messaging
          base.Dispose();
       }
 
-      private async Task ReceiverPump(IEnumerable<QueueMessage> messages)
+      private async Task ReceiverPump(IReadOnlyCollection<QueueMessage> messages)
       {
          _receivedMessages.AddRange(messages);
 
          Trace.WriteLine($"total received: {_receivedMessages.Count}");
 
-         foreach (QueueMessage qm in messages)
-         {
-            await _receiver.ConfirmMessageAsync(qm);
-         }
+         await _receiver.ConfirmMessagesAsync(messages);
       }
 
       private async Task PutMessageAsync(QueueMessage message, string tag)

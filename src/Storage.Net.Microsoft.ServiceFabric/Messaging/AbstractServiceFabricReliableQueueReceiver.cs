@@ -50,7 +50,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
       }
 
-      public Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken)
+      public Task ConfirmMessagesAsync(IReadOnlyCollection<QueueMessage> message, CancellationToken cancellationToken)
       {
          return Task.FromResult(true);
       }

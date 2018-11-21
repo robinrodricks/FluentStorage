@@ -22,9 +22,9 @@ namespace Storage.Net.Messaging
       /// Client must call this when message processing has succeeded, otherwise the message will reappear,
       /// however this depends on implementation details when and how.
       /// </summary>
-      /// <param name="message"></param>
+      /// <param name="messages"></param>
       /// <param name="cancellationToken"></param>
-      Task ConfirmMessageAsync(QueueMessage message, CancellationToken cancellationToken = default);
+      Task ConfirmMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Moves the message to a dead letter queue
