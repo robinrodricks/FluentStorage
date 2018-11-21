@@ -66,6 +66,17 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
          _messagePumpPollingTimeout = messagePumpPollingTimeout;
       }
 
+      /// <summary>
+      /// Returns an approximate message count for this queue
+      /// </summary>
+      /// <returns></returns>
+      public override async Task<int> GetMessageCountAsync()
+      {
+         await _queue.FetchAttributesAsync();
+
+         return _queue.ApproximateMessageCount ?? 0;
+      }
+
       private async Task<CloudQueue> GetDeadLetterQueue()
       {
          if (_deadLetterQueue == null)
@@ -112,6 +123,10 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// </summary>
       protected override async Task<IReadOnlyCollection<QueueMessage>> ReceiveMessagesAsync(int count, CancellationToken cancellationToken)
       {
+         //storage queue can get up to 32 messages
+         if (count > 32)
+            count = 32;
+
          IEnumerable<CloudQueueMessage> batch = await _queue.GetMessagesAsync(count, _messageVisibilityTimeout, null, null, cancellationToken);
          if(batch == null) return null;
          List<QueueMessage> result = batch.Select(Converter.ToQueueMessage).ToList();

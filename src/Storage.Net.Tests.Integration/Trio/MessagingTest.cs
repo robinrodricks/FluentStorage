@@ -121,7 +121,7 @@ namespace Storage.Net.Tests.Integration.Messaging
       public async Task InitializeAsync()
       {
          //start the pump
-         await _receiver.StartMessagePumpAsync(ReceiverPump, cancellationToken: _cts.Token, maxBatchSize: 5);
+         await _receiver.StartMessagePumpAsync(ReceiverPump, cancellationToken: _cts.Token, maxBatchSize: 500);
 
       }
 
@@ -244,7 +244,17 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          await WaitMessage(null, TimeSpan.FromSeconds(5), 10);
 
-         Assert.True(_receivedMessages.Count >= 9, _receivedMessages.Count.ToString());
+         Assert.True(_receivedMessages.Count >= 10, _receivedMessages.Count.ToString());
+      }
+
+      [Fact]
+      public async Task MessageCount_IsGreaterThanZero()
+      {
+         await _publisher.PutMessageAsync(QueueMessage.FromText("test for count"));
+
+         int count = await _receiver.GetMessageCountAsync();
+
+         Assert.True(count > 0);
       }
    }
 }

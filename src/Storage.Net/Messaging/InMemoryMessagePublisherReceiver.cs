@@ -49,5 +49,7 @@ namespace Storage.Net.Messaging
       {
          return Task.FromResult(true);
       }
+
+      public override Task<int> GetMessageCountAsync() => Task.FromResult(_queue.Count);
    }
 }
