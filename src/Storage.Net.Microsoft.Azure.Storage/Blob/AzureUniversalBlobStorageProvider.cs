@@ -187,7 +187,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          ListOptions options,
          CancellationToken cancellationToken)
       {
-         var browser = new AzureBlobDirectoryBrowser(container, _fixedContainer == null);
+         var browser = new AzureBlobDirectoryBrowser(container, _fixedContainer == null, options.MaxDegreeOfParalellism);
          IReadOnlyCollection<BlobId> containerBlobs = await browser.ListFolderAsync(options, cancellationToken);
          if (containerBlobs.Count > 0)
          {

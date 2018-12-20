@@ -13,11 +13,13 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
    {
       private readonly CloudBlobContainer _container;
       private readonly bool _prependContainerName;
+      private readonly SemaphoreSlim _throttler;
 
-      public AzureBlobDirectoryBrowser(CloudBlobContainer container, bool prependContainerName)
+      public AzureBlobDirectoryBrowser(CloudBlobContainer container, bool prependContainerName, int maxTasks)
       {
          _container = container;
          _prependContainerName = prependContainerName;
+         _throttler = new SemaphoreSlim(maxTasks);
       }
 
       public async Task<IReadOnlyCollection<BlobId>> ListFolderAsync(ListOptions options, CancellationToken cancellationToken)
@@ -37,25 +39,33 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          var batch = new List<BlobId>();
 
-         do
+         await _throttler.WaitAsync();
+         try
          {
-            BlobResultSegment segment = await dir.ListBlobsSegmentedAsync(
-               false, BlobListingDetails.None, null, token, null, null, cancellationToken);
-
-            token = segment.ContinuationToken;
-
-            foreach (IListBlobItem blob in segment.Results)
+            do
             {
-               BlobId id = ToBlobId(blob, options.IncludeMetaWhenKnown);
+               BlobResultSegment segment = await dir.ListBlobsSegmentedAsync(
+                  false, BlobListingDetails.None, null, token, null, null, cancellationToken);
 
-               if (options.IsMatch(id) && (options.BrowseFilter == null || options.BrowseFilter(id)))
+               token = segment.ContinuationToken;
+
+               foreach (IListBlobItem blob in segment.Results)
                {
-                  batch.Add(id);
-               }
-            }
+                  BlobId id = ToBlobId(blob, options.IncludeMetaWhenKnown);
 
+                  if (options.IsMatch(id) && (options.BrowseFilter == null || options.BrowseFilter(id)))
+                  {
+                     batch.Add(id);
+                  }
+               }
+
+            }
+            while (token != null && ((options.MaxResults == null) || (container.Count + batch.Count < options.MaxResults.Value)));
          }
-         while (token != null && ((options.MaxResults == null) || ( container.Count + batch.Count < options.MaxResults.Value)));
+         finally
+         {
+            _throttler.Release();
+         }
 
          batch = batch.Where(options.IsMatch).ToList();
          if (options.Add(container, batch)) return;

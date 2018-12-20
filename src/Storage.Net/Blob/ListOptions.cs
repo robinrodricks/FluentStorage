@@ -64,6 +64,11 @@ namespace Storage.Net.Blob
       public Action<long, long> ListProgressCallback { get; set; }
 
       /// <summary>
+      /// When supported, sets the maximum number of threads to be used for listing operations
+      /// </summary>
+      public int MaxDegreeOfParalellism { get; set; } = 10;
+
+      /// <summary>
       /// Helper method that returns true if a <see cref="BlobId"/> matches these list options.
       /// </summary>
       public bool IsMatch(BlobId id)
