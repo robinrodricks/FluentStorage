@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <VersionPrefix>3.5.0-alpha-4</VersionPrefix>
     <AssemblyName>Storage.Net.Tests</AssemblyName>
     <AssemblyOriginatorKeyFile>../storage.snk</AssemblyOriginatorKeyFile>
