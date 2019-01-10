@@ -1,4 +1,4 @@
-﻿using Xunit;
+﻿/*using Xunit;
 using Storage.Net.Messaging;
 using System;
 using LogMagic;
@@ -255,3 +255,4 @@ namespace Storage.Net.Tests.Integration.Messaging
       }
    }
 }
+*/
