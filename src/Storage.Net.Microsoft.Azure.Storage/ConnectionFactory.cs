@@ -19,7 +19,8 @@ namespace Storage.Net.Microsoft.Azure.Storage
             string containerName = connectionString.Get("container");
             connectionString.GetRequired("key", true, out string key);
 
-            return new AzureUniversalBlobStorageProvider(accountName, key, containerName);
+            return new AzureUniversalBlobStorageProvider(accountName, key,
+               string.IsNullOrEmpty(containerName) ? null : containerName);
          }
 
          return null;
