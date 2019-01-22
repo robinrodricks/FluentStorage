@@ -20,19 +20,9 @@ namespace Storage.Net.Tests.Integration.Blobs
 {
    #region [ Test Variations ]
 
-   public class AzureBlobStorageContainerProviderTest : BlobStorageTest
+   public class AzureBlobStorageProviderTest : BlobStorageTest
    {
-      public AzureBlobStorageContainerProviderTest() : base("azure") { }
-   }
-
-   public class AzureUniversalBlobStorageProviderTest : BlobStorageTest
-   {
-      public AzureUniversalBlobStorageProviderTest() : base("azure2", "testcontainer/") { }
-   }
-
-   public class AzureBlobStorageProviderBySasTest : BlobStorageTest
-   {
-      public AzureBlobStorageProviderBySasTest() : base("azure-sas") { }
+      public AzureBlobStorageProviderTest() : base("azure", "testcontainer/") { }
    }
 
    public class AzureDataLakeBlobStorageProviderTest : BlobStorageTest
@@ -65,10 +55,9 @@ namespace Storage.Net.Tests.Integration.Blobs
       public ZipFileBlobStorageProviderTest() : base("zip") { }
    }
 
-
    #endregion
 
-   public abstract class BlobStorageTest : AbstractTestFixture
+   public abstract class BlobStorageTest : AbstractTestFixture, IAsyncLifetime
    {
       private readonly string _type;
       private readonly string _blobPrefix;
@@ -85,21 +74,13 @@ namespace Storage.Net.Tests.Integration.Blobs
             .Build();
 
          _type = type;
-         _blobPrefix = blobPrefix ?? string.Empty;
+         _blobPrefix = blobPrefix;
          switch (_type)
          {
             case "azure":
-               _storage = StorageFactory.Blobs.AzureBlobStorage(_settings.AzureStorageName, _settings.AzureStorageKey, "blobstoragetest");
-               break;
-            case "azure2":
                _storage = StorageFactory.Blobs.AzureBlobStorage(_settings.AzureStorageName, _settings.AzureStorageKey);
                break;
-            case "azure-sas":
-               _storage = StorageFactory.Blobs.AzureBlobStorageByContainerSasUri(_settings.AzureContainerSasUri);
-               break;
             case "azure-datalakestore":
-               //Console.WriteLine("ac: {0}, tid: {1}, pid: {2}, ps: {3}", _settings.AzureDataLakeStoreAccountName, _settings.AzureDataLakeTenantId, _settings.AzureDataLakePrincipalId, _settings.AzureDataLakePrincipalSecret);
-
                _storage = StorageFactory.Blobs.AzureDataLakeStoreByClientSecret(
                   _settings.AzureDataLakeStoreAccountName,
                   _settings.AzureDataLakeTenantId,
@@ -129,10 +110,23 @@ namespace Storage.Net.Tests.Integration.Blobs
          }
       }
 
-      public override void Dispose()
+      public async Task InitializeAsync()
       {
-         IReadOnlyCollection<BlobId> allFiles = _storage.ListFilesAsync(null).Result;
-         _storage.DeleteAsync(allFiles.Select(id => id.FullPath)).Wait();
+
+      }
+
+      public async Task DisposeAsync()
+      {
+         IReadOnlyCollection<BlobId> allFiles = await _storage.ListFilesAsync(null);
+
+         try
+         {
+            await _storage.DeleteAsync(allFiles.Select(id => id.FullPath));
+         }
+         catch
+         {
+            //just don't care
+         }
       }
 
       private async Task<string> GetRandomStreamIdAsync(string prefix = null)
@@ -171,7 +165,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       {
          string prefix = RandomGenerator.RandomString;
 
-         int countBefore = (await _storage.ListAsync(new ListOptions { FilePrefix = prefix })).Count();
+         int countBefore = (await _storage.ListAsync(new ListOptions { FolderPath = _blobPrefix, FilePrefix = prefix})).Count();
 
          string id1 = RandomBlobId(prefix);
          string id2 = RandomBlobId(prefix);
@@ -181,7 +175,7 @@ namespace Storage.Net.Tests.Integration.Blobs
          await _storage.WriteTextAsync(id2, RandomGenerator.RandomString);
          await _storage.WriteTextAsync(id3, RandomGenerator.RandomString);
 
-         List<BlobId> items = (await _storage.ListAsync(new ListOptions { FilePrefix = prefix })).ToList();
+         List<BlobId> items = (await _storage.ListAsync(new ListOptions { FolderPath = _blobPrefix, FilePrefix = prefix})).ToList();
          Assert.Equal(2 + countBefore, items.Count); //2 files + containing folder
       }
 
@@ -192,7 +186,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 
          await _storage.WriteTextAsync(id, RandomGenerator.RandomString);
 
-         List<BlobId> items = (await _storage.ListAsync(new ListOptions { Recurse = false })).ToList();
+         List<BlobId> items = (await _storage.ListAsync(new ListOptions { FolderPath = _blobPrefix, Recurse = false })).ToList();
 
          Assert.True(items.Count > 0);
 
@@ -254,8 +248,8 @@ namespace Storage.Net.Tests.Integration.Blobs
          await _storage.WriteTextAsync(id1, RandomGenerator.RandomString);
          await _storage.WriteTextAsync(id2, RandomGenerator.RandomString);
 
-         int countAll = (await _storage.ListFilesAsync(new ListOptions { FilePrefix = prefix })).Count();
-         int countOne = (await _storage.ListAsync(new ListOptions { FilePrefix = prefix, MaxResults = 1 })).Count();
+         int countAll = (await _storage.ListFilesAsync(new ListOptions { FolderPath = _blobPrefix, FilePrefix = prefix })).Count();
+         int countOne = (await _storage.ListAsync(new ListOptions { FolderPath = _blobPrefix, FilePrefix = prefix, MaxResults = 1 })).Count();
 
          Assert.Equal(2, countAll);
          Assert.Equal(1, countOne);
