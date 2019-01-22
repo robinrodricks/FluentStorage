@@ -8,9 +8,9 @@ It provides generic interface for popular cloud storage providers like Amazon S3
 
 It also implements in-memory and on-disk versions of all the abstractions for faster local machine development. [Connection strings](doc/cs.md) are supported too!
 
-| Build | Integration Tests |
-|-------|-------------------|
-|[![Build status](https://aloneguid.visualstudio.com/Storage.Net/_apis/build/status/Primary%20Build)](https://aloneguid.visualstudio.com/Storage.Net/_build/latest?definitionId=36)|[![Build status](https://aloneguid.visualstudio.com/Storage.Net/_apis/build/status/Integration%20Tests)](https://aloneguid.visualstudio.com/Storage.Net/_build/latest?definitionId=35)|
+| Build | Tests |
+|-------|-------|
+|![](https://img.shields.io/azure-devops/build/aloneguid/7a9c6ed6-1a57-47cf-941f-f4b09440591b/36.svg)|![](https://img.shields.io/azure-devops/tests/aloneguid/Storage.Net/35.svg?label=integration%20tests)|
 
 ## Intentions
 
