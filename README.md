@@ -1,4 +1,4 @@
-# Storage.Net [![Build status](https://ci.appveyor.com/api/projects/status/ymwk4hx0gb0dleyk?svg=true)](https://ci.appveyor.com/project/aloneguid/storage) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.svg)](https://www.nuget.org/packages/Storage.Net/)
+# Storage.Net [![NuGet](https://img.shields.io/nuget/v/Storage.Net.svg)](https://www.nuget.org/packages/Storage.Net/)
 
 ![](doc/slide.jpg)
 
@@ -7,6 +7,10 @@ Storage.NET is a field-tested .NET library that helps to achieve [Polycloud tech
 It provides generic interface for popular cloud storage providers like Amazon S3, Azure Service Bus, Azure Event Hub, Azure Storage, Azure Data Lake Store thus abstracting Messaging, Blob (object store for unsturctured data) and Table (NoSQL key-value store) services.
 
 It also implements in-memory and on-disk versions of all the abstractions for faster local machine development. [Connection strings](doc/cs.md) are supported too!
+
+| Build |
+|-------|
+|[![Build status](https://aloneguid.visualstudio.com/Storage.Net/_apis/build/status/Primary%20Build)](https://aloneguid.visualstudio.com/Storage.Net/_build/latest?definitionId=36)|
 
 ## Intentions
 
