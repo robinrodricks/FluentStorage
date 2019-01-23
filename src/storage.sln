@@ -19,13 +19,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{9305459F-A91
 		..\doc\slide.jpg = ..\doc\slide.jpg
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "blob-storage", "blob-storage", "{3778B2D6-0A15-4BB9-8CAE-102B1F4BE560}"
-	ProjectSection(SolutionItems) = preProject
-		..\doc\blob-storage\dirtextfile.png = ..\doc\blob-storage\dirtextfile.png
-		..\doc\blob-storage\dirtextfileindir.png = ..\doc\blob-storage\dirtextfileindir.png
-		..\doc\blob-storage\index.md = ..\doc\blob-storage\index.md
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "implementations", "implementations", "{350AFDCF-E871-40F2-8077-C730E95B5B4E}"
 	ProjectSection(SolutionItems) = preProject
 		..\doc\implementations\inmemory.md = ..\doc\implementations\inmemory.md
@@ -125,7 +118,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9305459F-A911-49A1-ABA1-2BBAEC42338B} = {D1BF1BDC-D99C-4C85-AF21-34AC49F49319}
-		{3778B2D6-0A15-4BB9-8CAE-102B1F4BE560} = {9305459F-A911-49A1-ABA1-2BBAEC42338B}
 		{350AFDCF-E871-40F2-8077-C730E95B5B4E} = {9305459F-A911-49A1-ABA1-2BBAEC42338B}
 		{E025A581-C3EC-42F9-A473-5F2544E28E30} = {59E9D41F-BCD2-4A64-B62F-515B78986B63}
 		{52577099-44AA-434B-A3BD-D46FBDBB8F00} = {75082AEF-72A9-4874-8AFB-DB50013CAD28}

@@ -4,8 +4,6 @@ In-memory implementations is extremely useful if you decide you would like to us
 
 ## Blobs
 
-This document assumes you are already familiar [how blobs are implemented in Storage.Net](../blob-storage/index.md)
-
 To create the in-memory provider simply use
 
 ```csharp

@@ -6,8 +6,6 @@ Microsoft Azure implementations reside in a separate package hosted on [NuGet](h
 
 Blobs are interfacing with the official [Blob Storage](https://azure.microsoft.com/en-gb/services/storage/blobs/) and implement a good subset of functionality from the rich Blob Storage ecosystem in Azure.
 
-This document assumes you are already familiar [how blobs are implemented in Storage.Net](../blob-storage/index.md)
-
 ### Creating the blob client
 
 The easiest way to create a blob storage is to use the factory method

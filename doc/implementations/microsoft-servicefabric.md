@@ -14,8 +14,6 @@ IBlobStorage = StorageFactory.Blobs.AzureServiceFabricReliableStorage(this.State
 
 where `collection_name` maps to the name of the collection when obtained via `IReliableStateManager.GetOrAddAsync()`. 
 
-Having this instance crated you can perform the usual operations as outlined in [blob storage documentation](../blob-storage/index.md).
-
 ### Transactions
 
 Due to the fact single writes in ASF are not particulary effective, normally when using raw API you would create a transaction, perform writes and then commit it. It is also possible with Storage.Net:

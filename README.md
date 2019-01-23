@@ -34,6 +34,97 @@ Storage.Net defines three different storage types:
 - [**Key-Value Storage**](doc/key-value-storage/index.md) is essentialy a large dictionary where key points to some value. Examples are Azure Table Storage, etcd etc.
 - [**Messaging**](doc/messaging/index.md) is an asynchronous mechanism to send and receive messages between disconnected systems. For instance MSMQ, Azure Service Bus, Amazon Simple Queue etc.
 
+## Geting Started
+
+### Blob Storage
+
+Blob Storage stores files. A file has only two properties - `ID` and raw data. If you build an analogy with disk filesystem, file ID is a file name.
+
+Blob Storage is really simple abstraction - you read or write file data by it's ID, nothing else.
+
+The entry point to a blog storage is [IBlobStorage](src/Storage.Net/Blob/IBlobStorage.cs) interface. This interface is small but contains all possible methods to work with blobs, such as uploading and downloading data, listing storage contents, deleting files etc. The interface is kept small so that new storage providers can be added easily, without implementing a plethora of interface methods.
+
+In addition to this interface, there are plency of extension methods which enrich the functionality, therefore you will see more methods than this interface actually declares. They add a lot of useful and functionality rich methods to work with storage. For instance, `IBlobStorage` upload functionality only works with streams, however extension methods allows you to upload text, stream, file or even a class as a blob. Extension methods are also provider agnostic, therefore all the rich functionality just works and doesn't have to be reimplemented in underlying data provider.
+
+All the storage implementations can be created either directly or using factory methods available in the `Storage.Net.StorageFactory.Blobs` class. More methods appear in that class as you reference a **NuGet** package containing specific implementations, however there are a few built-in implementations available out of the box as well. After referencing an appropriate package from NuGet you can call to a storage factory to create a respective storage implementation:
+
+![](doc/storagefactory-intellisense.gif)
+
+You can also use connection strings to create blob storage instances. Connection strings are often useful if you want to completely abstract yourself from the underlying implementation. Please read the appropriate implementation details for connection string details. For instance, to create an instance of Azure Blob Storage provider you could write:
+
+```csharp
+IBlobStorage storage = StorageFactory.Blobs.FromConnectionString("azure.blobs://...parameters...");
+```
+
+In this example we create a blob storage implementation which happens to be Microsoft Azure blob storage. The project is referencing an appropriate [nuget package](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.Storage). As blob storage methods promote streaming we create a `MemoryStream` over a string for simplicity sake. In your case the actual stream can come from a variety of sources.
+
+```csharp
+using Storage.Net;
+using Storage.Net.Blob;
+using System.IO;
+using System.Text;
+
+namespace Scenario
+{
+   public class DocumentationScenarios
+   {
+      public async Task RunAsync()
+      {
+         //create the storage using a factory method
+         IBlobStorage storage = StorageFactory.Blobs.AzureBlobStorage(
+            "storage name",
+            "storage key");
+
+         //upload it
+         string content = "test content";
+         using (var s = new MemoryStream(Encoding.UTF8.GetBytes(content)))
+         {
+            await storage.WriteAsync("mycontainer/someid", s);
+         }
+
+         //read back
+         using (var s = new MemoryStream())
+         {
+            using (Stream ss = await storage.OpenReadAsync("mycontainer/someid"))
+            {
+               await ss.CopyToAsync(s);
+
+               //content is now "test content"
+               content = Encoding.UTF8.GetString(s.ToArray());
+            }
+         }
+      }
+   }
+}
+```
+
+This is really simple, right? However, the code looks really long and boring. If I need to just save and read a string why the hell do I need to dance around with streams? That was examply my point when trying to use external SDKs. Why do we need to work in an ugly way if all we want to do is something simple? Therefore with Storage.Net you can decrease this code to just two lines of code:
+
+```csharp
+public async Task BlobStorage_sample2()
+{
+    IBlobStorage storage = StorageFactory.Blobs.AzureBlobStorage(
+		"storage name",
+		"storage key");
+
+    //upload it
+    await storage.WriteTextAsync("mycontainer/someid", "test content");
+
+    //read back
+    string content = await storage.ReadTextAsync("mycontainer/someid");
+}
+```
+
+### Key-Value Storage
+
+> TODO
+
+### Messaging
+
+> TODO
+
+## Index of Supported Providers
+
 There are various implementations/providers of different storage types:
 
 - [In-Memory](doc/implementations/inmemory.md)
