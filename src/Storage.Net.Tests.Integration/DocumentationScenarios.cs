@@ -40,20 +40,6 @@ namespace Storage.Net.Tests
       {
 
          IKeyValueStorage kv = StorageFactory.KeyValue.AzureTableStorage("my account", "my key");
-         
-
-         kv.InsertAsync()
-
-
-
-
-
-
-
-
-
-
-
 
          IBlobStorage s = StorageFactory.Blobs.FromConnectionString("azure.blobs://...parameters...");
 
