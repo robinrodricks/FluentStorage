@@ -50,7 +50,6 @@ There are various implementations/providers of different storage types:
   - [Azure Data Lake Store](doc/implementations/microsoft-azure-datalakestore.md) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.Azure.DataLake.Store.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.DataLake.Store/)
   - [Azure Service Fabric](doc/implementations/microsoft-servicefabric.md) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.ServiceFabric.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.ServiceFabric)
 - Amazon S3 [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Amazon.Aws.svg)](https://www.nuget.org/packages/Storage.Net.Amazon.Aws)
-- [Microsoft SQL Server](doc/implementations/microsoft-sql.md) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Mssql.svg)](https://www.nuget.org/packages/Storage.Net.Mssql)
 
 ## Contributing
 
