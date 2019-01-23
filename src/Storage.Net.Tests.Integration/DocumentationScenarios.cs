@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using Config.Net;
 using NetBox.Generator;
 using NetBox.Extensions;
+using Storage.Net.KeyValue;
 
 namespace Storage.Net.Tests
 {
@@ -37,6 +38,22 @@ namespace Storage.Net.Tests
 
       public async Task Blobs_list_files_in_a_folder()
       {
+
+         IKeyValueStorage kv = StorageFactory.KeyValue.AzureTableStorage("my account", "my key");
+         
+
+         kv.InsertAsync()
+
+
+
+
+
+
+
+
+
+
+
 
          IBlobStorage s = StorageFactory.Blobs.FromConnectionString("azure.blobs://...parameters...");
 

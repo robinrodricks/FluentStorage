@@ -30,8 +30,8 @@ This framework supports `.NET 4.5.2` and `.NET Standard 1.6`, and all of the plu
 
 Storage.Net defines three different storage types:
 
-- [**Blob Storage**](doc/blob-storage/index.md) is used to store arbitrary files of any size, that do not have any structure. The data is essentially a binary file. Examples of a blog storage is Azure Blob Storage, Amazon S3, local folder etc.
-- [**Key-Value Storage**](doc/key-value-storage/index.md) is essentialy a large dictionary where key points to some value. Examples are Azure Table Storage, etcd etc.
+- **Blob Storage** is used to store arbitrary files of any size, that do not have any structure. The data is essentially a binary file. Examples of a blog storage is Azure Blob Storage, Amazon S3, local folder etc.
+- **Key-Value Storage** is essentialy a large dictionary where key points to some value. Examples are Azure Table Storage, etcd etc.
 - [**Messaging**](doc/messaging/index.md) is an asynchronous mechanism to send and receive messages between disconnected systems. For instance MSMQ, Azure Service Bus, Amazon Simple Queue etc.
 
 ## Geting Started
@@ -117,26 +117,63 @@ public async Task BlobStorage_sample2()
 
 ### Key-Value Storage
 
-> TODO
+The intention of creating a simplistic key-value storage is to abstract away different implementations of storing key-value data. An entry point to key-value storage is [IBlobStorage](src/Storage.Net/KeyValue/IKeyValueStorage.cs) interface. As with blobs, you can create this interface by calling to one of the factory methods:
+
+![](doc/storagefactory-intellisense-kv.gif)
+
+Once created, you can start working with key-value storage using one of the methods available in `IKeyValueStorage`.
 
 ### Messaging
 
-> TODO
+Messaging is inteded for message passing between one or more systems in disconnected fashion. You can send a message somewhere and current or remote system picks it up for processing later when required. This paradigm somehow fits into [CQRS](https://martinfowler.com/bliki/CQRS.html) and [Message Passing](https://www.defit.org/message-passing/) architectural ideas.
 
-## Index of Supported Providers
+To name a few examples, [Apache Kafka](http://kafka.apache.org/), [RabbitMQ](https://www.rabbitmq.com/), [Azure Service Bus](https://azure.microsoft.com/en-gb/services/service-bus/) are all falling into this category - essentially they are designed to pass messages. Some systems are more advanced to others of course, but most often it doesn't really matter.
 
-There are various implementations/providers of different storage types:
+Storage.Net supports many messaging providers out of the box, including **Azure Service Bus Topics and Queues**, **Azure Event Hub** and others.
 
-- [In-Memory](doc/implementations/inmemory.md)
-- [Local Disk](doc/implementations/local-disk.md) 
-- **Microsoft Azure**
-  - [Azure Storage (blobs/tables/queues)](doc/implementations/microsoft-azure.md) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.Azure.Storage.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.Storage)
-  - [Azure Event Hub](doc/implementations/microsoft-azure-eventhub.md) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.Azure.EventHub.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.EventHub)
-  - Azure Service Bus [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.Azure.ServiceBus.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.ServiceBus/)
-  - [Azure Key Vault](doc/implementations/microsoft-azure-key-vault.md) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.Azure.KeyVault.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.KeyVault)
-  - [Azure Data Lake Store](doc/implementations/microsoft-azure-datalakestore.md) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.Azure.DataLake.Store.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.DataLake.Store/)
-  - [Azure Service Fabric](doc/implementations/microsoft-servicefabric.md) [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.ServiceFabric.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.ServiceFabric)
-- Amazon S3 [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Amazon.Aws.svg)](https://www.nuget.org/packages/Storage.Net.Amazon.Aws)
+There are two abstractions available - **message publisher** and **message receiver**. As the name stands, one is publishing messages, and another is receiving them on another end.
+
+#### Publishing Messages
+
+To publish messages you will usually construct an instance of `IMessagePublisher` with an appropriate implementation. All the available implementations can be created using factory methods in the `Storage.Net.StorageFactory.Messages` class. More methods appear in that class as you reference an assembly containing specific implementations.
+
+#### Receiving Messages
+
+Similarly, to receive messages you can use factory methods to create receivers which all implement `IMessageReceiver` interface.
+
+The primary method of this interface
+
+```csharp
+Task StartMessagePumpAsync(
+	Func<IEnumerable<QueueMessage>, Task> onMessageAsync,
+	int maxBatchSize = 1,
+	CancellationToken cancellationToken = default);
+```
+
+starts a message pump that listens for incoming queue messages and calls `Func<IEnumerable<QueueMessage>, Task>` as a call back to pass those messages to your code.
+
+`maxBatchSize` is a number specifying how many messages you are ready to handle at once in your callback. Choose this number carefully as specifying number too low will result in slower message processing, whereas number too large will increase RAM requirements for your software.
+
+`cancellationToken` is used to signal the message pump to stop. Not passing any parameter there will result in never stopping message pump. See example below in Use Cases for a pattern on how to use this parameter.
+
+
+#### Serialising/deserialising `QueueMessage`
+
+`QueueMessage` class itself is not a serialisable entity when we talk about JSON or built-in .NET binary serialisation due to the fact it is a functionally rich structure. However, you might want to transfer the whole `QueueMessage` across the wire sometimes. For these purposes you can use built-in binary methods:
+
+```csharp
+var qm = new QueueMessage("id", "content");
+qm.DequeueCount = 4;
+qm.Properties.Add("key", "value");
+
+byte[] wireData = qm.ToByteArray();
+
+//transfer the bytes
+
+QueueMessage receivedMessage = QueueMessage.FromByteArray(wireData);
+```
+
+These methods make sure that *all* of the message data is preserved, and also are backward compatible between any changes to this class.
 
 ## Contributing
 
