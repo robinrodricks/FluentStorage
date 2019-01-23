@@ -20,11 +20,6 @@ namespace Storage.Net.Tests.Integration.KeyValue
       public AzureTableTest() : base("azure") { }
    }
 
-   public class MssqlTest : KeyValueStorageTest
-   {
-      public MssqlTest() : base("mssql") { }
-   }
-
    public abstract class KeyValueStorageTest : AbstractTestFixture
    {
       private readonly string _name;
@@ -50,11 +45,6 @@ namespace Storage.Net.Tests.Integration.KeyValue
             _tables = StorageFactory.KeyValue.AzureTableStorage(
                _settings.AzureStorageName,
                _settings.AzureStorageKey);
-         }
-         else if(_name == "mssql")
-         {
-            _tables = StorageFactory.KeyValue.MssqlServer(
-               _settings.MssqlConnectionString);
          }
 
          _tableName = "TableStorageTest" + Guid.NewGuid().ToString().Replace("-", "");

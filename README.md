@@ -1,24 +1,18 @@
-# Storage.Net [![NuGet](https://img.shields.io/nuget/v/Storage.Net.svg)](https://www.nuget.org/packages/Storage.Net/)
+# Storage.Net [![NuGet](https://img.shields.io/nuget/v/Storage.Net.svg)](https://www.nuget.org/packages/Storage.Net/) ![](https://img.shields.io/azure-devops/build/aloneguid/7a9c6ed6-1a57-47cf-941f-f4b09440591b/36.svg) ![](https://img.shields.io/azure-devops/tests/aloneguid/Storage.Net/35.svg?label=integration%20tests)|
 
 ![](doc/slide.jpg)
 
-Storage.NET is a field-tested .NET library that helps to achieve [Polycloud techniques](https://www.thoughtworks.com/radar/techniques/polycloud). 
+Storage.NET is a field-tested .NET library that helps to achieve [polycloud techniques](https://www.thoughtworks.com/radar/techniques/polycloud). 
 
 It provides generic interface for popular cloud storage providers like Amazon S3, Azure Service Bus, Azure Event Hub, Azure Storage, Azure Data Lake Store thus abstracting Messaging, Blob (object store for unsturctured data) and Table (NoSQL key-value store) services.
 
 It also implements in-memory and on-disk versions of all the abstractions for faster local machine development. [Connection strings](doc/cs.md) are supported too!
-
-| Build | Tests |
-|-------|-------|
-|![](https://img.shields.io/azure-devops/build/aloneguid/7a9c6ed6-1a57-47cf-941f-f4b09440591b/36.svg)|![](https://img.shields.io/azure-devops/tests/aloneguid/Storage.Net/35.svg?label=integration%20tests)|
 
 ## Intentions
 
 **One Library To Rule Them All**
 
 I'm not really sure why there are so many similar storage providers performing almost identical function but no standard. Why do we need to learn a new SDK to achieve something trivial we've done so many times before? I have no idea. If you don't either, use this library.
-
-### All Popular Storage Providers
 
 `Storage.Net` abstracts storage implementation like `blobs`, `tables` and `messages` from the .NET Applicatiion Developer. It's aimed to provide a generic interface regardless on which storage provider you are using. It also provides both synchronous and asynchronous alternatives of all methods and implements it to the best effort possible. 
 
@@ -32,11 +26,13 @@ This framework supports `.NET 4.5.2` and `.NET Standard 1.6`, and all of the plu
 
 ## Implementations
 
+![Storagetypes](doc/storagetypes.png)
+
 Storage.Net defines three different storage types:
 
-- [**Blob Storage**](doc/blob-storage/index.md) is used to store arbitrary files of any size.
-- [**Messaging**](doc/messaging/index.md) is an asynchronous mechanism to send simple messages between disconnected systems.
-- [**Table Storage**](doc/table-storage/index.md) is a simplistic way to store non-relational tabular data.
+- [**Blob Storage**](doc/blob-storage/index.md) is used to store arbitrary files of any size, that do not have any structure. The data is essentially a binary file. Examples of a blog storage is Azure Blob Storage, Amazon S3, local folder etc.
+- [**Key-Value Storage**](doc/key-value-storage/index.md) is essentialy a large dictionary where key points to some value. Examples are Azure Table Storage, etcd etc.
+- [**Messaging**](doc/messaging/index.md) is an asynchronous mechanism to send and receive messages between disconnected systems. For instance MSMQ, Azure Service Bus, Amazon Simple Queue etc.
 
 There are various implementations/providers of different storage types:
 
