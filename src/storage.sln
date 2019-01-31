@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{59E9D41F-BCD2-4A64-B62F-515B78986B63}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D1BF1BDC-D99C-4C85-AF21-34AC49F49319}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ext", "ext", "{D1BF1BDC-D99C-4C85-AF21-34AC49F49319}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		..\build.ini = ..\build.ini
