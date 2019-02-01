@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6;net452;net461</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>../storage.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>../../storage.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
@@ -26,6 +26,6 @@
     <PackageReference Include="System.Net.Http" Version="4.3.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
+    <ProjectReference Include="..\..\Storage.Net\Storage.Net.csproj" />
   </ItemGroup>
 </Project>

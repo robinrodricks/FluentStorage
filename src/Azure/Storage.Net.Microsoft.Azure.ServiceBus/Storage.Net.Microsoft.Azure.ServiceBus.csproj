@@ -1,15 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net452;netstandard1.6</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
-    <AssemblyTitle>Storage.Net.Microsoft.Azure.Storage</AssemblyTitle>
+    <AssemblyTitle>Storage.Net.Microsoft.Azure.ServiceBus</AssemblyTitle>
     <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyOriginatorKeyFile>../storage.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>../../storage.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
-    <PackageId>Storage.Net.Microsoft.Azure.Storage</PackageId>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>Storage.Net.Microsoft.Azure.ServiceBus</PackageId>
     <PackageIconUrl>http://i.isolineltd.com/nuget/storage.png</PackageIconUrl>
-     <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);dnxcore50;portable-net451+win8</PackageTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -20,25 +22,14 @@
     <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>GitHub</RepositoryType>
     <Description>Extension to Storage.Net providing integration with Microsoft Azure Storage for blobs, tables and queues.</Description>
-    <PackageReleaseNotes>v5.8.1
-new feature: Azure Blob Storage supports connection by container SAS URI</PackageReleaseNotes>
-     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\JsonExtensions.cs" Link="JsonExtensions.cs" />
+    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="3.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="WindowsAzure.Storage" Version="9.3.1" />
-  </ItemGroup>
-   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-      <Reference Include="System.Net.Http" />
-   </ItemGroup>
-   <ItemGroup>
-    <ProjectReference Include="..\Storage.Net\Storage.Net.csproj" />
+    <ProjectReference Include="..\..\Storage.Net\Storage.Net.csproj" />
   </ItemGroup>
 </Project>
