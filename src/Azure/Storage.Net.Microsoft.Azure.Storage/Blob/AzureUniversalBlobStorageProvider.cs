@@ -207,6 +207,21 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          throw new Exception("must not be here");
       }
 
+      public async Task<Stream> OpenRandomAccessReadAsync(string id, CancellationToken cancellationToken = default)
+      {
+         GenericValidation.CheckBlobId(id);
+
+         (CloudBlobContainer container, string path) = await GetPartsAsync(id, false);
+
+         if (container == null) return null;
+
+         CloudBlockBlob blob = container.GetBlockBlobReference(StoragePath.Normalize(path, false));
+
+         if (!(await blob.ExistsAsync())) return null;
+
+         return new AzureBlockBlobRandomAccessStream(blob);
+      }
+
       public Task<ITransaction> OpenTransactionAsync()
       {
          return Task.FromResult(EmptyTransaction.Instance);
