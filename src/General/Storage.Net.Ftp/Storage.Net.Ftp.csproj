@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+      <TargetFramework>netstandard2.0</TargetFramework>
+      <AssemblyOriginatorKeyFile>../../storage.snk</AssemblyOriginatorKeyFile>
+      <SignAssembly>true</SignAssembly>
+      <LangVersion>latest</LangVersion>
+   </PropertyGroup>
+
+   <ItemGroup>
+      <PackageReference Include="FluentFTP" Version="21.0.0" />
+   </ItemGroup>
+
+   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+      <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+   </PropertyGroup>
+
+   <ItemGroup>
+      <ProjectReference Include="..\..\Storage.Net\Storage.Net.csproj" />
+   </ItemGroup>
+
+</Project>

@@ -50,9 +50,7 @@ namespace Storage.Net.Blob
          string[] parts = StoragePath.Split(path);
 
          Id = parts.Last();
-         FolderPath = parts.Length > 1
-            ? StoragePath.Combine(parts.Take(parts.Length - 1))
-            : StoragePath.PathStrSeparator;
+         FolderPath = StoragePath.GetParent(path);
 
          Kind = kind;
       }

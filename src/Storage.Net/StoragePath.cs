@@ -42,6 +42,21 @@ namespace Storage.Net
       }
 
       /// <summary>
+      /// Gets parent path of this item
+      /// </summary>
+      public static string GetParent(string path)
+      {
+         if (path == null) return null;
+
+         string[] parts = Split(path);
+         if (parts.Length == 0) return null;
+
+         return parts.Length > 1
+            ? Combine(parts.Take(parts.Length - 1))
+            : PathStrSeparator;
+      }
+
+      /// <summary>
       /// Combines parts of path
       /// </summary>
       /// <param name="parts"></param>

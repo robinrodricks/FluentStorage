@@ -16,7 +16,7 @@ namespace Storage.Net.Blob
       /// <summary>
       /// Folder path to start browsing from. When not set scanning starts from the root folder.
       /// </summary>
-      public string FolderPath { get; set; }
+      public string FolderPath { get; set; } = StoragePath.RootFolderPath;
 
       /// <summary>
       /// Gets or sets a browsing filter used by some implementations which can filter out results before returning it to you.

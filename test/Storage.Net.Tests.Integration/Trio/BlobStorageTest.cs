@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,6 +56,11 @@ namespace Storage.Net.Tests.Integration.Blobs
       public ZipFileBlobStorageProviderTest() : base("zip") { }
    }
 
+    public class FtpBlobStorageProviderTest : BlobStorageTest
+    {
+        public FtpBlobStorageProviderTest() : base("ftp") { }
+    }
+
    #endregion
 
    public abstract class BlobStorageTest : AbstractTestFixture, IAsyncLifetime
@@ -64,51 +70,54 @@ namespace Storage.Net.Tests.Integration.Blobs
       private IBlobStorage _storage;
       private ITestSettings _settings;
 
-      public BlobStorageTest(string type, string blobPrefix = null)
-      {
-         StorageFactory.Modules.UseAzureStorage();
+        public BlobStorageTest(string type, string blobPrefix = null)
+        {
+            StorageFactory.Modules.UseAzureStorage();
 
-         _settings = new ConfigurationBuilder<ITestSettings>()
-            .UseIniFile("c:\\tmp\\integration-tests.ini")
-            .UseEnvironmentVariables()
-            .Build();
+            _settings = new ConfigurationBuilder<ITestSettings>()
+               .UseIniFile("c:\\tmp\\integration-tests.ini")
+               .UseEnvironmentVariables()
+               .Build();
 
-         _type = type;
-         _blobPrefix = blobPrefix;
-         switch (_type)
-         {
-            case "azure":
-               _storage = StorageFactory.Blobs.AzureBlobStorage(_settings.AzureStorageName, _settings.AzureStorageKey);
-               break;
-            case "azure-datalakestore":
-               _storage = StorageFactory.Blobs.AzureDataLakeStoreByClientSecret(
-                  _settings.AzureDataLakeStoreAccountName,
-                  _settings.AzureDataLakeTenantId,
-                  _settings.AzureDataLakePrincipalId,
-                  _settings.AzureDataLakePrincipalSecret);
-               break;
-            case "disk-directory":
-               _storage = StorageFactory.Blobs.DirectoryFiles(TestDir);
-               break;
-            case "zip":
-               _storage = StorageFactory.Blobs.ZipFile(Path.Combine(TestDir.FullName, "test.zip"));
-               break;
-            case "aws-s3":
-               _storage = StorageFactory.Blobs.AmazonS3BlobStorage(
-                  _settings.AwsAccessKeyId,
-                  _settings.AwsSecretAccessKey,
-                  _settings.AwsTestBucketName);
-               break;
-            case "inmemory":
-               _storage = StorageFactory.Blobs.InMemory();
-               break;
-            case "azurekeyvault":
-               _storage = StorageFactory.Blobs.AzureKeyVault(
-                  _settings.KeyVaultUri,
-                  _settings.KeyVaultCreds);
-               break;
-         }
-      }
+            _type = type;
+            _blobPrefix = blobPrefix;
+            switch (_type)
+            {
+                case "azure":
+                    _storage = StorageFactory.Blobs.AzureBlobStorage(_settings.AzureStorageName, _settings.AzureStorageKey);
+                    break;
+                case "azure-datalakestore":
+                    _storage = StorageFactory.Blobs.AzureDataLakeStoreByClientSecret(
+                       _settings.AzureDataLakeStoreAccountName,
+                       _settings.AzureDataLakeTenantId,
+                       _settings.AzureDataLakePrincipalId,
+                       _settings.AzureDataLakePrincipalSecret);
+                    break;
+                case "disk-directory":
+                    _storage = StorageFactory.Blobs.DirectoryFiles(TestDir);
+                    break;
+                case "zip":
+                    _storage = StorageFactory.Blobs.ZipFile(Path.Combine(TestDir.FullName, "test.zip"));
+                    break;
+                case "aws-s3":
+                    _storage = StorageFactory.Blobs.AmazonS3BlobStorage(
+                       _settings.AwsAccessKeyId,
+                       _settings.AwsSecretAccessKey,
+                       _settings.AwsTestBucketName);
+                    break;
+                case "inmemory":
+                    _storage = StorageFactory.Blobs.InMemory();
+                    break;
+                case "azurekeyvault":
+                    _storage = StorageFactory.Blobs.AzureKeyVault(
+                       _settings.KeyVaultUri,
+                       _settings.KeyVaultCreds);
+                    break;
+                case "ftp":
+                    _storage = StorageFactory.Blobs.Ftp(_settings.FtpHostName, new NetworkCredential(_settings.FtpUsername, _settings.FtpPassword));
+                    break;
+            }
+        }
 
       public async Task InitializeAsync()
       {
@@ -117,10 +126,9 @@ namespace Storage.Net.Tests.Integration.Blobs
 
       public async Task DisposeAsync()
       {
-         IReadOnlyCollection<BlobId> allFiles = await _storage.ListFilesAsync(null);
-
          try
          {
+            IReadOnlyCollection<BlobId> allFiles = await _storage.ListFilesAsync(null);
             await _storage.DeleteAsync(allFiles.Select(id => id.FullPath));
          }
          catch
