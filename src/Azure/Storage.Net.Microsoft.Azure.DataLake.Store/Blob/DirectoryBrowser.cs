@@ -106,7 +106,8 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       internal async Task<List<DirectoryEntry>> EnumerateDirectoryAsync(string path,
          int maxEntries, string listAfter, string listBefore, UserGroupRepresentation userIdFormat = UserGroupRepresentation.ObjectID, CancellationToken cancelToken = default(CancellationToken))
       {
-         if (string.IsNullOrEmpty(path)) throw new ArgumentException("Path is null");
+         //ADLS requires a root prefix
+         path = StoragePath.Normalize(path, true);
 
          var resp = new OperationResponse();
          List<DirectoryEntry> page = await Core.ListStatusAsync(path, listAfter, listBefore, maxEntries, userIdFormat, _client,

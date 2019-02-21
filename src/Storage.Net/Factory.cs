@@ -126,5 +126,10 @@ namespace Storage.Net
       {
          return InMemoryMessagePublisherReceiver.CreateOrGet(name);
       }
+
+      static IMessagePublisher HandleLargeContent(this IMessagePublisher messagePublisher, IBlobStorage contentStorage, int minSizeLarge)
+      {
+         return messagePublisher;
+      }
    }
 }
