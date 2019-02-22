@@ -6,6 +6,7 @@ using Storage.Net.Messaging;
 using Storage.Net.ConnectionString;
 using Storage.Net.KeyValue;
 using Storage.Net.KeyValue.Files;
+using Storage.Net.Messaging.Large;
 
 namespace Storage.Net
 {
@@ -127,9 +128,9 @@ namespace Storage.Net
          return InMemoryMessagePublisherReceiver.CreateOrGet(name);
       }
 
-      static IMessagePublisher HandleLargeContent(this IMessagePublisher messagePublisher, IBlobStorage contentStorage, int minSizeLarge)
+      public static IMessagePublisher HandleLargeContent(this IMessagePublisher messagePublisher, IBlobStorage offloadStorage, int minSizeLarge)
       {
-         return messagePublisher;
+         return new LargeMessageContentMessagePublisher(messagePublisher, offloadStorage, minSizeLarge, false);
       }
    }
 }

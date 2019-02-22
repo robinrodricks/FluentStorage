@@ -120,6 +120,26 @@ namespace Storage.Net.Blob
 
       #endregion
 
+      #region [ Bytes ]
+
+      /// <summary>
+      /// Writes byte array to the target storage. If you can, never use large byte arrays, they are terrible!
+      /// </summary>
+      public static async Task WriteAsync(this IBlobStorage provider, string id, byte[] data, bool append = false, CancellationToken cancellationToken = default)
+      {
+         if (data == null)
+         {
+            throw new ArgumentNullException(nameof(data));
+         }
+
+         using (var source = new MemoryStream(data))
+         {
+            await provider.WriteAsync(id, source, append, cancellationToken);
+         }
+      }
+
+      #endregion
+
       #region [ Streaming ]
 
       /// <summary>

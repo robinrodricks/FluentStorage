@@ -10,6 +10,11 @@ namespace Storage.Net.Messaging
    /// </summary>
    public class QueueMessage
    {
+      /// <summary>
+      /// Message header that points to large message content, if you are using content offloading feature
+      /// </summary>
+      public const string LargeMessageContentHeaderName = "x-sn-large";
+
       private Dictionary<string, string> _properties;
 
       /// <summary>
