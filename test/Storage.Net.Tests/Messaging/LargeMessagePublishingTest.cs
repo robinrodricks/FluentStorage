@@ -1,9 +1,6 @@
-﻿using Moq;
-using NetBox.Generator;
+﻿using NetBox.Generator;
 using Storage.Net.Blob;
 using Storage.Net.Messaging;
-using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -30,7 +27,7 @@ namespace Storage.Net.Tests.Messaging
 
             //send small message
             await _publisher.PutMessageAsync(smallMessage);
-            int blobCount = (await _blobStorage.ListFilesAsync(null)).Count;
+            int blobCount = (await _blobStorage.ListFilesAsync(new ListOptions { Recurse = true })).Count;
 
             //validate that small message was never uploaded
             Assert.Equal(0, blobCount);
@@ -46,7 +43,7 @@ namespace Storage.Net.Tests.Messaging
 
             //send large message
             await _publisher.PutMessageAsync(largeMessage);
-            int blobCount = (await _blobStorage.ListFilesAsync(null)).Count;
+            int blobCount = (await _blobStorage.ListFilesAsync(new ListOptions { Recurse = true })).Count;
 
             //validate that small message was uploaded once
             Assert.Equal(1, blobCount);
