@@ -108,13 +108,16 @@ namespace Storage.Net
       }
 
       /// <summary>
-      /// Checks if path is root folder path
+      /// Checks if path is root folder path, which can be an empty string, null, or the actual root path.
       /// </summary>
       public static bool IsRootPath(string path)
       {
          return string.IsNullOrEmpty(path) || path == RootFolderPath;
       }
 
+      /// <summary>
+      /// Compare that two path entries are equal. This takes into account path entries which are slightly different as strings but identical in physical location.
+      /// </summary>
       public static bool ComparePath(string path1, string path2)
       {
          return Normalize(path1) == Normalize(path2);

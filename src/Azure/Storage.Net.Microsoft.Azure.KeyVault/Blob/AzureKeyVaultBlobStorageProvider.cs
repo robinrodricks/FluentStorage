@@ -43,7 +43,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
 
          GenericValidation.CheckBlobPrefix(options.FilePrefix);
 
-         if (options.FolderPath != null) return new List<BlobId>();
+         if (!StoragePath.IsRootPath(options.FolderPath)) return new List<BlobId>();
 
          var secretNames = new List<BlobId>();
          IPage<SecretItem> page = await _vaultClient.GetSecretsAsync(_vaultUri);
