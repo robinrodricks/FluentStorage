@@ -114,5 +114,10 @@ namespace Storage.Net
       {
          return string.IsNullOrEmpty(path) || path == RootFolderPath;
       }
+
+      public static bool ComparePath(string path1, string path2)
+      {
+         return Normalize(path1) == Normalize(path2);
+      }
    }
 }

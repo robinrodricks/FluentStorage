@@ -33,7 +33,7 @@ namespace Storage.Net.Blob
 
             .Where(e => options.Recurse
                ? e.Key.FolderPath.StartsWith(options.FolderPath)
-               : e.Key.FolderPath == options.FolderPath)
+               : StoragePath.ComparePath(e.Key.FolderPath, options.FolderPath))
 
             .Select(e => e.Key)
             .Where(options.IsMatch)
@@ -47,6 +47,7 @@ namespace Storage.Net.Blob
       public Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
+         id = StoragePath.Normalize(id);
 
          if (append)
          {
@@ -73,6 +74,7 @@ namespace Storage.Net.Blob
       public Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
+         id = StoragePath.Normalize(id);
 
          var result = new FixedStream(new MemoryStream(), null, fx =>
          {
@@ -87,6 +89,7 @@ namespace Storage.Net.Blob
       public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(id);
+         id = StoragePath.Normalize(id);
 
          if (!_idToData.TryGetValue(id, out Tag tag)) return Task.FromResult<Stream>(null);
 
@@ -99,7 +102,7 @@ namespace Storage.Net.Blob
 
          foreach (string blobId in ids)
          {
-            _idToData.Remove(blobId);
+            _idToData.Remove(StoragePath.Normalize(blobId));
          }
 
          return Task.FromResult(true);
@@ -111,7 +114,7 @@ namespace Storage.Net.Blob
 
          foreach (string id in ids)
          {
-            result.Add(_idToData.ContainsKey(id));
+            result.Add(_idToData.ContainsKey(StoragePath.Normalize(id)));
          }
 
          return Task.FromResult<IReadOnlyCollection<bool>>(result);
@@ -125,7 +128,7 @@ namespace Storage.Net.Blob
 
          foreach (string id in ids)
          {
-            if (!_idToData.TryGetValue(id, out Tag tag))
+            if (!_idToData.TryGetValue(StoragePath.Normalize(id), out Tag tag))
             {
                result.Add(null);
             }
@@ -142,6 +145,9 @@ namespace Storage.Net.Blob
 
       private void Write(string id, Stream sourceStream)
       {
+         GenericValidation.CheckBlobId(id);
+         id = StoragePath.Normalize(id);
+
          Tag tag = ToTag(sourceStream);
 
          _idToData[id] = tag;

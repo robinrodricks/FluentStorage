@@ -2,10 +2,7 @@
 using NetBox.Generator;
 using Storage.Net.Blob;
 using Storage.Net.Messaging;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -14,14 +11,16 @@ namespace Storage.Net.Tests.Messaging
 {
     public class LargeMessagePublishingTest
     {
-        private readonly Mock<IBlobStorage> _blobStorage = new Mock<IBlobStorage>();
+        private readonly IBlobStorage _blobStorage;
         private readonly IMessagePublisher _publisher;
 
         public LargeMessagePublishingTest()
         {
+            _blobStorage = StorageFactory.Blobs.InMemory();
+
             _publisher = StorageFactory.Messages
                 .InMemoryPublisher(nameof(LargeMessagePublishingTest))
-                .HandleLargeContent(_blobStorage.Object, 100);
+                .HandleLargeContent(_blobStorage, 100);
         }
 
         [Fact]
@@ -31,9 +30,10 @@ namespace Storage.Net.Tests.Messaging
 
             //send small message
             await _publisher.PutMessageAsync(smallMessage);
+            int blobCount = (await _blobStorage.ListFilesAsync(null)).Count;
 
             //validate that small message was never uploaded
-            _blobStorage.Verify(s => s.WriteAsync(It.IsAny<string>(), It.IsAny<Stream>(), false, default(CancellationToken)), Times.Never);
+            Assert.Equal(0, blobCount);
 
             //validate that message does not have
             Assert.False(smallMessage.Properties.ContainsKey(QueueMessage.LargeMessageContentHeaderName));
@@ -46,9 +46,10 @@ namespace Storage.Net.Tests.Messaging
 
             //send large message
             await _publisher.PutMessageAsync(largeMessage);
+            int blobCount = (await _blobStorage.ListFilesAsync(null)).Count;
 
             //validate that small message was uploaded once
-            _blobStorage.Verify(s => s.WriteAsync(It.IsAny<string>(), It.IsAny<Stream>(), false, default(CancellationToken)), Times.Once);
+            Assert.Equal(1, blobCount);
 
             //validate that message has offload header
             Assert.True(largeMessage.Properties.ContainsKey(QueueMessage.LargeMessageContentHeaderName));
