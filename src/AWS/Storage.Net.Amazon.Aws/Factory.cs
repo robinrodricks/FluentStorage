@@ -1,7 +1,9 @@
 ﻿using Amazon;
 using Amazon.S3;
+using Storage.Net.Amazon.Aws.Messaging;
 using Storage.Net.Aws.Blob;
 using Storage.Net.Blob;
+using Storage.Net.Messaging;
 
 namespace Storage.Net
 {
@@ -63,6 +65,14 @@ namespace Storage.Net
          AmazonS3Config clientConfig)
       {
          return new AwsS3BlobStorageProvider(accessKeyId, secretAccessKey, bucketName, clientConfig);
+      }
+
+      public static IMessagePublisher AmazonSQSMessagePublisher(this IMessagingFactory factory,
+         string serviceUrl,
+         string queueName,
+         RegionEndpoint regionEndpoint = null)
+      {
+         return new AwsS3MessagePublisher(serviceUrl, queueName, regionEndpoint);
       }
    }
 }

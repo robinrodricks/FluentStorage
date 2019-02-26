@@ -69,7 +69,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
 
       private static string GetBlobName(string partitionId)
       {
-         return $"partition-{partitionId}.json";
+         return StoragePath.Combine("partition", $"{partitionId}.json");
       }
 
       class StateToken
