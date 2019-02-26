@@ -1,0 +1,36 @@
+pool:
+  vmImage: 'vs2017-win2016'
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+
+pr:
+  branches:
+    include:
+      - master
+  paths:
+    exclude:
+      - README.md
+
+variables:
+  - group: 'External Resources'
+
+steps:
+- task: gittools.gitversion.gitversion-task.GitVersion@4
+  displayName: GitVersion
+  inputs:
+    preferBundledVersion: false
+- task: DotNetCoreCLI@2
+  displayName: build
+  inputs:
+    projects: test/Storage.Net.Tests.Integration
+    arguments: '-c debug'
+- task: DotNetCoreCLI@2
+  displayName: 'run integration tests'
+  inputs:
+    command: test
+    projects: test/Storage.Net.Tests.Integration
+    arguments: '-c debug -v d'
