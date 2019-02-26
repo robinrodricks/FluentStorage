@@ -1,5 +1,5 @@
 pool:
-  vmImage: Hosted VS2017
+  vmImage: "Hosted VS2017"
 
 steps:
 - task: gittools.gitversion.gitversion-task.GitVersion@4
