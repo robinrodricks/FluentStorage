@@ -1,4 +1,6 @@
-# Storage.Net [![NuGet](https://img.shields.io/nuget/v/Storage.Net.svg)](https://www.nuget.org/packages/Storage.Net/) [![](https://img.shields.io/azure-devops/build/aloneguid/7a9c6ed6-1a57-47cf-941f-f4b09440591b/40.svg)](https://aloneguid.visualstudio.com/Storage.Net/_build?definitionId=40) [![](https://img.shields.io/azure-devops/tests/aloneguid/Storage.Net/41.svg?label=integration%20tests)](https://aloneguid.visualstudio.com/Storage.Net/_build?definitionId=41)
+# Storage.Net
+### One Interface To Rule Them All
+[![NuGet](https://img.shields.io/nuget/v/Storage.Net.svg)](https://www.nuget.org/packages/Storage.Net/) [![](https://img.shields.io/azure-devops/build/aloneguid/7a9c6ed6-1a57-47cf-941f-f4b09440591b/40.svg)](https://aloneguid.visualstudio.com/Storage.Net/_build?definitionId=40) [![](https://img.shields.io/azure-devops/tests/aloneguid/Storage.Net/41.svg?label=integration%20tests)](https://aloneguid.visualstudio.com/Storage.Net/_build?definitionId=41)
 
 ![Slide](doc/slide.png)
 
@@ -9,8 +11,6 @@ It provides generic interface for popular cloud storage providers like Amazon S3
 It also implements in-memory and on-disk versions of all the abstractions for faster local machine development. [Connection strings](doc/cs.md) are supported too!
 
 ## Intentions
-
-**One Library To Rule Them All**
 
 I'm not really sure why there are so many similar storage providers performing almost identical function but no standard. Why do we need to learn a new SDK to achieve something trivial we've done so many times before? I have no idea. If you don't either, use this library.
 
