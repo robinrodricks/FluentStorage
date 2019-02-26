@@ -128,9 +128,30 @@ namespace Storage.Net
          return InMemoryMessagePublisherReceiver.CreateOrGet(name);
       }
 
+      /// <summary>
+      /// Wraps message publisher so that if it's content is larger than <paramref name="minSizeLarge"/>, the content is uploaded
+      /// to blob storage and cleared on the message itself. The message is then stamped with a property <see cref="QueueMessage.LargeMessageContentHeaderName"/>
+      /// which contains blob path of the message content.
+      /// </summary>
+      /// <param name="messagePublisher">Message publisher to wrap</param>
+      /// <param name="offloadStorage">Blob storage used to offload the message content</param>
+      /// <param name="minSizeLarge">Threshold size</param>
+      /// <returns></returns>
       public static IMessagePublisher HandleLargeContent(this IMessagePublisher messagePublisher, IBlobStorage offloadStorage, int minSizeLarge)
       {
          return new LargeMessageContentMessagePublisher(messagePublisher, offloadStorage, minSizeLarge, false);
+      }
+
+      /// <summary>
+      /// Wraps message receiver so that if it has message property <see cref="QueueMessage.LargeMessageContentHeaderName"/> set,
+      /// uses <paramref name="offloadStorage"/> to download the message content, inject into the message, and remove the property.
+      /// </summary>
+      /// <param name="messageReceiver">Message receiver to wrap</param>
+      /// <param name="offloadStorage">Storage used to find large content</param>
+      /// <returns></returns>
+      public static IMessageReceiver HandleLargeContent(this IMessageReceiver messageReceiver, IBlobStorage offloadStorage)
+      {
+         return new LargeMessageContentMessageReceiver(messageReceiver, offloadStorage);
       }
    }
 }

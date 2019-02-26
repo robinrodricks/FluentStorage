@@ -1,32 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Storage.Net.Blob;
 
 namespace Storage.Net.Messaging.Large
 {
    class LargeMessageContentMessageReceiver : IMessageReceiver
    {
       private readonly IMessageReceiver _parentReceiver;
+      private readonly IBlobStorage _offloadStorage;
 
-      public LargeMessageContentMessageReceiver(IMessageReceiver parentReceiver, bool storageOpen)
+      public LargeMessageContentMessageReceiver(IMessageReceiver parentReceiver, IBlobStorage offloadStorage)
       {
          _parentReceiver = parentReceiver;
+         _offloadStorage = offloadStorage;
       }
 
       public async Task ConfirmMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default)
       {
          await _parentReceiver.ConfirmMessagesAsync(messages, cancellationToken);
 
-         //todo: remove blobs
+         foreach(QueueMessage message in messages)
+         {
+            await DeleteBlobAsync(message);
+         }
       }
 
       public async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default)
       {
          await _parentReceiver.DeadLetterAsync(message, reason, errorDescription, cancellationToken);
 
-         //todo: remove blobs
+         await DeleteBlobAsync(message);
+      }
+
+      private async Task DeleteBlobAsync(QueueMessage message)
+      {
+         if (!message.Properties.TryGetValue(QueueMessage.LargeMessageContentHeaderName, out string fileId)) return;
+
+         await _offloadStorage.DeleteAsync(fileId);
       }
 
       public void Dispose()
@@ -43,14 +55,25 @@ namespace Storage.Net.Messaging.Large
          //todo: redirect pumping
 
          return _parentReceiver.StartMessagePumpAsync(
-            onMessageAsync,
+            (mms) => DownloadingMessagePumpAsync(mms, onMessageAsync, cancellationToken),
             maxBatchSize, cancellationToken);
       }
 
       private async Task DownloadingMessagePumpAsync(IReadOnlyCollection<QueueMessage> messages,
-         Func<IReadOnlyCollection<QueueMessage>, Task> onMessageAsync)
+         Func<IReadOnlyCollection<QueueMessage>, Task> onParentMessagesAsync,
+         CancellationToken cancellationToken)
       {
-         //todo: download and forward
+         //process messages to download external content
+         foreach(QueueMessage message in messages)
+         {
+            if (!message.Properties.TryGetValue(QueueMessage.LargeMessageContentHeaderName, out string fileId)) continue;
+
+            message.Content = await _offloadStorage.ReadBytesAsync(fileId, cancellationToken);
+            message.Properties.Remove(QueueMessage.LargeMessageContentHeaderName);
+         }
+
+         //now that messages are augmented pass them to parent
+         await onParentMessagesAsync(messages);
       }
    }
 }

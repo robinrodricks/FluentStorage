@@ -36,10 +36,10 @@ namespace Storage.Net.Tests.Integration.Messaging
         public AzureEventHubMessageQeueueTest() : base("azure-eventhub") { }
     }
 
-    public class InMemoryMessageQeueueTest : MessagingTest
+    /*public class InMemoryMessageQeueueTest : MessagingTest
     {
         public InMemoryMessageQeueueTest() : base("inmemory") { }
-    }
+    }*/
 
     /*public class AmazonSQSMessageQueueTest : MessagingTest
     {

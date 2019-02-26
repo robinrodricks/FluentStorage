@@ -138,6 +138,23 @@ namespace Storage.Net.Blob
          }
       }
 
+      /// <summary>
+      /// Reads blob content as byte array
+      /// </summary>
+      public static async Task<byte[]> ReadBytesAsync(this IBlobStorage storage, string id, CancellationToken cancellationToken = default)
+      {
+         Stream src = await storage.OpenReadAsync(id, cancellationToken);
+         if (src == null) return null;
+
+         var ms = new MemoryStream();
+         using (src)
+         {
+            await src.CopyToAsync(ms);
+         }
+
+         return ms.ToArray();
+      }
+
       #endregion
 
       #region [ Streaming ]
