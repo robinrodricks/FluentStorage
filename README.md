@@ -1,6 +1,6 @@
 # Storage.Net [![NuGet](https://img.shields.io/nuget/v/Storage.Net.svg)](https://www.nuget.org/packages/Storage.Net/) [![](https://img.shields.io/azure-devops/build/aloneguid/7a9c6ed6-1a57-47cf-941f-f4b09440591b/40.svg)](https://aloneguid.visualstudio.com/Storage.Net/_build?definitionId=40) [![](https://img.shields.io/azure-devops/tests/aloneguid/Storage.Net/41.svg?label=integration%20tests)](https://aloneguid.visualstudio.com/Storage.Net/_build?definitionId=41)
 
-![](doc/slide.jpg)
+![Slide](doc/slide.png)
 
 Storage.NET is a field-tested .NET library that helps to achieve [polycloud techniques](https://www.thoughtworks.com/radar/techniques/polycloud). 
 
