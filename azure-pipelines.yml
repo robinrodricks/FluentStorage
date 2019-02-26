@@ -1,5 +1,5 @@
 pool:
-  vmImage: "Hosted VS2017"
+  vmImage: 'Hosted VS2017'
 
 trigger:
   batch: true
