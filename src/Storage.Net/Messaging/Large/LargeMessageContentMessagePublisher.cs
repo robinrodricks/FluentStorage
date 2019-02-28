@@ -13,16 +13,19 @@ namespace Storage.Net.Messaging.Large
       private readonly IBlobStorage _offloadStorage;
       private readonly long _minSizeLarge;
       private readonly bool _keepPublisherOpen;
+      private Func<QueueMessage, string> _blobPathGenerator;
 
       public LargeMessageContentMessagePublisher(
          IMessagePublisher parentPublisher,
          IBlobStorage offloadStorage,
          long minSizeLarge,
+         Func<QueueMessage, string> blobPathGenerator = null,
          bool keepPublisherOpen = false)
       {
          _parentPublisher = parentPublisher ?? throw new ArgumentNullException(nameof(parentPublisher));
          _offloadStorage = offloadStorage ?? throw new ArgumentNullException(nameof(offloadStorage));
          _minSizeLarge = minSizeLarge;
+         _blobPathGenerator = blobPathGenerator ?? GenerateBlobPath;
          _keepPublisherOpen = keepPublisherOpen;
       }
 
@@ -49,9 +52,14 @@ namespace Storage.Net.Messaging.Large
 
       private void AddBlobId(QueueMessage message, out string id)
       {
-         id = StoragePath.Combine("message", Guid.NewGuid().ToString());
+         id = _blobPathGenerator(message);
 
          message.Properties[QueueMessage.LargeMessageContentHeaderName] = id;
+      }
+
+      private string GenerateBlobPath(QueueMessage message)
+      {
+         return StoragePath.Combine("message", Guid.NewGuid().ToString());
       }
 
       public void Dispose()

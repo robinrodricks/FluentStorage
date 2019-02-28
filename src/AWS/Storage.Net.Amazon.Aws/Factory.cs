@@ -67,6 +67,15 @@ namespace Storage.Net
          return new AwsS3BlobStorageProvider(accessKeyId, secretAccessKey, bucketName, clientConfig);
       }
 
+#if DEBUG
+      /// <summary>
+      /// Creates Amazon Simple Queue Service publisher
+      /// </summary>
+      /// <param name="factory"></param>
+      /// <param name="serviceUrl"></param>
+      /// <param name="queueName"></param>
+      /// <param name="regionEndpoint"></param>
+      /// <returns></returns>
       public static IMessagePublisher AmazonSQSMessagePublisher(this IMessagingFactory factory,
          string serviceUrl,
          string queueName,
@@ -74,5 +83,6 @@ namespace Storage.Net
       {
          return new AwsS3MessagePublisher(serviceUrl, queueName, regionEndpoint);
       }
+#endif
    }
 }

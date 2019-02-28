@@ -38,6 +38,8 @@ namespace Storage.Net.Messaging.Large
       {
          if (!message.Properties.TryGetValue(QueueMessage.LargeMessageContentHeaderName, out string fileId)) return;
 
+         message.Properties.Remove(QueueMessage.LargeMessageContentHeaderName);
+
          await _offloadStorage.DeleteAsync(fileId);
       }
 
@@ -52,8 +54,6 @@ namespace Storage.Net.Messaging.Large
 
       public Task StartMessagePumpAsync(Func<IReadOnlyCollection<QueueMessage>, Task> onMessageAsync, int maxBatchSize = 1, CancellationToken cancellationToken = default)
       {
-         //todo: redirect pumping
-
          return _parentReceiver.StartMessagePumpAsync(
             (mms) => DownloadingMessagePumpAsync(mms, onMessageAsync, cancellationToken),
             maxBatchSize, cancellationToken);
@@ -69,7 +69,6 @@ namespace Storage.Net.Messaging.Large
             if (!message.Properties.TryGetValue(QueueMessage.LargeMessageContentHeaderName, out string fileId)) continue;
 
             message.Content = await _offloadStorage.ReadBytesAsync(fileId, cancellationToken);
-            message.Properties.Remove(QueueMessage.LargeMessageContentHeaderName);
          }
 
          //now that messages are augmented pass them to parent

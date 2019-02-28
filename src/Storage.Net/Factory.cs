@@ -136,10 +136,12 @@ namespace Storage.Net
       /// <param name="messagePublisher">Message publisher to wrap</param>
       /// <param name="offloadStorage">Blob storage used to offload the message content</param>
       /// <param name="minSizeLarge">Threshold size</param>
+      /// <param name="blobPathGenerator">Optional generator for blob path used to save large message content.</param>
       /// <returns></returns>
-      public static IMessagePublisher HandleLargeContent(this IMessagePublisher messagePublisher, IBlobStorage offloadStorage, int minSizeLarge)
+      public static IMessagePublisher HandleLargeContent(this IMessagePublisher messagePublisher, IBlobStorage offloadStorage, int minSizeLarge,
+         Func<QueueMessage, string> blobPathGenerator = null)
       {
-         return new LargeMessageContentMessagePublisher(messagePublisher, offloadStorage, minSizeLarge, false);
+         return new LargeMessageContentMessagePublisher(messagePublisher, offloadStorage, minSizeLarge, blobPathGenerator, false);
       }
 
       /// <summary>

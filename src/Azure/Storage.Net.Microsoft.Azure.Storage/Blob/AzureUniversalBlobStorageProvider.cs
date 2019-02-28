@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
    class AzureUniversalBlobStorageProvider : IBlobStorage, IAzureBlobStorageNativeOperations
    {
       private readonly CloudBlobClient _client;
-      private readonly Dictionary<string, CloudBlobContainer> _containerNameToContainer = new Dictionary<string, CloudBlobContainer>();
+      private readonly ConcurrentDictionary<string, CloudBlobContainer> _containerNameToContainer = new ConcurrentDictionary<string, CloudBlobContainer>();
 
       public CloudBlobClient NativeBlobClient => _client;
 

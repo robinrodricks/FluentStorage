@@ -156,6 +156,31 @@ starts a message pump that listens for incoming queue messages and calls `Func<I
 
 `cancellationToken` is used to signal the message pump to stop. Not passing any parameter there will result in never stopping message pump. See example below in Use Cases for a pattern on how to use this parameter.
 
+#### Handling Large Messages
+
+Storage.Net provides built-in capability to handle large message content by allowing you to offload message content over a certain threshold to an external blob storage. It works in the following way:
+
+1. Check that message content is larger than `threshold value`.
+2. If not, do the usual processing.
+3. If it is, upload message content as a blob to external storage, clear message content and add a custom header `x-sn-large` that points to the blob containing message content.
+
+When receiving messages, it will check that `x-sn-large` header is present, and if so, will download blob, set it's content as message content, and return the message to the receiver.
+
+Blob is deleted from the blob storage only when message is confirmed by the receiver.
+
+Large message handling works **on any supported queue implementation** because it's implemented in the core library itself, outside of specific queue implementation. To enable it, call `.HandleLargeContent` on both publisher and receiver:
+
+```csharp
+IBlobStorage offloadStorage = ...; // your blob storage for offloading content
+
+IMessagePublisher publisher = StorageFactory.Messages
+  .XXXPublisher(...)
+  .HandleLargeContent(offloadStorage, thresholdValue);
+
+IMessageReceiver receiver = StorageFactory.Messages
+  .XXXReceiver(...)
+  .HandleLargeContent(offloadStorage);
+```
 
 #### Serialising/deserialising `QueueMessage`
 

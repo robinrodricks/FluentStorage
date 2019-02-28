@@ -11,6 +11,7 @@ using NetBox.Generator;
 using System.Threading;
 using System.Diagnostics;
 using Amazon;
+using Storage.Net.Blob;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
@@ -19,6 +20,11 @@ namespace Storage.Net.Tests.Integration.Messaging
     public class AzureStorageQueueMessageQueueTest : MessagingTest
     {
         public AzureStorageQueueMessageQueueTest() : base("azure-storage-queue") { }
+    }
+
+    public class AzureLargeStorageQueueMessageQueueTest : MessagingTest
+    {
+        public AzureLargeStorageQueueMessageQueueTest() : base("azure-storage-queue-large") { }
     }
 
     public class AzureServiceBusQueueMessageQeueueTest : MessagingTest
@@ -82,6 +88,21 @@ namespace Storage.Net.Tests.Integration.Messaging
                        _settings.AzureStorageQueueName,
                        TimeSpan.FromMinutes(1),
                        TimeSpan.FromMilliseconds(500));
+                    break;
+                case "azure-storage-queue-large":
+                    IBlobStorage offloadStorage = StorageFactory.Blobs.AzureBlobStorage(_settings.AzureStorageName, _settings.AzureStorageKey);
+                    _publisher = StorageFactory.Messages.AzureStorageQueuePublisher(
+                       _settings.AzureStorageName,
+                       _settings.AzureStorageKey,
+                       _settings.AzureStorageQueueName)
+                       .HandleLargeContent(offloadStorage, 2);
+                    _receiver = StorageFactory.Messages.AzureStorageQueueReceiver(
+                       _settings.AzureStorageName,
+                       _settings.AzureStorageKey,
+                       _settings.AzureStorageQueueName,
+                       TimeSpan.FromMinutes(1),
+                       TimeSpan.FromMilliseconds(500))
+                       .HandleLargeContent(offloadStorage);
                     break;
                 case "azure-servicebus-queue":
                     _receiver = StorageFactory.Messages.AzureServiceBusQueueReceiver(

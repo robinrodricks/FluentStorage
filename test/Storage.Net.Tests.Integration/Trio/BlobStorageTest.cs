@@ -120,9 +120,9 @@ namespace Storage.Net.Tests.Integration.Blobs
             }
         }
 
-      public async Task InitializeAsync()
+      public Task InitializeAsync()
       {
-
+            return Task.FromResult(true);
       }
 
       public async Task DisposeAsync()

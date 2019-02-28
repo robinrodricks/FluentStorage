@@ -16,6 +16,11 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       /// </summary>
       CloudBlobClient NativeBlobClient { get; }
 
+#if DEBUG
+      /// <summary>
+      /// Opens Azure Blob for random access
+      /// </summary>
       Task<Stream> OpenRandomAccessReadAsync(string id, CancellationToken cancellationToken = default);
+#endif
    }
 }

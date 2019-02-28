@@ -40,7 +40,10 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
                writer.Write(CustomFlagBytes);
                writer.Write(propBytes.Length);
                writer.Write(propBytes);
-               writer.Write(message.Content);
+               if (message.Content != null)
+               {
+                  writer.Write(message.Content);
+               }
             }
 
             result = new CloudQueueMessage((string)null);

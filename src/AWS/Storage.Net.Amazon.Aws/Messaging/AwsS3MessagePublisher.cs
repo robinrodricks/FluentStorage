@@ -20,6 +20,7 @@ namespace Storage.Net.Amazon.Aws.Messaging
       /// 
       /// </summary>
       /// <param name="serviceUrl">Serivce URL, for instance http://sqs.us-west-2.amazonaws.com"</param>
+      /// <param name="queueName"></param>
       /// <param name="regionEndpoint">Optional regional endpoint</param>
       public AwsS3MessagePublisher(string serviceUrl, string queueName, RegionEndpoint regionEndpoint)
       {
