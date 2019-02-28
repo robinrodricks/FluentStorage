@@ -11,7 +11,8 @@ namespace Storage.Net.Tests.Integration.Azure
 {
     public class LeakyAzureBlobStorageTest
     {
-        //[Fact]
+#if DEBUG
+        [Fact]
         public async Task Read_large_file()
         {
             IBlobStorage blobsGeneric = StorageFactory.Blobs.AzureBlobStorage("", "");
@@ -24,5 +25,6 @@ namespace Storage.Net.Tests.Integration.Azure
             byte[] data = new byte[100];
             int read = s.Read(data, 0, 20);
         }
+#endif
     }
 }

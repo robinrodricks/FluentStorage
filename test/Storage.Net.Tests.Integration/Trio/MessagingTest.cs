@@ -141,6 +141,7 @@ namespace Storage.Net.Tests.Integration.Messaging
                     _receiver = StorageFactory.Messages.InMemoryReceiver(inMemoryTag);
                     _publisher = StorageFactory.Messages.InMemoryPublisher(inMemoryTag);
                     break;
+#if DEBUG
                 case "amazon-sqs":
                     _receiver = null;
                     _publisher = StorageFactory.Messages.AmazonSQSMessagePublisher(
@@ -148,6 +149,8 @@ namespace Storage.Net.Tests.Integration.Messaging
                         "integration",
                         RegionEndpoint.USEast1);
                     break;
+#endif
+
             }
         }
 
