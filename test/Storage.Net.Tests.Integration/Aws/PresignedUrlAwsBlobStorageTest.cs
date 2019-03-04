@@ -20,7 +20,7 @@ namespace Storage.Net.Tests.Integration.Aws
         private readonly ITestOutputHelper _output;
         private readonly IBlobStorage _blobStorage;
         private readonly IAwsS3BlobStorageNativeOperations _awsClient;
-        private const string MimeType = MimeTypeNames.ApplicationOctetStream;
+        private const string MimeType = Misc.MimeType.ApplicationOctetStream;
 
         private const string TestFileName = @"test.bin";
         private const string TestFilePath = @"Data\" + TestFileName;

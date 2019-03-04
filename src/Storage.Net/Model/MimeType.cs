@@ -6,7 +6,7 @@
    /// <summary>
    /// Common mime types. 
    /// </summary>
-   public static class MimeTypeNames
+   public static class MimeType
    {
       ///<summary>Used to denote the encoding necessary for files containing JavaScript source code. The alternative MIME type for this file type is text/javascript.</summary>
       public const string ApplicationXJavascript = "application/x-javascript";
