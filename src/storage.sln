@@ -1,13 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.421
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28714.193
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{59E9D41F-BCD2-4A64-B62F-515B78986B63}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{D1BF1BDC-D99C-4C85-AF21-34AC49F49319}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		..\azure-pipelines-integration.yml = ..\azure-pipelines-integration.yml
+		..\azure-pipelines.yml = ..\azure-pipelines.yml
+		..\build.ini = ..\build.ini
 		JsonExtensions.cs = JsonExtensions.cs
 	EndProjectSection
 EndProject
