@@ -14,6 +14,7 @@ pr:
   paths:
     exclude:
       - README.md
+      - /doc/**/*
 
 steps:
 - task: gittools.gitversion.gitversion-task.GitVersion@4
