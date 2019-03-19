@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Messaging
 {
@@ -12,7 +13,8 @@ namespace Storage.Net.Messaging
       /// </summary>
       public static Task PutMessageAsync(this IMessagePublisher messagePublisher, QueueMessage message)
       {
-         if (message == null) return Task.FromResult(false);
+         if(message == null)
+            throw new ArgumentNullException(nameof(message));
 
          return messagePublisher.PutMessagesAsync(new[] { message });
       }

@@ -16,6 +16,9 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
 
       public static CloudQueueMessage ToCloudQueueMessage(QueueMessage message)
       {
+         if(message == null)
+            throw new ArgumentNullException(nameof(message));
+
          //when there are no properties pack the data as binary in raw form
          if(message.Properties == null || message.Properties.Count == 0)
          {

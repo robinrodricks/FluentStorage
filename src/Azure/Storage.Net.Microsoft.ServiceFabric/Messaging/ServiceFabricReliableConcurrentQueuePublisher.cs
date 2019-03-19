@@ -23,7 +23,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
          _timeout = timeout;
       }
 
-      public async Task PutMessagesAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken)
+      public async Task PutMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken)
       {
          IReliableConcurrentQueue<byte[]> collection = await _stateManager.GetOrAddAsync<IReliableConcurrentQueue<byte[]>>(_queueName);
 

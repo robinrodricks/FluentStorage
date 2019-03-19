@@ -60,7 +60,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       /// Pushes new messages to storage queue. Due to the fact storage queues don't support batched pushes
       /// this method makes a call per message.
       /// </summary>
-      public async Task PutMessagesAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken)
+      public async Task PutMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken)
       {
          if (messages == null) return;
          foreach (QueueMessage message in messages)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.EventHubs;
 using NetBox.Extensions;
 using Storage.Net.Messaging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,6 +11,9 @@ namespace Storage.Net.Microsoft.Azure.EventHub
    {
       public static EventData ToEventData(QueueMessage message)
       {
+         if(message == null)
+            throw new ArgumentNullException(nameof(message));
+
          var ev = new EventData(message.Content);
          if(message.Properties.Count > 0)
          {
@@ -20,9 +24,15 @@ namespace Storage.Net.Microsoft.Azure.EventHub
 
       public static QueueMessage ToQueueMessage(EventData ed, string partitionId)
       {
+         if(ed == null)
+            return null;
+
          var r = new QueueMessage(ed.Body.Array);
          r.Properties.AddRange(ed.Properties.ToDictionary(kv => kv.Key, kv => kv.Value?.ToString()));
-         r.Properties.Add("x-eventhub-partitionid", partitionId);
+         if(partitionId != null)
+         {
+            r.Properties.Add("x-eventhub-partitionid", partitionId);
+         }
          return r;
       }
    }

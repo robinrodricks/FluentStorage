@@ -27,10 +27,16 @@ namespace Storage.Net.Messaging.Files
 
       #region [ Publisher ]
 
-      public Task PutMessagesAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
+      public Task PutMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default)
       {
+         if(messages == null)
+            return Task.FromResult(true);
+
          foreach (QueueMessage msg in messages)
          {
+            if(msg == null)
+               throw new ArgumentNullException(nameof(msg));
+
             string filePath = Path.Combine(_root, GenerateDiskId());
 
             File.WriteAllBytes(filePath, msg.ToByteArray());

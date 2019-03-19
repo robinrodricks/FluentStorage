@@ -229,6 +229,24 @@ namespace Storage.Net.Tests.Integration.Messaging
         }
 
         [Fact]
+        public async Task SendMessage_Null_ThrowsArgumentNull()
+        {
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _publisher.PutMessageAsync(null));
+        }
+
+        [Fact]
+        public async Task SendMessages_Null_DoesntFail()
+        {
+            await _publisher.PutMessagesAsync(null);
+        }
+
+        [Fact]
+        public async Task SendMessages_SomeNull_ThrowsArgumentNull()
+        {
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _publisher.PutMessagesAsync(new[] { QueueMessage.FromText("test"), null }));
+        }
+
+        [Fact]
         public async Task SendMessage_ExtraProperties_DoesntCrash()
         {
             var msg = new QueueMessage("prop content at " + DateTime.UtcNow);

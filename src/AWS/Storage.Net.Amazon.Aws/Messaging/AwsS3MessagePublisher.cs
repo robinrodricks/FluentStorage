@@ -34,7 +34,7 @@ namespace Storage.Net.Amazon.Aws.Messaging
          _queueName = queueName;
       }
 
-      public async Task PutMessagesAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
+      public async Task PutMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default)
       {
          var sqs = messages.Select(ToSQSMessage).ToList();
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.ServiceBus;
+using System;
 using System.Collections.Generic;
 using QueueMessage = Storage.Net.Messaging.QueueMessage;
 
@@ -8,6 +9,9 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus
    {
       public static Message ToMessage(QueueMessage message)
       {
+         if(message == null)
+            throw new ArgumentNullException(nameof(message));
+
          var result = new Message(message.Content);
          if(message.Properties != null && message.Properties.Count > 0)
          {

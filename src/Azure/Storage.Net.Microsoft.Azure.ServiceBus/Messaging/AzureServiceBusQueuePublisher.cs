@@ -31,7 +31,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
       /// <summary>
       /// Puts message to the queue with default options
       /// </summary>
-      public async Task PutMessagesAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken)
+      public async Task PutMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken)
       {
          if (messages == null) return;
 

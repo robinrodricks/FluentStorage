@@ -29,7 +29,7 @@ namespace Storage.Net.Messaging.Large
          _keepPublisherOpen = keepPublisherOpen;
       }
 
-      public async Task PutMessagesAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
+      public async Task PutMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default)
       {
          if (messages == null) return;
 

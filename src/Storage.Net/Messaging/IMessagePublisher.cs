@@ -14,6 +14,6 @@ namespace Storage.Net.Messaging
       /// Puts a new batch of messages to the back of the queue as quick and efficient as possible for
       /// a given queue implementation.
       /// </summary>
-      Task PutMessagesAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default);
+      Task PutMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default);
    }
 }
