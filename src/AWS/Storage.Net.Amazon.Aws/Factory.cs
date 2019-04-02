@@ -67,22 +67,44 @@ namespace Storage.Net
          return new AwsS3BlobStorageProvider(accessKeyId, secretAccessKey, bucketName, clientConfig);
       }
 
-#if DEBUG
       /// <summary>
       /// Creates Amazon Simple Queue Service publisher
       /// </summary>
       /// <param name="factory"></param>
+      /// <param name="accessKeyId">Access key ID</param>
+      /// <param name="secretAccessKey">Secret access key</param>
       /// <param name="serviceUrl"></param>
       /// <param name="queueName"></param>
       /// <param name="regionEndpoint"></param>
       /// <returns></returns>
       public static IMessagePublisher AmazonSQSMessagePublisher(this IMessagingFactory factory,
+         string accessKeyId,
+         string secretAccessKey,
          string serviceUrl,
          string queueName,
          RegionEndpoint regionEndpoint = null)
       {
-         return new AwsS3MessagePublisher(serviceUrl, queueName, regionEndpoint);
+         return new AwsS3MessagePublisher(accessKeyId, secretAccessKey, serviceUrl, queueName, regionEndpoint);
       }
-#endif
+
+      /// <summary>
+      /// Creates Amazon Simple Queue Service receiver
+      /// </summary>
+      /// <param name="factory"></param>
+      /// <param name="accessKeyId">Access key ID</param>
+      /// <param name="secretAccessKey">Secret access key</param>
+      /// <param name="serviceUrl"></param>
+      /// <param name="queueName"></param>
+      /// <param name="regionEndpoint"></param>
+      /// <returns></returns>
+      public static IMessageReceiver AmazonSQSMessageReceiver(this IMessagingFactory factory,
+         string accessKeyId,
+         string secretAccessKey,
+         string serviceUrl,
+         string queueName,
+         RegionEndpoint regionEndpoint = null)
+      {
+         return new AwsS3MessageReceiver(accessKeyId, secretAccessKey, serviceUrl, queueName, regionEndpoint);
+      }
    }
 }
