@@ -39,7 +39,7 @@ namespace Storage.Net.Ftp
          return _client;
       }
 
-      public async Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default(CancellationToken))
+      public async Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default)
       {
          FtpClient client = await GetClientAsync();
 
@@ -168,7 +168,7 @@ namespace Storage.Net.Ftp
       {
          FtpClient client = await GetClientAsync();
 
-         await client.UploadAsync(sourceStream, id, FtpExists.Overwrite, true, cancellationToken, null);
+         await client.UploadAsync(sourceStream, id, FtpExists.Overwrite, true, null, cancellationToken);
       }
 
       public void Dispose()

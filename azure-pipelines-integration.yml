@@ -20,13 +20,42 @@ variables:
   - group: 'External Resources'
 
 steps:
+
 - task: gittools.gitversion.gitversion-task.GitVersion@4
   displayName: GitVersion
   inputs:
     preferBundledVersion: false
+
+- task: petersendev.dotnet-global-tool-installer.DotnetGlobalToolInstaller.DotnetGlobalToolInstaller@0
+  displayName: 'Install SQ Scanner'
+  inputs:
+    name: 'dotnet-sonarscanner'
+    checkLatest: true
+
 - task: DotNetCoreCLI@2
-  displayName: 'run integration tests'
+  displayName: 'Integration and Unit Test (with coverlet)'
+  continueOnError: true
   inputs:
     command: test
-    projects: test/Storage.Net.Tests.Integration
-    arguments: '-c debug'
+    projects: ./src/storage.sln
+    arguments: '/p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Exclude="[xunit*]*%2c[*Test*]*" /p:CoverletOutput=$(Build.StagingDirectory)/coverage.xml'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Begin SQ analysis'
+  inputs:
+    command: custom
+    custom: sonarscanner
+    arguments: 'begin /k:"aloneguid_storage" /o:"aloneguid-github" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="$(Sonar.Login)" /d:sonar.cs.opencover.reportsPaths="$(Build.StagingDirectory)/coverage.xml"'
+
+#SQ requires building the whole solution, specifically from .sln file, otherwise everything fails miserably
+- task: DotNetCoreCLI@2
+  displayName: 'Build Solution'
+  inputs:
+    projects: src/storage.sln
+
+- task: DotNetCoreCLI@2
+  displayName: 'End SQ analysis'
+  inputs:
+    command: custom
+    custom: sonarscanner
+    arguments: 'end /d:sonar.login="$(Sonar.Login)"'

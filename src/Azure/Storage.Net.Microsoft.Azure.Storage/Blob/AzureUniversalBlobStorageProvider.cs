@@ -14,7 +14,7 @@ using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blob
 {
-   class AzureUniversalBlobStorageProvider : IBlobStorage, IAzureBlobStorageNativeOperations
+   class AzureUniversalBlobStorageProvider : IAzureBlobStorageNativeOperations
    {
       private readonly CloudBlobClient _client;
       private readonly ConcurrentDictionary<string, CloudBlobContainer> _containerNameToContainer = new ConcurrentDictionary<string, CloudBlobContainer>();
@@ -228,7 +228,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             if (!AzureStorageValidation.TryHandleStorageException(ex)) throw;
          }
 
-         throw new Exception("must not be here");
+         throw new InvalidOperationException("must not be here");
       }
 
       public async Task<Stream> OpenRandomAccessReadAsync(string id, CancellationToken cancellationToken = default)
@@ -279,7 +279,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          if (append)
          {
             CloudAppendBlob cab = container.GetAppendBlobReference(StoragePath.Normalize(path, false));
-            if (!(await cab.ExistsAsync())) await cab.CreateOrReplaceAsync();
+            if (!await cab.ExistsAsync()) await cab.CreateOrReplaceAsync();
 
             await cab.AppendFromStreamAsync(sourceStream);
 
@@ -327,7 +327,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
             if (!AzureStorageValidation.TryHandleStorageException(ex)) throw;
          }
 
-         throw new Exception("must not be here");
+         throw new InvalidOperationException("must not be here");
       }
 
       #region [ Path forking ]
@@ -371,14 +371,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          }
 
          return (container, relativePath);
-      }
-
-      private string GetRelativePath(string path)
-      {
-         int idx = path.IndexOf(StoragePath.PathSeparator);
-         if (idx == -1) throw new ArgumentException("blob path must contain container name", nameof(path));
-
-         return path.Substring(idx);
       }
 
       #endregion

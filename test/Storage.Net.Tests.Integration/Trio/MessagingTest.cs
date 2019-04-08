@@ -218,11 +218,10 @@ namespace Storage.Net.Tests.Integration.Messaging
 
             if(candidate != null && _receivedMessages.Count >= minCount)
             {
-               //_receivedMessages.Clear();
                return candidate;
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
          }
 
          return null;
@@ -239,6 +238,12 @@ namespace Storage.Net.Tests.Integration.Messaging
       public async Task SendMessage_Null_ThrowsArgumentNull()
       {
          await Assert.ThrowsAsync<ArgumentNullException>(() => _publisher.PutMessageAsync(null));
+      }
+
+      [Fact]
+      public async Task SendMessages_LargeAmount_Succeeds()
+      {
+         await _publisher.PutMessagesAsync(Enumerable.Range(0, 100).Select(i => QueueMessage.FromText("message #" + i)).ToList());
       }
 
       [Fact]
@@ -287,7 +292,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          QueueMessage received = await WaitMessage(_tag);
 
-         Assert.NotNull(received);
+         Assert.True(received != null, "no message received with tag " + _tag);
          Assert.Equal(content, received.StringContent);
          Assert.Equal("v1", received.Properties["one"]);
       }
@@ -312,7 +317,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          await _publisher.PutMessagesAsync(messages);
 
-         await WaitMessage(null, TimeSpan.FromSeconds(5), 10);
+         await WaitMessage(null, null, 10);
 
          Assert.True(_receivedMessages.Count >= 10, _receivedMessages.Count.ToString());
       }
@@ -320,7 +325,9 @@ namespace Storage.Net.Tests.Integration.Messaging
       [Fact]
       public async Task MessageCount_IsGreaterThanZero()
       {
-         await _publisher.PutMessageAsync(QueueMessage.FromText("test for count"));
+         //put quite a few messages
+
+         await _publisher.PutMessagesAsync(Enumerable.Range(0, 100).Select(i => QueueMessage.FromText("message #" + i)).ToList());
 
          try
          {

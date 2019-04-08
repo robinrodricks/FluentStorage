@@ -38,7 +38,7 @@ namespace Storage.Net.Blob.Files
          }
       }
 
-      public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken))
+      public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
          ZipArchive zipArchive = GetArchive(false);
          if(zipArchive == null)
@@ -60,7 +60,7 @@ namespace Storage.Net.Blob.Files
          return Task.FromResult<IReadOnlyCollection<bool>>(result);
       }
 
-      public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default(CancellationToken))
+      public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
          var result = new List<BlobMeta>();
          ZipArchive zipArchive = GetArchive(false);
@@ -86,7 +86,7 @@ namespace Storage.Net.Blob.Files
          return Task.FromResult<IEnumerable<BlobMeta>>(result);
       }
 
-      public Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken = default(CancellationToken))
+      public Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken = default)
       {
          if (!File.Exists(_filePath)) return Task.FromResult<IReadOnlyCollection<BlobId>>(new List<BlobId>());
 
@@ -101,7 +101,7 @@ namespace Storage.Net.Blob.Files
          return Task.FromResult<IReadOnlyCollection<BlobId>>(ids.ToList());
       }
 
-      public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
+      public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default)
       {
          id = StoragePath.Normalize(id, false);
 
@@ -119,7 +119,7 @@ namespace Storage.Net.Blob.Files
          return Task.FromResult(EmptyTransaction.Instance);
       }
 
-      public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
+      public async Task WriteAsync(string id, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
       {
          id = StoragePath.Normalize(id, false);
          ZipArchive archive = GetArchive(true);
@@ -132,7 +132,7 @@ namespace Storage.Net.Blob.Files
          }
       }
 
-      public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
          ZipArchive archive = GetArchive(true);
 
@@ -149,7 +149,7 @@ namespace Storage.Net.Blob.Files
             }
             catch(NotSupportedException)
             {
-
+               //ignore this
             }
          }
 
