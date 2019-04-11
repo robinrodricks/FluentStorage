@@ -1,261 +1,59 @@
 ﻿using Xunit;
 using Storage.Net.Messaging;
 using System;
-using LogMagic;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using NetBox;
 using System.Linq;
-using Config.Net;
 using NetBox.Generator;
-using System.Threading;
 using System.Diagnostics;
-using Amazon;
-using Storage.Net.Blob;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
-   #region [ Test Variations ]
 
-   public class AzureStorageQueueMessageQueueTest : MessagingTest
+   public abstract class MessagingTest : IAsyncLifetime
    {
-      public AzureStorageQueueMessageQueueTest() : base("azure-storage-queue") { }
-   }
+      private readonly MessagingFixture _fixture;
 
-   public class AzureLargeStorageQueueMessageQueueTest : MessagingTest
-   {
-      public AzureLargeStorageQueueMessageQueueTest() : base("azure-storage-queue-large") { }
-   }
-
-   public class AzureServiceBusQueueMessageQeueueTest : MessagingTest
-   {
-      public AzureServiceBusQueueMessageQeueueTest() : base("azure-servicebus-queue") { }
-   }
-
-   public class AzureServiceBusTopicMessageQeueueTest : MessagingTest
-   {
-      public AzureServiceBusTopicMessageQeueueTest() : base("azure-servicebus-topic") { }
-   }
-
-   public class AzureEventHubMessageQeueueTest : MessagingTest
-   {
-      public AzureEventHubMessageQeueueTest() : base("azure-eventhub") { }
-   }
-
-   public class DirectoryFilesMessagingTest : MessagingTest
-   {
-      public DirectoryFilesMessagingTest() : base("directory") { }
-   }
-
-   /*public class InMemoryMessageQeueueTest : MessagingTest
-   {
-       public InMemoryMessageQeueueTest() : base("inmemory") { }
-   }*/
-
-   public class AmazonSQSMessageQueueTest : MessagingTest
-   {
-      public AmazonSQSMessageQueueTest() : base("amazon-sqs") { }
-   }
-
-   #endregion
-
-   public abstract class MessagingTest : AbstractTestFixture, IAsyncLifetime
-   {
-      private readonly ILog _log = L.G<MessagingTest>();
-      private readonly string _name;
-      private readonly IMessagePublisher _publisher;
-      private readonly IMessageReceiver _receiver;
-      private readonly List<QueueMessage> _receivedMessages = new List<QueueMessage>();
-      private readonly ITestSettings _settings;
-      private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-      private static readonly TimeSpan MaxWaitTime = TimeSpan.FromMinutes(1);
-      private readonly string _tag = Guid.NewGuid().ToString();
-
-      protected MessagingTest(string name)
+      public MessagingTest(MessagingFixture fixture)
       {
-         _settings = new ConfigurationBuilder<ITestSettings>()
-            .UseIniFile("c:\\tmp\\integration-tests.ini")
-            .UseEnvironmentVariables()
-            .Build();
-
-         _name = name;
-
-         switch(_name)
-         {
-            case "azure-storage-queue":
-               _publisher = StorageFactory.Messages.AzureStorageQueuePublisher(
-                  _settings.AzureStorageName,
-                  _settings.AzureStorageKey,
-                  _settings.AzureStorageQueueName);
-               _receiver = StorageFactory.Messages.AzureStorageQueueReceiver(
-                  _settings.AzureStorageName,
-                  _settings.AzureStorageKey,
-                  _settings.AzureStorageQueueName,
-                  TimeSpan.FromMinutes(1),
-                  TimeSpan.FromMilliseconds(500));
-               break;
-            case "azure-storage-queue-large":
-               IBlobStorage offloadStorage = StorageFactory.Blobs.AzureBlobStorage(_settings.AzureStorageName, _settings.AzureStorageKey);
-               string largeQueueName = _settings.AzureStorageQueueName + "lg";
-               _publisher = StorageFactory.Messages.AzureStorageQueuePublisher(
-                  _settings.AzureStorageName,
-                  _settings.AzureStorageKey,
-                  largeQueueName)
-                  .HandleLargeContent(offloadStorage, 2);
-               _receiver = StorageFactory.Messages.AzureStorageQueueReceiver(
-                  _settings.AzureStorageName,
-                  _settings.AzureStorageKey,
-                  largeQueueName,
-                  TimeSpan.FromMinutes(1),
-                  TimeSpan.FromMilliseconds(500))
-                  .HandleLargeContent(offloadStorage);
-               break;
-            case "azure-servicebus-queue":
-               _receiver = StorageFactory.Messages.AzureServiceBusQueueReceiver(
-                  _settings.ServiceBusConnectionString,
-                  "testqueue",
-                  true);
-               _publisher = StorageFactory.Messages.AzureServiceBusQueuePublisher(
-                  _settings.ServiceBusConnectionString,
-                  "testqueue");
-               break;
-            case "azure-servicebus-topic":
-               _receiver = StorageFactory.Messages.AzureServiceBusTopicReceiver(
-                  _settings.ServiceBusConnectionString,
-                  "testtopic",
-                  "testsub",
-                  true);
-               _publisher = StorageFactory.Messages.AzureServiceBusTopicPublisher(
-                  _settings.ServiceBusConnectionString,
-                  "testtopic");
-               break;
-            case "azure-eventhub":
-               _receiver = StorageFactory.Messages.AzureEventHubReceiver(
-                  _settings.EventHubConnectionString,
-                  _settings.EventHubPath,
-                  null,
-                  null,
-                  StorageFactory.Blobs.AzureBlobStorage(
-                     _settings.AzureStorageName,
-                     _settings.AzureStorageKey));
-               _publisher = StorageFactory.Messages.AzureEventHubPublisher(
-                  _settings.EventHubConnectionString,
-                  _settings.EventHubPath);
-               break;
-            case "inmemory":
-               string inMemoryTag = RandomGenerator.RandomString;
-               _receiver = StorageFactory.Messages.InMemoryReceiver(inMemoryTag);
-               _publisher = StorageFactory.Messages.InMemoryPublisher(inMemoryTag);
-               break;
-            case "directory":
-               string path = TestDir.FullName;
-               _publisher = StorageFactory.Messages.DirectoryFilesPublisher(path);
-               _receiver = StorageFactory.Messages.DirectoryFilesReceiver(path);
-               break;
-            case "amazon-sqs":
-               _receiver = StorageFactory.Messages.AmazonSQSMessageReceiver(
-                  _settings.AwsAccessKeyId,
-                  _settings.AwsSecretAccessKey,
-                   "https://sqs.us-east-1.amazonaws.com",
-                   "integration",
-                   RegionEndpoint.USEast1);
-               _publisher = StorageFactory.Messages.AmazonSQSMessagePublisher(
-                  _settings.AwsAccessKeyId,
-                  _settings.AwsSecretAccessKey,
-                   "https://sqs.us-east-1.amazonaws.com",
-                   "integration",
-                   RegionEndpoint.USEast1);
-               break;
-         }
+         _fixture = fixture;
       }
 
       public async Task InitializeAsync()
       {
-         if(_receiver == null)
-            return;
-         //start the pump
-         await _receiver.StartMessagePumpAsync(ReceiverPump, cancellationToken: _cts.Token, maxBatchSize: 500);
-
+         await _fixture.StartPumpAsync();
       }
 
       public Task DisposeAsync() => Task.CompletedTask;
-
-      public override void Dispose()
-      {
-         _cts.Cancel();
-
-         if(_publisher != null)
-            _publisher.Dispose();
-         if(_receiver != null)
-            _receiver.Dispose();
-
-         base.Dispose();
-      }
-
-      private async Task ReceiverPump(IReadOnlyCollection<QueueMessage> messages)
-      {
-         _receivedMessages.AddRange(messages);
-
-         Trace.WriteLine($"total received: {_receivedMessages.Count}");
-
-         await _receiver.ConfirmMessagesAsync(messages);
-      }
-
-      private async Task PutMessageAsync(QueueMessage message, string tag)
-      {
-         message.Properties["tag"] = tag;
-
-         await _publisher.PutMessagesAsync(new[] { message });
-      }
-
-      private async Task<QueueMessage> WaitMessage(string tag, TimeSpan? maxWaitTime = null, int minCount = 1)
-      {
-         DateTime start = DateTime.UtcNow;
-
-         while((DateTime.UtcNow - start) < (maxWaitTime ?? MaxWaitTime))
-         {
-            QueueMessage candidate = _receivedMessages.FirstOrDefault(m => m.Properties.ContainsKey("tag") && m.Properties["tag"] == tag);
-
-            if(candidate != null && _receivedMessages.Count >= minCount)
-            {
-               return candidate;
-            }
-
-            await Task.Delay(TimeSpan.FromMilliseconds(100));
-         }
-
-         return null;
-      }
 
       [Fact]
       public async Task SendMessage_OneMessage_DoesntCrash()
       {
          var qm = QueueMessage.FromText("test");
-         await _publisher.PutMessagesAsync(new[] { qm });
+         await _fixture.Publisher.PutMessagesAsync(new[] { qm });
       }
 
       [Fact]
       public async Task SendMessage_Null_ThrowsArgumentNull()
       {
-         await Assert.ThrowsAsync<ArgumentNullException>(() => _publisher.PutMessageAsync(null));
+         await Assert.ThrowsAsync<ArgumentNullException>(() => _fixture.Publisher.PutMessageAsync(null));
       }
 
       [Fact]
       public async Task SendMessages_LargeAmount_Succeeds()
       {
-         await _publisher.PutMessagesAsync(Enumerable.Range(0, 100).Select(i => QueueMessage.FromText("message #" + i)).ToList());
+         await _fixture.Publisher.PutMessagesAsync(Enumerable.Range(0, 100).Select(i => QueueMessage.FromText("message #" + i)).ToList());
       }
 
       [Fact]
       public async Task SendMessages_Null_DoesntFail()
       {
-         await _publisher.PutMessagesAsync(null);
+         await _fixture.Publisher.PutMessagesAsync(null);
       }
 
       [Fact]
       public async Task SendMessages_SomeNull_ThrowsArgumentNull()
       {
-         await Assert.ThrowsAsync<ArgumentNullException>(() => _publisher.PutMessagesAsync(new[] { QueueMessage.FromText("test"), null }));
+         await Assert.ThrowsAsync<ArgumentNullException>(() => _fixture.Publisher.PutMessagesAsync(new[] { QueueMessage.FromText("test"), null }));
       }
 
       [Fact]
@@ -264,7 +62,7 @@ namespace Storage.Net.Tests.Integration.Messaging
          var msg = new QueueMessage("prop content at " + DateTime.UtcNow);
          msg.Properties["one"] = "one value";
          msg.Properties["two"] = "two value";
-         await _publisher.PutMessagesAsync(new[] { msg });
+         await _fixture.Publisher.PutMessagesAsync(new[] { msg });
       }
 
       [Fact]
@@ -272,11 +70,11 @@ namespace Storage.Net.Tests.Integration.Messaging
       {
          string content = RandomGenerator.RandomString;
 
-         await PutMessageAsync(new QueueMessage(content), _tag);
+         string tag = await _fixture.PutMessageAsync(new QueueMessage(content));
 
-         QueueMessage received = await WaitMessage(_tag);
+         QueueMessage received = await _fixture.WaitMessageAsync(tag);
 
-         Assert.NotNull(received);
+         Assert.True(received != null, $"no messages received with tag {tag}, {_fixture.GetMessageCount()} received in total");
          Assert.Equal(content, received.StringContent);
       }
 
@@ -288,11 +86,11 @@ namespace Storage.Net.Tests.Integration.Messaging
          var msg = new QueueMessage(content);
          msg.Properties["one"] = "v1";
 
-         await PutMessageAsync(msg, _tag);
+         string tag = await _fixture.PutMessageAsync(msg);
 
-         QueueMessage received = await WaitMessage(_tag);
+         QueueMessage received = await _fixture.WaitMessageAsync(tag);
 
-         Assert.True(received != null, "no message received with tag " + _tag);
+         Assert.True(received != null, "no message received with tag " + tag);
          Assert.Equal(content, received.StringContent);
          Assert.Equal("v1", received.Properties["one"]);
       }
@@ -302,9 +100,9 @@ namespace Storage.Net.Tests.Integration.Messaging
       {
          string content = RandomGenerator.RandomString;
          var msg = new QueueMessage(content);
-         await PutMessageAsync(msg, _tag);
+         string tag = await _fixture.PutMessageAsync(msg);
 
-         QueueMessage rmsg = await WaitMessage(_tag);
+         QueueMessage rmsg = await _fixture.WaitMessageAsync(tag);
          Assert.NotNull(rmsg);
       }
 
@@ -315,11 +113,12 @@ namespace Storage.Net.Tests.Integration.Messaging
             .Select(i => new QueueMessage(nameof(MessagePump_AddFewMessages_CanReceiveOneAndPumpClearsThemAll) + "#" + i))
             .ToArray();
 
-         await _publisher.PutMessagesAsync(messages);
+         int prevCount = _fixture.GetMessageCount();
+         await _fixture.Publisher.PutMessagesAsync(messages);
+         await Task.Delay(TimeSpan.FromSeconds(10));
+         int nowCount = _fixture.GetMessageCount();
 
-         await WaitMessage(null, null, 10);
-
-         Assert.True(_receivedMessages.Count >= 10, _receivedMessages.Count.ToString());
+         Assert.True(nowCount - prevCount >= 10, $"was: {prevCount}, now: {nowCount}, needs at least 10");
       }
 
       [Fact]
@@ -327,11 +126,11 @@ namespace Storage.Net.Tests.Integration.Messaging
       {
          //put quite a few messages
 
-         await _publisher.PutMessagesAsync(Enumerable.Range(0, 100).Select(i => QueueMessage.FromText("message #" + i)).ToList());
+         await _fixture.Publisher.PutMessagesAsync(Enumerable.Range(0, 100).Select(i => QueueMessage.FromText("message #" + i)).ToList());
 
          try
          {
-            int count = await _receiver.GetMessageCountAsync();
+            int count = await _fixture.Receiver.GetMessageCountAsync();
 
             Assert.True(count > 0);
          }
