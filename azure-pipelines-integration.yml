@@ -6,7 +6,7 @@ trigger:
   branches:
     include:
       - master
-        paths:
+  paths:
     exclude:
       - README.md
       - /doc/**/*
