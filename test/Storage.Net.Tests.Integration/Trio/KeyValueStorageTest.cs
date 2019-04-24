@@ -36,10 +36,7 @@ namespace Storage.Net.Tests.Integration.KeyValue
 
       protected KeyValueStorageTest(string name)
       {
-         _settings = new ConfigurationBuilder<ITestSettings>()
-            .UseIniFile("c:\\tmp\\integration-tests.ini")
-            .UseEnvironmentVariables()
-            .Build();
+         _settings = Settings.Instance;
 
          _name = name;
 
