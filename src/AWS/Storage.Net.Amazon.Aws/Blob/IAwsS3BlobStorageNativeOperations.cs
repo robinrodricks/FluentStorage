@@ -1,12 +1,13 @@
 ﻿using System.Threading.Tasks;
 using Amazon.S3;
+using Storage.Net.Blob;
 
 namespace Storage.Net.Amazon.Aws.Blob
 {
    /// <summary>
    /// Provides access to native operations
    /// </summary>
-   public interface IAwsS3BlobStorageNativeOperations
+   public interface IAwsS3BlobStorage : IBlobStorage
    {
       /// <summary>
       /// Returns reference to the native AWS S3 blob client.

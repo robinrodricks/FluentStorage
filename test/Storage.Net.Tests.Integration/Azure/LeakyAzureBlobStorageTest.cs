@@ -10,14 +10,14 @@ namespace Storage.Net.Tests.Integration.Azure
    public class LeakyAzureBlobStorageTest
    {
       private readonly IBlobStorage _storage;
-      private readonly IAzureBlobStorageNativeOperations _native;
+      private readonly IAzureBlobStorage _native;
 
       public LeakyAzureBlobStorageTest()
       {
          ITestSettings settings = Settings.Instance;
 
          _storage = StorageFactory.Blobs.AzureBlobStorage(settings.AzureStorageName, settings.AzureStorageKey);
-         _native = (IAzureBlobStorageNativeOperations)_storage;
+         _native = (IAzureBlobStorage)_storage;
       }
 
       [Fact]

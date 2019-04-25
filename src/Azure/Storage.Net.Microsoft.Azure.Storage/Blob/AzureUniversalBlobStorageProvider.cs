@@ -14,7 +14,7 @@ using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blob
 {
-   class AzureUniversalBlobStorageProvider : IAzureBlobStorageNativeOperations
+   class AzureUniversalBlobStorageProvider : IAzureBlobStorage
    {
       private readonly CloudBlobClient _client;
       private readonly ConcurrentDictionary<string, CloudBlobContainer> _containerNameToContainer = new ConcurrentDictionary<string, CloudBlobContainer>();
@@ -295,15 +295,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
       public async Task<string> GetSasUriAsync(
          string id,
          SharedAccessBlobPolicy sasConstraints,
-         bool createContainer,
-         CancellationToken cancellationToken)
-      {
-         return await GetSasUriAsync(id, sasConstraints, null, createContainer, cancellationToken);
-      }
-
-      public async Task<string> GetSasUriAsync(
-         string id,
-         SharedAccessBlobPolicy sasConstraints,
          SharedAccessBlobHeaders headers,
          bool createContainer,
          CancellationToken cancellationToken)
@@ -329,6 +320,76 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          throw new InvalidOperationException("must not be here");
       }
+
+      #region [ Native Operations ] 
+
+      /// <summary>
+      /// Returns Uri to Azure Blob with read-only Shared Access Token.
+      /// </summary>
+      public async Task<string> GetReadOnlySasUriAsync(
+         string id,
+         SharedAccessBlobHeaders headers = null,
+         int minutesToExpiration = 30,
+         CancellationToken cancellationToken = default)
+      {
+         return await GetSasUriAsync(
+            id,
+            GetSharedAccessBlobPolicy(minutesToExpiration, SharedAccessBlobPermissions.Read),
+            headers: headers,
+            createContainer: false,
+            cancellationToken);
+      }
+
+      /// <summary>
+      /// Returns Uri to Azure Blob with write-only Shared Access Token.
+      /// </summary>
+      public async Task<string> GetWriteOnlySasUriAsync(
+         string id,
+         SharedAccessBlobHeaders headers = null,
+         int minutesToExpiration = 30,
+         CancellationToken cancellationToken = default)
+      {
+         return await GetSasUriAsync(
+            id,
+            GetSharedAccessBlobPolicy(minutesToExpiration, SharedAccessBlobPermissions.Write),
+            headers: headers,
+            createContainer: true,
+            cancellationToken);
+      }
+
+      /// <summary>
+      /// Returns Uri to Azure Blob with read-write Shared Access Token.
+      /// </summary>
+      public async Task<string> GetReadWriteSasUriAsync(
+         string id,
+         SharedAccessBlobHeaders headers = null,
+         int minutesToExpiration = 30,
+         CancellationToken cancellationToken = default)
+      {
+         return await GetSasUriAsync(
+            id,
+            GetSharedAccessBlobPolicy(minutesToExpiration, SharedAccessBlobPermissions.Read | SharedAccessBlobPermissions.Write),
+            headers: headers,
+            createContainer: true,
+            cancellationToken);
+      }
+
+      private static SharedAccessBlobPolicy GetSharedAccessBlobPolicy(
+          int minutesToExpiration,
+          SharedAccessBlobPermissions permissions,
+          int startTimeCorrection = -5)
+      {
+         DateTimeOffset now = DateTimeOffset.UtcNow;
+
+         return new SharedAccessBlobPolicy
+         {
+            SharedAccessStartTime = now.AddMinutes(startTimeCorrection),
+            SharedAccessExpiryTime = now.AddMinutes(minutesToExpiration),
+            Permissions = permissions,
+         };
+      }
+
+      #endregion
 
       #region [ Path forking ]
 

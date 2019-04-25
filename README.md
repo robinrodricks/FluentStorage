@@ -136,6 +136,8 @@ public async Task BlobStorage_sample2()
 }
 ```
 
+You can find the list of supported blob storage implementations [here](doc/blobs.md).
+
 ### Key-Value Storage
 
 The intention of creating a simplistic key-value storage is to abstract away different implementations of storing key-value data. An entry point to key-value storage is [IKeyValueStorage](src/Storage.Net/KeyValue/IKeyValueStorage.cs) interface. As with blobs, you can create this interface by calling to one of the factory methods:
@@ -143,6 +145,8 @@ The intention of creating a simplistic key-value storage is to abstract away dif
 ![](doc/storagefactory-intellisense-kv.gif)
 
 Once created, you can start working with key-value storage using one of the methods available in `IKeyValueStorage`.
+
+You can find the list of supported key-value implementations [here](doc/keyvalue.md).
 
 ### Messaging
 
@@ -176,6 +180,8 @@ starts a message pump that listens for incoming queue messages and calls `Func<I
 `maxBatchSize` is a number specifying how many messages you are ready to handle at once in your callback. Choose this number carefully as specifying number too low will result in slower message processing, whereas number too large will increase RAM requirements for your software.
 
 `cancellationToken` is used to signal the message pump to stop. Not passing any parameter there will result in never stopping message pump. See example below in Use Cases for a pattern on how to use this parameter.
+
+You can find the list of supported messaging implementations [here](doc/messaging.md).
 
 #### Handling Large Messages
 
