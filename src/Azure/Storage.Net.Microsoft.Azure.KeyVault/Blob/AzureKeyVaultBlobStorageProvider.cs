@@ -135,7 +135,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
       {
          GenericValidation.CheckBlobId(ids);
 
-         return await Task.WhenAll(ids.Select(id => ExistsAsync(id, cancellationToken)));
+         return await Task.WhenAll(ids.Select(id => ExistsAsync(id)));
       }
 
       private async Task<bool> ExistsAsync(string id)
