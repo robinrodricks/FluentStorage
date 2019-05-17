@@ -15,6 +15,7 @@
       <AssemblyOriginatorKeyFile>../../storage.snk</AssemblyOriginatorKeyFile>
       <SignAssembly>true</SignAssembly>
       <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+      <LangVersion>latest</LangVersion>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
