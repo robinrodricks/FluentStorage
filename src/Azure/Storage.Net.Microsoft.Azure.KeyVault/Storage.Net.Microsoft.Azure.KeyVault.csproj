@@ -14,6 +14,7 @@
     <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
     <PackageLicenseUrl>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>GitHub</RepositoryType>
+     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
