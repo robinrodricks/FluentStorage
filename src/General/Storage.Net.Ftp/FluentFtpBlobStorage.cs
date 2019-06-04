@@ -6,6 +6,8 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentFTP;
+using Polly;
+using Polly.Retry;
 using Storage.Net.Blob;
 
 namespace Storage.Net.Ftp
@@ -14,10 +16,12 @@ namespace Storage.Net.Ftp
    {
       private readonly FtpClient _client;
       private readonly bool _dispose;
+      private static readonly AsyncRetryPolicy retryPolicy = Policy.Handle<FtpException>().RetryAsync(3);
 
       public FluentFtpBlobStorage(string hostNameOrAddress, NetworkCredential credentials)
          : this(new FtpClient(hostNameOrAddress, credentials), true)
       {
+         
       }
 
       public FluentFtpBlobStorage(FtpClient ftpClient, bool dispose = false)
@@ -159,7 +163,10 @@ namespace Storage.Net.Ftp
       {
          FtpClient client = await GetClientAsync();
 
-         return await client.OpenWriteAsync(id, FtpDataType.Binary, true);
+         return await retryPolicy.ExecuteAsync<Stream>(async () =>
+         {
+            return await client.OpenWriteAsync(id, FtpDataType.Binary, true);
+         });
       }
 
       public async Task WriteAsync(string id, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
