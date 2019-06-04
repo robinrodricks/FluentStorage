@@ -87,6 +87,7 @@ stages:
         organization: aloneguid-github
         projectKey: aloneguid_storage
         projectName: 'Storage.Net'
+        projectVersion: '$(GitVersion.SemVer)'
         extraProperties: 'sonar.cs.opencover.reportsPaths=$(Build.StagingDirectory)/coverage.xml'
 
     - task: DotNetCoreCLI@2
