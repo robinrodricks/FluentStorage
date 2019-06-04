@@ -126,5 +126,6 @@ namespace Storage.Net.Microsoft.ServiceFabric.Messaging
       }
 
       protected abstract Task<IReliableState> GetCollectionAsync();
+      public Task KeepAliveAsync(QueueMessage message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default) => throw new NotSupportedException();
    }
 }
