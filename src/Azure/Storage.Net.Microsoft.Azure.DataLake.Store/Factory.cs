@@ -1,6 +1,6 @@
-﻿using Storage.Net.Blob;
+﻿using Storage.Net.Blobs;
 using Storage.Net.Microsoft.Azure.DataLake.Store;
-using Storage.Net.Microsoft.Azure.DataLake.Store.Blob;
+using Storage.Net.Microsoft.Azure.DataLake.Store.Blobs;
 using System;
 using System.Net;
 

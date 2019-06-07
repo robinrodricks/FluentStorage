@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using Storage.Net.Blob;
+﻿using System.Net;
+using Storage.Net.Blobs;
 using Storage.Net.ConnectionString;
 using Storage.Net.KeyValue;
 using Storage.Net.Messaging;

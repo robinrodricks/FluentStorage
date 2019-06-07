@@ -3,7 +3,7 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Azure.EventHubs;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 using System.Threading;
 using System.Linq;
 using NetBox.Extensions;

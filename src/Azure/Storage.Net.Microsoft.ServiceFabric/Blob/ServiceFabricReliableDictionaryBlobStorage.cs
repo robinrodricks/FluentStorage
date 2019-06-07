@@ -2,14 +2,14 @@
 using Microsoft.ServiceFabric.Data.Collections;
 using NetBox;
 using NetBox.Extensions;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Storage.Net.Microsoft.ServiceFabric.Blob
+namespace Storage.Net.Microsoft.ServiceFabric.Blobs
 {
    class ServiceFabricReliableDictionaryBlobStorageProvider : IBlobStorage
    {
@@ -23,11 +23,11 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          _collectionName = collectionName ?? throw new ArgumentNullException(nameof(collectionName));
       }
 
-      public async Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
          if (options == null) options = new ListOptions();
 
-         var result = new List<BlobId>();
+         var result = new List<Blob>();
 
          using (ServiceFabricTransaction tx = GetTransaction())
          {
@@ -44,7 +44,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
 
                   if (options.FilePrefix == null || current.Key.StartsWith(options.FilePrefix))
                   {
-                     result.Add(new BlobId(current.Key, BlobItemKind.File));
+                     result.Add(new Blob(current.Key, BlobItemKind.File));
                   }
                }
             }
@@ -176,11 +176,11 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          return result;
       }
 
-      public async Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 
-         var result = new List<BlobId>();
+         var result = new List<Blob>();
 
          using (ServiceFabricTransaction tx = GetTransaction())
          {
@@ -196,7 +196,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
                }
                else
                {
-                  var meta = new BlobId(id)
+                  var meta = new Blob(id)
                   {
                      Size = value.Value.Length
                   };

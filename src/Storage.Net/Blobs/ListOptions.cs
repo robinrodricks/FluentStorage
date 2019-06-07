@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NetBox.Extensions;
 
-namespace Storage.Net.Blob
+namespace Storage.Net.Blobs
 {
    /// <summary>
    /// Options for listing storage content
@@ -24,7 +24,7 @@ namespace Storage.Net.Blob
       /// Note that filtering will be happening on the client side, therefore this is the least efficient filter and should
       /// only be used when you're concerned about RAM usage.
       /// </summary>
-      public Func<BlobId, bool> BrowseFilter { get; set; }
+      public Func<Blob, bool> BrowseFilter { get; set; }
 
       /// <summary>
       /// Prefix to filter file name by. Folders are not affected by this filter. If you list files recursively
@@ -69,9 +69,9 @@ namespace Storage.Net.Blob
       public int MaxDegreeOfParalellism { get; set; } = 10;
 
       /// <summary>
-      /// Helper method that returns true if a <see cref="BlobId"/> matches these list options.
+      /// Helper method that returns true if a <see cref="Blob"/> matches these list options.
       /// </summary>
-      public bool IsMatch(BlobId id)
+      public bool IsMatch(Blob id)
       {
          return _prefix == null || id.Kind != BlobItemKind.File || id.Id.StartsWith(_prefix);
       }
@@ -79,7 +79,7 @@ namespace Storage.Net.Blob
       /// <summary>
       /// Only for internal use
       /// </summary>
-      public bool Add(ICollection<BlobId> dest, ICollection<BlobId> src)
+      public bool Add(ICollection<Blob> dest, ICollection<Blob> src)
       {
          if(MaxResults == null || (dest.Count + src.Count < MaxResults.Value))
          {

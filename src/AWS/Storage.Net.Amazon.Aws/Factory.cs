@@ -1,8 +1,8 @@
 ﻿using Amazon;
 using Amazon.S3;
 using Storage.Net.Amazon.Aws.Messaging;
-using Storage.Net.Aws.Blob;
-using Storage.Net.Blob;
+using Storage.Net.Aws.Blobs;
+using Storage.Net.Blobs;
 using Storage.Net.Messaging;
 
 namespace Storage.Net

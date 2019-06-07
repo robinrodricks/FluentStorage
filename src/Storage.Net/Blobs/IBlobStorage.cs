@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Storage.Net.Blob
+namespace Storage.Net.Blobs
 {
    /// <summary>
    /// Slim interface providing access to blob storage.
@@ -17,7 +17,7 @@ namespace Storage.Net.Blob
       /// <param name="options"></param>
       /// <param name="cancellationToken"></param>
       /// <returns>List of blob IDs</returns>
-      Task<IReadOnlyCollection<BlobId>> ListAsync(
+      Task<IReadOnlyCollection<Blob>> ListAsync(
          ListOptions options = null,
          CancellationToken cancellationToken = default);
 
@@ -79,7 +79,7 @@ namespace Storage.Net.Blob
       /// <summary>
       /// Gets blob information
       /// </summary>
-      Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default);
+      Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Starts a new transaction

@@ -10,7 +10,7 @@ using NetBox.Extensions;
 using NetBox;
 using Storage.Net.Streaming;
 
-namespace Storage.Net.Blob
+namespace Storage.Net.Blobs
 {
    class InMemoryBlobStorage : IBlobStorage
    {
@@ -21,15 +21,15 @@ namespace Storage.Net.Blob
          public string md5;
       }
 
-      private readonly Dictionary<BlobId, Tag> _idToData = new Dictionary<BlobId, Tag>();
+      private readonly Dictionary<Blob, Tag> _idToData = new Dictionary<Blob, Tag>();
 
-      public Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
+      public Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
          if (options == null) options = new ListOptions();
 
          options.FolderPath = StoragePath.Normalize(options.FolderPath);
 
-         List<BlobId> matches = _idToData
+         List<Blob> matches = _idToData
 
             .Where(e => options.Recurse
                ? e.Key.FolderPath.StartsWith(options.FolderPath)
@@ -41,7 +41,7 @@ namespace Storage.Net.Blob
             .Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value)
             .ToList();
 
-         return Task.FromResult((IReadOnlyCollection<BlobId>)matches);
+         return Task.FromResult((IReadOnlyCollection<Blob>)matches);
       }
 
       public Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
@@ -120,11 +120,11 @@ namespace Storage.Net.Blob
          return Task.FromResult<IReadOnlyCollection<bool>>(result);
       }
 
-      public Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 
-         var result = new List<BlobId>();
+         var result = new List<Blob>();
 
          foreach (string id in ids)
          {
@@ -134,7 +134,7 @@ namespace Storage.Net.Blob
             }
             else
             {
-               var r = new BlobId(id)
+               var r = new Blob(id)
                {
                   Size = tag.data.Length,
                   MD5 = tag.md5,
@@ -145,7 +145,7 @@ namespace Storage.Net.Blob
             }
          }
 
-         return Task.FromResult<IReadOnlyCollection<BlobId>>(result);
+         return Task.FromResult<IReadOnlyCollection<Blob>>(result);
       }
 
       private void Write(string id, Stream sourceStream)

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Storage.Net.Blob;
-using Storage.Net.Blob.Files;
+using Storage.Net.Blobs;
+using Storage.Net.Blobs.Files;
 using Storage.Net.KeyValue;
 using Storage.Net.KeyValue.Files;
 using Storage.Net.Messaging;

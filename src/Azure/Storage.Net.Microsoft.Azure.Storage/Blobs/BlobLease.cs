@@ -4,7 +4,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Blob
+namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 {
    /// <summary>
    /// Represents a blob lease

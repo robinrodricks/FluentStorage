@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 using FluentFTP;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 using Storage.Net.ConnectionString;
 using Storage.Net.Ftp;
 

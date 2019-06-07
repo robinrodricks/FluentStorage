@@ -1,4 +1,4 @@
-﻿using Storage.Net.Blob;
+﻿using Storage.Net.Blobs;
 using Storage.Net.KeyValue;
 using Storage.Net.Messaging;
 

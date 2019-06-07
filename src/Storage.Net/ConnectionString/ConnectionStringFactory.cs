@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Storage.Net.Blob;
-using NetBox.Extensions;
+using Storage.Net.Blobs;
 using System.Linq;
 using Storage.Net.KeyValue;
 using Storage.Net.Messaging;

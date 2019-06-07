@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using Microsoft.Azure.DataLake.Store;
 
-namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
+namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 {
    class AdlsWriteableStream : Stream
    {

@@ -1,5 +1,5 @@
 ﻿using System;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 using Storage.Net.Messaging;
 using Storage.Net.KeyValue;
 using System.Net;

@@ -9,7 +9,7 @@ using Config.Net;
 using NetBox;
 using NetBox.Extensions;
 using NetBox.Generator;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 using Xunit;
 
 namespace Storage.Net.Tests.Integration.Blobs
@@ -123,7 +123,7 @@ namespace Storage.Net.Tests.Integration.Blobs
         {
             try
             {
-                IReadOnlyCollection<BlobId> allFiles = await _storage.ListFilesAsync(null);
+                IReadOnlyCollection<Blob> allFiles = await _storage.ListFilesAsync(null);
                 await _storage.DeleteAsync(allFiles.Select(id => id.FullPath));
             }
             catch
@@ -158,7 +158,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 
             await _storage.WriteTextAsync(targetId, "test");
 
-            IReadOnlyCollection<BlobId> rootContent = await _storage.ListAsync(new ListOptions { Recurse = false, IncludeMetaWhenKnown = true });
+            IReadOnlyCollection<Blob> rootContent = await _storage.ListAsync(new ListOptions { Recurse = false, IncludeMetaWhenKnown = true });
 
             Assert.NotEmpty(rootContent);
         }
@@ -178,7 +178,7 @@ namespace Storage.Net.Tests.Integration.Blobs
             await _storage.WriteTextAsync(id2, RandomGenerator.RandomString);
             await _storage.WriteTextAsync(id3, RandomGenerator.RandomString);
 
-            List<BlobId> items = (await _storage.ListAsync(new ListOptions { FolderPath = _blobPrefix, FilePrefix = prefix })).ToList();
+            List<Blob> items = (await _storage.ListAsync(new ListOptions { FolderPath = _blobPrefix, FilePrefix = prefix })).ToList();
             Assert.Equal(2 + countBefore, items.Count); //2 files + containing folder
         }
 
@@ -189,11 +189,11 @@ namespace Storage.Net.Tests.Integration.Blobs
 
             await _storage.WriteTextAsync(id, RandomGenerator.RandomString);
 
-            List<BlobId> items = (await _storage.ListAsync(new ListOptions { FolderPath = _blobPrefix, Recurse = false })).ToList();
+            List<Blob> items = (await _storage.ListAsync(new ListOptions { FolderPath = _blobPrefix, Recurse = false })).ToList();
 
             Assert.True(items.Count > 0);
 
-            BlobId tid = items.FirstOrDefault(i => i.FullPath == id);
+            Blob tid = items.FirstOrDefault(i => i.FullPath == id);
             Assert.NotNull(tid);
         }
 
@@ -221,7 +221,7 @@ namespace Storage.Net.Tests.Integration.Blobs
         [Fact]
         public async Task List_InNonExistingFolder_EmptyCollection()
         {
-            IEnumerable<BlobId> objects = await _storage.ListAsync(new ListOptions { FolderPath = RandomBlobId() });
+            IEnumerable<Blob> objects = await _storage.ListAsync(new ListOptions { FolderPath = RandomBlobId() });
 
             Assert.NotNull(objects);
             Assert.True(objects.Count() == 0);
@@ -230,7 +230,7 @@ namespace Storage.Net.Tests.Integration.Blobs
         [Fact]
         public async Task List_FilesInNonExistingFolder_EmptyCollection()
         {
-            IEnumerable<BlobId> objects = await _storage.ListFilesAsync(new ListOptions { FolderPath = RandomBlobId() });
+            IEnumerable<Blob> objects = await _storage.ListFilesAsync(new ListOptions { FolderPath = RandomBlobId() });
 
             Assert.NotNull(objects);
             Assert.True(objects.Count() == 0);
@@ -267,7 +267,7 @@ namespace Storage.Net.Tests.Integration.Blobs
             await _storage.WriteTextAsync(id2, RandomGenerator.RandomString);
 
             //dump compare
-            IReadOnlyCollection<BlobId> files = await _storage.ListFilesAsync(new ListOptions
+            IReadOnlyCollection<Blob> files = await _storage.ListFilesAsync(new ListOptions
             {
                 Recurse = true
             });
@@ -293,7 +293,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 
             await _storage.WriteTextAsync(id, content);
 
-            BlobId meta = await _storage.GetBlobAsync(id);
+            Blob meta = await _storage.GetBlobAsync(id);
 
             long size = Encoding.UTF8.GetBytes(content).Length;
             string md5 = content.GetHash(HashType.Md5);
@@ -308,7 +308,7 @@ namespace Storage.Net.Tests.Integration.Blobs
         {
             string id = RandomBlobId();
 
-            BlobId meta = (await _storage.GetBlobsAsync(new[] { id })).First();
+            Blob meta = (await _storage.GetBlobsAsync(new[] { id })).First();
 
             Assert.Null(meta);
         }

@@ -1,7 +1,7 @@
 ﻿using System;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 using Storage.Net.Messaging;
-using Storage.Net.Microsoft.Azure.Storage.Blob;
+using Storage.Net.Microsoft.Azure.Storage.Blobs;
 using Storage.Net.Microsoft.Azure.Storage.Messaging;
 using Storage.Net.Microsoft.Azure.Storage.KeyValue;
 using Storage.Net.KeyValue;

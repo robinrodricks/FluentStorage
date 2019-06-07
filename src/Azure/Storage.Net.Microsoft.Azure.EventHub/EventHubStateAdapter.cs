@@ -1,6 +1,6 @@
 ﻿using Microsoft.Azure.EventHubs;
 using Newtonsoft.Json;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 using System;
 using System.Collections.Generic;
 using System.Linq;

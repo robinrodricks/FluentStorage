@@ -1,5 +1,5 @@
 ﻿using Microsoft.Rest.Azure.Authentication;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Azure.DataLake.Store;
 
-namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
+namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 {
    class AzureDataLakeStoreBlobStorageProvider : IBlobStorage
    {
@@ -62,7 +62,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          return new AzureDataLakeStoreBlobStorageProvider(accountName, credential.Domain, credential.UserName, credential.Password, null);
       }
 
-      public async Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
          if (options == null) options = new ListOptions();
 
@@ -166,7 +166,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          return result;
       }
 
-      public async Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 
@@ -175,12 +175,12 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          return await Task.WhenAll(ids.Select(id => GetBlobWithMetaAsync(id, client, cancellationToken)));
       }
 
-      private async Task<BlobId> GetBlobWithMetaAsync(string id, AdlsClient client, CancellationToken cancellationToken)
+      private async Task<Blob> GetBlobWithMetaAsync(string id, AdlsClient client, CancellationToken cancellationToken)
       {
          try
          {
             DirectoryEntry entry = await client.GetDirectoryEntryAsync(id, cancelToken: cancellationToken);
-            return new BlobId(id)
+            return new Blob(id)
             {
                Size = entry.Length,
                LastModificationTime = entry.LastModifiedTime

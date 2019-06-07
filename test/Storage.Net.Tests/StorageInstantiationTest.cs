@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Storage.Net.Blob;
-using Storage.Net.Blob.Files;
-using Storage.Net.Microsoft.Azure.Storage.Blob;
+﻿using Storage.Net.Blobs;
+using Storage.Net.Blobs.Files;
 using Storage.Net.Tests.Integration;
 using Xunit;
 

@@ -1,5 +1,5 @@
-﻿using Storage.Net.Blob;
-using Storage.Net.Microsoft.Azure.Storage.Blob;
+﻿using Storage.Net.Blobs;
+using Storage.Net.Microsoft.Azure.Storage.Blobs;
 using System;
 using System.Net;
 using System.Threading.Tasks;

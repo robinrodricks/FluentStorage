@@ -1,7 +1,7 @@
 ﻿using Microsoft.ServiceFabric.Data;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 using Storage.Net.Messaging;
-using Storage.Net.Microsoft.ServiceFabric.Blob;
+using Storage.Net.Microsoft.ServiceFabric.Blobs;
 using Storage.Net.Microsoft.ServiceFabric.Messaging;
 using System;
 

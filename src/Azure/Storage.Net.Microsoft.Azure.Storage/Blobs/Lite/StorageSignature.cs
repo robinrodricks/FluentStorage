@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Blob.Lite
+namespace Storage.Net.Microsoft.Azure.Storage.Blobs.Lite
 {
    class StorageSignature
    {

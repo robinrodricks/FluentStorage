@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Amazon.S3;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 
 namespace Storage.Net.Amazon.Aws.Blob
 {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Blob
+namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 {
    static class AzureStorageValidation
    {

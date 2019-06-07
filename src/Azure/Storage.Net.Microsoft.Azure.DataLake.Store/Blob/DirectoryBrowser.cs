@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.DataLake.Store;
 using Microsoft.Azure.DataLake.Store.RetryPolicies;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 
-namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
+namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 {
    class DirectoryBrowser
    {
@@ -21,23 +21,23 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          _listBatchSize = listBatchSize;
       }
 
-      public async Task<IReadOnlyCollection<BlobId>> BrowseAsync(ListOptions options, CancellationToken token)
+      public async Task<IReadOnlyCollection<Blob>> BrowseAsync(ListOptions options, CancellationToken token)
       {
          string path = StoragePath.Normalize(options.FolderPath);
-         var result = new List<BlobId>();
+         var result = new List<Blob>();
 
          await BrowseAsync(path, options, result, token);
 
          return result;
       }
 
-      private async Task BrowseAsync(string path, ListOptions options, ICollection<BlobId> container, CancellationToken token)
+      private async Task BrowseAsync(string path, ListOptions options, ICollection<Blob> container, CancellationToken token)
       {
-         List<BlobId> batch;
+         List<Blob> batch;
 
          try
          {
-            IEnumerable<BlobId> entries = 
+            IEnumerable<Blob> entries = 
                (await EnumerateDirectoryAsync(path, options, UserGroupRepresentation.ObjectID))
                .Where(options.IsMatch);
 
@@ -60,7 +60,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
          if(options.Recurse)
          {
-            List<BlobId> folders = batch.Where(b => b.Kind == BlobItemKind.Folder).ToList();
+            var folders = batch.Where(b => b.Kind == BlobItemKind.Folder).ToList();
 
             if(folders.Count > 0)
             {
@@ -74,13 +74,13 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
             }
          }
       }
-      private async Task<IReadOnlyCollection<BlobId>> EnumerateDirectoryAsync(
+      private async Task<IReadOnlyCollection<Blob>> EnumerateDirectoryAsync(
          string path,
          ListOptions options,
          UserGroupRepresentation userIdFormat = UserGroupRepresentation.ObjectID,
          CancellationToken cancelToken = default)
       {
-         var result = new List<BlobId>();
+         var result = new List<Blob>();
 
          string listAfter = "";
 
@@ -117,9 +117,9 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          //return new FileStatusOutput(listBefore, listAfter, maxEntries, userIdFormat, _client, path);
       }
 
-      private static BlobId ToBlobId(string path, DirectoryEntry entry, bool includeMeta)
+      private static Blob ToBlobId(string path, DirectoryEntry entry, bool includeMeta)
       {
-         var blob = new BlobId(path, entry.Name, entry.Type == DirectoryEntryType.FILE ? BlobItemKind.File : BlobItemKind.Folder);
+         var blob = new Blob(path, entry.Name, entry.Type == DirectoryEntryType.FILE ? BlobItemKind.File : BlobItemKind.Folder);
          blob.Size = entry.Length;
          blob.LastModificationTime = entry.LastModifiedTime;
          return blob;

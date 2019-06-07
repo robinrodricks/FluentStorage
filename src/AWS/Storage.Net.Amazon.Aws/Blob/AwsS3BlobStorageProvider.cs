@@ -1,4 +1,4 @@
-﻿using Storage.Net.Blob;
+﻿using Storage.Net.Blobs;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +13,7 @@ using System.Threading;
 using Storage.Net.Amazon.Aws.Blob;
 using Storage.Net.Streaming;
 
-namespace Storage.Net.Aws.Blob
+namespace Storage.Net.Aws.Blobs
 {
    /// <summary>
    /// Amazon S3 storage adapter for blobs
@@ -89,7 +89,7 @@ namespace Storage.Net.Aws.Blob
       /// <summary>
       /// Lists all buckets, optionaly filtering by prefix. Prefix filtering happens on client side.
       /// </summary>
-      public async Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default)
+      public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default)
       {
          if (options == null) options = new ListOptions();
 
@@ -108,7 +108,7 @@ namespace Storage.Net.Aws.Blob
          ListObjectsV2Response response = await client.ListObjectsV2Async(request, cancellationToken);
 
          return response.S3Objects
-            .Select(s3Obj => new BlobId(StoragePath.RootFolderPath, s3Obj.Key, BlobItemKind.File))
+            .Select(s3Obj => new Blob(StoragePath.RootFolderPath, s3Obj.Key, BlobItemKind.File))
             .Where(options.IsMatch)
             .Where(bid => (options.FolderPath == null || bid.FolderPath == options.FolderPath))
             .Where(bid => options.BrowseFilter == null || options.BrowseFilter(bid))
@@ -198,12 +198,12 @@ namespace Storage.Net.Aws.Blob
          return true;
       }
 
-      public async Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
          return await Task.WhenAll(ids.Select(GetBlobAsync));
       }
 
-      private async Task<BlobId> GetBlobAsync(string id)
+      private async Task<Blob> GetBlobAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -216,7 +216,7 @@ namespace Storage.Net.Aws.Blob
 
                if(obj != null)
                {
-                  var r = new BlobId(id);
+                  var r = new Blob(id);
                   r.MD5 = obj.ETag.Trim('\"');
                   r.Size = obj.ContentLength;
                   r.LastModificationTime = obj.LastModified.ToUniversalTime();

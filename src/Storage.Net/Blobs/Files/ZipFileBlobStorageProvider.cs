@@ -5,10 +5,10 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 using Storage.Net.Streaming;
 
-namespace Storage.Net.Blob.Files
+namespace Storage.Net.Blobs.Files
 {
    class ZipFileBlobStorageProvider : IBlobStorage
    {
@@ -60,9 +60,9 @@ namespace Storage.Net.Blob.Files
          return Task.FromResult<IReadOnlyCollection<bool>>(result);
       }
 
-      public Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         var result = new List<BlobId>();
+         var result = new List<Blob>();
          ZipArchive zipArchive = GetArchive(false);
 
          foreach (string id in ids)
@@ -75,7 +75,7 @@ namespace Storage.Net.Blob.Files
 
                long originalLength = entry.Length;
 
-               result.Add(new BlobId(nid) { Size = originalLength, LastModificationTime = entry.LastWriteTime });
+               result.Add(new Blob(nid) { Size = originalLength, LastModificationTime = entry.LastWriteTime });
             }
             catch (NullReferenceException)
             {
@@ -83,22 +83,22 @@ namespace Storage.Net.Blob.Files
             }
          }
 
-         return Task.FromResult<IReadOnlyCollection<BlobId>>(result);
+         return Task.FromResult<IReadOnlyCollection<Blob>>(result);
       }
 
-      public Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken = default)
+      public Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken = default)
       {
-         if (!File.Exists(_filePath)) return Task.FromResult<IReadOnlyCollection<BlobId>>(new List<BlobId>());
+         if (!File.Exists(_filePath)) return Task.FromResult<IReadOnlyCollection<Blob>>(new List<Blob>());
 
          ZipArchive archive = GetArchive(false);
 
          if (options == null) options = new ListOptions();
-         IEnumerable<BlobId> ids = archive.Entries.Select(ze => new BlobId(ze.FullName, BlobItemKind.File));
+         IEnumerable<Blob> ids = archive.Entries.Select(ze => new Blob(ze.FullName, BlobItemKind.File));
          if (options.FilePrefix != null) ids = ids.Where(id => id.Id.StartsWith(options.FilePrefix));
          if (options.BrowseFilter != null) ids = ids.Where(id => options.BrowseFilter(id));
          if (options.MaxResults != null) ids = ids.Take(options.MaxResults.Value);
 
-         return Task.FromResult<IReadOnlyCollection<BlobId>>(ids.ToList());
+         return Task.FromResult<IReadOnlyCollection<Blob>>(ids.ToList());
       }
 
       public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default)

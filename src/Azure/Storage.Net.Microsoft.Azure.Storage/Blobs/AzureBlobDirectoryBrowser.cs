@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Blob;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Blob
+namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 {
    class AzureBlobDirectoryBrowser
    {
@@ -20,22 +20,22 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          _throttler = new SemaphoreSlim(maxTasks);
       }
 
-      public async Task<IReadOnlyCollection<BlobId>> ListFolderAsync(ListOptions options, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<Blob>> ListFolderAsync(ListOptions options, CancellationToken cancellationToken)
       {
-         var result = new List<BlobId>();
+         var result = new List<Blob>();
 
          await ListFolderAsync(result, options.FolderPath, options, cancellationToken);
 
          return result;
       }
 
-      private async Task ListFolderAsync(List<BlobId> container, string path, ListOptions options, CancellationToken cancellationToken)
+      private async Task ListFolderAsync(List<Blob> container, string path, ListOptions options, CancellationToken cancellationToken)
       {
          CloudBlobDirectory dir = GetCloudBlobDirectory(path);
 
          BlobContinuationToken token = null;
 
-         var batch = new List<BlobId>();
+         var batch = new List<Blob>();
 
          await _throttler.WaitAsync();
          try
@@ -49,7 +49,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
                foreach (IListBlobItem blob in segment.Results)
                {
-                  BlobId id = ToBlobId(blob, options.IncludeMetaWhenKnown);
+                  Blob id = ToBlobId(blob, options.IncludeMetaWhenKnown);
 
                   if (options.IsMatch(id) && (options.BrowseFilter == null || options.BrowseFilter(id)))
                   {
@@ -72,7 +72,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
 
          if (options.Recurse)
          {
-            List<BlobId> folderIds = batch.Where(r => r.Kind == BlobItemKind.Folder).ToList();
+            var folderIds = batch.Where(r => r.Kind == BlobItemKind.Folder).ToList();
 
             await Task.WhenAll(
                folderIds.Select(folderId => ListFolderAsync(
@@ -92,27 +92,27 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          return dir;
       }
 
-      private BlobId ToBlobId(IListBlobItem blob, bool attachMetadata)
+      private Blob ToBlobId(IListBlobItem blob, bool attachMetadata)
       {
-         BlobId id;
+         Blob id;
 
          if (blob is CloudBlockBlob blockBlob)
          {
             string fullName = StoragePath.Combine(_container.Name, blockBlob.Name);
 
-            id = new BlobId(fullName, BlobItemKind.File);
+            id = new Blob(fullName, BlobItemKind.File);
          }
          else if (blob is CloudAppendBlob appendBlob)
          {
             string fullName = StoragePath.Combine(_container.Name, appendBlob.Name);
 
-            id = new BlobId(fullName, BlobItemKind.File);
+            id = new Blob(fullName, BlobItemKind.File);
          }
          else if (blob is CloudBlobDirectory dirBlob)
          {
             string fullName = StoragePath.Combine(_container.Name, dirBlob.Prefix);
 
-            id = new BlobId(fullName, BlobItemKind.Folder);
+            id = new Blob(fullName, BlobItemKind.Folder);
          }
          else
          {

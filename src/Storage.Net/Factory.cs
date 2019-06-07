@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using Storage.Net.Blob;
-using Storage.Net.Blob.Files;
+using Storage.Net.Blobs;
+using Storage.Net.Blobs.Files;
 using Storage.Net.Messaging;
 using Storage.Net.ConnectionString;
 using Storage.Net.KeyValue;

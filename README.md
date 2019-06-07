@@ -81,7 +81,7 @@ In this example we create a blob storage implementation which happens to be Micr
 
 ```csharp
 using Storage.Net;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 using System.IO;
 using System.Text;
 

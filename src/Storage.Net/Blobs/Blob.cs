@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Storage.Net.Blob
+namespace Storage.Net.Blobs
 {
    /// <summary>
    /// Blob item description
    /// </summary>
-   public sealed class BlobId : IEquatable<BlobId>
+   public sealed class Blob : IEquatable<Blob>
    {
       /// <summary>
       /// Gets the kind of item
@@ -55,7 +55,7 @@ namespace Storage.Net.Blob
       /// </summary>
       /// <param name="fullId"></param>
       /// <param name="kind"></param>
-      public BlobId(string fullId, BlobItemKind kind = BlobItemKind.File)
+      public Blob(string fullId, BlobItemKind kind = BlobItemKind.File)
       {
          string path = StoragePath.Normalize(fullId);
          string[] parts = StoragePath.Split(path);
@@ -72,7 +72,7 @@ namespace Storage.Net.Blob
       /// <param name="folderPath"></param>
       /// <param name="id"></param>
       /// <param name="kind"></param>
-      public BlobId(string folderPath, string id, BlobItemKind kind)
+      public Blob(string folderPath, string id, BlobItemKind kind)
       {
          Id = id ?? throw new ArgumentNullException(nameof(id));
          FolderPath = folderPath;
@@ -93,7 +93,7 @@ namespace Storage.Net.Blob
       /// Equality check
       /// </summary>
       /// <param name="other"></param>
-      public bool Equals(BlobId other)
+      public bool Equals(Blob other)
       {
          if (ReferenceEquals(other, null)) return false;
 
@@ -110,9 +110,9 @@ namespace Storage.Net.Blob
       {
          if (ReferenceEquals(other, null)) return false;
          if (ReferenceEquals(other, this)) return true;
-         if (other.GetType() != typeof(BlobId)) return false;
+         if (other.GetType() != typeof(Blob)) return false;
 
-         return Equals((BlobId)other);
+         return Equals((Blob)other);
       }
 
       /// <summary>
@@ -126,9 +126,9 @@ namespace Storage.Net.Blob
       /// <summary>
       /// Constructs a file blob by full ID
       /// </summary>
-      public static implicit operator BlobId(string fileId)
+      public static implicit operator Blob(string fileId)
       {
-         return new BlobId(fileId, BlobItemKind.File);
+         return new Blob(fileId, BlobItemKind.File);
       }
    }
 }

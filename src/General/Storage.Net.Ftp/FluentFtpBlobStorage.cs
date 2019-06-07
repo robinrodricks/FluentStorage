@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using FluentFTP;
 using Polly;
 using Polly.Retry;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 
 namespace Storage.Net.Ftp
 {
@@ -43,7 +43,7 @@ namespace Storage.Net.Ftp
          return _client;
       }
 
-      public async Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default)
+      public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default)
       {
          FtpClient client = await GetClientAsync();
 
@@ -51,7 +51,7 @@ namespace Storage.Net.Ftp
 
          FtpListItem[] items = await client.GetListingAsync(options.FolderPath);
 
-         var results = new List<BlobId>();
+         var results = new List<Blob>();
          foreach(FtpListItem item in items)
          {
             if(options.FilePrefix != null && !item.Name.StartsWith(options.FilePrefix))
@@ -59,7 +59,7 @@ namespace Storage.Net.Ftp
                continue;
             }
 
-            BlobId bid = ToBlobId(item);
+            Blob bid = ToBlobId(item);
             if (bid == null) continue;
 
             if(options.BrowseFilter != null)
@@ -76,11 +76,11 @@ namespace Storage.Net.Ftp
          return results;
       }
 
-      private BlobId ToBlobId(FtpListItem ff)
+      private Blob ToBlobId(FtpListItem ff)
       {
          if (ff.Type != FtpFileSystemObjectType.Directory && ff.Type != FtpFileSystemObjectType.File) return null;
 
-         var id = new  BlobId(ff.FullName,
+         var id = new  Blob(ff.FullName,
             ff.Type == FtpFileSystemObjectType.File
             ? BlobItemKind.File
             : BlobItemKind.Folder);
@@ -118,11 +118,11 @@ namespace Storage.Net.Ftp
          return results;
       }
 
-      public async Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
          FtpClient client = await GetClientAsync();
 
-         var results = new List<BlobId>();
+         var results = new List<Blob>();
          foreach(string path in ids)
          {
             string cpath = StoragePath.Normalize(path, true);
@@ -137,7 +137,7 @@ namespace Storage.Net.Ftp
                continue;
             }
 
-            var r = new BlobId(path)
+            var r = new Blob(path)
             {
                Size = foundItem.Size,
                LastModificationTime = foundItem.Modified

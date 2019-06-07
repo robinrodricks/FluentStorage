@@ -3,9 +3,9 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Blob;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Blob
+namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 {
    /// <summary>
    /// Provides access to native operations

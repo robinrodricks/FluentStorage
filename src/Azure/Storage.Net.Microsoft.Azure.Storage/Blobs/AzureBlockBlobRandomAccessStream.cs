@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Blob
+namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 {
    class AzureBlockBlobRandomAccessStream : Stream
    {

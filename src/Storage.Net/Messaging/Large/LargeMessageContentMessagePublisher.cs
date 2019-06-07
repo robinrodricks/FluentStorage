@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 
 namespace Storage.Net.Messaging.Large
 {

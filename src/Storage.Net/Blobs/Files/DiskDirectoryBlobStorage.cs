@@ -8,7 +8,7 @@ using System.Threading;
 using NetBox.Extensions;
 using NetBox;
 
-namespace Storage.Net.Blob.Files
+namespace Storage.Net.Blobs.Files
 {
    /// <summary>
    /// Blob storage implementation which uses local file system directory
@@ -34,16 +34,16 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// Returns the list of blob names in this storage, optionally filtered by prefix
       /// </summary>
-      public Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken)
+      public Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
          if (options == null) options = new ListOptions();
 
          GenericValidation.CheckBlobPrefix(options.FilePrefix);
 
-         if (!_directory.Exists) return Task.FromResult<IReadOnlyCollection<BlobId>>(new List<BlobId>());
+         if (!_directory.Exists) return Task.FromResult<IReadOnlyCollection<Blob>>(new List<Blob>());
 
          string fullPath = GetFolder(options?.FolderPath, false);
-         if (fullPath == null) return Task.FromResult<IReadOnlyCollection<BlobId>>(new List<BlobId>());
+         if (fullPath == null) return Task.FromResult<IReadOnlyCollection<Blob>>(new List<Blob>());
 
          string[] fileIds = Directory.GetFiles(
             fullPath,
@@ -59,14 +59,14 @@ namespace Storage.Net.Blob.Files
                   : options.FilePrefix + "*",
                options.Recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
-         var result = new List<BlobId>();
+         var result = new List<Blob>();
          result.AddRange(directoryIds.Select(id => ToBlobItem(id, BlobItemKind.Folder, options.IncludeMetaWhenKnown)));
          result.AddRange(fileIds.Select(id => ToBlobItem(id, BlobItemKind.File, options.IncludeMetaWhenKnown)));
          result = result
             .Where(i => options.BrowseFilter == null || options.BrowseFilter(i))
             .Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value)
             .ToList();
-         return Task.FromResult<IReadOnlyCollection<BlobId>>(result);
+         return Task.FromResult<IReadOnlyCollection<Blob>>(result);
       }
 
       private string ToId(FileInfo fi)
@@ -80,14 +80,14 @@ namespace Storage.Net.Blob.Files
          return string.Join(StoragePath.PathStrSeparator, parts.Select(DecodePathPart));
       }
 
-      private BlobId ToBlobItem(string fullPath, BlobItemKind kind, bool includeMeta)
+      private Blob ToBlobItem(string fullPath, BlobItemKind kind, bool includeMeta)
       {
          fullPath = fullPath.Substring(_directory.FullName.Length);
          fullPath = fullPath.Replace(Path.DirectorySeparatorChar, StoragePath.PathSeparator);
          fullPath = fullPath.Trim(StoragePath.PathSeparator);
          fullPath = StoragePath.PathStrSeparator + fullPath;
 
-         var blobId = new BlobId(fullPath, kind);
+         var blobId = new Blob(fullPath, kind);
 
          if(includeMeta)
          {
@@ -267,9 +267,9 @@ namespace Storage.Net.Blob.Files
       /// <summary>
       /// See interface
       /// </summary>
-      public Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         var result = new List<BlobId>();
+         var result = new List<Blob>();
 
          foreach(string blobId in ids)
          {
@@ -282,14 +282,14 @@ namespace Storage.Net.Blob.Files
                continue;
             }
 
-            var bid = new BlobId(blobId);
+            var bid = new Blob(blobId);
             EnrichWithMetadata(bid);
          }
 
-         return Task.FromResult<IReadOnlyCollection<BlobId>>(result);
+         return Task.FromResult<IReadOnlyCollection<Blob>>(result);
       }
 
-      private void EnrichWithMetadata(BlobId id)
+      private void EnrichWithMetadata(Blob id)
       {
          string path = GetFilePath(StoragePath.Normalize(id.FullPath, false));
 

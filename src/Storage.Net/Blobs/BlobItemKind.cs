@@ -1,4 +1,4 @@
-﻿namespace Storage.Net.Blob
+﻿namespace Storage.Net.Blobs
 {
    /// <summary>
    /// Type of the blob item in the storage

@@ -1,6 +1,6 @@
 ﻿using System;
 using Amazon;
-using Storage.Net.Blob;
+using Storage.Net.Blobs;
 using Storage.Net.Messaging;
 using Xunit;
 

@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NetBox.Extensions;
 
-namespace Storage.Net.Blob
+namespace Storage.Net.Blobs
 {
    /// <summary>
    /// Blob storage on steroids. Takes in <see cref="IBlobStorage"/> and adds a lot of extra useful operations on top we as
@@ -26,11 +26,11 @@ namespace Storage.Net.Blob
       /// <param name="options"></param>
       /// <param name="cancellationToken"></param>
       /// <returns>List of blob IDs</returns>
-      public static async Task<IReadOnlyCollection<BlobId>> ListFilesAsync(this IBlobStorage provider,
+      public static async Task<IReadOnlyCollection<Blob>> ListFilesAsync(this IBlobStorage provider,
          ListOptions options,
          CancellationToken cancellationToken = default)
       {
-         IEnumerable<BlobId> all = await provider.ListAsync(options, cancellationToken);
+         IEnumerable<Blob> all = await provider.ListAsync(options, cancellationToken);
 
          return all.Where(i => i.Kind == BlobItemKind.File).ToList();
       }
@@ -112,7 +112,7 @@ namespace Storage.Net.Blob
       /// Gets basic blob metadata
       /// </summary>
       /// <returns>Blob metadata or null if blob doesn't exist</returns>
-      public static async Task<BlobId> GetBlobAsync(this IBlobStorage storage,
+      public static async Task<Blob> GetBlobAsync(this IBlobStorage storage,
          string id, CancellationToken cancellationToken = default)
       {
          return (await storage.GetBlobsAsync(new[] { id }, cancellationToken)).First();

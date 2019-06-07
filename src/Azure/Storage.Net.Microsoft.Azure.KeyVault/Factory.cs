@@ -1,5 +1,5 @@
-﻿using Storage.Net.Blob;
-using Storage.Net.Microsoft.Azure.KeyVault.Blob;
+﻿using Storage.Net.Blobs;
+using Storage.Net.Microsoft.Azure.KeyVault.Blobs;
 using System;
 using System.Net;
 
