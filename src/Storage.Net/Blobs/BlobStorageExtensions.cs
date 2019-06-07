@@ -22,17 +22,53 @@ namespace Storage.Net.Blobs
       /// <summary>
       /// Returns the list of available files, excluding folders.
       /// </summary>
-      /// <param name="provider"></param>
+      /// <param name="blobStorage"></param>
       /// <param name="options"></param>
       /// <param name="cancellationToken"></param>
       /// <returns>List of blob IDs</returns>
-      public static async Task<IReadOnlyCollection<Blob>> ListFilesAsync(this IBlobStorage provider,
+      public static async Task<IReadOnlyCollection<Blob>> ListFilesAsync(this IBlobStorage blobStorage,
          ListOptions options,
          CancellationToken cancellationToken = default)
       {
-         IEnumerable<Blob> all = await provider.ListAsync(options, cancellationToken);
+         IEnumerable<Blob> all = await blobStorage.ListAsync(options, cancellationToken);
 
          return all.Where(i => i.Kind == BlobItemKind.File).ToList();
+      }
+
+      /// <summary>
+      /// Returns the list of available blobs
+      /// </summary>
+      /// <param name="blobStorage"></param>
+      /// <param name="folderPath"><see cref="ListOptions.FolderPath"/><</param>
+      /// <param name="browseFilter"><see cref="ListOptions.BrowseFilter"/></param>
+      /// <param name="filePrefix"><see cref="ListOptions.FilePrefix"/></param>
+      /// <param name="recurse"><see cref="ListOptions.Recurse"/></param>
+      /// <param name="maxResults"><see cref="ListOptions.MaxResults"/></param>
+      /// <param name="includeMetaWhenKnown"><see cref="ListOptions.IncludeMetaWhenKnown"/></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns>List of blob IDs</returns>
+      public static Task<IReadOnlyCollection<Blob>> ListAsync(this IBlobStorage blobStorage,
+         string folderPath = null,
+         Func<Blob, bool> browseFilter = null,
+         string filePrefix = null,
+         bool recurse = false,
+         int? maxResults = null,
+         bool includeMetaWhenKnown = false,
+         CancellationToken cancellationToken = default)
+      {
+         var options = new ListOptions();
+         if(folderPath != null)
+            options.FolderPath = folderPath;
+         if(browseFilter != null)
+            options.BrowseFilter = browseFilter;
+         if(filePrefix != null)
+            options.FilePrefix = filePrefix;
+         options.Recurse = recurse;
+         if(maxResults != null)
+            options.MaxResults = maxResults;
+         options.IncludeMetaWhenKnown = includeMetaWhenKnown;
+
+         return blobStorage.ListAsync(options, cancellationToken);
       }
 
       #endregion

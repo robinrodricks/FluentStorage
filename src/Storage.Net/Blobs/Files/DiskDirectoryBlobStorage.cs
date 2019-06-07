@@ -284,6 +284,7 @@ namespace Storage.Net.Blobs.Files
 
             var bid = new Blob(blobId);
             EnrichWithMetadata(bid);
+            result.Add(bid);
          }
 
          return Task.FromResult<IReadOnlyCollection<Blob>>(result);
