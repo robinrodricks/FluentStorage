@@ -66,7 +66,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          if (options == null) options = new ListOptions();
 
-         AdlsClient client = await GetAdlsClient();
+         AdlsClient client = await GetAdlsClientAsync();
 
          var browser = new DirectoryBrowser(client, ListBatchSize);
          return await browser.BrowseAsync(options, cancellationToken);
@@ -76,7 +76,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          GenericValidation.CheckBlobId(id);
 
-         AdlsClient client = await GetAdlsClient();
+         AdlsClient client = await GetAdlsClientAsync();
 
          if (append && (await ExistsAsync(new[] { id }, cancellationToken)).First())
          {
@@ -103,7 +103,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          GenericValidation.CheckBlobId(id);
 
-         AdlsClient client = await GetAdlsClient();
+         AdlsClient client = await GetAdlsClientAsync();
 
          AdlsOutputStream stream;
 
@@ -125,7 +125,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          GenericValidation.CheckBlobId(id);
 
-         AdlsClient client = await GetAdlsClient();
+         AdlsClient client = await GetAdlsClientAsync();
 
          try
          {
@@ -143,7 +143,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          GenericValidation.CheckBlobId(ids);
 
-         AdlsClient client = await GetAdlsClient();
+         AdlsClient client = await GetAdlsClientAsync();
 
          await Task.WhenAll(ids.Select(id => client.DeleteAsync(id, cancellationToken)));
       }
@@ -152,7 +152,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
       {
          GenericValidation.CheckBlobId(ids);
 
-         AdlsClient client = await GetAdlsClient();
+         AdlsClient client = await GetAdlsClientAsync();
 
          var result = new List<bool>();
 
@@ -166,43 +166,44 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
          return result;
       }
 
-      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 
-         AdlsClient client = await GetAdlsClient();
+         AdlsClient client = await GetAdlsClientAsync();
 
-         return await Task.WhenAll(ids.Select(id => GetMetaAsync(id, client, cancellationToken)));
+         return await Task.WhenAll(ids.Select(id => GetBlobWithMetaAsync(id, client, cancellationToken)));
       }
 
-      private async Task<BlobMeta> GetMetaAsync(string id, AdlsClient client, CancellationToken cancellationToken)
+      private async Task<BlobId> GetBlobWithMetaAsync(string id, AdlsClient client, CancellationToken cancellationToken)
       {
-         DirectoryEntry entry;
-
          try
          {
-            entry = await client.GetDirectoryEntryAsync(id, cancelToken: cancellationToken);
+            DirectoryEntry entry = await client.GetDirectoryEntryAsync(id, cancelToken: cancellationToken);
+            return new BlobId(id)
+            {
+               Size = entry.Length,
+               LastModificationTime = entry.LastModifiedTime
+            };
          }
          catch(AdlsException ex) when (ex.HttpStatus == HttpStatusCode.NotFound)
          {
             return null;
          }
-
-         return new BlobMeta(entry.Length, null, entry.LastModifiedTime);
       }
 
-      private async Task<AdlsClient> GetAdlsClient()
+      private async Task<AdlsClient> GetAdlsClientAsync()
       {
          if (_client != null) return _client;
 
-         ServiceClientCredentials creds = await GetCreds();
+         ServiceClientCredentials creds = await GetCredsAsync();
 
          _client = AdlsClient.CreateClient($"{_accountName}.azuredatalakestore.net", creds);
 
          return _client;
       }
 
-      private async Task<ServiceClientCredentials> GetCreds()
+      private async Task<ServiceClientCredentials> GetCredsAsync()
       {
          if (_credential != null) return _credential;
 

@@ -154,30 +154,30 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blob
          return secret != null;
       }
 
-      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public async Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
          GenericValidation.CheckBlobId(ids);
 
          return await Task.WhenAll(ids.Select(id => GetMetaAsync(id)));
       }
 
-      private async Task<BlobMeta> GetMetaAsync(string id)
+      private async Task<BlobId> GetMetaAsync(string id)
       {
-         SecretBundle secret;
-
          try
          {
-            secret = await _vaultClient.GetSecretAsync(_vaultUri, id);
+            SecretBundle secret = await _vaultClient.GetSecretAsync(_vaultUri, id);
+            byte[] data = Encoding.UTF8.GetBytes(secret.Value);
+            return new BlobId(id)
+            {
+               Size = data.Length,
+               MD5 = secret.Value.GetHash(HashType.Md5),
+               LastModificationTime = secret.Attributes.Updated
+            };
          }
          catch(KeyVaultErrorException ex) when(ex.Response.StatusCode == HttpStatusCode.NotFound)
          {
             return null;
          }
-
-
-         byte[] data = Encoding.UTF8.GetBytes(secret.Value);
-
-         return new BlobMeta(data.Length, secret.Value.GetHash(HashType.Md5), secret.Attributes.Updated);
       }
 
       #endregion

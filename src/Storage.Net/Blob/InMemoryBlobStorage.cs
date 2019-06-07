@@ -120,11 +120,11 @@ namespace Storage.Net.Blob
          return Task.FromResult<IReadOnlyCollection<bool>>(result);
       }
 
-      public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 
-         var result = new List<BlobMeta>();
+         var result = new List<BlobId>();
 
          foreach (string id in ids)
          {
@@ -134,13 +134,18 @@ namespace Storage.Net.Blob
             }
             else
             {
-               var meta = new BlobMeta(tag.data.Length, tag.md5, tag.lastMod);
+               var r = new BlobId(id)
+               {
+                  Size = tag.data.Length,
+                  MD5 = tag.md5,
+                  LastModificationTime = tag.lastMod
+               };
 
-               result.Add(meta);
+               result.Add(r);
             }
          }
 
-         return Task.FromResult<IEnumerable<BlobMeta>>(result);
+         return Task.FromResult<IReadOnlyCollection<BlobId>>(result);
       }
 
       private void Write(string id, Stream sourceStream)

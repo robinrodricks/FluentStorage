@@ -286,15 +286,14 @@ namespace Storage.Net.Tests.Integration.Blobs
         }
 
         [Fact]
-        public async Task GetMeta_for_one_file_succeeds()
+        public async Task GetBlob_for_one_file_succeeds()
         {
             string content = RandomGenerator.GetRandomString(1000, false);
             string id = RandomBlobId();
 
             await _storage.WriteTextAsync(id, content);
 
-            BlobMeta meta = await _storage.GetMetaAsync(id);
-
+            BlobId meta = await _storage.GetBlobAsync(id);
 
             long size = Encoding.UTF8.GetBytes(content).Length;
             string md5 = content.GetHash(HashType.Md5);
@@ -305,11 +304,11 @@ namespace Storage.Net.Tests.Integration.Blobs
         }
 
         [Fact]
-        public async Task GetMeta_doesnt_exist_returns_null()
+        public async Task GetBlob_doesnt_exist_returns_null()
         {
             string id = RandomBlobId();
 
-            BlobMeta meta = (await _storage.GetMetaAsync(new[] { id })).First();
+            BlobId meta = (await _storage.GetBlobsAsync(new[] { id })).First();
 
             Assert.Null(meta);
         }

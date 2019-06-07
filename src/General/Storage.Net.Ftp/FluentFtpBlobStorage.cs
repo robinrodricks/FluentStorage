@@ -118,11 +118,11 @@ namespace Storage.Net.Ftp
          return results;
       }
 
-      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public async Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
          FtpClient client = await GetClientAsync();
 
-         var results = new List<BlobMeta>();
+         var results = new List<BlobId>();
          foreach(string path in ids)
          {
             string cpath = StoragePath.Normalize(path, true);
@@ -137,8 +137,12 @@ namespace Storage.Net.Ftp
                continue;
             }
 
-            var meta = new BlobMeta(foundItem.Size, null, foundItem.Modified);
-            results.Add(meta);
+            var r = new BlobId(path)
+            {
+               Size = foundItem.Size,
+               LastModificationTime = foundItem.Modified
+            };
+            results.Add(r);
          }
          return results;
       }

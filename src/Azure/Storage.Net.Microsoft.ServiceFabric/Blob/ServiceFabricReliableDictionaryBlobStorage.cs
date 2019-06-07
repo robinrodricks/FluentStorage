@@ -176,11 +176,11 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
          return result;
       }
 
-      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobId(ids);
 
-         var result = new List<BlobMeta>();
+         var result = new List<BlobId>();
 
          using (ServiceFabricTransaction tx = GetTransaction())
          {
@@ -196,7 +196,10 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blob
                }
                else
                {
-                  var meta = new BlobMeta(value.Value.Length, null, null);
+                  var meta = new BlobId(id)
+                  {
+                     Size = value.Value.Length
+                  };
                   result.Add(meta);
                }
             }

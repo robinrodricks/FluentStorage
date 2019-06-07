@@ -119,12 +119,10 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blob
 
       private static BlobId ToBlobId(string path, DirectoryEntry entry, bool includeMeta)
       {
-         BlobMeta meta = includeMeta ? new BlobMeta(entry.Length, null, entry.LastModifiedTime) : null;
-
-         if (entry.Type == DirectoryEntryType.FILE)
-            return new BlobId(path, entry.Name, BlobItemKind.File) { Meta = meta };
-         else
-            return new BlobId(path, entry.Name, BlobItemKind.Folder) { Meta = meta };
+         var blob = new BlobId(path, entry.Name, entry.Type == DirectoryEntryType.FILE ? BlobItemKind.File : BlobItemKind.Folder);
+         blob.Size = entry.Length;
+         blob.LastModificationTime = entry.LastModifiedTime;
+         return blob;
       }
    }
 }

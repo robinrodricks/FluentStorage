@@ -3,6 +3,7 @@ trigger:
   branches:
     include:
       - master
+      - v7
   paths:
     exclude:
       - README.md

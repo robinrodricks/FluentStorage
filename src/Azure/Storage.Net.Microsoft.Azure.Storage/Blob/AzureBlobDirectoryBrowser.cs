@@ -122,7 +122,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          //attach metadata if we can
          if(attachMetadata && blob is CloudBlob cloudBlob)
          {
-            id.Meta = AzureUniversalBlobStorageProvider.GetblobMeta(cloudBlob);
+            AzureUniversalBlobStorageProvider.AttachBlobMeta(id, cloudBlob);
          }
 
          return id;

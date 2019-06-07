@@ -98,18 +98,18 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          return result;
       }
 
-      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public async Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         var result = new List<BlobMeta>();
+         var result = new List<BlobId>();
          foreach (string id in ids)
          {
             GenericValidation.CheckBlobId(id);
          }
 
-         return await Task.WhenAll(ids.Select(id => GetMetaAsync(id, cancellationToken)));
+         return await Task.WhenAll(ids.Select(id => GetBlobWithMetaAsync(id, cancellationToken)));
       }
 
-      private async Task<BlobMeta> GetMetaAsync(string id, CancellationToken cancellationToken)
+      private async Task<BlobId> GetBlobWithMetaAsync(string id, CancellationToken cancellationToken)
       {
          (CloudBlobContainer container, string path) = await GetPartsAsync(id, false);
          if (container == null) return null;
@@ -117,20 +117,18 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          CloudBlob blob = container.GetBlobReference(StoragePath.Normalize(path, false));
          if (!(await blob.ExistsAsync())) return null;
 
+         var r = new BlobId(id);
          await blob.FetchAttributesAsync();
-
-         return GetblobMeta(blob);
+         AttachBlobMeta(r, blob);
+         return r;
       }
 
-      internal static BlobMeta GetblobMeta(CloudBlob blob)
+      internal static void AttachBlobMeta(BlobId blobId, CloudBlob blob)
       {
          //ContentMD5 is base64-encoded hash, whereas we work with HEX encoded ones
-         string md5 = blob.Properties.ContentMD5.Base64DecodeAsBytes().ToHexString();
-
-         var meta = new BlobMeta(
-            blob.Properties.Length,
-            md5,
-            blob.Properties.LastModified);
+         blobId.MD5 = blob.Properties.ContentMD5.Base64DecodeAsBytes().ToHexString();
+         blobId.Size = blob.Properties.Length;
+         blobId.LastModificationTime = blob.Properties.LastModified;
 
          /*meta.Properties["BlobType"] = blob.BlobType.ToString();
          meta.Properties["IsDeleted"] = blob.IsDeleted;
@@ -139,8 +137,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blob
          meta.Properties["ContentEncoding"] = blob.Properties.ContentEncoding;
          meta.Properties["ContentLanguage"] = blob.Properties.ContentLanguage;
          meta.Properties["ContentType"] = blob.Properties.ContentType;*/
-
-         return meta;
       }
 
       public async Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken = default)

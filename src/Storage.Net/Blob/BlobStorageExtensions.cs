@@ -112,10 +112,10 @@ namespace Storage.Net.Blob
       /// Gets basic blob metadata
       /// </summary>
       /// <returns>Blob metadata or null if blob doesn't exist</returns>
-      public static async Task<BlobMeta> GetMetaAsync(this IBlobStorage storage,
+      public static async Task<BlobId> GetBlobAsync(this IBlobStorage storage,
          string id, CancellationToken cancellationToken = default)
       {
-         return (await storage.GetMetaAsync(new[] { id }, cancellationToken)).First();
+         return (await storage.GetBlobsAsync(new[] { id }, cancellationToken)).First();
       }
 
       #endregion

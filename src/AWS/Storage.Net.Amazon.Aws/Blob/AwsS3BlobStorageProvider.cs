@@ -198,12 +198,12 @@ namespace Storage.Net.Aws.Blob
          return true;
       }
 
-      public async Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public async Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         return await Task.WhenAll(ids.Select(GetMetaAsync));
+         return await Task.WhenAll(ids.Select(GetBlobAsync));
       }
 
-      private async Task<BlobMeta> GetMetaAsync(string id)
+      private async Task<BlobId> GetBlobAsync(string id)
       {
          GenericValidation.CheckBlobId(id);
 
@@ -214,15 +214,22 @@ namespace Storage.Net.Aws.Blob
             {
                //ETag contains actual MD5 hash, not sure why!
 
-               return (obj != null)
-                  ? new BlobMeta(obj.ContentLength, obj.ETag.Trim('\"'), obj.LastModified.ToUniversalTime())
-                  : null;
+               if(obj != null)
+               {
+                  var r = new BlobId(id);
+                  r.MD5 = obj.ETag.Trim('\"');
+                  r.Size = obj.ContentLength;
+                  r.LastModificationTime = obj.LastModified.ToUniversalTime();
+                  return r;
+               }
             }
          }
          catch (StorageException ex) when (ex.ErrorCode == ErrorCode.NotFound)
          {
-            return null;
+            //if blob is not found, don't return any information
          }
+
+         return null;
       }
 
       private async Task<GetObjectResponse> GetObjectAsync(string key)

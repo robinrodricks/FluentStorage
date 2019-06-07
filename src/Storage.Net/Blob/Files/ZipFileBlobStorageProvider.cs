@@ -60,9 +60,9 @@ namespace Storage.Net.Blob.Files
          return Task.FromResult<IReadOnlyCollection<bool>>(result);
       }
 
-      public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         var result = new List<BlobMeta>();
+         var result = new List<BlobId>();
          ZipArchive zipArchive = GetArchive(false);
 
          foreach (string id in ids)
@@ -75,7 +75,7 @@ namespace Storage.Net.Blob.Files
 
                long originalLength = entry.Length;
 
-               result.Add(new BlobMeta(originalLength, null, entry.LastWriteTime));
+               result.Add(new BlobId(nid) { Size = originalLength, LastModificationTime = entry.LastWriteTime });
             }
             catch (NullReferenceException)
             {
@@ -83,7 +83,7 @@ namespace Storage.Net.Blob.Files
             }
          }
 
-         return Task.FromResult<IEnumerable<BlobMeta>>(result);
+         return Task.FromResult<IReadOnlyCollection<BlobId>>(result);
       }
 
       public Task<IReadOnlyCollection<BlobId>> ListAsync(ListOptions options, CancellationToken cancellationToken = default)

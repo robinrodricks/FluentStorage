@@ -91,7 +91,7 @@ namespace Storage.Net.Blob.Files
 
          if(includeMeta)
          {
-            blobId.Meta = BlobMetaFromId(blobId.FullPath);
+            EnrichWithMetadata(blobId);
          }
 
          return blobId;
@@ -265,44 +265,45 @@ namespace Storage.Net.Blob.Files
       }
 
       /// <summary>
-      /// Gets file metadata
+      /// See interface
       /// </summary>
-      public Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         if (ids == null) return Task.FromResult<IEnumerable<BlobMeta>>(null);
+         var result = new List<BlobId>();
 
-         GenericValidation.CheckBlobId(ids);
-
-         var result = new List<BlobMeta>();
-
-         foreach (string id in ids)
+         foreach(string blobId in ids)
          {
-            result.Add(BlobMetaFromId(id));
+            GenericValidation.CheckBlobId(blobId);
+
+            string filePath = GetFilePath(blobId, false);
+            if(!File.Exists(filePath))
+            {
+               result.Add(null);
+               continue;
+            }
+
+            var bid = new BlobId(blobId);
+            EnrichWithMetadata(bid);
          }
 
-         return Task.FromResult((IEnumerable<BlobMeta>) result);
+         return Task.FromResult<IReadOnlyCollection<BlobId>>(result);
       }
 
-      private BlobMeta BlobMetaFromId(string id)
+      private void EnrichWithMetadata(BlobId id)
       {
-         string path = GetFilePath(StoragePath.Normalize(id, false));
+         string path = GetFilePath(StoragePath.Normalize(id.FullPath, false));
 
-         if (!File.Exists(path)) return null;
+         if (!File.Exists(path)) return;
 
          var fi = new FileInfo(path);
 
-         string md5;
          using (Stream fs = File.OpenRead(fi.FullName))
          {
-            md5 = fs.GetHash(HashType.Md5);
+            id.MD5 = fs.GetHash(HashType.Md5);
          }
 
-         var meta = new BlobMeta(
-            fi.Length,
-            md5,
-            fi.CreationTimeUtc);
-
-         return meta;
+         id.Size = fi.Length;
+         id.LastModificationTime = fi.CreationTimeUtc;
       }
 
       /// <summary>

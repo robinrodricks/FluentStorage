@@ -25,9 +25,20 @@ namespace Storage.Net.Blob
       public string Id { get; private set; }
 
       /// <summary>
-      /// Contains blob metadata when known, optional.
+      /// Blob size
       /// </summary>
-      public BlobMeta Meta { get; set; }
+      public long? Size { get; set; }
+
+      /// <summary>
+      /// MD5 content hash of the blob. Note that this property can be null if underlying storage has
+      /// no information about the hash.
+      /// </summary>
+      public string MD5 { get; set;  }
+
+      /// <summary>
+      /// Last modification time when known
+      /// </summary>
+      public DateTimeOffset? LastModificationTime { get; set; }
 
       /// <summary>
       /// Gets full path to this blob which is a combination of folder path and blob name

@@ -77,12 +77,9 @@ namespace Storage.Net.Blob
       Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default);
 
       /// <summary>
-      /// Gets basic blob metadata
+      /// Gets blob information
       /// </summary>
-      /// <param name="ids">Blob id</param>
-      /// <param name="cancellationToken"></param>
-      /// <returns>Blob metadata or null if blob doesn't exist</returns>
-      Task<IEnumerable<BlobMeta>> GetMetaAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default);
+      Task<IReadOnlyCollection<BlobId>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Starts a new transaction
