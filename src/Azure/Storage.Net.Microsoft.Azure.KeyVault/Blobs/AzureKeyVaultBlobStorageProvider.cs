@@ -126,14 +126,14 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
 
       public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         GenericValidation.CheckBlobPaths(ids);
+         GenericValidation.CheckBlobFullPaths(ids);
 
          await Task.WhenAll(ids.Select(id => _vaultClient.DeleteSecretAsync(_vaultUri, id)));
       }
 
       public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         GenericValidation.CheckBlobPaths(ids);
+         GenericValidation.CheckBlobFullPaths(ids);
 
          return await Task.WhenAll(ids.Select(id => ExistsAsync(id)));
       }
@@ -156,7 +156,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
 
       public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         GenericValidation.CheckBlobPaths(ids);
+         GenericValidation.CheckBlobFullPaths(ids);
 
          return await Task.WhenAll(ids.Select(id => GetMetaAsync(id)));
       }

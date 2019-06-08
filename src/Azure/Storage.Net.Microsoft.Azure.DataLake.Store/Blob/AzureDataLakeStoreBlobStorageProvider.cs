@@ -141,7 +141,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 
       public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobPaths(ids);
+         GenericValidation.CheckBlobFullPaths(ids);
 
          AdlsClient client = await GetAdlsClientAsync();
 
@@ -150,7 +150,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 
       public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobPaths(ids);
+         GenericValidation.CheckBlobFullPaths(ids);
 
          AdlsClient client = await GetAdlsClientAsync();
 
@@ -168,7 +168,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 
       public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobPaths(ids);
+         GenericValidation.CheckBlobFullPaths(ids);
 
          AdlsClient client = await GetAdlsClientAsync();
 

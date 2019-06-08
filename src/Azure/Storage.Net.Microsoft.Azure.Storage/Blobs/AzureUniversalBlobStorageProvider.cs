@@ -56,7 +56,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
       public async Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         GenericValidation.CheckBlobPaths(fullPaths);
+         GenericValidation.CheckBlobFullPaths(fullPaths);
 
          await Task.WhenAll(fullPaths.Select(fullPath => DeleteAsync(fullPath, cancellationToken)));
       }
@@ -100,7 +100,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
       public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         GenericValidation.CheckBlobPaths(fullPaths);
+         GenericValidation.CheckBlobFullPaths(fullPaths);
          return await Task.WhenAll(fullPaths.Select(id => GetBlobWithMetaAsync(id, cancellationToken)));
       }
 

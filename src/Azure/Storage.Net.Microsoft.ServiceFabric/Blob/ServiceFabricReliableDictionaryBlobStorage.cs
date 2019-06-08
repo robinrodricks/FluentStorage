@@ -142,7 +142,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
 
       public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobPaths(ids);
+         GenericValidation.CheckBlobFullPaths(ids);
 
          using (ServiceFabricTransaction tx = GetTransaction())
          {
@@ -159,7 +159,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
 
       public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobPaths(ids);
+         GenericValidation.CheckBlobFullPaths(ids);
 
          var result = new List<bool>();
          using (ServiceFabricTransaction tx = GetTransaction())
@@ -178,7 +178,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
 
       public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobPaths(ids);
+         GenericValidation.CheckBlobFullPaths(ids);
 
          var result = new List<Blob>();
 

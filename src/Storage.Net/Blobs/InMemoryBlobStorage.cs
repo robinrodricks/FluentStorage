@@ -98,7 +98,7 @@ namespace Storage.Net.Blobs
 
       public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobPaths(ids);
+         GenericValidation.CheckBlobFullPaths(ids);
 
          foreach (string blobId in ids)
          {
@@ -122,7 +122,7 @@ namespace Storage.Net.Blobs
 
       public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobPaths(ids);
+         GenericValidation.CheckBlobFullPaths(ids);
 
          var result = new List<Blob>();
 

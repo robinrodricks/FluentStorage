@@ -252,7 +252,7 @@ namespace Storage.Net.Blobs.Files
 
          if (ids != null)
          {
-            GenericValidation.CheckBlobPaths(ids);
+            GenericValidation.CheckBlobFullPaths(ids);
 
             foreach (string id in ids)
             {

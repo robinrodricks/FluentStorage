@@ -42,7 +42,7 @@ namespace Storage.Net
       /// <summary>
       /// Checks blob ID for generic rules
       /// </summary>
-      public static void CheckBlobPaths(IEnumerable<string> ids)
+      public static void CheckBlobFullPaths(IEnumerable<string> ids)
       {
          if (ids == null) return;
 

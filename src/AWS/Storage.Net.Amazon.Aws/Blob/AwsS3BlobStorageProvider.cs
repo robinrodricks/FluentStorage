@@ -115,77 +115,77 @@ namespace Storage.Net.Aws.Blobs
             .ToList();
       }
 
-      public async Task WriteAsync(string id, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
+      public async Task WriteAsync(string fullPath, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
       {
          if (append) throw new NotSupportedException();
 
-         GenericValidation.CheckBlobFullPath(id);
+         GenericValidation.CheckBlobFullPath(fullPath);
          GenericValidation.CheckSourceStream(sourceStream);
 
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
 
-         id = StoragePath.Normalize(id, false);
-         await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, id, cancellationToken);
+         fullPath = StoragePath.Normalize(fullPath, false);
+         await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, fullPath, cancellationToken);
       }
 
       /// <summary>
       /// S3 doesnt support this natively and will cache everything in MemoryStream until disposed.
       /// </summary>
-      public Task<Stream> OpenWriteAsync(string id, bool append = false, CancellationToken cancellationToken = default)
+      public Task<Stream> OpenWriteAsync(string fullPath, bool append = false, CancellationToken cancellationToken = default)
       {
          if (append) throw new NotSupportedException();
-         GenericValidation.CheckBlobFullPath(id);
-         id = StoragePath.Normalize(id, false);
+         GenericValidation.CheckBlobFullPath(fullPath);
+         fullPath = StoragePath.Normalize(fullPath, false);
 
          var callbackStream = new FixedStream(new MemoryStream(), null, fx =>
          {
             var ms = (MemoryStream)fx.Parent;
             ms.Position = 0;
 
-            _fileTransferUtility.UploadAsync(ms, _bucketName, id, cancellationToken).Wait();
+            _fileTransferUtility.UploadAsync(ms, _bucketName, fullPath, cancellationToken).Wait();
          });
 
          return Task.FromResult<Stream>(callbackStream);
       }
 
-      public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default)
+      public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
       {
-         GenericValidation.CheckBlobFullPath(id);
+         GenericValidation.CheckBlobFullPath(fullPath);
 
-         id = StoragePath.Normalize(id, false);
-         GetObjectResponse response = await GetObjectAsync(id);
+         fullPath = StoragePath.Normalize(fullPath, false);
+         GetObjectResponse response = await GetObjectAsync(fullPath);
          if (response == null) return null;
 
          return new FixedStream(response.ResponseStream, length: response.ContentLength);
       }
 
-      public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         return Task.WhenAll(ids.Select(id => DeleteAsync(id, cancellationToken)));
+         return Task.WhenAll(fullPaths.Select(fullPath => DeleteAsync(fullPath, cancellationToken)));
       }
 
-      private async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
+      private async Task DeleteAsync(string fullPath, CancellationToken cancellationToken = default)
       {
-         GenericValidation.CheckBlobFullPath(id);
+         GenericValidation.CheckBlobFullPath(fullPath);
 
-         id = StoragePath.Normalize(id, false);
+         fullPath = StoragePath.Normalize(fullPath, false);
          AmazonS3Client client = await GetClientAsync();
-         await client.DeleteObjectAsync(_bucketName, id, cancellationToken);
+         await client.DeleteObjectAsync(_bucketName, fullPath, cancellationToken);
       }
 
-      public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         return await Task.WhenAll(ids.Select(ExistsAsync));
+         return await Task.WhenAll(fullPaths.Select(ExistsAsync));
       }
 
-      private async Task<bool> ExistsAsync(string id)
+      private async Task<bool> ExistsAsync(string fullPath)
       {
-         GenericValidation.CheckBlobFullPath(id);
+         GenericValidation.CheckBlobFullPath(fullPath);
 
          try
          {
-            id = StoragePath.Normalize(id, false);
-            using (GetObjectResponse response = await GetObjectAsync(id))
+            fullPath = StoragePath.Normalize(fullPath, false);
+            using (GetObjectResponse response = await GetObjectAsync(fullPath))
             {
                if (response == null) return false;
             }
@@ -198,25 +198,25 @@ namespace Storage.Net.Aws.Blobs
          return true;
       }
 
-      public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         return await Task.WhenAll(ids.Select(GetBlobAsync));
+         return await Task.WhenAll(fullPaths.Select(GetBlobAsync));
       }
 
-      private async Task<Blob> GetBlobAsync(string id)
+      private async Task<Blob> GetBlobAsync(string fullPath)
       {
-         GenericValidation.CheckBlobFullPath(id);
+         GenericValidation.CheckBlobFullPath(fullPath);
 
          try
          {
-            id = StoragePath.Normalize(id, false);
-            using (GetObjectResponse obj = await GetObjectAsync(id))
+            fullPath = StoragePath.Normalize(fullPath, false);
+            using (GetObjectResponse obj = await GetObjectAsync(fullPath))
             {
                //ETag contains actual MD5 hash, not sure why!
 
                if(obj != null)
                {
-                  var r = new Blob(id);
+                  var r = new Blob(fullPath);
                   r.MD5 = obj.ETag.Trim('\"');
                   r.Size = obj.ContentLength;
                   r.LastModificationTime = obj.LastModified.ToUniversalTime();
@@ -279,23 +279,23 @@ namespace Storage.Net.Aws.Blobs
       /// <summary>
       /// Get presigned url for upload object to Blob Storage.
       /// </summary>
-      public async Task<string> GetUploadUrlAsync(string id, string mimeType, int expiresInSeconds = 86000)
+      public async Task<string> GetUploadUrlAsync(string fullPath, string mimeType, int expiresInSeconds = 86000)
       {
-         return await GetPresignedUrlAsync(id, mimeType, expiresInSeconds, HttpVerb.PUT);
+         return await GetPresignedUrlAsync(fullPath, mimeType, expiresInSeconds, HttpVerb.PUT);
       }
 
       /// <summary>
       /// Get presigned url for download object from Blob Storage.
       /// </summary>
-      public async Task<string> GetDownloadUrlAsync(string id, string mimeType, int expiresInSeconds = 86000)
+      public async Task<string> GetDownloadUrlAsync(string fullPath, string mimeType, int expiresInSeconds = 86000)
       {
-         return await GetPresignedUrlAsync(id, mimeType, expiresInSeconds, HttpVerb.GET);
+         return await GetPresignedUrlAsync(fullPath, mimeType, expiresInSeconds, HttpVerb.GET);
       }
 
       /// <summary>
       /// Get presigned url for requested operation with Blob Storage.
       /// </summary>
-      public async Task<string> GetPresignedUrlAsync(string id, string mimeType, int expiresInSeconds, HttpVerb verb)
+      public async Task<string> GetPresignedUrlAsync(string fullPath, string mimeType, int expiresInSeconds, HttpVerb verb)
       {
          IAmazonS3 client = await GetClientAsync();
 
@@ -304,7 +304,7 @@ namespace Storage.Net.Aws.Blobs
             BucketName = _bucketName,
             ContentType = mimeType,
             Expires = DateTime.UtcNow.AddSeconds(expiresInSeconds),
-            Key = StoragePath.Normalize(id, false),
+            Key = StoragePath.Normalize(fullPath, false),
             Verb = verb,
          });
       }
