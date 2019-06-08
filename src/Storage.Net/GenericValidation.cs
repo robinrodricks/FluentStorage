@@ -25,7 +25,7 @@ namespace Storage.Net
          {
             if (part.Length > MaxBlobPrefixLength)
                throw new ArgumentException(
-                  string.Format(Exceptions.BlobPrefix_TooLong, MaxBlobPrefixLength),
+                  string.Format("blob prefix cannot exceed {0} characters", MaxBlobPrefixLength),
                   nameof(prefix));
          }
       }
