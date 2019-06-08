@@ -55,7 +55,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
 
       public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
 
          if (append)
          {
@@ -126,7 +126,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
 
       public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
          id = ToId(id);
 
          using (ServiceFabricTransaction tx = GetTransaction())
@@ -142,7 +142,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
 
       public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(ids);
+         GenericValidation.CheckBlobPaths(ids);
 
          using (ServiceFabricTransaction tx = GetTransaction())
          {
@@ -159,7 +159,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
 
       public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(ids);
+         GenericValidation.CheckBlobPaths(ids);
 
          var result = new List<bool>();
          using (ServiceFabricTransaction tx = GetTransaction())
@@ -178,7 +178,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
 
       public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(ids);
+         GenericValidation.CheckBlobPaths(ids);
 
          var result = new List<Blob>();
 

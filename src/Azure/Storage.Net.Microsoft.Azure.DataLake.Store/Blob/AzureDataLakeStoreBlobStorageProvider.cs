@@ -74,7 +74,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 
       public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
 
          AdlsClient client = await GetAdlsClientAsync();
 
@@ -101,7 +101,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 
       public async Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
 
          AdlsClient client = await GetAdlsClientAsync();
 
@@ -123,7 +123,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 
       public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
 
          AdlsClient client = await GetAdlsClientAsync();
 
@@ -141,7 +141,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 
       public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(ids);
+         GenericValidation.CheckBlobPaths(ids);
 
          AdlsClient client = await GetAdlsClientAsync();
 
@@ -150,7 +150,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 
       public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(ids);
+         GenericValidation.CheckBlobPaths(ids);
 
          AdlsClient client = await GetAdlsClientAsync();
 
@@ -168,7 +168,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 
       public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(ids);
+         GenericValidation.CheckBlobPaths(ids);
 
          AdlsClient client = await GetAdlsClientAsync();
 

@@ -46,7 +46,7 @@ namespace Storage.Net.Blobs
 
       public Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
          id = StoragePath.Normalize(id);
 
          if (append)
@@ -73,7 +73,7 @@ namespace Storage.Net.Blobs
 
       public Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
          id = StoragePath.Normalize(id);
 
          var result = new FixedStream(new MemoryStream(), null, fx =>
@@ -88,7 +88,7 @@ namespace Storage.Net.Blobs
 
       public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
          id = StoragePath.Normalize(id);
 
          if (!_idToData.TryGetValue(id, out Tag tag)) return Task.FromResult<Stream>(null);
@@ -98,7 +98,7 @@ namespace Storage.Net.Blobs
 
       public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(ids);
+         GenericValidation.CheckBlobPaths(ids);
 
          foreach (string blobId in ids)
          {
@@ -122,7 +122,7 @@ namespace Storage.Net.Blobs
 
       public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(ids);
+         GenericValidation.CheckBlobPaths(ids);
 
          var result = new List<Blob>();
 
@@ -150,7 +150,7 @@ namespace Storage.Net.Blobs
 
       private void Write(string id, Stream sourceStream)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
          id = StoragePath.Normalize(id);
 
          Tag tag = ToTag(sourceStream);
@@ -175,7 +175,7 @@ namespace Storage.Net.Blobs
 
       private bool Exists(string id)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
 
          return _idToData.ContainsKey(id);
       }

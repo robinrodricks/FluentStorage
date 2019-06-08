@@ -150,7 +150,7 @@ namespace Storage.Net.Blobs.Files
 
       private Stream CreateStream(string id, bool overwrite = true)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
          if (!_directory.Exists) _directory.Create();
          string path = GetFilePath(id);
 
@@ -161,7 +161,7 @@ namespace Storage.Net.Blobs.Files
 
       private Stream OpenStream(string id)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
          string path = GetFilePath(id);
          if(!File.Exists(path)) return null;
 
@@ -190,7 +190,7 @@ namespace Storage.Net.Blobs.Files
       /// </summary>
       public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
          GenericValidation.CheckSourceStream(sourceStream);
 
          id = StoragePath.Normalize(id, false);
@@ -205,7 +205,7 @@ namespace Storage.Net.Blobs.Files
       /// </summary>
       public Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
 
          id = StoragePath.Normalize(id, false);
 
@@ -217,7 +217,7 @@ namespace Storage.Net.Blobs.Files
       /// </summary>
       public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
 
          id = StoragePath.Normalize(id, false);
          Stream result = OpenStream(id);
@@ -234,7 +234,7 @@ namespace Storage.Net.Blobs.Files
 
          foreach (string id in ids)
          {
-            GenericValidation.CheckBlobId(id);
+            GenericValidation.CheckBlobFullPath(id);
 
             string path = GetFilePath(StoragePath.Normalize(id, false));
             if (File.Exists(path)) File.Delete(path);
@@ -252,7 +252,7 @@ namespace Storage.Net.Blobs.Files
 
          if (ids != null)
          {
-            GenericValidation.CheckBlobId(ids);
+            GenericValidation.CheckBlobPaths(ids);
 
             foreach (string id in ids)
             {
@@ -273,7 +273,7 @@ namespace Storage.Net.Blobs.Files
 
          foreach(string blobId in ids)
          {
-            GenericValidation.CheckBlobId(blobId);
+            GenericValidation.CheckBlobFullPath(blobId);
 
             string filePath = GetFilePath(blobId, false);
             if(!File.Exists(filePath))

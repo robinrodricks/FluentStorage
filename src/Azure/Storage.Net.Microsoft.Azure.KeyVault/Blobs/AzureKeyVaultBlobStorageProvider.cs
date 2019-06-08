@@ -75,7 +75,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
 
       public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
          ValidateSecretName(id);
          GenericValidation.CheckSourceStream(sourceStream);
          if (append) throw new ArgumentException("appending to secrets is not supported", nameof(append));
@@ -87,7 +87,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
 
       public Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
          ValidateSecretName(id);
          if (append) throw new ArgumentException("appending to secrets is not supported", nameof(append));
 
@@ -104,7 +104,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
 
       public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
          ValidateSecretName(id);
 
          SecretBundle secret;
@@ -126,14 +126,14 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
 
       public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         GenericValidation.CheckBlobId(ids);
+         GenericValidation.CheckBlobPaths(ids);
 
          await Task.WhenAll(ids.Select(id => _vaultClient.DeleteSecretAsync(_vaultUri, id)));
       }
 
       public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         GenericValidation.CheckBlobId(ids);
+         GenericValidation.CheckBlobPaths(ids);
 
          return await Task.WhenAll(ids.Select(id => ExistsAsync(id)));
       }
@@ -156,7 +156,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
 
       public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         GenericValidation.CheckBlobId(ids);
+         GenericValidation.CheckBlobPaths(ids);
 
          return await Task.WhenAll(ids.Select(id => GetMetaAsync(id)));
       }

@@ -119,7 +119,7 @@ namespace Storage.Net.Aws.Blobs
       {
          if (append) throw new NotSupportedException();
 
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
          GenericValidation.CheckSourceStream(sourceStream);
 
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
@@ -134,7 +134,7 @@ namespace Storage.Net.Aws.Blobs
       public Task<Stream> OpenWriteAsync(string id, bool append = false, CancellationToken cancellationToken = default)
       {
          if (append) throw new NotSupportedException();
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
          id = StoragePath.Normalize(id, false);
 
          var callbackStream = new FixedStream(new MemoryStream(), null, fx =>
@@ -150,7 +150,7 @@ namespace Storage.Net.Aws.Blobs
 
       public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
 
          id = StoragePath.Normalize(id, false);
          GetObjectResponse response = await GetObjectAsync(id);
@@ -166,7 +166,7 @@ namespace Storage.Net.Aws.Blobs
 
       private async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
 
          id = StoragePath.Normalize(id, false);
          AmazonS3Client client = await GetClientAsync();
@@ -180,7 +180,7 @@ namespace Storage.Net.Aws.Blobs
 
       private async Task<bool> ExistsAsync(string id)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
 
          try
          {
@@ -205,7 +205,7 @@ namespace Storage.Net.Aws.Blobs
 
       private async Task<Blob> GetBlobAsync(string id)
       {
-         GenericValidation.CheckBlobId(id);
+         GenericValidation.CheckBlobFullPath(id);
 
          try
          {

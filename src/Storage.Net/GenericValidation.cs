@@ -34,7 +34,7 @@ namespace Storage.Net
       /// Validates blob ID
       /// </summary>
       /// <param name="id"></param>
-      public static void CheckBlobId(string id)
+      public static void CheckBlobFullPath(string id)
       {
          if (id == null) throw new ArgumentNullException(nameof(id));
       }
@@ -42,13 +42,13 @@ namespace Storage.Net
       /// <summary>
       /// Checks blob ID for generic rules
       /// </summary>
-      public static void CheckBlobId(IEnumerable<string> ids)
+      public static void CheckBlobPaths(IEnumerable<string> ids)
       {
          if (ids == null) return;
 
          foreach (string id in ids)
          {
-            CheckBlobId(id);
+            CheckBlobFullPath(id);
          }
       }
 
