@@ -58,12 +58,6 @@ namespace Storage.Net.Blobs
       public bool IncludeMetaWhenKnown { get; set; } = false;
 
       /// <summary>
-      /// When set, an implementing provider might be able to send notification on progress callback if it supports them.
-      /// First parameter indicates number of items already listed, second - total number of items (if known).
-      /// </summary>
-      public Action<long, long> ListProgressCallback { get; set; }
-
-      /// <summary>
       /// When supported, sets the maximum number of threads to be used for listing operations
       /// </summary>
       public int MaxDegreeOfParalellism { get; set; } = 10;

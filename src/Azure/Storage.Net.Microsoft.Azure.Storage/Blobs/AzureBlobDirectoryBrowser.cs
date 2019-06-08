@@ -68,8 +68,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          batch = batch.Where(options.IsMatch).ToList();
          if (options.Add(container, batch)) return;
 
-         options.ListProgressCallback?.Invoke(container.Count, -1);
-
          if (options.Recurse)
          {
             var folderIds = batch.Where(r => r.Kind == BlobItemKind.Folder).ToList();
