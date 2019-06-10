@@ -24,7 +24,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       {
          var result = new List<Blob>();
 
-         await ListFolderAsync(result, options.FolderPath, options, cancellationToken);
+         await ListFolderAsync(result, options.FolderPath, options, cancellationToken).ConfigureAwait(false);
 
          return result;
       }
@@ -43,13 +43,13 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             do
             {
                BlobResultSegment segment = await dir.ListBlobsSegmentedAsync(
-                  false, BlobListingDetails.None, null, token, null, null, cancellationToken);
+                  false, BlobListingDetails.None, null, token, null, null, cancellationToken).ConfigureAwait(false);
 
                token = segment.ContinuationToken;
 
                foreach (IListBlobItem blob in segment.Results)
                {
-                  Blob id = ToBlobId(blob, options.IncludeMetaWhenKnown);
+                  Blob id = await ToBlobIdAsync(blob, options.IncludeMetaWhenKnown).ConfigureAwait(false);
 
                   if (options.IsMatch(id) && (options.BrowseFilter == null || options.BrowseFilter(id)))
                   {
@@ -77,7 +77,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
                   container,
                   StoragePath.Combine(path, folderId.Id),
                   options,
-                  cancellationToken)));
+                  cancellationToken))).ConfigureAwait(false);
          }
       }
 
@@ -90,7 +90,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return dir;
       }
 
-      private Blob ToBlobId(IListBlobItem blob, bool attachMetadata)
+      private async Task<Blob> ToBlobIdAsync(IListBlobItem blob, bool attachMetadata)
       {
          Blob id;
 
@@ -120,6 +120,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          //attach metadata if we can
          if(attachMetadata && blob is CloudBlob cloudBlob)
          {
+            await cloudBlob.FetchAttributesAsync().ConfigureAwait(false);
             AzureUniversalBlobStorageProvider.AttachBlobMeta(id, cloudBlob);
          }
 

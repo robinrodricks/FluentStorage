@@ -454,6 +454,27 @@ namespace Storage.Net.Tests.Integration.Blobs
          Assert.Equal(2, blob2.Metadata.Count);
       }
 
+      [Fact]
+      public async Task UserMetadata_List_AlsoReturnsMetadata()
+      {
+         var blob = new Blob(RandomBlobId());
+         blob.Metadata = new Dictionary<string, string>
+         {
+            ["user"] = "ivan",
+            ["fun"] = "no"
+         };
+         await _storage.WriteTextAsync(blob, "test2");
+
+         IReadOnlyCollection<Blob> all = await _storage.ListAsync(folderPath: blob.FolderPath, includeMetaWhenKnown: true);
+
+         //test
+         Blob blob2 = all.First(b => b.FullPath == blob.FullPath);
+         Assert.NotNull(blob2.Metadata);
+         Assert.Equal("ivan", blob2.Metadata["user"]);
+         Assert.Equal("no", blob2.Metadata["fun"]);
+         Assert.Equal(2, blob2.Metadata.Count);
+      }
+
       private string RandomBlobId(string prefix = null)
       {
          return _blobPrefix +
