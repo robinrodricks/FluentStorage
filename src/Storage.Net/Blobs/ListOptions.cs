@@ -51,11 +51,11 @@ namespace Storage.Net.Blobs
       public int? MaxResults { get; set; }
 
       /// <summary>
-      /// When set, includes blob metadata in the response if the provider supports it. False by default
+      /// When set, includes blob attributes in the response if the provider supports it. False by default
       /// only because metadata consumes more memory in response object, although most of the providers do not
       /// have any overhead in creating this metadata.
       /// </summary>
-      public bool IncludeMetaWhenKnown { get; set; } = false;
+      public bool IncludeAttributes { get; set; } = false;
 
       /// <summary>
       /// When supported, sets the maximum number of threads to be used for listing operations

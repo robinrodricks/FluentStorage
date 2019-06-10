@@ -97,7 +97,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
             //set pointer to next page
             listAfter = page[page.Count - 1].Name;
 
-            result.AddRange(page.Select(p => ToBlobId(path, p, options.IncludeMetaWhenKnown)));
+            result.AddRange(page.Select(p => ToBlobId(path, p, options.IncludeAttributes)));
          }
 
          return result;

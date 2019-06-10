@@ -44,7 +44,7 @@ namespace Storage.Net.Blobs
       /// <param name="filePrefix"><see cref="ListOptions.FilePrefix"/></param>
       /// <param name="recurse"><see cref="ListOptions.Recurse"/></param>
       /// <param name="maxResults"><see cref="ListOptions.MaxResults"/></param>
-      /// <param name="includeMetaWhenKnown"><see cref="ListOptions.IncludeMetaWhenKnown"/></param>
+      /// <param name="includeAttributes"><see cref="ListOptions.IncludeAttributes"/></param>
       /// <param name="cancellationToken"></param>
       /// <returns>List of blob IDs</returns>
       public static Task<IReadOnlyCollection<Blob>> ListAsync(this IBlobStorage blobStorage,
@@ -53,7 +53,7 @@ namespace Storage.Net.Blobs
          string filePrefix = null,
          bool recurse = false,
          int? maxResults = null,
-         bool includeMetaWhenKnown = false,
+         bool includeAttributes = false,
          CancellationToken cancellationToken = default)
       {
          var options = new ListOptions();
@@ -66,7 +66,7 @@ namespace Storage.Net.Blobs
          options.Recurse = recurse;
          if(maxResults != null)
             options.MaxResults = maxResults;
-         options.IncludeMetaWhenKnown = includeMetaWhenKnown;
+         options.IncludeAttributes = includeAttributes;
 
          return blobStorage.ListAsync(options, cancellationToken);
       }

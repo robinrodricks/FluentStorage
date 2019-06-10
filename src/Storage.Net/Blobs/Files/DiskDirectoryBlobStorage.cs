@@ -60,8 +60,8 @@ namespace Storage.Net.Blobs.Files
                options.Recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
          var result = new List<Blob>();
-         result.AddRange(directoryIds.Select(id => ToBlobItem(id, BlobItemKind.Folder, options.IncludeMetaWhenKnown)));
-         result.AddRange(fileIds.Select(id => ToBlobItem(id, BlobItemKind.File, options.IncludeMetaWhenKnown)));
+         result.AddRange(directoryIds.Select(id => ToBlobItem(id, BlobItemKind.Folder, options.IncludeAttributes)));
+         result.AddRange(fileIds.Select(id => ToBlobItem(id, BlobItemKind.File, options.IncludeAttributes)));
          result = result
             .Where(i => options.BrowseFilter == null || options.BrowseFilter(i))
             .Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value)

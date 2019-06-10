@@ -49,7 +49,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
                foreach (IListBlobItem blob in segment.Results)
                {
-                  Blob id = await ToBlobIdAsync(blob, options.IncludeMetaWhenKnown).ConfigureAwait(false);
+                  Blob id = await ToBlobIdAsync(blob, options.IncludeAttributes).ConfigureAwait(false);
 
                   if (options.IsMatch(id) && (options.BrowseFilter == null || options.BrowseFilter(id)))
                   {

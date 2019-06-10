@@ -170,7 +170,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 
          await _storage.WriteTextAsync(targetId, "test");
 
-         IReadOnlyCollection<Blob> rootContent = await _storage.ListAsync(new ListOptions { Recurse = false, IncludeMetaWhenKnown = true });
+         IReadOnlyCollection<Blob> rootContent = await _storage.ListAsync(new ListOptions { Recurse = false, IncludeAttributes = true });
 
          Assert.NotEmpty(rootContent);
       }
@@ -465,7 +465,7 @@ namespace Storage.Net.Tests.Integration.Blobs
          };
          await _storage.WriteTextAsync(blob, "test2");
 
-         IReadOnlyCollection<Blob> all = await _storage.ListAsync(folderPath: blob.FolderPath, includeMetaWhenKnown: true);
+         IReadOnlyCollection<Blob> all = await _storage.ListAsync(folderPath: blob.FolderPath, includeAttributes: true);
 
          //test
          Blob blob2 = all.First(b => b.FullPath == blob.FullPath);
