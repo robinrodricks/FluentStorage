@@ -387,6 +387,73 @@ namespace Storage.Net.Tests.Integration.Blobs
 
       }
 
+      [Fact]
+      public async Task UserMetadata_write_readsback()
+      {
+         var blob = new Blob(RandomBlobId());
+         blob.Metadata = new Dictionary<string, string>
+         {
+            ["user"] = "ivan",
+            ["fun"] = "no"
+         };
+
+         await _storage.WriteTextAsync(blob, "test");
+
+         //test
+         Blob blob2 = await _storage.GetBlobAsync(blob);
+         Assert.NotNull(blob2.Metadata);
+         Assert.Equal("ivan", blob2.Metadata["user"]);
+         Assert.Equal("no", blob2.Metadata["fun"]);
+         Assert.Equal(2, blob2.Metadata.Count);
+      }
+
+      [Fact]
+      public async Task UserMetadata_OverwriteWithLess_RemovesOld()
+      {
+         //setup
+         var blob = new Blob(RandomBlobId());
+         blob.Metadata = new Dictionary<string, string>
+         {
+            ["user"] = "ivan",
+            ["fun"] = "no"
+         };
+         await _storage.WriteTextAsync(blob, "test");
+         blob.Metadata = new Dictionary<string, string>
+         {
+            ["user"] = "ivan2"
+         };
+         await _storage.WriteTextAsync(blob, "test2");
+
+         //test
+         Blob blob2 = await _storage.GetBlobAsync(blob);
+         Assert.NotNull(blob2.Metadata);
+         Assert.Equal(1, blob2.Metadata.Count);
+         Assert.Equal("ivan2", blob2.Metadata["user"]);
+      }
+
+      [Fact]
+      public async Task UserMetadata_openwrite_readsback()
+      {
+         var blob = new Blob(RandomBlobId());
+         blob.Metadata = new Dictionary<string, string>
+         {
+            ["user"] = "ivan",
+            ["fun"] = "no"
+         };
+
+         using(Stream s = await _storage.OpenWriteAsync(blob))
+         {
+            s.Write(RandomGenerator.GetRandomBytes(10, 15));
+         }
+
+         //test
+         Blob blob2 = await _storage.GetBlobAsync(blob);
+         Assert.NotNull(blob2.Metadata);
+         Assert.Equal("ivan", blob2.Metadata["user"]);
+         Assert.Equal("no", blob2.Metadata["fun"]);
+         Assert.Equal(2, blob2.Metadata.Count);
+      }
+
       private string RandomBlobId(string prefix = null)
       {
          return _blobPrefix +

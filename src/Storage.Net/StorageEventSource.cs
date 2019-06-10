@@ -5,12 +5,13 @@ namespace Storage.Net
    /// <summary>
    /// Internal logger
    /// </summary>
-   public sealed class MessagingEventSource : EventSource
+   [EventSource(Name = "Storage.Net")]
+   public sealed class StorageEventSource : EventSource
    {
       /// <summary>
       /// Logger instance
       /// </summary>
-      public static MessagingEventSource Log { get; } = new MessagingEventSource();
+      public static StorageEventSource Log { get; } = new StorageEventSource();
 
       /// <summary>
       /// Writes generic debug message

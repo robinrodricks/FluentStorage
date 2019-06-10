@@ -163,21 +163,21 @@ namespace Storage.Net.Ftp
 
       public Task<ITransaction> OpenTransactionAsync() => Task.FromResult(EmptyTransaction.Instance);
 
-      public async Task<Stream> OpenWriteAsync(string id, bool append = false, CancellationToken cancellationToken = default)
+      public async Task<Stream> OpenWriteAsync(Blob blob, bool append = false, CancellationToken cancellationToken = default)
       {
          FtpClient client = await GetClientAsync();
 
          return await retryPolicy.ExecuteAsync<Stream>(async () =>
          {
-            return await client.OpenWriteAsync(id, FtpDataType.Binary, true);
+            return await client.OpenWriteAsync(blob, FtpDataType.Binary, true);
          });
       }
 
-      public async Task WriteAsync(string id, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
+      public async Task WriteAsync(Blob blob, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
       {
          FtpClient client = await GetClientAsync();
 
-         await client.UploadAsync(sourceStream, id, FtpExists.Overwrite, true, null, cancellationToken);
+         await client.UploadAsync(sourceStream, blob, FtpExists.Overwrite, true, null, cancellationToken);
       }
 
       public void Dispose()

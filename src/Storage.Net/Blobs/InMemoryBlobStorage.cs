@@ -44,43 +44,43 @@ namespace Storage.Net.Blobs
          return Task.FromResult((IReadOnlyCollection<Blob>)matches);
       }
 
-      public Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
+      public Task WriteAsync(Blob blob, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(id);
-         id = StoragePath.Normalize(id);
+         GenericValidation.CheckBlobFullPath(blob);
+         string fullPath = StoragePath.Normalize(blob);
 
          if (append)
          {
-            if (!Exists(id))
+            if (!Exists(fullPath))
             {
-               Write(id, sourceStream);
+               Write(fullPath, sourceStream);
             }
             else
             {
-               Tag tag = _idToData[id];
+               Tag tag = _idToData[fullPath];
                byte[] data = tag.data.Concat(sourceStream.ToByteArray()).ToArray();
 
-               _idToData[id] = ToTag(data);
+               _idToData[fullPath] = ToTag(data);
             }
          }
          else
          {
-            Write(id, sourceStream);
+            Write(fullPath, sourceStream);
          }
 
          return Task.FromResult(true);
       }
 
-      public Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
+      public Task<Stream> OpenWriteAsync(Blob blob, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(id);
-         id = StoragePath.Normalize(id);
+         GenericValidation.CheckBlobFullPath(blob);
+         string fullPath = StoragePath.Normalize(blob);
 
          var result = new FixedStream(new MemoryStream(), null, fx =>
          {
             MemoryStream ms = (MemoryStream)fx.Parent;
             ms.Position = 0;
-            WriteAsync(id, ms, append, cancellationToken).Wait();
+            WriteAsync(fullPath, ms, append, cancellationToken).Wait();
          });
 
          return Task.FromResult<Stream>(result);

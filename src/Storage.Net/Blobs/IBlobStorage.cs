@@ -25,28 +25,28 @@ namespace Storage.Net.Blobs
       /// Creates a new blob and uploads data intor it. If the blob already exists it will be
       /// overwritten.
       /// </summary>
-      /// <param name="fullPath">Blob's full path</param>
+      /// <param name="blob">Blob metadata</param>
       /// <param name="sourceStream">Source stream, must be readable and support Length</param>
       /// <param name="cancellationToken"></param>
       /// <param name="append">When true, appends to the file instead of writing a new one.</param>
       /// <returns>Writeable stream</returns>
       /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task WriteAsync(string fullPath, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default);
+      Task WriteAsync(Blob blob, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Creates a new blob and opens a writeable stream for it. If the blob already exists it will be
-      /// overwritten. Please note that <see cref="WriteAsync(string, Stream, bool, CancellationToken)"/> is always
+      /// overwritten. Please note that <see cref="WriteAsync(Blob, Stream, bool, CancellationToken)"/> is always
       /// more effective than this method, because not all of the providers support holding a write stream natively and
       /// some will incur workaround options to support this.
       /// </summary>
-      /// <param name="fullPath">Blob's full path</param>
+      /// <param name="blob">Blob metadata</param>
       /// <param name="cancellationToken"></param>
       /// <param name="append">When true, appends to the file instead of writing a new one.</param>
       /// <returns>Writeable stream</returns>
       /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>
-      Task<Stream> OpenWriteAsync(string fullPath, bool append = false, CancellationToken cancellationToken = default);
+      Task<Stream> OpenWriteAsync(Blob blob, bool append = false, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Opens the blob stream to read.

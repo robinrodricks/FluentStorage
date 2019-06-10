@@ -27,8 +27,9 @@ namespace Storage.Net.Tests.Integration.KeyValue
       public AzureTableEmulatorTest() : base("azure-emulator") { }
    }*/
 
-   public abstract class KeyValueStorageTest : AbstractTestFixture
+   public abstract class KeyValueStorageTest : AbstractTestFixture, IAsyncLifetime
    {
+      private const string TestTablePrefix = "TableStorageTest";
       private readonly string _name;
       private readonly IKeyValueStorage _tables;
       private readonly string _tableName;
@@ -55,7 +56,22 @@ namespace Storage.Net.Tests.Integration.KeyValue
             _tables = StorageFactory.KeyValue.AzureTableDevelopmentStorage();
          }
 
-         _tableName = "TableStorageTest" + Guid.NewGuid().ToString().Replace("-", "");
+         _tableName = TestTablePrefix + Guid.NewGuid().ToString().Replace("-", "");
+      }
+
+      public async Task InitializeAsync()
+      {
+         //delete orphaned tables
+         IReadOnlyCollection<string> tableNames = await _tables.ListTableNamesAsync();
+         foreach(string table in tableNames.Where(n => n.StartsWith(TestTablePrefix)))
+         {
+            await _tables.DeleteAsync(table);
+         }
+      }
+
+      public Task DisposeAsync()
+      {
+         return Task.CompletedTask;
       }
 
       public override void Dispose()

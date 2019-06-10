@@ -119,13 +119,13 @@ namespace Storage.Net.Blobs.Files
          return Task.FromResult(EmptyTransaction.Instance);
       }
 
-      public async Task WriteAsync(string id, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
+      public async Task WriteAsync(Blob blob, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
       {
-         id = StoragePath.Normalize(id, false);
+         string fullPath = StoragePath.Normalize(blob, false);
          ZipArchive archive = GetArchive(true);
 
 
-         ZipArchiveEntry entry = archive.CreateEntry(id, CompressionLevel.Optimal);
+         ZipArchiveEntry entry = archive.CreateEntry(fullPath, CompressionLevel.Optimal);
          using (Stream dest = entry.Open())
          {
             await sourceStream.CopyToAsync(dest);
@@ -157,14 +157,14 @@ namespace Storage.Net.Blobs.Files
       }
 
 
-      public Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
+      public Task<Stream> OpenWriteAsync(Blob blob, bool append, CancellationToken cancellationToken)
       {
          var callbackStream = new FixedStream(new MemoryStream(), null, fx =>
          {
-            id = StoragePath.Normalize(id, false);
+            string fullPath = StoragePath.Normalize(blob, false);
             ZipArchive archive = GetArchive(true);
 
-            ZipArchiveEntry entry = archive.CreateEntry(id, CompressionLevel.Optimal);
+            ZipArchiveEntry entry = archive.CreateEntry(fullPath, CompressionLevel.Optimal);
             using (Stream dest = entry.Open())
             {
                fx.Parent.Position = 0;

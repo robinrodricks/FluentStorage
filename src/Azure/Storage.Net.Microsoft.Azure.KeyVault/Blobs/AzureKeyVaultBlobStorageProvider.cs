@@ -73,29 +73,29 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
          return new Blob(item.Id.Substring(idx + 1), BlobItemKind.File);
       }
 
-      public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
+      public async Task WriteAsync(Blob blob, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(id);
-         ValidateSecretName(id);
+         GenericValidation.CheckBlobFullPath(blob);
+         ValidateSecretName(blob);
          GenericValidation.CheckSourceStream(sourceStream);
          if (append) throw new ArgumentException("appending to secrets is not supported", nameof(append));
 
          string value = Encoding.UTF8.GetString(sourceStream.ToByteArray());
 
-         await _vaultClient.SetSecretAsync(_vaultUri, id, value);
+         await _vaultClient.SetSecretAsync(_vaultUri, blob.FullPath, value);
       }
 
-      public Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
+      public Task<Stream> OpenWriteAsync(Blob blob, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(id);
-         ValidateSecretName(id);
+         GenericValidation.CheckBlobFullPath(blob);
+         ValidateSecretName(blob);
          if (append) throw new ArgumentException("appending to secrets is not supported", nameof(append));
 
          var callbackStream = new FixedStream(new MemoryStream(), null, fx =>
          {
             string value = Encoding.UTF8.GetString(((MemoryStream)fx.Parent).ToArray());
 
-            _vaultClient.SetSecretAsync(_vaultUri, id, value).Wait();
+            _vaultClient.SetSecretAsync(_vaultUri, blob.FullPath, value).Wait();
          });
 
          return Task.FromResult<Stream>(callbackStream);

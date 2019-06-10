@@ -53,28 +53,28 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
          return result;
       }
 
-      public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
+      public async Task WriteAsync(Blob blob, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(id);
+         GenericValidation.CheckBlobFullPath(blob);
 
          if (append)
          {
-            await AppendAsync(id, sourceStream);
+            await AppendAsync(blob, sourceStream);
          }
          else
          {
-            await WriteAsync(id, sourceStream);
+            await WriteAsync(blob, sourceStream);
          }
       }
 
-      public Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken = default)
+      public Task<Stream> OpenWriteAsync(Blob blob, bool append, CancellationToken cancellationToken = default)
       {
          throw new NotImplementedException();
       }
 
-      private async Task WriteAsync(string id, Stream sourceStream)
+      private async Task WriteAsync(Blob blob, Stream sourceStream)
       {
-         id = ToId(id);
+         string id = ToId(blob);
 
          byte[] value = sourceStream.ToByteArray();
 

@@ -118,12 +118,12 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return r;
       }
 
-      internal static void AttachBlobMeta(Blob blob, CloudBlob cloudBlob)
+      internal static void AttachBlobMeta(Blob destination, CloudBlob source)
       {
          //ContentMD5 is base64-encoded hash, whereas we work with HEX encoded ones
-         blob.MD5 = cloudBlob.Properties.ContentMD5.Base64DecodeAsBytes().ToHexString();
-         blob.Size = cloudBlob.Properties.Length;
-         blob.LastModificationTime = cloudBlob.Properties.LastModified;
+         destination.MD5 = source.Properties.ContentMD5.Base64DecodeAsBytes().ToHexString();
+         destination.Size = source.Properties.Length;
+         destination.LastModificationTime = source.Properties.LastModified;
 
          /*meta.Properties["BlobType"] = blob.BlobType.ToString();
          meta.Properties["IsDeleted"] = blob.IsDeleted;
@@ -132,6 +132,35 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          meta.Properties["ContentEncoding"] = blob.Properties.ContentEncoding;
          meta.Properties["ContentLanguage"] = blob.Properties.ContentLanguage;
          meta.Properties["ContentType"] = blob.Properties.ContentType;*/
+
+         if(source.Metadata.Count > 0)
+         {
+            destination.Metadata = new Dictionary<string, string>(source.Metadata);
+         }
+      }
+
+      private async Task AttachBlobMetaAsync(CloudBlob destination, Blob source)
+      {
+         if(source.Metadata == null)
+            return;
+
+         bool exists = await destination.ExistsAsync().ConfigureAwait(false);
+         if(exists)
+         {
+            await destination.FetchAttributesAsync().ConfigureAwait(false);
+         }
+
+         destination.Metadata.Clear();
+
+         foreach(KeyValuePair<string, string> pair in source.Metadata)
+         {
+            destination.Metadata[pair.Key] = pair.Value;
+         }
+
+         if(exists)
+         {
+            await destination.SetMetadataAsync().ConfigureAwait(false);
+         }
       }
 
       public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken = default)
@@ -242,44 +271,48 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return Task.FromResult(EmptyTransaction.Instance);
       }
 
-      public async Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
+      public async Task<Stream> OpenWriteAsync(Blob blob, bool append, CancellationToken cancellationToken)
       {
-         (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath);
+         (CloudBlobContainer container, string path) = await GetPartsAsync(blob);
 
          if (append)
          {
             CloudAppendBlob cab = container.GetAppendBlobReference(path);
+            await AttachBlobMetaAsync(cab, blob).ConfigureAwait(false);
 
-            return await cab.OpenWriteAsync(!append);
+            return await cab.OpenWriteAsync(!append).ConfigureAwait(false);
          }
          else
          {
             CloudBlockBlob cab = container.GetBlockBlobReference(path);
+            await AttachBlobMetaAsync(cab, blob).ConfigureAwait(false);
 
-            return await cab.OpenWriteAsync();
+            return await cab.OpenWriteAsync().ConfigureAwait(false);
 
          }
       }
 
-      public async Task WriteAsync(string fullPath, Stream sourceStream, bool append, CancellationToken cancellationToken)
+      public async Task WriteAsync(Blob blob, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
          GenericValidation.CheckSourceStream(sourceStream);
 
-         (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath);
+         (CloudBlobContainer container, string path) = await GetPartsAsync(blob).ConfigureAwait(false);
 
          if (append)
          {
             CloudAppendBlob cab = container.GetAppendBlobReference(StoragePath.Normalize(path, false));
-            if (!await cab.ExistsAsync()) await cab.CreateOrReplaceAsync();
+            if (!await cab.ExistsAsync()) await cab.CreateOrReplaceAsync().ConfigureAwait(false);
+            await AttachBlobMetaAsync(cab, blob).ConfigureAwait(false);
 
-            await cab.AppendFromStreamAsync(sourceStream);
+            await cab.AppendFromStreamAsync(sourceStream).ConfigureAwait(false);
 
          }
          else
          {
-            CloudBlockBlob blob = container.GetBlockBlobReference(StoragePath.Normalize(path, false));
+            CloudBlockBlob cloudBlob = container.GetBlockBlobReference(StoragePath.Normalize(path, false));
+            await AttachBlobMetaAsync(cloudBlob, blob).ConfigureAwait(false);
 
-            await blob.UploadFromStreamAsync(sourceStream);
+            await cloudBlob.UploadFromStreamAsync(sourceStream).ConfigureAwait(false);
          }
       }
 

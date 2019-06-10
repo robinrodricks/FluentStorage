@@ -188,13 +188,13 @@ namespace Storage.Net.Blobs.Files
       /// <summary>
       /// Streams into file
       /// </summary>
-      public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
+      public async Task WriteAsync(Blob blob, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(id);
+         GenericValidation.CheckBlobFullPath(blob);
          GenericValidation.CheckSourceStream(sourceStream);
 
-         id = StoragePath.Normalize(id, false);
-         using (Stream dest = CreateStream(id, !append))
+         string fullPath = StoragePath.Normalize(blob, false);
+         using (Stream dest = CreateStream(fullPath, !append))
          {
            await sourceStream.CopyToAsync(dest);
          }
@@ -203,13 +203,13 @@ namespace Storage.Net.Blobs.Files
       /// <summary>
       /// 
       /// </summary>
-      public Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
+      public Task<Stream> OpenWriteAsync(Blob blob, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(id);
+         GenericValidation.CheckBlobFullPath(blob);
 
-         id = StoragePath.Normalize(id, false);
+         string fullPath = StoragePath.Normalize(blob, false);
 
-         return Task.FromResult(CreateStream(id, !append));
+         return Task.FromResult(CreateStream(fullPath, !append));
       }
 
       /// <summary>

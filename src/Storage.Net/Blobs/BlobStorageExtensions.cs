@@ -102,17 +102,17 @@ namespace Storage.Net.Blobs
       /// Converts text to blob content and writes to storage
       /// </summary>
       /// <param name="provider"></param>
-      /// <param name="id">Blob id</param>
+      /// <param name="blob">Blob to write</param>
       /// <param name="text">Text to write, treated in UTF-8 encoding</param>
       /// <param name="cancellationToken"></param>
       /// <returns></returns>
       public static async Task WriteTextAsync(
          this IBlobStorage provider,
-         string id, string text, CancellationToken cancellationToken = default)
+         Blob blob, string text, CancellationToken cancellationToken = default)
       {
          using (Stream s = text.ToMemoryStream())
          {
-            await provider.WriteAsync(id, s, false, cancellationToken);
+            await provider.WriteAsync(blob, s, false, cancellationToken);
          }
       }
 

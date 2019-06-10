@@ -72,15 +72,15 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
          return await browser.BrowseAsync(options, cancellationToken);
       }
 
-      public async Task WriteAsync(string id, Stream sourceStream, bool append, CancellationToken cancellationToken)
+      public async Task WriteAsync(Blob blob, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(id);
+         GenericValidation.CheckBlobFullPath(blob);
 
          AdlsClient client = await GetAdlsClientAsync();
 
-         if (append && (await ExistsAsync(new[] { id }, cancellationToken)).First())
+         if (append && (await ExistsAsync(new[] { blob.FullPath }, cancellationToken)).First())
          {
-            AdlsOutputStream adlsStream = await client.GetAppendStreamAsync(id, cancellationToken);
+            AdlsOutputStream adlsStream = await client.GetAppendStreamAsync(blob.FullPath, cancellationToken);
             using (var writeStream = new AdlsWriteableStream(adlsStream))
             {
                await sourceStream.CopyToAsync(writeStream);
@@ -88,7 +88,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
          }
          else
          {
-            AdlsOutputStream adlsStream = await client.CreateFileAsync(id, IfExists.Overwrite,
+            AdlsOutputStream adlsStream = await client.CreateFileAsync(blob, IfExists.Overwrite,
                createParent:true,
                cancelToken: cancellationToken);
 
@@ -99,9 +99,9 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
          }
       }
 
-      public async Task<Stream> OpenWriteAsync(string id, bool append, CancellationToken cancellationToken)
+      public async Task<Stream> OpenWriteAsync(Blob blob, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(id);
+         GenericValidation.CheckBlobFullPath(blob);
 
          AdlsClient client = await GetAdlsClientAsync();
 
@@ -109,11 +109,11 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 
          if(append)
          {
-            stream = await client.GetAppendStreamAsync(id, cancellationToken);
+            stream = await client.GetAppendStreamAsync(blob.FullPath, cancellationToken);
          }
          else
          {
-            stream = await client.CreateFileAsync(id, IfExists.Overwrite,
+            stream = await client.CreateFileAsync(blob.FullPath, IfExists.Overwrite,
                createParent: true,
                cancelToken: cancellationToken);
          }

@@ -51,6 +51,11 @@ namespace Storage.Net.Blobs
       public Dictionary<string, string> Properties { get; set; }
 
       /// <summary>
+      /// User defined metadata
+      /// </summary>
+      public Dictionary<string, string> Metadata { get; set; }
+
+      /// <summary>
       /// Create a new instance
       /// </summary>
       /// <param name="fullId"></param>
@@ -126,9 +131,18 @@ namespace Storage.Net.Blobs
       /// <summary>
       /// Constructs a file blob by full ID
       /// </summary>
-      public static implicit operator Blob(string fileId)
+      public static implicit operator Blob(string fullPath)
       {
-         return new Blob(fileId, BlobItemKind.File);
+         return new Blob(fullPath, BlobItemKind.File);
+      }
+
+      /// <summary>
+      /// Converts blob to string by using full path
+      /// </summary>
+      /// <param name="blob"></param>
+      public static implicit operator string(Blob blob)
+      {
+         return blob.FullPath;
       }
    }
 }
