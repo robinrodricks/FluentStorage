@@ -2,7 +2,7 @@
 using Amazon.S3;
 using Storage.Net.Blobs;
 
-namespace Storage.Net.Amazon.Aws.Blob
+namespace Storage.Net.Amazon.Aws.Blobs
 {
    /// <summary>
    /// Provides access to native operations

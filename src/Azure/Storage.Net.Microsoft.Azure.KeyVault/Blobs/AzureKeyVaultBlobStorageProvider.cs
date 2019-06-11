@@ -91,11 +91,11 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
          ValidateSecretName(blob);
          if (append) throw new ArgumentException("appending to secrets is not supported", nameof(append));
 
-         var callbackStream = new FixedStream(new MemoryStream(), null, fx =>
+         var callbackStream = new FixedStream(new MemoryStream(), null, async fx =>
          {
             string value = Encoding.UTF8.GetString(((MemoryStream)fx.Parent).ToArray());
 
-            _vaultClient.SetSecretAsync(_vaultUri, blob.FullPath, value).Wait();
+            await _vaultClient.SetSecretAsync(_vaultUri, blob.FullPath, value).ConfigureAwait(false);
          });
 
          return Task.FromResult<Stream>(callbackStream);

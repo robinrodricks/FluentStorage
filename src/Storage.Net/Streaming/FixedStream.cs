@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Storage.Net.Streaming
 {
@@ -10,7 +11,7 @@ namespace Storage.Net.Streaming
    {
       private readonly Stream _parent;
       private readonly long? _length;
-      private readonly Action<FixedStream> _disposeCallback;
+      private readonly Func<FixedStream, Task> _disposeCallback;
       private long _position;
 
       /// <summary>
@@ -18,7 +19,7 @@ namespace Storage.Net.Streaming
       /// </summary>
       public FixedStream(Stream parent,
          long? length = null,
-         Action<FixedStream> disposeCallback = null)
+         Func<FixedStream, Task> disposeCallback = null)
       {
          _parent = parent ?? throw new ArgumentNullException(nameof(parent));
          _length = length;
@@ -117,7 +118,7 @@ namespace Storage.Net.Streaming
       /// <param name="disposing"></param>
       protected override void Dispose(bool disposing)
       {
-         _disposeCallback?.Invoke(this);
+         _disposeCallback?.Invoke(this).Wait();
 
          base.Dispose(disposing);
       }

@@ -159,7 +159,7 @@ namespace Storage.Net.Blobs.Files
 
       public Task<Stream> OpenWriteAsync(Blob blob, bool append, CancellationToken cancellationToken)
       {
-         var callbackStream = new FixedStream(new MemoryStream(), null, fx =>
+         var callbackStream = new FixedStream(new MemoryStream(), null, async fx =>
          {
             string fullPath = StoragePath.Normalize(blob, false);
             ZipArchive archive = GetArchive(true);

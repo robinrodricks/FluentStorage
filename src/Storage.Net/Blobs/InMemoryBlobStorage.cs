@@ -76,7 +76,7 @@ namespace Storage.Net.Blobs
          GenericValidation.CheckBlobFullPath(blob);
          string fullPath = StoragePath.Normalize(blob);
 
-         var result = new FixedStream(new MemoryStream(), null, fx =>
+         var result = new FixedStream(new MemoryStream(), null, async fx =>
          {
             MemoryStream ms = (MemoryStream)fx.Parent;
             ms.Position = 0;

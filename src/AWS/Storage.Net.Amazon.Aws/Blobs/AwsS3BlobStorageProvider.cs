@@ -10,10 +10,9 @@ using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using System.Threading.Tasks;
 using System.Threading;
-using Storage.Net.Amazon.Aws.Blob;
 using Storage.Net.Streaming;
 
-namespace Storage.Net.Aws.Blobs
+namespace Storage.Net.Amazon.Aws.Blobs
 {
    /// <summary>
    /// Amazon S3 storage adapter for blobs
@@ -104,15 +103,19 @@ namespace Storage.Net.Aws.Blobs
 
 
          //todo: paging
-         AmazonS3Client client = await GetClientAsync();
-         ListObjectsV2Response response = await client.ListObjectsV2Async(request, cancellationToken);
+         AmazonS3Client client = await GetClientAsync().ConfigureAwait(false);
+         ListObjectsV2Response response = await client.ListObjectsV2Async(request, cancellationToken).ConfigureAwait(false);
 
-         return response.S3Objects
+         List<Blob> blobs = response.S3Objects
             .Select(s3Obj => new Blob(StoragePath.RootFolderPath, s3Obj.Key, BlobItemKind.File))
             .Where(options.IsMatch)
             .Where(bid => (options.FolderPath == null || bid.FolderPath == options.FolderPath))
             .Where(bid => options.BrowseFilter == null || options.BrowseFilter(bid))
             .ToList();
+
+         await Converter.AppendMetadataAsync(client, _bucketName, blobs, cancellationToken).ConfigureAwait(false);
+
+         return blobs;
       }
 
       public async Task WriteAsync(Blob blob, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
@@ -125,27 +128,45 @@ namespace Storage.Net.Aws.Blobs
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
 
          string fullPath = StoragePath.Normalize(blob, false);
-         await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, fullPath, cancellationToken);
+         await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, fullPath, cancellationToken).ConfigureAwait(false);
+
+         if(blob.Metadata != null)
+         {
+            await Converter.UpdateMetadataAsync(
+               await GetClientAsync().ConfigureAwait(false),
+               blob,
+               _bucketName,
+               fullPath).ConfigureAwait(false);
+         }
       }
 
       /// <summary>
       /// S3 doesnt support this natively and will cache everything in MemoryStream until disposed.
       /// </summary>
-      public Task<Stream> OpenWriteAsync(Blob blob, bool append = false, CancellationToken cancellationToken = default)
+      public async Task<Stream> OpenWriteAsync(Blob blob, bool append = false, CancellationToken cancellationToken = default)
       {
          if (append) throw new NotSupportedException();
          GenericValidation.CheckBlobFullPath(blob);
          string fullPath = StoragePath.Normalize(blob, false);
 
-         var callbackStream = new FixedStream(new MemoryStream(), null, fx =>
+         var callbackStream = new FixedStream(new MemoryStream(), null, async (fx) =>
          {
             var ms = (MemoryStream)fx.Parent;
             ms.Position = 0;
 
-            _fileTransferUtility.UploadAsync(ms, _bucketName, fullPath, cancellationToken).Wait();
+            await _fileTransferUtility.UploadAsync(ms, _bucketName, fullPath, cancellationToken).ConfigureAwait(false);
+
+            if(blob.Metadata != null)
+            {
+               await Converter.UpdateMetadataAsync(
+                  await GetClientAsync().ConfigureAwait(false),
+                  blob,
+                  _bucketName,
+                  fullPath).ConfigureAwait(false);
+            }
          });
 
-         return Task.FromResult<Stream>(callbackStream);
+         return callbackStream;
       }
 
       public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
@@ -185,7 +206,7 @@ namespace Storage.Net.Aws.Blobs
          try
          {
             fullPath = StoragePath.Normalize(fullPath, false);
-            using (GetObjectResponse response = await GetObjectAsync(fullPath))
+            using (GetObjectResponse response = await GetObjectAsync(fullPath).ConfigureAwait(false))
             {
                if (response == null) return false;
             }
@@ -200,7 +221,15 @@ namespace Storage.Net.Aws.Blobs
 
       public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         return await Task.WhenAll(fullPaths.Select(GetBlobAsync));
+         Blob[] blobs = await Task.WhenAll(fullPaths.Select(GetBlobAsync)).ConfigureAwait(false);
+
+         await Converter.AppendMetadataAsync(
+            await GetClientAsync().ConfigureAwait(false),
+            _bucketName,
+            blobs,
+            cancellationToken).ConfigureAwait(false);
+
+         return blobs;
       }
 
       private async Task<Blob> GetBlobAsync(string fullPath)
@@ -210,7 +239,7 @@ namespace Storage.Net.Aws.Blobs
          try
          {
             fullPath = StoragePath.Normalize(fullPath, false);
-            using (GetObjectResponse obj = await GetObjectAsync(fullPath))
+            using (GetObjectResponse obj = await GetObjectAsync(fullPath).ConfigureAwait(false))
             {
                //ETag contains actual MD5 hash, not sure why!
 
@@ -235,11 +264,11 @@ namespace Storage.Net.Aws.Blobs
       private async Task<GetObjectResponse> GetObjectAsync(string key)
       {
          var request = new GetObjectRequest { BucketName = _bucketName, Key = key };
-         AmazonS3Client client = await GetClientAsync();
+         AmazonS3Client client = await GetClientAsync().ConfigureAwait(false);
 
          try
          {
-            GetObjectResponse response = await client.GetObjectAsync(request);
+            GetObjectResponse response = await client.GetObjectAsync(request).ConfigureAwait(false);
             return response;
          }
          catch (AmazonS3Exception ex)
