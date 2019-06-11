@@ -9,22 +9,21 @@ namespace Storage.Net.Tests.Integration.Azure
 {
    public class LeakyAzureBlobStorageTest
    {
-      private readonly IBlobStorage _storage;
       private readonly IAzureBlobStorage _native;
 
       public LeakyAzureBlobStorageTest()
       {
          ITestSettings settings = Settings.Instance;
 
-         _storage = StorageFactory.Blobs.AzureBlobStorage(settings.AzureStorageName, settings.AzureStorageKey);
-         _native = (IAzureBlobStorage)_storage;
+         IBlobStorage storage = StorageFactory.Blobs.AzureBlobStorage(settings.AzureStorageName, settings.AzureStorageKey);
+         _native = (IAzureBlobStorage)storage;
       }
 
       [Fact]
       public async Task GetReadOnlySasUriAsync()
       {
          string id = "test/single.txt";
-         await _storage.WriteTextAsync(id, "test");
+         await _native.WriteTextAsync(id, "test");
 
          string uri = await _native.GetReadOnlySasUriAsync(id);
          string content = await new WebClient().DownloadStringTaskAsync(new Uri(uri));
