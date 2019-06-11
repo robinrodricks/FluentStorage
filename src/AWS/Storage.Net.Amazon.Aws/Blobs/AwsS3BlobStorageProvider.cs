@@ -113,7 +113,10 @@ namespace Storage.Net.Amazon.Aws.Blobs
             .Where(bid => options.BrowseFilter == null || options.BrowseFilter(bid))
             .ToList();
 
-         await Converter.AppendMetadataAsync(client, _bucketName, blobs, cancellationToken).ConfigureAwait(false);
+         if(options.IncludeAttributes)
+         {
+            await Converter.AppendMetadataAsync(client, _bucketName, blobs, cancellationToken).ConfigureAwait(false);
+         }
 
          return blobs;
       }

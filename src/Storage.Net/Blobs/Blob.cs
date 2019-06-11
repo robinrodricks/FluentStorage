@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Storage.Net.Blobs
 {
@@ -33,7 +35,7 @@ namespace Storage.Net.Blobs
       /// MD5 content hash of the blob. Note that this property can be null if underlying storage has
       /// no information about the hash.
       /// </summary>
-      public string MD5 { get; set;  }
+      public string MD5 { get; set; }
 
       /// <summary>
       /// Last modification time when known
@@ -90,7 +92,7 @@ namespace Storage.Net.Blobs
       public override string ToString()
       {
          string k = Kind == BlobItemKind.File ? "file" : "folder";
-         
+
          return $"{k}: {Id}@{FolderPath}";
       }
 
@@ -100,7 +102,8 @@ namespace Storage.Net.Blobs
       /// <param name="other"></param>
       public bool Equals(Blob other)
       {
-         if (ReferenceEquals(other, null)) return false;
+         if(ReferenceEquals(other, null))
+            return false;
 
          return
             other.FullPath == FullPath &&
@@ -113,9 +116,12 @@ namespace Storage.Net.Blobs
       /// <param name="other"></param>
       public override bool Equals(object other)
       {
-         if (ReferenceEquals(other, null)) return false;
-         if (ReferenceEquals(other, this)) return true;
-         if (other.GetType() != typeof(Blob)) return false;
+         if(ReferenceEquals(other, null))
+            return false;
+         if(ReferenceEquals(other, this))
+            return true;
+         if(other.GetType() != typeof(Blob))
+            return false;
 
          return Equals((Blob)other);
       }
@@ -143,6 +149,66 @@ namespace Storage.Net.Blobs
       public static implicit operator string(Blob blob)
       {
          return blob.FullPath;
+      }
+
+      /// <summary>
+      /// Converts blob attributes (user metadata to byte array)
+      /// </summary>
+      /// <returns></returns>
+      public byte[] AttributesToByteArray()
+      {
+         using(var ms = new MemoryStream())
+         {
+            using(var b = new BinaryWriter(ms, Encoding.UTF8, true))
+            {
+               b.Write((byte)1); //version marker
+
+               b.Write((int)Metadata?.Count);   //number of metadata items
+
+               foreach(KeyValuePair<string, string> pair in Metadata)
+               {
+                  b.Write(pair.Key);
+                  b.Write(pair.Value);
+               }
+            }
+
+            return ms.ToArray();
+         }
+      }
+
+      /// <summary>
+      /// Appends attributes from byte array representation
+      /// </summary>
+      /// <param name="data"></param>
+      public void AppendAttributesFromByteArray(byte[] data)
+      {
+         if(data == null)
+            return;
+
+         using(var ms = new MemoryStream(data))
+         {
+            using(var b = new BinaryReader(ms, Encoding.UTF8, true))
+            {
+               byte version = b.ReadByte();  //to be used with versioning
+               if(version != 1)
+               {
+                  throw new ArgumentException($"version {version} is not supported", nameof(data));
+               }
+
+               int count = b.ReadInt32();
+               if(count > 0)
+               {
+                  Metadata = new Dictionary<string, string>();
+                  for(int i = 0; i < count; i++)
+                  {
+                     string key = b.ReadString();
+                     string value = b.ReadString();
+
+                     Metadata[key] = value;
+                  }
+               }
+            }
+         }
       }
    }
 }

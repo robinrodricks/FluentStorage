@@ -16,6 +16,7 @@ namespace Storage.Net.Blobs.Files
    public class DiskDirectoryBlobStorage : IBlobStorage
    {
       private readonly DirectoryInfo _directory;
+      private const string AttributesFileExtension = ".attr";
 
       /// <summary>
       /// Creates an instance in a specific disk directory
@@ -61,23 +62,13 @@ namespace Storage.Net.Blobs.Files
 
          var result = new List<Blob>();
          result.AddRange(directoryIds.Select(id => ToBlobItem(id, BlobItemKind.Folder, options.IncludeAttributes)));
-         result.AddRange(fileIds.Select(id => ToBlobItem(id, BlobItemKind.File, options.IncludeAttributes)));
+         result.AddRange(
+            fileIds.Where(fid => !fid.EndsWith(AttributesFileExtension)).Select(id => ToBlobItem(id, BlobItemKind.File, options.IncludeAttributes)));
          result = result
             .Where(i => options.BrowseFilter == null || options.BrowseFilter(i))
             .Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value)
             .ToList();
          return Task.FromResult<IReadOnlyCollection<Blob>>(result);
-      }
-
-      private string ToId(FileInfo fi)
-      {
-         string name = fi.FullName.Substring(_directory.FullName.Length + 1);
-
-         name = name.Replace(Path.DirectorySeparatorChar, StoragePath.PathSeparator);
-
-         string[] parts = name.Split(StoragePath.PathSeparator);
-
-         return string.Join(StoragePath.PathStrSeparator, parts.Select(DecodePathPart));
       }
 
       private Blob ToBlobItem(string fullPath, BlobItemKind kind, bool includeMeta)
@@ -194,9 +185,11 @@ namespace Storage.Net.Blobs.Files
          GenericValidation.CheckSourceStream(sourceStream);
 
          string fullPath = StoragePath.Normalize(blob, false);
-         using (Stream dest = CreateStream(fullPath, !append))
+         using(Stream dest = CreateStream(fullPath, !append))
          {
-           await sourceStream.CopyToAsync(dest);
+            await sourceStream.CopyToAsync(dest).ConfigureAwait(false);
+
+            WriteAttributes(blob);
          }
       }
 
@@ -209,7 +202,21 @@ namespace Storage.Net.Blobs.Files
 
          string fullPath = StoragePath.Normalize(blob, false);
 
-         return Task.FromResult(CreateStream(fullPath, !append));
+         Stream stream = CreateStream(fullPath, !append);
+
+         WriteAttributes(blob);
+
+         return Task.FromResult(stream);
+      }
+
+      private void WriteAttributes(Blob blob)
+      {
+         if(blob?.Metadata == null)
+            return;
+
+         string attrPath = GetFilePath(blob.FullPath) + AttributesFileExtension;
+
+         File.WriteAllBytes(attrPath, blob.AttributesToByteArray());
       }
 
       /// <summary>
@@ -290,9 +297,9 @@ namespace Storage.Net.Blobs.Files
          return Task.FromResult<IReadOnlyCollection<Blob>>(result);
       }
 
-      private void EnrichWithMetadata(Blob id)
+      private void EnrichWithMetadata(Blob blob)
       {
-         string path = GetFilePath(StoragePath.Normalize(id.FullPath, false));
+         string path = GetFilePath(StoragePath.Normalize(blob.FullPath, false));
 
          if (!File.Exists(path)) return;
 
@@ -300,11 +307,18 @@ namespace Storage.Net.Blobs.Files
 
          using (Stream fs = File.OpenRead(fi.FullName))
          {
-            id.MD5 = fs.GetHash(HashType.Md5);
+            blob.MD5 = fs.GetHash(HashType.Md5);
          }
 
-         id.Size = fi.Length;
-         id.LastModificationTime = fi.CreationTimeUtc;
+         blob.Size = fi.Length;
+         blob.LastModificationTime = fi.CreationTimeUtc;
+
+         string attrFilePath = path + AttributesFileExtension;
+         if(File.Exists(attrFilePath))
+         {
+            byte[] content = File.ReadAllBytes(attrFilePath);
+            blob.AppendAttributesFromByteArray(content);
+         }
       }
 
       /// <summary>
