@@ -32,9 +32,9 @@ namespace Storage.Net.Tests.Integration.Azure
       }
 
       [Fact]
-      public async Task CanAcquireAndReleaseLeaseAsync()
+      public async Task Lease_CanAcquireAndRelease()
       {
-         string id = $"test/{nameof(CanAcquireAndReleaseLeaseAsync)}.lck";
+         string id = $"test/{nameof(Lease_CanAcquireAndRelease)}.lck";
 
          using(BlobLease lease = await _native.AcquireBlobLeaseAsync(id, TimeSpan.FromSeconds(20)))
          {
@@ -43,9 +43,9 @@ namespace Storage.Net.Tests.Integration.Azure
       }
 
       [Fact]
-      public async Task FailsOnAcquiredLock()
+      public async Task Lease_FailsOnAcquiredLeasedBlob()
       {
-         string id = $"test/{nameof(FailsOnAcquiredLock)}.lck";
+         string id = $"test/{nameof(Lease_FailsOnAcquiredLeasedBlob)}.lck";
 
          using(BlobLease lease1 = await _native.AcquireBlobLeaseAsync(id, TimeSpan.FromSeconds(20)))
          {
@@ -54,9 +54,9 @@ namespace Storage.Net.Tests.Integration.Azure
       }
 
       [Fact]
-      public async Task WaitsToReleaseAcquiredLock()
+      public async Task Lease_WaitsToReleaseAcquiredLease()
       {
-         string id = $"test/{nameof(WaitsToReleaseAcquiredLock)}.lck";
+         string id = $"test/{nameof(Lease_WaitsToReleaseAcquiredLease)}.lck";
 
          using(BlobLease lease1 = await _native.AcquireBlobLeaseAsync(id, TimeSpan.FromSeconds(20)))
          {
