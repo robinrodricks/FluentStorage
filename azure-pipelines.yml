@@ -114,7 +114,8 @@ stages:
 
 - stage: Deploy
   displayName:
-  condition: "eq(variables['Build.SourceBranch'], 'refs/heads/master')"
+  #condition: "eq(variables['Build.SourceBranch'], 'refs/heads/master')"
+  condition: "or( eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/v7') )"
   jobs:
   - deployment: NugetOrg
     pool:
