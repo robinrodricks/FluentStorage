@@ -11,7 +11,8 @@ namespace Storage.Net.Streaming
    {
       private readonly Stream _parent;
       private readonly long? _length;
-      private readonly Func<FixedStream, Task> _disposeCallback;
+      private readonly Func<FixedStream, Task> _disposeAsyncCallback;
+      private readonly Action<FixedStream> _disposeCallback;
       private long _position;
 
       /// <summary>
@@ -20,6 +21,18 @@ namespace Storage.Net.Streaming
       public FixedStream(Stream parent,
          long? length = null,
          Func<FixedStream, Task> disposeCallback = null)
+      {
+         _parent = parent ?? throw new ArgumentNullException(nameof(parent));
+         _length = length;
+         _disposeAsyncCallback = disposeCallback;
+      }
+
+      /// <summary>
+      /// Creates a new instance
+      /// </summary>
+      public FixedStream(Stream parent,
+         long? length = null,
+         Action<FixedStream> disposeCallback = null)
       {
          _parent = parent ?? throw new ArgumentNullException(nameof(parent));
          _length = length;
@@ -118,7 +131,9 @@ namespace Storage.Net.Streaming
       /// <param name="disposing"></param>
       protected override void Dispose(bool disposing)
       {
-         _disposeCallback?.Invoke(this).Wait();
+         _disposeAsyncCallback?.Invoke(this).Wait();
+
+         _disposeCallback?.Invoke(this);
 
          base.Dispose(disposing);
       }

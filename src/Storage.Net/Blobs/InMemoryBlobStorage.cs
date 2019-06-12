@@ -44,10 +44,10 @@ namespace Storage.Net.Blobs
          return Task.FromResult((IReadOnlyCollection<Blob>)matches);
       }
 
-      public Task WriteAsync(Blob blob, Stream sourceStream, bool append, CancellationToken cancellationToken)
+      public Task WriteAsync(string fullPath, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(blob);
-         string fullPath = StoragePath.Normalize(blob);
+         GenericValidation.CheckBlobFullPath(fullPath);
+         fullPath = StoragePath.Normalize(fullPath);
 
          if (append)
          {
@@ -71,16 +71,16 @@ namespace Storage.Net.Blobs
          return Task.FromResult(true);
       }
 
-      public Task<Stream> OpenWriteAsync(Blob blob, bool append, CancellationToken cancellationToken)
+      public Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(blob);
-         string fullPath = StoragePath.Normalize(blob);
+         GenericValidation.CheckBlobFullPath(fullPath);
+         fullPath = StoragePath.Normalize(fullPath);
 
          var result = new FixedStream(new MemoryStream(), null, async fx =>
          {
             MemoryStream ms = (MemoryStream)fx.Parent;
             ms.Position = 0;
-            WriteAsync(fullPath, ms, append, cancellationToken).Wait();
+            await WriteAsync(fullPath, ms, append, cancellationToken).ConfigureAwait(false);
          });
 
          return Task.FromResult<Stream>(result);
@@ -146,6 +146,11 @@ namespace Storage.Net.Blobs
          }
 
          return Task.FromResult<IReadOnlyCollection<Blob>>(result);
+      }
+
+      public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
+      {
+         throw new NotSupportedException();
       }
 
       private void Write(string id, Stream sourceStream)

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Storage.Net.Blobs;
 
 namespace Storage.Net
 {
@@ -31,25 +33,36 @@ namespace Storage.Net
       }
 
       /// <summary>
-      /// Validates blob ID
+      /// Validates blob full path
       /// </summary>
-      /// <param name="id"></param>
-      public static void CheckBlobFullPath(string id)
+      /// <param name="fullPath"></param>
+      public static void CheckBlobFullPath(string fullPath)
       {
-         if (id == null) throw new ArgumentNullException(nameof(id));
+         if (fullPath == null) throw new ArgumentNullException(nameof(fullPath));
       }
 
       /// <summary>
-      /// Checks blob ID for generic rules
+      /// Checks blob full path for generic rules
       /// </summary>
-      public static void CheckBlobFullPaths(IEnumerable<string> ids)
+      public static void CheckBlobFullPaths(IEnumerable<string> fullPaths)
       {
-         if (ids == null) return;
+         if (fullPaths == null) return;
 
-         foreach (string id in ids)
+         foreach (string fullPath in fullPaths)
          {
-            CheckBlobFullPath(id);
+            CheckBlobFullPath(fullPath);
          }
+      }
+
+      /// <summary>
+      /// Checks blob full path for generic rules
+      /// </summary>
+      public static void CheckBlobFullPaths(IEnumerable<Blob> blobs)
+      {
+         if(blobs == null)
+            return;
+
+         CheckBlobFullPaths(blobs.Select(b => b.FullPath));
       }
 
       /// <summary>

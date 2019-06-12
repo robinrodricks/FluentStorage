@@ -121,36 +121,27 @@ namespace Storage.Net.Amazon.Aws.Blobs
          return blobs;
       }
 
-      public async Task WriteAsync(Blob blob, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
+      public async Task WriteAsync(string fullPath, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
       {
          if (append) throw new NotSupportedException();
 
-         GenericValidation.CheckBlobFullPath(blob);
+         GenericValidation.CheckBlobFullPath(fullPath);
          GenericValidation.CheckSourceStream(sourceStream);
 
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
 
-         string fullPath = StoragePath.Normalize(blob, false);
+         fullPath = StoragePath.Normalize(fullPath, false);
          await _fileTransferUtility.UploadAsync(sourceStream, _bucketName, fullPath, cancellationToken).ConfigureAwait(false);
-
-         if(blob.Metadata != null)
-         {
-            await Converter.UpdateMetadataAsync(
-               await GetClientAsync().ConfigureAwait(false),
-               blob,
-               _bucketName,
-               fullPath).ConfigureAwait(false);
-         }
       }
 
       /// <summary>
       /// S3 doesnt support this natively and will cache everything in MemoryStream until disposed.
       /// </summary>
-      public async Task<Stream> OpenWriteAsync(Blob blob, bool append = false, CancellationToken cancellationToken = default)
+      public Task<Stream> OpenWriteAsync(string fullPath, bool append = false, CancellationToken cancellationToken = default)
       {
          if (append) throw new NotSupportedException();
-         GenericValidation.CheckBlobFullPath(blob);
-         string fullPath = StoragePath.Normalize(blob, false);
+         GenericValidation.CheckBlobFullPath(fullPath);
+         fullPath = StoragePath.Normalize(fullPath, false);
 
          var callbackStream = new FixedStream(new MemoryStream(), null, async (fx) =>
          {
@@ -158,18 +149,9 @@ namespace Storage.Net.Amazon.Aws.Blobs
             ms.Position = 0;
 
             await _fileTransferUtility.UploadAsync(ms, _bucketName, fullPath, cancellationToken).ConfigureAwait(false);
-
-            if(blob.Metadata != null)
-            {
-               await Converter.UpdateMetadataAsync(
-                  await GetClientAsync().ConfigureAwait(false),
-                  blob,
-                  _bucketName,
-                  fullPath).ConfigureAwait(false);
-            }
          });
 
-         return callbackStream;
+         return Task.FromResult<Stream>(callbackStream);
       }
 
       public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
@@ -180,7 +162,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
          GetObjectResponse response = await GetObjectAsync(fullPath);
          if (response == null) return null;
 
-         return new FixedStream(response.ResponseStream, length: response.ContentLength);
+         return new FixedStream(response.ResponseStream, length: response.ContentLength, (Action<FixedStream>)null);
       }
 
       public Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
@@ -262,6 +244,26 @@ namespace Storage.Net.Amazon.Aws.Blobs
          }
 
          return null;
+      }
+
+      public async Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
+      {
+         if(blobs == null)
+            return;
+
+         AmazonS3Client client = await GetClientAsync().ConfigureAwait(false);
+
+         foreach(Blob blob in blobs.Where(b => b != null))
+         {
+            if(blob.Metadata != null)
+            {
+               await Converter.UpdateMetadataAsync(
+                  client,
+                  blob,
+                  _bucketName,
+                  blob).ConfigureAwait(false);
+            }
+         }
       }
 
       private async Task<GetObjectResponse> GetObjectAsync(string key)

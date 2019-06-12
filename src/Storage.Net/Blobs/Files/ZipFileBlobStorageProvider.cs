@@ -86,6 +86,11 @@ namespace Storage.Net.Blobs.Files
          return Task.FromResult<IReadOnlyCollection<Blob>>(result);
       }
 
+      public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
+      {
+         throw new NotSupportedException();
+      }
+
       public Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken = default)
       {
          if (!File.Exists(_filePath)) return Task.FromResult<IReadOnlyCollection<Blob>>(new List<Blob>());
@@ -119,9 +124,9 @@ namespace Storage.Net.Blobs.Files
          return Task.FromResult(EmptyTransaction.Instance);
       }
 
-      public async Task WriteAsync(Blob blob, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
+      public async Task WriteAsync(string fullPath, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
       {
-         string fullPath = StoragePath.Normalize(blob, false);
+         fullPath = StoragePath.Normalize(fullPath, false);
          ZipArchive archive = GetArchive(true);
 
 
@@ -130,6 +135,24 @@ namespace Storage.Net.Blobs.Files
          {
             await sourceStream.CopyToAsync(dest);
          }
+      }
+
+      public Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
+      {
+         var callbackStream = new FixedStream(new MemoryStream(), null, fx =>
+         {
+            fullPath = StoragePath.Normalize(fullPath, false);
+            ZipArchive archive = GetArchive(true);
+
+            ZipArchiveEntry entry = archive.CreateEntry(fullPath, CompressionLevel.Optimal);
+            using(Stream dest = entry.Open())
+            {
+               fx.Parent.Position = 0;
+               fx.Parent.CopyTo(dest);
+            }
+         });
+
+         return Task.FromResult<Stream>(callbackStream);
       }
 
       public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
@@ -154,25 +177,6 @@ namespace Storage.Net.Blobs.Files
          }
 
          return Task.FromResult(true);
-      }
-
-
-      public Task<Stream> OpenWriteAsync(Blob blob, bool append, CancellationToken cancellationToken)
-      {
-         var callbackStream = new FixedStream(new MemoryStream(), null, async fx =>
-         {
-            string fullPath = StoragePath.Normalize(blob, false);
-            ZipArchive archive = GetArchive(true);
-
-            ZipArchiveEntry entry = archive.CreateEntry(fullPath, CompressionLevel.Optimal);
-            using (Stream dest = entry.Open())
-            {
-               fx.Parent.Position = 0;
-               fx.Parent.CopyTo(dest);
-            }
-         });
-
-         return Task.FromResult<Stream>(callbackStream);
       }
 
       private ZipArchive GetArchive(bool? forWriting)

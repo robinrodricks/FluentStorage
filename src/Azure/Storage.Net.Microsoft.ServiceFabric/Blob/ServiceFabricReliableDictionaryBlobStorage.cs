@@ -53,21 +53,21 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
          return result;
       }
 
-      public async Task WriteAsync(Blob blob, Stream sourceStream, bool append, CancellationToken cancellationToken)
+      public async Task WriteAsync(string fullPath, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(blob);
+         GenericValidation.CheckBlobFullPath(fullPath);
 
          if (append)
          {
-            await AppendAsync(blob, sourceStream);
+            await AppendAsync(fullPath, sourceStream);
          }
          else
          {
-            await WriteAsync(blob, sourceStream);
+            await WriteAsync(fullPath, sourceStream);
          }
       }
 
-      public Task<Stream> OpenWriteAsync(Blob blob, bool append, CancellationToken cancellationToken = default)
+      public Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken = default)
       {
          throw new NotImplementedException();
       }
@@ -205,6 +205,11 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
             }
          }
          return result;
+      }
+
+      public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
+      {
+         throw new NotSupportedException();
       }
 
       private async Task<IReliableDictionary<string, byte[]>> OpenCollectionAsync()

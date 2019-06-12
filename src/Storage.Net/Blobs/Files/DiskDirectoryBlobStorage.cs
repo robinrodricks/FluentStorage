@@ -13,7 +13,7 @@ namespace Storage.Net.Blobs.Files
    /// <summary>
    /// Blob storage implementation which uses local file system directory
    /// </summary>
-   public class DiskDirectoryBlobStorage : IBlobStorage
+   internal class DiskDirectoryBlobStorage : IBlobStorage
    {
       private readonly DirectoryInfo _directory;
       private const string AttributesFileExtension = ".attr";
@@ -37,14 +37,14 @@ namespace Storage.Net.Blobs.Files
       /// </summary>
       public Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
-         if (options == null) options = new ListOptions();
+         if(options == null) options = new ListOptions();
 
          GenericValidation.CheckBlobPrefix(options.FilePrefix);
 
-         if (!_directory.Exists) return Task.FromResult<IReadOnlyCollection<Blob>>(new List<Blob>());
+         if(!_directory.Exists) return Task.FromResult<IReadOnlyCollection<Blob>>(new List<Blob>());
 
          string fullPath = GetFolder(options?.FolderPath, false);
-         if (fullPath == null) return Task.FromResult<IReadOnlyCollection<Blob>>(new List<Blob>());
+         if(fullPath == null) return Task.FromResult<IReadOnlyCollection<Blob>>(new List<Blob>());
 
          string[] fileIds = Directory.GetFiles(
             fullPath,
@@ -90,19 +90,19 @@ namespace Storage.Net.Blobs.Files
 
       private string GetFolder(string path, bool createIfNotExists)
       {
-         if (path == null) return _directory.FullName;
+         if(path == null) return _directory.FullName;
          string[] parts = StoragePath.Split(path);
 
          string fullPath = _directory.FullName;
 
-         foreach (string part in parts)
+         foreach(string part in parts)
          {
             fullPath = Path.Combine(fullPath, part);
          }
 
-         if (!Directory.Exists(fullPath))
+         if(!Directory.Exists(fullPath))
          {
-            if (createIfNotExists)
+            if(createIfNotExists)
             {
                Directory.CreateDirectory(fullPath);
             }
@@ -133,7 +133,7 @@ namespace Storage.Net.Blobs.Files
             string fullPath = Path.Combine(_directory.FullName, extraPath);
 
             dir = new DirectoryInfo(fullPath);
-            if (!dir.Exists) dir.Create();
+            if(!dir.Exists) dir.Create();
          }
 
          return Path.Combine(dir.FullName, name);
@@ -142,7 +142,7 @@ namespace Storage.Net.Blobs.Files
       private Stream CreateStream(string id, bool overwrite = true)
       {
          GenericValidation.CheckBlobFullPath(id);
-         if (!_directory.Exists) _directory.Create();
+         if(!_directory.Exists) _directory.Create();
          string path = GetFilePath(id);
 
          Stream s = overwrite ? File.Create(path) : File.OpenWrite(path);
@@ -179,44 +179,30 @@ namespace Storage.Net.Blobs.Files
       /// <summary>
       /// Streams into file
       /// </summary>
-      public async Task WriteAsync(Blob blob, Stream sourceStream, bool append, CancellationToken cancellationToken)
+      public async Task WriteAsync(string fullPath, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(blob);
+         GenericValidation.CheckBlobFullPath(fullPath);
          GenericValidation.CheckSourceStream(sourceStream);
 
-         string fullPath = StoragePath.Normalize(blob, false);
+         fullPath = StoragePath.Normalize(fullPath, false);
          using(Stream dest = CreateStream(fullPath, !append))
          {
             await sourceStream.CopyToAsync(dest).ConfigureAwait(false);
-
-            WriteAttributes(blob);
          }
       }
 
       /// <summary>
       /// 
       /// </summary>
-      public Task<Stream> OpenWriteAsync(Blob blob, bool append, CancellationToken cancellationToken)
+      public Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(blob);
+         GenericValidation.CheckBlobFullPath(fullPath);
 
-         string fullPath = StoragePath.Normalize(blob, false);
+         fullPath = StoragePath.Normalize(fullPath, false);
 
          Stream stream = CreateStream(fullPath, !append);
 
-         WriteAttributes(blob);
-
          return Task.FromResult(stream);
-      }
-
-      private void WriteAttributes(Blob blob)
-      {
-         if(blob?.Metadata == null)
-            return;
-
-         string attrPath = GetFilePath(blob.FullPath) + AttributesFileExtension;
-
-         File.WriteAllBytes(attrPath, blob.AttributesToByteArray());
       }
 
       /// <summary>
@@ -237,14 +223,14 @@ namespace Storage.Net.Blobs.Files
       /// </summary>
       public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
       {
-         if (ids == null) return Task.FromResult(true);
+         if(ids == null) return Task.FromResult(true);
 
-         foreach (string id in ids)
+         foreach(string id in ids)
          {
             GenericValidation.CheckBlobFullPath(id);
 
             string path = GetFilePath(StoragePath.Normalize(id, false));
-            if (File.Exists(path)) File.Delete(path);
+            if(File.Exists(path)) File.Delete(path);
          }
 
          return Task.FromResult(true);
@@ -257,11 +243,11 @@ namespace Storage.Net.Blobs.Files
       {
          var result = new List<bool>();
 
-         if (ids != null)
+         if(ids != null)
          {
             GenericValidation.CheckBlobFullPaths(ids);
 
-            foreach (string id in ids)
+            foreach(string id in ids)
             {
                bool exists = File.Exists(GetFilePath(StoragePath.Normalize(id, false)));
                result.Add(exists);
@@ -295,6 +281,24 @@ namespace Storage.Net.Blobs.Files
          }
 
          return Task.FromResult<IReadOnlyCollection<Blob>>(result);
+      }
+
+      public async Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
+      {
+         GenericValidation.CheckBlobFullPaths(blobs);
+
+         foreach(Blob blob in blobs.Select(b => b.FullPath))
+         {
+            string attrPath = GetFilePath(blob.FullPath) + AttributesFileExtension;
+
+            if(!File.Exists(attrPath))
+               continue;
+
+            if(blob?.Metadata == null)
+               continue;
+
+            File.WriteAllBytes(attrPath, blob.AttributesToByteArray());
+         }
       }
 
       private void EnrichWithMetadata(Blob blob)

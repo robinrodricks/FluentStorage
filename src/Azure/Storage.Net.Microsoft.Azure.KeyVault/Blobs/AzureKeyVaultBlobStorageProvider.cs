@@ -73,44 +73,44 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
          return new Blob(item.Id.Substring(idx + 1), BlobItemKind.File);
       }
 
-      public async Task WriteAsync(Blob blob, Stream sourceStream, bool append, CancellationToken cancellationToken)
+      public async Task WriteAsync(string fullPath, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(blob);
-         ValidateSecretName(blob);
+         GenericValidation.CheckBlobFullPath(fullPath);
+         ValidateSecretName(fullPath);
          GenericValidation.CheckSourceStream(sourceStream);
          if (append) throw new ArgumentException("appending to secrets is not supported", nameof(append));
 
          string value = Encoding.UTF8.GetString(sourceStream.ToByteArray());
 
-         await _vaultClient.SetSecretAsync(_vaultUri, blob.FullPath, value);
+         await _vaultClient.SetSecretAsync(_vaultUri, fullPath, value);
       }
 
-      public Task<Stream> OpenWriteAsync(Blob blob, bool append, CancellationToken cancellationToken)
+      public Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(blob);
-         ValidateSecretName(blob);
+         GenericValidation.CheckBlobFullPath(fullPath);
+         ValidateSecretName(fullPath);
          if (append) throw new ArgumentException("appending to secrets is not supported", nameof(append));
 
          var callbackStream = new FixedStream(new MemoryStream(), null, async fx =>
          {
             string value = Encoding.UTF8.GetString(((MemoryStream)fx.Parent).ToArray());
 
-            await _vaultClient.SetSecretAsync(_vaultUri, blob.FullPath, value).ConfigureAwait(false);
+            await _vaultClient.SetSecretAsync(_vaultUri, fullPath, value).ConfigureAwait(false);
          });
 
          return Task.FromResult<Stream>(callbackStream);
          
       }
 
-      public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
+      public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(id);
-         ValidateSecretName(id);
+         GenericValidation.CheckBlobFullPath(fullPath);
+         ValidateSecretName(fullPath);
 
          SecretBundle secret;
          try
          {
-            secret = await _vaultClient.GetSecretAsync(_vaultUri, id);
+            secret = await _vaultClient.GetSecretAsync(_vaultUri, fullPath);
          }
          catch(KeyVaultErrorException ex)
          {
@@ -158,10 +158,15 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
       {
          GenericValidation.CheckBlobFullPaths(ids);
 
-         return await Task.WhenAll(ids.Select(id => GetMetaAsync(id)));
+         return await Task.WhenAll(ids.Select(id => GetBlobAsync(id)));
       }
 
-      private async Task<Blob> GetMetaAsync(string id)
+      public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
+      {
+         throw new NotSupportedException();
+      }
+
+      private async Task<Blob> GetBlobAsync(string id)
       {
          try
          {

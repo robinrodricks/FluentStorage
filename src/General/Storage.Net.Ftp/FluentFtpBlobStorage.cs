@@ -146,7 +146,12 @@ namespace Storage.Net.Ftp
          }
          return results;
       }
-      
+
+      public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
+      {
+         throw new NotSupportedException();
+      }
+
       public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default)
       {
          FtpClient client = await GetClientAsync();
@@ -163,21 +168,21 @@ namespace Storage.Net.Ftp
 
       public Task<ITransaction> OpenTransactionAsync() => Task.FromResult(EmptyTransaction.Instance);
 
-      public async Task<Stream> OpenWriteAsync(Blob blob, bool append = false, CancellationToken cancellationToken = default)
+      public async Task<Stream> OpenWriteAsync(string fullPath, bool append = false, CancellationToken cancellationToken = default)
       {
          FtpClient client = await GetClientAsync();
 
          return await retryPolicy.ExecuteAsync<Stream>(async () =>
          {
-            return await client.OpenWriteAsync(blob, FtpDataType.Binary, true);
+            return await client.OpenWriteAsync(fullPath, FtpDataType.Binary, true);
          });
       }
 
-      public async Task WriteAsync(Blob blob, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
+      public async Task WriteAsync(string fullPath, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
       {
          FtpClient client = await GetClientAsync();
 
-         await client.UploadAsync(sourceStream, blob, FtpExists.Overwrite, true, null, cancellationToken);
+         await client.UploadAsync(sourceStream, fullPath, FtpExists.Overwrite, true, null, cancellationToken);
       }
 
       public void Dispose()

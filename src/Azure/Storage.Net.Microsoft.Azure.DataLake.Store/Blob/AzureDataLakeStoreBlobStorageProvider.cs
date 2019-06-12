@@ -72,15 +72,15 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
          return await browser.BrowseAsync(options, cancellationToken);
       }
 
-      public async Task WriteAsync(Blob blob, Stream sourceStream, bool append, CancellationToken cancellationToken)
+      public async Task WriteAsync(string fullPath, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(blob);
+         GenericValidation.CheckBlobFullPath(fullPath);
 
          AdlsClient client = await GetAdlsClientAsync();
 
-         if (append && (await ExistsAsync(new[] { blob.FullPath }, cancellationToken)).First())
+         if (append && (await ExistsAsync(new[] { fullPath }, cancellationToken)).First())
          {
-            AdlsOutputStream adlsStream = await client.GetAppendStreamAsync(blob.FullPath, cancellationToken);
+            AdlsOutputStream adlsStream = await client.GetAppendStreamAsync(fullPath, cancellationToken);
             using (var writeStream = new AdlsWriteableStream(adlsStream))
             {
                await sourceStream.CopyToAsync(writeStream);
@@ -88,7 +88,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
          }
          else
          {
-            AdlsOutputStream adlsStream = await client.CreateFileAsync(blob, IfExists.Overwrite,
+            AdlsOutputStream adlsStream = await client.CreateFileAsync(fullPath, IfExists.Overwrite,
                createParent:true,
                cancelToken: cancellationToken);
 
@@ -99,9 +99,9 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
          }
       }
 
-      public async Task<Stream> OpenWriteAsync(Blob blob, bool append, CancellationToken cancellationToken)
+      public async Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(blob);
+         GenericValidation.CheckBlobFullPath(fullPath);
 
          AdlsClient client = await GetAdlsClientAsync();
 
@@ -109,11 +109,11 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 
          if(append)
          {
-            stream = await client.GetAppendStreamAsync(blob.FullPath, cancellationToken);
+            stream = await client.GetAppendStreamAsync(fullPath, cancellationToken);
          }
          else
          {
-            stream = await client.CreateFileAsync(blob.FullPath, IfExists.Overwrite,
+            stream = await client.CreateFileAsync(fullPath, IfExists.Overwrite,
                createParent: true,
                cancelToken: cancellationToken);
          }
@@ -173,6 +173,11 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
          AdlsClient client = await GetAdlsClientAsync();
 
          return await Task.WhenAll(ids.Select(id => GetBlobWithMetaAsync(id, client, cancellationToken)));
+      }
+
+      public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
+      {
+         throw new NotSupportedException("ADLS Gen1 doesn't support file metadata");
       }
 
       private async Task<Blob> GetBlobWithMetaAsync(string id, AdlsClient client, CancellationToken cancellationToken)

@@ -82,7 +82,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          {
             GenericValidation.CheckBlobFullPath(fullPath);
 
-            (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath, false);
+            (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath, false).ConfigureAwait(false);
             if (container == null)
             {
                result.Add(false);
@@ -90,7 +90,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             else
             {
                CloudBlockBlob blob = container.GetBlockBlobReference(StoragePath.Normalize(path, false));
-               bool exists = await blob.ExistsAsync();
+               bool exists = await blob.ExistsAsync().ConfigureAwait(false);
                result.Add(exists);
             }
          }
@@ -101,10 +101,23 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
          GenericValidation.CheckBlobFullPaths(fullPaths);
-         return await Task.WhenAll(fullPaths.Select(id => GetBlobWithMetaAsync(id, cancellationToken)));
+         return await Task.WhenAll(fullPaths.Select(id => GetBlobAsync(id, cancellationToken)));
       }
 
-      private async Task<Blob> GetBlobWithMetaAsync(string fullPath, CancellationToken cancellationToken)
+      public async Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
+      {
+         if(blobs == null)
+            return;
+
+         foreach(string fullPath in blobs.Where(b => b != null).Select(b => b.FullPath))
+         {
+            (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath, false).ConfigureAwait(false);
+            CloudBlockBlob cloudBlob = container.GetBlockBlobReference(StoragePath.Normalize(path, false));
+            await AttachBlobMetaAsync(cloudBlob, fullPath).ConfigureAwait(false);
+         }
+      }
+
+      private async Task<Blob> GetBlobAsync(string fullPath, CancellationToken cancellationToken)
       {
          (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath, false);
          if (container == null) return null;
@@ -271,38 +284,37 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return Task.FromResult(EmptyTransaction.Instance);
       }
 
-      public async Task<Stream> OpenWriteAsync(Blob blob, bool append, CancellationToken cancellationToken)
+      public async Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
       {
-         (CloudBlobContainer container, string path) = await GetPartsAsync(blob);
+         (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath);
 
          if (append)
          {
             CloudAppendBlob cab = container.GetAppendBlobReference(path);
-            await AttachBlobMetaAsync(cab, blob).ConfigureAwait(false);
+            await AttachBlobMetaAsync(cab, fullPath).ConfigureAwait(false);
 
             return await cab.OpenWriteAsync(!append).ConfigureAwait(false);
          }
          else
          {
             CloudBlockBlob cab = container.GetBlockBlobReference(path);
-            await AttachBlobMetaAsync(cab, blob).ConfigureAwait(false);
+            await AttachBlobMetaAsync(cab, fullPath).ConfigureAwait(false);
 
             return await cab.OpenWriteAsync().ConfigureAwait(false);
 
          }
       }
 
-      public async Task WriteAsync(Blob blob, Stream sourceStream, bool append, CancellationToken cancellationToken)
+      public async Task WriteAsync(string fullPath, Stream sourceStream, bool append, CancellationToken cancellationToken)
       {
          GenericValidation.CheckSourceStream(sourceStream);
 
-         (CloudBlobContainer container, string path) = await GetPartsAsync(blob).ConfigureAwait(false);
+         (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath).ConfigureAwait(false);
 
          if (append)
          {
             CloudAppendBlob cab = container.GetAppendBlobReference(StoragePath.Normalize(path, false));
             if (!await cab.ExistsAsync()) await cab.CreateOrReplaceAsync().ConfigureAwait(false);
-            await AttachBlobMetaAsync(cab, blob).ConfigureAwait(false);
 
             await cab.AppendFromStreamAsync(sourceStream).ConfigureAwait(false);
 
@@ -310,7 +322,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          else
          {
             CloudBlockBlob cloudBlob = container.GetBlockBlobReference(StoragePath.Normalize(path, false));
-            await AttachBlobMetaAsync(cloudBlob, blob).ConfigureAwait(false);
 
             await cloudBlob.UploadFromStreamAsync(sourceStream).ConfigureAwait(false);
          }
