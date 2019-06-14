@@ -424,9 +424,9 @@ namespace Storage.Net.Microsoft.Azure.Storage.KeyValue
       /// <summary>
       /// Checks if blob name is valid
       /// </summary>
-      /// <param name="id"></param>
+      /// <param name="fullPath"></param>
       /// <returns></returns>
-      public static bool IsValidBlobName(string id)
+      public static bool IsValidBlobName(string fullPath)
       {
          /*
           * A blob name must conforming to the following naming rules:
@@ -437,13 +437,13 @@ namespace Storage.Net.Microsoft.Azure.Storage.KeyValue
           * - The number of path segments comprising the blob name cannot exceed 254. A path segment is the string between consecutive delimiter characters (e.g., the forward slash '/') that corresponds to the name of a virtual directory.
           */
 
-         if(string.IsNullOrEmpty(id))
+         if(string.IsNullOrEmpty(fullPath))
             return false;
-         if(id.Length == 0)
+         if(fullPath.Length == 0)
             return false;
-         if(id.Length > 1024)
+         if(fullPath.Length > 1024)
             return false;
-         if(id.UrlEncode() != id)
+         if(fullPath.UrlEncode() != fullPath)
             return false;
 
          return true;

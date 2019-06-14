@@ -74,7 +74,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
 
       private async Task WriteAsync(Blob blob, Stream sourceStream)
       {
-         string id = ToId(blob);
+         string fullPath = ToFullPath(blob);
 
          byte[] value = sourceStream.ToByteArray();
 
@@ -90,16 +90,16 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
                Md = value.GetHash(HashType.Md5).ToHexString()
             };
 
-            await metaColl.AddOrUpdateAsync(tx.Tx, id, meta, (k, v) => meta);
-            await coll.AddOrUpdateAsync(tx.Tx, id, value, (k, v) => value);
+            await metaColl.AddOrUpdateAsync(tx.Tx, fullPath, meta, (k, v) => meta);
+            await coll.AddOrUpdateAsync(tx.Tx, fullPath, value, (k, v) => value);
 
             await tx.CommitAsync();
          }
       }
 
-      private async Task AppendAsync(string id, Stream sourceStream)
+      private async Task AppendAsync(string fullPath, Stream sourceStream)
       {
-         id = ToId(id);
+         fullPath = ToFullPath(fullPath);
 
          using (ServiceFabricTransaction tx = GetTransaction())
          {
@@ -107,7 +107,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
 
             //create a new byte array with
             byte[] extra = sourceStream.ToByteArray();
-            ConditionalValue<byte[]> value = await coll.TryGetValueAsync(tx.Tx, id);
+            ConditionalValue<byte[]> value = await coll.TryGetValueAsync(tx.Tx, fullPath);
             int oldLength = value.HasValue ? value.Value.Length : 0;
             byte[] newData = new byte[oldLength + extra.Length];
             if(value.HasValue)
@@ -117,7 +117,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
             Array.Copy(extra, 0, newData, oldLength, extra.Length);
 
             //put new array into the key
-            await coll.AddOrUpdateAsync(tx.Tx, id, extra, (k, v) => extra);
+            await coll.AddOrUpdateAsync(tx.Tx, fullPath, extra, (k, v) => extra);
 
             //commit the transaction
             await tx.CommitAsync();
@@ -127,7 +127,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
       public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobFullPath(id);
-         id = ToId(id);
+         id = ToFullPath(id);
 
          using (ServiceFabricTransaction tx = GetTransaction())
          {
@@ -140,35 +140,35 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
          }
       }
 
-      public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public async Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPaths(ids);
+         GenericValidation.CheckBlobFullPaths(fullPaths);
 
          using (ServiceFabricTransaction tx = GetTransaction())
          {
             IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync();
 
-            foreach (string id in ids)
+            foreach (string fullPath in fullPaths)
             {
-               await coll.TryRemoveAsync(tx.Tx, ToId(id));
+               await coll.TryRemoveAsync(tx.Tx, ToFullPath(fullPath));
             }
 
             await tx.CommitAsync();
          }
       }
 
-      public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPaths(ids);
+         GenericValidation.CheckBlobFullPaths(fullPaths);
 
          var result = new List<bool>();
          using (ServiceFabricTransaction tx = GetTransaction())
          {
             IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync();
 
-            foreach (string id in ids)
+            foreach (string fullPath in fullPaths)
             {
-               bool exists = await coll.ContainsKeyAsync(tx.Tx, ToId(id));
+               bool exists = await coll.ContainsKeyAsync(tx.Tx, ToFullPath(fullPath));
 
                result.Add(exists);
             }
@@ -176,9 +176,9 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
          return result;
       }
 
-      public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPaths(ids);
+         GenericValidation.CheckBlobFullPaths(fullPaths);
 
          var result = new List<Blob>();
 
@@ -186,9 +186,9 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
          {
             IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync();
 
-            foreach (string id in ids)
+            foreach (string fullPath in fullPaths)
             {
-               ConditionalValue<byte[]> value = await coll.TryGetValueAsync(tx.Tx, ToId(id));
+               ConditionalValue<byte[]> value = await coll.TryGetValueAsync(tx.Tx, ToFullPath(fullPath));
 
                if (!value.HasValue)
                {
@@ -196,7 +196,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
                }
                else
                {
-                  var meta = new Blob(id)
+                  var meta = new Blob(fullPath)
                   {
                      Size = value.Value.Length
                   };
@@ -255,9 +255,9 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
          _currentTransaction = null;
       }
 
-      private string ToId(string id)
+      private string ToFullPath(string fullPath)
       {
-         return StoragePath.Normalize(id, false);
+         return StoragePath.Normalize(fullPath, false);
       }
    }
 }

@@ -79,14 +79,14 @@ namespace Storage.Net.Blobs
       /// Reads blob content and converts to text in UTF-8 encoding
       /// </summary>
       /// <param name="provider"></param>
-      /// <param name="id">Blob id</param>
+      /// <param name="fullPath">Blob id</param>
       /// <param name="cancellationToken"></param>
       /// <returns></returns>
       public static async Task<string> ReadTextAsync(
          this IBlobStorage provider,
-         string id, CancellationToken cancellationToken = default)
+         string fullPath, CancellationToken cancellationToken = default)
       {
-         Stream src = await provider.OpenReadAsync(id, cancellationToken);
+         Stream src = await provider.OpenReadAsync(fullPath, cancellationToken);
          if (src == null) return null;
 
          var ms = new MemoryStream();
@@ -124,9 +124,9 @@ namespace Storage.Net.Blobs
       /// Checksi if blobs exists in the storage
       /// </summary>
       public static async Task<bool> ExistsAsync(this IBlobStorage blobStorage,
-         string id, CancellationToken cancellationToken = default)
+         string fullPath, CancellationToken cancellationToken = default)
       {
-         IEnumerable<bool> r = await blobStorage.ExistsAsync(new[] { id }, cancellationToken);
+         IEnumerable<bool> r = await blobStorage.ExistsAsync(new[] { fullPath }, cancellationToken);
          return r.First();
       }
 
@@ -134,14 +134,14 @@ namespace Storage.Net.Blobs
       /// Deletes a single blob
       /// </summary>
       /// <param name="storage"></param>
-      /// <param name="id"></param>
+      /// <param name="fullPath"></param>
       /// <param name="cancellationToken"></param>
       /// <returns></returns>
       public static Task DeleteAsync(
          this IBlobStorage storage,
-         string id, CancellationToken cancellationToken = default)
+         string fullPath, CancellationToken cancellationToken = default)
       {
-         return storage.DeleteAsync(new[] {id}, cancellationToken);
+         return storage.DeleteAsync(new[] {fullPath}, cancellationToken);
       }
 
       /// <summary>
@@ -149,9 +149,9 @@ namespace Storage.Net.Blobs
       /// </summary>
       /// <returns>Blob metadata or null if blob doesn't exist</returns>
       public static async Task<Blob> GetBlobAsync(this IBlobStorage storage,
-         string id, CancellationToken cancellationToken = default)
+         string fullPath, CancellationToken cancellationToken = default)
       {
-         return (await storage.GetBlobsAsync(new[] { id }, cancellationToken)).First();
+         return (await storage.GetBlobsAsync(new[] { fullPath }, cancellationToken)).First();
       }
 
       #endregion
@@ -161,7 +161,7 @@ namespace Storage.Net.Blobs
       /// <summary>
       /// Writes byte array to the target storage. If you can, never use large byte arrays, they are terrible!
       /// </summary>
-      public static async Task WriteAsync(this IBlobStorage provider, string id, byte[] data, bool append = false, CancellationToken cancellationToken = default)
+      public static async Task WriteAsync(this IBlobStorage provider, string fullPath, byte[] data, bool append = false, CancellationToken cancellationToken = default)
       {
          if (data == null)
          {
@@ -170,16 +170,16 @@ namespace Storage.Net.Blobs
 
          using (var source = new MemoryStream(data))
          {
-            await provider.WriteAsync(id, source, append, cancellationToken);
+            await provider.WriteAsync(fullPath, source, append, cancellationToken);
          }
       }
 
       /// <summary>
       /// Reads blob content as byte array
       /// </summary>
-      public static async Task<byte[]> ReadBytesAsync(this IBlobStorage storage, string id, CancellationToken cancellationToken = default)
+      public static async Task<byte[]> ReadBytesAsync(this IBlobStorage storage, string fullPath, CancellationToken cancellationToken = default)
       {
-         Stream src = await storage.OpenReadAsync(id, cancellationToken);
+         Stream src = await storage.OpenReadAsync(fullPath, cancellationToken);
          if (src == null) return null;
 
          var ms = new MemoryStream();
@@ -199,7 +199,7 @@ namespace Storage.Net.Blobs
       /// Downloads blob to a stream
       /// </summary>
       /// <param name="provider"></param>
-      /// <param name="id">Blob ID, required</param>
+      /// <param name="fullPath">Blob ID, required</param>
       /// <param name="targetStream">Target stream to copy to, required</param>
       /// <param name="cancellationToken"></param>
       /// <exception cref="System.ArgumentNullException">Thrown when any parameter is null</exception>
@@ -207,12 +207,12 @@ namespace Storage.Net.Blobs
       /// <exception cref="StorageException">Thrown when blob does not exist, error code set to <see cref="ErrorCode.NotFound"/></exception>
       public static async Task ReadToStreamAsync(
          this IBlobStorage provider,
-         string id, Stream targetStream, CancellationToken cancellationToken = default)
+         string fullPath, Stream targetStream, CancellationToken cancellationToken = default)
       {
          if (targetStream == null)
             throw new ArgumentNullException(nameof(targetStream));
 
-         Stream src = await provider.OpenReadAsync(id, cancellationToken);
+         Stream src = await provider.OpenReadAsync(fullPath, cancellationToken);
          if (src == null) return;
 
          using (src)
@@ -229,14 +229,14 @@ namespace Storage.Net.Blobs
       /// Downloads a blob to the local filesystem.
       /// </summary>
       /// <param name="provider"></param>
-      /// <param name="id">Blob ID to download</param>
+      /// <param name="fullPath">Blob ID to download</param>
       /// <param name="filePath">Full path to the local file to be downloaded to. If the file exists it will be recreated wtih blob data.</param>
       /// <param name="cancellationToken"></param>
       public static async Task ReadToFileAsync(
          this IBlobStorage provider,
-         string id, string filePath, CancellationToken cancellationToken = default)
+         string fullPath, string filePath, CancellationToken cancellationToken = default)
       {
-         Stream src = await provider.OpenReadAsync(id, cancellationToken);
+         Stream src = await provider.OpenReadAsync(fullPath, cancellationToken);
          if (src == null) return;
 
          using (src)
@@ -253,16 +253,16 @@ namespace Storage.Net.Blobs
       /// Uploads local file to the blob storage
       /// </summary>
       /// <param name="provider"></param>
-      /// <param name="id">Blob ID to create or overwrite</param>
+      /// <param name="fullPath">Blob ID to create or overwrite</param>
       /// <param name="filePath">Path to local file</param>
       /// <param name="cancellationToken"></param>
       public static async Task WriteFileAsync(
          this IBlobStorage provider,
-         string id, string filePath, CancellationToken cancellationToken = default)
+         string fullPath, string filePath, CancellationToken cancellationToken = default)
       {
          using (Stream src = File.OpenRead(filePath))
          {
-            await provider.WriteAsync(id, src, false, cancellationToken);
+            await provider.WriteAsync(fullPath, src, false, cancellationToken);
          }
       }
 

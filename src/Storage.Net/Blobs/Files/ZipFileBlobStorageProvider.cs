@@ -38,19 +38,19 @@ namespace Storage.Net.Blobs.Files
          }
       }
 
-      public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
          ZipArchive zipArchive = GetArchive(false);
          if(zipArchive == null)
          {
-            return Task.FromResult<IReadOnlyCollection<bool>>(new bool[ids.Count()]);
+            return Task.FromResult<IReadOnlyCollection<bool>>(new bool[fullPaths.Count()]);
          }
 
          var result = new List<bool>();
 
-         foreach(string id in ids)
+         foreach(string fullPath in fullPaths)
          {
-            string nid = StoragePath.Normalize(id, false);
+            string nid = StoragePath.Normalize(fullPath, false);
 
             ZipArchiveEntry entry = zipArchive.GetEntry(nid);
 
@@ -60,14 +60,14 @@ namespace Storage.Net.Blobs.Files
          return Task.FromResult<IReadOnlyCollection<bool>>(result);
       }
 
-      public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
          var result = new List<Blob>();
          ZipArchive zipArchive = GetArchive(false);
 
-         foreach (string id in ids)
+         foreach (string fullPath in fullPaths)
          {
-            string nid = StoragePath.Normalize(id, false);
+            string nid = StoragePath.Normalize(fullPath, false);
 
             try
             {
@@ -106,14 +106,14 @@ namespace Storage.Net.Blobs.Files
          return Task.FromResult<IReadOnlyCollection<Blob>>(ids.ToList());
       }
 
-      public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default)
+      public Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
       {
-         id = StoragePath.Normalize(id, false);
+         fullPath = StoragePath.Normalize(fullPath, false);
 
          ZipArchive archive = GetArchive(false);
          if (archive == null) return Task.FromResult<Stream>(null);
 
-         ZipArchiveEntry entry = archive.GetEntry(id);
+         ZipArchiveEntry entry = archive.GetEntry(fullPath);
          if (entry == null) return Task.FromResult<Stream>(null);
 
          return Task.FromResult(entry.Open());
@@ -155,13 +155,13 @@ namespace Storage.Net.Blobs.Files
          return Task.FromResult<Stream>(callbackStream);
       }
 
-      public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
          ZipArchive archive = GetArchive(true);
 
-         foreach(string id in ids)
+         foreach(string fullPath in fullPaths)
          {
-            string nid = StoragePath.Normalize(id, false);
+            string nid = StoragePath.Normalize(fullPath, false);
 
             ZipArchiveEntry entry = archive.GetEntry(nid);
             if (entry == null) continue;

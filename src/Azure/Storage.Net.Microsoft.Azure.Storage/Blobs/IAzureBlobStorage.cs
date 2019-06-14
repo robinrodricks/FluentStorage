@@ -20,7 +20,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       /// <summary>
       /// Returns Uri to Azure Blob with Shared Access Token.
       /// </summary>
-      Task<string> GetSasUriAsync(string id,
+      Task<string> GetSasUriAsync(string fullPath,
          SharedAccessBlobPolicy sasConstraints,
          SharedAccessBlobHeaders headers = null,
          bool createContainer = false,
@@ -30,7 +30,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       /// Returns Uri to Azure Blob with read-only Shared Access Token.
       /// </summary>
       Task<string> GetReadOnlySasUriAsync(
-         string id,
+         string fullPath,
          SharedAccessBlobHeaders headers = null,
          int minutesToExpiration = 30,
          CancellationToken cancellationToken = default);
@@ -39,7 +39,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       /// Returns Uri to Azure Blob with write-only Shared Access Token.
       /// </summary>
       Task<string> GetWriteOnlySasUriAsync(
-         string id,
+         string fullPath,
          SharedAccessBlobHeaders headers = null,
          int minutesToExpiration = 30,
          CancellationToken cancellationToken = default);
@@ -48,7 +48,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       /// Returns Uri to Azure Blob with read-write Shared Access Token.
       /// </summary>
       Task<string> GetReadWriteSasUriAsync(
-         string id,
+         string fullPath,
          SharedAccessBlobHeaders headers = null,
          int minutesToExpiration = 30,
          CancellationToken cancellationToken = default);
@@ -56,11 +56,11 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       /// <summary>
       /// Acquires a lease
       /// </summary>
-      /// <param name="id"></param>
+      /// <param name="fullPath"></param>
       /// <param name="maxLeaseTime"></param>
       /// <param name="waitForRelease">When true, the call will wait for the lock to be released</param>
       /// <param name="cancellationToken"></param>
       /// <returns></returns>
-      Task<BlobLease> AcquireBlobLeaseAsync(string id, TimeSpan maxLeaseTime, bool waitForRelease = false, CancellationToken cancellationToken = default);
+      Task<BlobLease> AcquireBlobLeaseAsync(string fullPath, TimeSpan maxLeaseTime, bool waitForRelease = false, CancellationToken cancellationToken = default);
    }
 }

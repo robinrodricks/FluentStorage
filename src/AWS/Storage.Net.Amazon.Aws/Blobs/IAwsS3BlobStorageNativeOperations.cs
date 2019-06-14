@@ -17,16 +17,16 @@ namespace Storage.Net.Amazon.Aws.Blobs
       /// <summary>
       /// Get presigned url for upload object to Blob Storage.
       /// </summary>
-      Task<string> GetUploadUrlAsync(string id, string mimeType, int expiresInSeconds = 86000);
+      Task<string> GetUploadUrlAsync(string fullPath, string mimeType, int expiresInSeconds = 86000);
 
       /// <summary>
       /// Get presigned url for download object from Blob Storage.
       /// </summary>
-      Task<string> GetDownloadUrlAsync(string id, string mimeType, int expiresInSeconds = 86000);
+      Task<string> GetDownloadUrlAsync(string fullPath, string mimeType, int expiresInSeconds = 86000);
 
       /// <summary>
       /// Get presigned url for requested operation with Blob Storage.
       /// </summary>
-      Task<string> GetPresignedUrlAsync(string id, string mimeType, int expiresInSeconds, HttpVerb verb);
+      Task<string> GetPresignedUrlAsync(string fullPath, string mimeType, int expiresInSeconds, HttpVerb verb);
    }
 }

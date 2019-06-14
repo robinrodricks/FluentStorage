@@ -138,13 +138,13 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
          return await Task.WhenAll(ids.Select(id => ExistsAsync(id)));
       }
 
-      private async Task<bool> ExistsAsync(string id)
+      private async Task<bool> ExistsAsync(string fullPath)
       {
          SecretBundle secret;
 
          try
          {
-            secret = await _vaultClient.GetSecretAsync(_vaultUri, id);
+            secret = await _vaultClient.GetSecretAsync(_vaultUri, fullPath);
          }
          catch (KeyVaultErrorException)
          {
@@ -166,13 +166,13 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
          throw new NotSupportedException();
       }
 
-      private async Task<Blob> GetBlobAsync(string id)
+      private async Task<Blob> GetBlobAsync(string fullPath)
       {
          try
          {
-            SecretBundle secret = await _vaultClient.GetSecretAsync(_vaultUri, id);
+            SecretBundle secret = await _vaultClient.GetSecretAsync(_vaultUri, fullPath);
             byte[] data = Encoding.UTF8.GetBytes(secret.Value);
-            return new Blob(id)
+            return new Blob(fullPath)
             {
                Size = data.Length,
                MD5 = secret.Value.GetHash(HashType.Md5),
@@ -226,11 +226,11 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
          return ex.Body.Error.Code == "SecretNotFound";
       }
 
-      private static void ValidateSecretName(string id)
+      private static void ValidateSecretName(string fullPath)
       {
-         if(!secretNameRegex.IsMatch(id))
+         if(!secretNameRegex.IsMatch(fullPath))
          {
-            throw new NotSupportedException($"secret '{id}' does not match expected pattern '^[0-9a-zA-Z-]+$'");
+            throw new NotSupportedException($"secret '{fullPath}' does not match expected pattern '^[0-9a-zA-Z-]+$'");
          }
       }
 

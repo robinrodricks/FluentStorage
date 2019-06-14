@@ -115,11 +115,11 @@ namespace Storage.Net.Blobs.Files
          return fullPath;
       }
 
-      private string GetFilePath(string id, bool createIfNotExists = true)
+      private string GetFilePath(string fullPath, bool createIfNotExists = true)
       {
          //id can contain path separators
-         id = id.Trim(StoragePath.PathSeparator);
-         string[] parts = id.Split(StoragePath.PathSeparator).Select(EncodePathPart).ToArray();
+         fullPath = fullPath.Trim(StoragePath.PathSeparator);
+         string[] parts = fullPath.Split(StoragePath.PathSeparator).Select(EncodePathPart).ToArray();
          string name = parts[parts.Length - 1];
          DirectoryInfo dir;
          if(parts.Length == 1)
@@ -130,7 +130,7 @@ namespace Storage.Net.Blobs.Files
          {
             string extraPath = string.Join(StoragePath.PathStrSeparator, parts, 0, parts.Length - 1);
 
-            string fullPath = Path.Combine(_directory.FullName, extraPath);
+            fullPath = Path.Combine(_directory.FullName, extraPath);
 
             dir = new DirectoryInfo(fullPath);
             if(!dir.Exists) dir.Create();
@@ -139,21 +139,21 @@ namespace Storage.Net.Blobs.Files
          return Path.Combine(dir.FullName, name);
       }
 
-      private Stream CreateStream(string id, bool overwrite = true)
+      private Stream CreateStream(string fullPath, bool overwrite = true)
       {
-         GenericValidation.CheckBlobFullPath(id);
+         GenericValidation.CheckBlobFullPath(fullPath);
          if(!_directory.Exists) _directory.Create();
-         string path = GetFilePath(id);
+         string path = GetFilePath(fullPath);
 
          Stream s = overwrite ? File.Create(path) : File.OpenWrite(path);
          s.Seek(0, SeekOrigin.End);
          return s;
       }
 
-      private Stream OpenStream(string id)
+      private Stream OpenStream(string fullPath)
       {
-         GenericValidation.CheckBlobFullPath(id);
-         string path = GetFilePath(id);
+         GenericValidation.CheckBlobFullPath(fullPath);
+         string path = GetFilePath(fullPath);
          if(!File.Exists(path)) return null;
 
          return File.OpenRead(path);
@@ -208,12 +208,12 @@ namespace Storage.Net.Blobs.Files
       /// <summary>
       /// Opens file and returns the open stream
       /// </summary>
-      public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
+      public Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(id);
+         GenericValidation.CheckBlobFullPath(fullPath);
 
-         id = StoragePath.Normalize(id, false);
-         Stream result = OpenStream(id);
+         fullPath = StoragePath.Normalize(fullPath, false);
+         Stream result = OpenStream(fullPath);
 
          return Task.FromResult(result);
       }
@@ -221,15 +221,15 @@ namespace Storage.Net.Blobs.Files
       /// <summary>
       /// Deletes files if they exist
       /// </summary>
-      public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken)
       {
-         if(ids == null) return Task.FromResult(true);
+         if(fullPaths == null) return Task.FromResult(true);
 
-         foreach(string id in ids)
+         foreach(string fullPath in fullPaths)
          {
-            GenericValidation.CheckBlobFullPath(id);
+            GenericValidation.CheckBlobFullPath(fullPath);
 
-            string path = GetFilePath(StoragePath.Normalize(id, false));
+            string path = GetFilePath(StoragePath.Normalize(fullPath, false));
             if(File.Exists(path)) File.Delete(path);
          }
 
@@ -239,17 +239,17 @@ namespace Storage.Net.Blobs.Files
       /// <summary>
       /// Checks if files exist on disk
       /// </summary>
-      public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken)
       {
          var result = new List<bool>();
 
-         if(ids != null)
+         if(fullPaths != null)
          {
-            GenericValidation.CheckBlobFullPaths(ids);
+            GenericValidation.CheckBlobFullPaths(fullPaths);
 
-            foreach(string id in ids)
+            foreach(string fullPath in fullPaths)
             {
-               bool exists = File.Exists(GetFilePath(StoragePath.Normalize(id, false)));
+               bool exists = File.Exists(GetFilePath(StoragePath.Normalize(fullPath, false)));
                result.Add(exists);
             }
          }

@@ -121,15 +121,15 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
          return new AdlsWriteableStream(stream);
       }
 
-      public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
+      public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(id);
+         GenericValidation.CheckBlobFullPath(fullPath);
 
          AdlsClient client = await GetAdlsClientAsync();
 
          try
          {
-            AdlsInputStream response = await client.GetReadStreamAsync(id, cancellationToken);
+            AdlsInputStream response = await client.GetReadStreamAsync(fullPath, cancellationToken);
 
             return response;
          }
@@ -148,17 +148,17 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
          await Task.WhenAll(ids.Select(id => client.DeleteAsync(id, cancellationToken)));
       }
 
-      public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPaths(ids);
+         GenericValidation.CheckBlobFullPaths(fullPaths);
 
          AdlsClient client = await GetAdlsClientAsync();
 
          var result = new List<bool>();
 
-         foreach (string id in ids)
+         foreach (string fullPath in fullPaths)
          {
-            bool exists = client.CheckExists(id);
+            bool exists = client.CheckExists(fullPath);
 
             result.Add(exists);
          }
@@ -180,12 +180,12 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
          throw new NotSupportedException("ADLS Gen1 doesn't support file metadata");
       }
 
-      private async Task<Blob> GetBlobWithMetaAsync(string id, AdlsClient client, CancellationToken cancellationToken)
+      private async Task<Blob> GetBlobWithMetaAsync(string fullPath, AdlsClient client, CancellationToken cancellationToken)
       {
          try
          {
-            DirectoryEntry entry = await client.GetDirectoryEntryAsync(id, cancelToken: cancellationToken);
-            return new Blob(id)
+            DirectoryEntry entry = await client.GetDirectoryEntryAsync(fullPath, cancelToken: cancellationToken);
+            return new Blob(fullPath)
             {
                Size = entry.Length,
                LastModificationTime = entry.LastModifiedTime

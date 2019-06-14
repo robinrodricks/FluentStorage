@@ -152,13 +152,13 @@ namespace Storage.Net.Ftp
          throw new NotSupportedException();
       }
 
-      public async Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken = default)
+      public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
       {
          FtpClient client = await GetClientAsync();
 
          try
          {
-            return await client.OpenReadAsync(id, FtpDataType.Binary, 0, true);
+            return await client.OpenReadAsync(fullPath, FtpDataType.Binary, 0, true);
          }
          catch(FtpCommandException ex) when (ex.CompletionCode == "550")
          {

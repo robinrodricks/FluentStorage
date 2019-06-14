@@ -86,21 +86,21 @@ namespace Storage.Net.Blobs
          return Task.FromResult<Stream>(result);
       }
 
-      public Task<Stream> OpenReadAsync(string id, CancellationToken cancellationToken)
+      public Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPath(id);
-         id = StoragePath.Normalize(id);
+         GenericValidation.CheckBlobFullPath(fullPath);
+         fullPath = StoragePath.Normalize(fullPath);
 
-         if (!_idToData.TryGetValue(id, out Tag tag)) return Task.FromResult<Stream>(null);
+         if (!_idToData.TryGetValue(fullPath, out Tag tag)) return Task.FromResult<Stream>(null);
 
          return Task.FromResult<Stream>(new NonCloseableStream(new MemoryStream(tag.data)));
       }
 
-      public Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPaths(ids);
+         GenericValidation.CheckBlobFullPaths(fullPaths);
 
-         foreach (string blobId in ids)
+         foreach (string blobId in fullPaths)
          {
             _idToData.Remove(StoragePath.Normalize(blobId));
          }
@@ -153,14 +153,14 @@ namespace Storage.Net.Blobs
          throw new NotSupportedException();
       }
 
-      private void Write(string id, Stream sourceStream)
+      private void Write(string fullPath, Stream sourceStream)
       {
-         GenericValidation.CheckBlobFullPath(id);
-         id = StoragePath.Normalize(id);
+         GenericValidation.CheckBlobFullPath(fullPath);
+         fullPath = StoragePath.Normalize(fullPath);
 
          Tag tag = ToTag(sourceStream);
 
-         _idToData[id] = tag;
+         _idToData[fullPath] = tag;
       }
 
       private static Tag ToTag(Stream s)
@@ -178,11 +178,11 @@ namespace Storage.Net.Blobs
          return tag;
       }
 
-      private bool Exists(string id)
+      private bool Exists(string fullPath)
       {
-         GenericValidation.CheckBlobFullPath(id);
+         GenericValidation.CheckBlobFullPath(fullPath);
 
-         return _idToData.ContainsKey(id);
+         return _idToData.ContainsKey(fullPath);
       }
 
       public void Dispose()
