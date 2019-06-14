@@ -287,16 +287,17 @@ namespace Storage.Net.Blobs.Files
       {
          GenericValidation.CheckBlobFullPaths(blobs);
 
-         foreach(Blob blob in blobs.Select(b => b.FullPath))
+         foreach(Blob blob in blobs.Where(b => b != null))
          {
-            string attrPath = GetFilePath(blob.FullPath) + AttributesFileExtension;
+            string blobPath = GetFilePath(blob.FullPath);
 
-            if(!File.Exists(attrPath))
+            if(!File.Exists(blobPath))
                continue;
 
             if(blob?.Metadata == null)
                continue;
 
+            string attrPath = GetFilePath(blob.FullPath) + AttributesFileExtension;
             File.WriteAllBytes(attrPath, blob.AttributesToByteArray());
          }
       }

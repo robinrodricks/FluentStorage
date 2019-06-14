@@ -154,6 +154,15 @@ namespace Storage.Net.Blobs
          return (await storage.GetBlobsAsync(new[] { fullPath }, cancellationToken)).First();
       }
 
+      /// <summary>
+      /// Set blob attributes
+      /// </summary>
+      public static Task SetBlobAsync(this IBlobStorage storage,
+         Blob blob, CancellationToken cancellationToken = default)
+      {
+         return storage.SetBlobsAsync(new[] { blob }, cancellationToken);
+      }
+
       #endregion
 
       #region [ Bytes ]

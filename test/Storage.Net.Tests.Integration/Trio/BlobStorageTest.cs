@@ -398,6 +398,14 @@ namespace Storage.Net.Tests.Integration.Blobs
          };
 
          await _storage.WriteTextAsync(blob, "test");
+         try
+         {
+            await _storage.SetBlobAsync(blob);
+         }
+         catch(NotSupportedException)
+         {
+            return;
+         }
 
          //test
          Blob blob2 = await _storage.GetBlobAsync(blob);
@@ -418,11 +426,20 @@ namespace Storage.Net.Tests.Integration.Blobs
             ["fun"] = "no"
          };
          await _storage.WriteTextAsync(blob, "test");
+         try
+         {
+            await _storage.SetBlobAsync(blob);
+         }
+         catch(NotSupportedException)
+         {
+            return;
+         }
          blob.Metadata = new Dictionary<string, string>
          {
             ["user"] = "ivan2"
          };
          await _storage.WriteTextAsync(blob, "test2");
+         await _storage.SetBlobAsync(blob);
 
          //test
          Blob blob2 = await _storage.GetBlobAsync(blob);
@@ -445,6 +462,14 @@ namespace Storage.Net.Tests.Integration.Blobs
          {
             s.Write(RandomGenerator.GetRandomBytes(10, 15));
          }
+         try
+         {
+            await _storage.SetBlobAsync(blob);
+         }
+         catch(NotSupportedException)
+         {
+            return;
+         }
 
          //test
          Blob blob2 = await _storage.GetBlobAsync(blob);
@@ -464,6 +489,15 @@ namespace Storage.Net.Tests.Integration.Blobs
             ["fun"] = "no"
          };
          await _storage.WriteTextAsync(blob, "test2");
+
+         try
+         {
+            await _storage.SetBlobAsync(blob);
+         }
+         catch(NotSupportedException)
+         {
+            return;
+         }
 
          IReadOnlyCollection<Blob> all = await _storage.ListAsync(folderPath: blob.FolderPath, includeAttributes: true);
 

@@ -109,11 +109,11 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          if(blobs == null)
             return;
 
-         foreach(string fullPath in blobs.Where(b => b != null).Select(b => b.FullPath))
+         foreach(Blob blob in blobs.Where(b => b != null))
          {
-            (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath, false).ConfigureAwait(false);
+            (CloudBlobContainer container, string path) = await GetPartsAsync(blob, false).ConfigureAwait(false);
             CloudBlockBlob cloudBlob = container.GetBlockBlobReference(StoragePath.Normalize(path, false));
-            await AttachBlobMetaAsync(cloudBlob, fullPath).ConfigureAwait(false);
+            await AttachBlobMetaAsync(cloudBlob, blob).ConfigureAwait(false);
          }
       }
 
