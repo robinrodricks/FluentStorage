@@ -118,11 +118,11 @@ namespace Storage.Net.Tests.Integration.Blobs
       {
          //drop all blobs in test storage
 
-         IReadOnlyCollection<Blob> files = (await _storage.ListAsync(recurse: true)).Where(b => b.Kind == BlobItemKind.File).ToList();
+         IReadOnlyCollection<Blob> topLevel = (await _storage.ListAsync(recurse: false)).ToList();
 
          try
          {
-            await _storage.DeleteAsync(files.Select(f => f.FullPath));
+            await _storage.DeleteAsync(topLevel.Select(f => f.FullPath));
          }
          catch
          {
@@ -145,7 +145,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 
       private async Task<string> GetRandomStreamIdAsync(string prefix = null)
       {
-         string id = RandomBlobId();
+         string id = RandomBlobPath();
          if(prefix != null)
             id = prefix + "/" + id;
 
@@ -166,7 +166,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task List_RootFolder_HasAtLeastOne()
       {
-         string targetId = RandomBlobId();
+         string targetId = RandomBlobPath();
 
          await _storage.WriteTextAsync(targetId, "test");
 
@@ -182,9 +182,9 @@ namespace Storage.Net.Tests.Integration.Blobs
 
          int countBefore = (await _storage.ListAsync(new ListOptions { FolderPath = _blobPrefix, FilePrefix = prefix })).Count();
 
-         string id1 = RandomBlobId(prefix);
-         string id2 = RandomBlobId(prefix);
-         string id3 = RandomBlobId();
+         string id1 = RandomBlobPath(prefix);
+         string id2 = RandomBlobPath(prefix);
+         string id3 = RandomBlobPath();
 
          await _storage.WriteTextAsync(id1, RandomGenerator.RandomString);
          await _storage.WriteTextAsync(id2, RandomGenerator.RandomString);
@@ -197,7 +197,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task List_FilesInFolder_NonRecursive()
       {
-         string id = RandomBlobId();
+         string id = RandomBlobPath();
 
          await _storage.WriteTextAsync(id, RandomGenerator.RandomString);
 
@@ -212,9 +212,9 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task List_FilesInFolder_Recursive()
       {
-         string id1 = RandomBlobId();
-         string id2 = StoragePath.Combine(RandomBlobId(), RandomGenerator.RandomString);
-         string id3 = StoragePath.Combine(RandomBlobId(), RandomGenerator.RandomString, RandomGenerator.RandomString);
+         string id1 = RandomBlobPath();
+         string id2 = StoragePath.Combine(RandomBlobPath(), RandomGenerator.RandomString);
+         string id3 = StoragePath.Combine(RandomBlobPath(), RandomGenerator.RandomString, RandomGenerator.RandomString);
 
          try
          {
@@ -233,7 +233,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task List_InNonExistingFolder_EmptyCollection()
       {
-         IEnumerable<Blob> objects = await _storage.ListAsync(new ListOptions { FolderPath = RandomBlobId() });
+         IEnumerable<Blob> objects = await _storage.ListAsync(new ListOptions { FolderPath = RandomBlobPath() });
 
          Assert.NotNull(objects);
          Assert.True(objects.Count() == 0);
@@ -242,7 +242,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task List_FilesInNonExistingFolder_EmptyCollection()
       {
-         IEnumerable<Blob> objects = await _storage.ListFilesAsync(new ListOptions { FolderPath = RandomBlobId() });
+         IEnumerable<Blob> objects = await _storage.ListFilesAsync(new ListOptions { FolderPath = RandomBlobPath() });
 
          Assert.NotNull(objects);
          Assert.True(objects.Count() == 0);
@@ -258,8 +258,8 @@ namespace Storage.Net.Tests.Integration.Blobs
       public async Task List_limited_number_of_results()
       {
          string prefix = RandomGenerator.RandomString;
-         string id1 = RandomBlobId(prefix);
-         string id2 = RandomBlobId(prefix);
+         string id1 = RandomBlobPath(prefix);
+         string id2 = RandomBlobPath(prefix);
          await _storage.WriteTextAsync(id1, RandomGenerator.RandomString);
          await _storage.WriteTextAsync(id2, RandomGenerator.RandomString);
 
@@ -273,8 +273,8 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task List_with_browsefilter_calls_filter()
       {
-         string id1 = RandomBlobId();
-         string id2 = RandomBlobId();
+         string id1 = RandomBlobPath();
+         string id2 = RandomBlobPath();
          await _storage.WriteTextAsync(id1, RandomGenerator.RandomString);
          await _storage.WriteTextAsync(id2, RandomGenerator.RandomString);
 
@@ -301,7 +301,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       public async Task GetBlob_for_one_file_succeeds()
       {
          string content = RandomGenerator.GetRandomString(1000, false);
-         string id = RandomBlobId();
+         string id = RandomBlobPath();
 
          await _storage.WriteTextAsync(id, content);
 
@@ -320,7 +320,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task GetBlob_doesnt_exist_returns_null()
       {
-         string id = RandomBlobId();
+         string id = RandomBlobPath();
 
          Blob meta = (await _storage.GetBlobsAsync(new[] { id })).First();
 
@@ -330,7 +330,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task Open_doesnt_exist_returns_null()
       {
-         string id = RandomBlobId();
+         string id = RandomBlobPath();
 
          Assert.Null(await _storage.OpenReadAsync(id));
       }
@@ -348,7 +348,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task Write_with_openwrite_succeeds()
       {
-         string id = RandomBlobId();
+         string id = RandomBlobPath();
          byte[] data = Encoding.UTF8.GetBytes("oh my");
 
          using(Stream dest = await _storage.OpenWriteAsync(id))
@@ -364,13 +364,13 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task Exists_non_existing_blob_returns_false()
       {
-         Assert.False(await _storage.ExistsAsync(RandomBlobId()));
+         Assert.False(await _storage.ExistsAsync(RandomBlobPath()));
       }
 
       [Fact]
       public async Task Exists_existing_blob_returns_true()
       {
-         string id = RandomBlobId();
+         string id = RandomBlobPath();
          await _storage.WriteTextAsync(id, "test");
 
          Assert.True(await _storage.ExistsAsync(id));
@@ -379,18 +379,35 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task Delete_create_and_delete_doesnt_exist()
       {
-         string id = RandomBlobId();
+         string id = RandomBlobPath();
          await _storage.WriteTextAsync(id, "test");
          await _storage.DeleteAsync(id);
 
          Assert.False(await _storage.ExistsAsync(id));
+      }
 
+      [Fact]
+      public async Task Delete_folder_removes_all_files()
+      {
+         //setup
+         string prefix = RandomBlobPath();
+         string file1 = StoragePath.Combine(prefix, "1.txt");
+         string file2 = StoragePath.Combine(prefix, "2.txt");
+         await _storage.WriteTextAsync(file1, "1");
+         await _storage.WriteTextAsync(file2, "2");
+
+         //act
+         await _storage.DeleteAsync(prefix);
+
+         //assert
+         Assert.False(await _storage.ExistsAsync(file1));
+         Assert.False(await _storage.ExistsAsync(file2));
       }
 
       [Fact]
       public async Task UserMetadata_write_readsback()
       {
-         var blob = new Blob(RandomBlobId());
+         var blob = new Blob(RandomBlobPath());
          blob.Metadata = new Dictionary<string, string>
          {
             ["user"] = "ivan",
@@ -419,7 +436,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       public async Task UserMetadata_OverwriteWithLess_RemovesOld()
       {
          //setup
-         var blob = new Blob(RandomBlobId());
+         var blob = new Blob(RandomBlobPath());
          blob.Metadata = new Dictionary<string, string>
          {
             ["user"] = "ivan",
@@ -451,7 +468,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task UserMetadata_openwrite_readsback()
       {
-         var blob = new Blob(RandomBlobId());
+         var blob = new Blob(RandomBlobPath());
          blob.Metadata = new Dictionary<string, string>
          {
             ["user"] = "ivan",
@@ -482,7 +499,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task UserMetadata_List_AlsoReturnsMetadata()
       {
-         var blob = new Blob(RandomBlobId());
+         var blob = new Blob(RandomBlobPath());
          blob.Metadata = new Dictionary<string, string>
          {
             ["user"] = "ivan",
@@ -509,7 +526,7 @@ namespace Storage.Net.Tests.Integration.Blobs
          Assert.Equal(2, blob2.Metadata.Count);
       }
 
-      private string RandomBlobId(string prefix = null)
+      private string RandomBlobPath(string prefix = null)
       {
          return _blobPrefix +
             (prefix == null ? string.Empty : prefix) +

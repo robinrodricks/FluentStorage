@@ -60,9 +60,9 @@ namespace Storage.Net.Blobs
       Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default);
 
       /// <summary>
-      /// Deletes a blob by id
+      /// Deletes an object by it's full path.
       /// </summary>
-      /// <param name="fullPaths">Blob paths to delete.</param>
+      /// <param name="fullPaths">Path to delete. If this path points to a folder, the folder is deleted recursively.</param>
       /// <param name="cancellationToken"></param>
       /// <exception cref="ArgumentNullException">Thrown when ID is null.</exception>
       /// <exception cref="ArgumentException">Thrown when ID is too long. Long IDs are the ones longer than 50 characters.</exception>

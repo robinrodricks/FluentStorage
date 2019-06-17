@@ -76,7 +76,7 @@ namespace Storage.Net.Blobs.Files
          fullPath = fullPath.Substring(_directory.FullName.Length);
          fullPath = fullPath.Replace(Path.DirectorySeparatorChar, StoragePath.PathSeparator);
          fullPath = fullPath.Trim(StoragePath.PathSeparator);
-         fullPath = StoragePath.PathStrSeparator + fullPath;
+         fullPath = StoragePath.PathSeparatorString + fullPath;
 
          var blobId = new Blob(fullPath, kind);
 
@@ -128,7 +128,7 @@ namespace Storage.Net.Blobs.Files
          }
          else
          {
-            string extraPath = string.Join(StoragePath.PathStrSeparator, parts, 0, parts.Length - 1);
+            string extraPath = string.Join(StoragePath.PathSeparatorString, parts, 0, parts.Length - 1);
 
             fullPath = Path.Combine(_directory.FullName, extraPath);
 
@@ -230,7 +230,14 @@ namespace Storage.Net.Blobs.Files
             GenericValidation.CheckBlobFullPath(fullPath);
 
             string path = GetFilePath(StoragePath.Normalize(fullPath, false));
-            if(File.Exists(path)) File.Delete(path);
+            if(File.Exists(path))
+            {
+               File.Delete(path);
+            }
+            else if(Directory.Exists(path))
+            {
+               Directory.Delete(path, true);
+            }
          }
 
          return Task.FromResult(true);

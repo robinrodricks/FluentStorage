@@ -94,11 +94,11 @@ namespace Storage.Net.Ftp
          return id;
       }
 
-      public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public async Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
          FtpClient client = await GetClientAsync();
 
-         foreach(string path in ids)
+         foreach(string path in fullPaths)
          {
             await client.DeleteFileAsync(path);
          }

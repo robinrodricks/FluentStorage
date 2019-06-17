@@ -20,11 +20,6 @@ namespace Storage.Net
       public static readonly string PathSeparatorString = new string(PathSeparator, 1);
 
       /// <summary>
-      /// Character used to split paths 
-      /// </summary>
-      public static readonly string PathStrSeparator = new string(PathSeparator, 1);
-
-      /// <summary>
       /// Returns '/'
       /// </summary>
       public static readonly string RootFolderPath = "/";
@@ -38,7 +33,7 @@ namespace Storage.Net
       {
          if (parts == null) return Normalize(null);
 
-         return Normalize(string.Join(PathStrSeparator, parts.Where(p => p != null).Select(p => NormalizePart(p))));
+         return Normalize(string.Join(PathSeparatorString, parts.Where(p => p != null).Select(p => NormalizePart(p))));
       }
 
       /// <summary>
@@ -53,7 +48,7 @@ namespace Storage.Net
 
          return parts.Length > 1
             ? Combine(parts.Take(parts.Length - 1))
-            : PathStrSeparator;
+            : PathSeparatorString;
       }
 
       /// <summary>

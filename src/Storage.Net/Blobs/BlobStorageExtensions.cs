@@ -131,7 +131,7 @@ namespace Storage.Net.Blobs
       }
 
       /// <summary>
-      /// Deletes a single blob
+      /// Deletes a single blob or a folder recursively.
       /// </summary>
       /// <param name="storage"></param>
       /// <param name="fullPath"></param>
@@ -142,6 +142,17 @@ namespace Storage.Net.Blobs
          string fullPath, CancellationToken cancellationToken = default)
       {
          return storage.DeleteAsync(new[] {fullPath}, cancellationToken);
+      }
+
+      /// <summary>
+      /// Deletes a collection of blobs or folders
+      /// </summary>
+      public static Task DeleteAsync(
+         this IBlobStorage storage,
+         IEnumerable<Blob> blobs,
+         CancellationToken cancellationToken = default)
+      {
+         return storage.DeleteAsync(blobs.Select(b => b.FullPath), cancellationToken);
       }
 
       /// <summary>

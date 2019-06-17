@@ -139,13 +139,16 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
          }
       }
 
-      public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public async Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPaths(ids);
+         GenericValidation.CheckBlobFullPaths(fullPaths);
 
          AdlsClient client = await GetAdlsClientAsync();
 
-         await Task.WhenAll(ids.Select(id => client.DeleteAsync(id, cancellationToken)));
+         //DeleteRecursiveAsync works with both files and folder, however it will delete folders recursively (that's what I want)
+         await Task.WhenAll(
+            fullPaths.Select(
+               fullPath => client.DeleteRecursiveAsync(fullPath, cancellationToken)));
       }
 
       public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken)

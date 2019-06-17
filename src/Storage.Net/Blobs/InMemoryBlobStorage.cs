@@ -21,7 +21,7 @@ namespace Storage.Net.Blobs
          public string md5;
       }
 
-      private readonly Dictionary<Blob, Tag> _idToData = new Dictionary<Blob, Tag>();
+      private readonly Dictionary<Blob, Tag> _blobToTag = new Dictionary<Blob, Tag>();
 
       public Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
@@ -29,7 +29,7 @@ namespace Storage.Net.Blobs
 
          options.FolderPath = StoragePath.Normalize(options.FolderPath);
 
-         List<Blob> matches = _idToData
+         List<Blob> matches = _blobToTag
 
             .Where(e => options.Recurse
                ? e.Key.FolderPath.StartsWith(options.FolderPath)
@@ -57,10 +57,10 @@ namespace Storage.Net.Blobs
             }
             else
             {
-               Tag tag = _idToData[fullPath];
+               Tag tag = _blobToTag[fullPath];
                byte[] data = tag.data.Concat(sourceStream.ToByteArray()).ToArray();
 
-               _idToData[fullPath] = ToTag(data);
+               _blobToTag[fullPath] = ToTag(data);
             }
          }
          else
@@ -91,7 +91,7 @@ namespace Storage.Net.Blobs
          GenericValidation.CheckBlobFullPath(fullPath);
          fullPath = StoragePath.Normalize(fullPath);
 
-         if (!_idToData.TryGetValue(fullPath, out Tag tag)) return Task.FromResult<Stream>(null);
+         if (!_blobToTag.TryGetValue(fullPath, out Tag tag)) return Task.FromResult<Stream>(null);
 
          return Task.FromResult<Stream>(new NonCloseableStream(new MemoryStream(tag.data)));
       }
@@ -100,11 +100,17 @@ namespace Storage.Net.Blobs
       {
          GenericValidation.CheckBlobFullPaths(fullPaths);
 
-         foreach (string blobId in fullPaths)
+         foreach(string path in fullPaths)
          {
-            _idToData.Remove(StoragePath.Normalize(blobId));
-         }
+            string prefix = StoragePath.Normalize(path) + StoragePath.PathSeparatorString;
 
+            List<Blob> candidates = _blobToTag.Where(p => p.Key.FullPath.StartsWith(prefix)).Select(p => p.Key).ToList();
+
+            foreach(Blob candidate in candidates)
+            {
+               _blobToTag.Remove(candidate);
+            }
+         }
          return Task.FromResult(true);
       }
 
@@ -114,27 +120,27 @@ namespace Storage.Net.Blobs
 
          foreach (string id in ids)
          {
-            result.Add(_idToData.ContainsKey(StoragePath.Normalize(id)));
+            result.Add(_blobToTag.ContainsKey(StoragePath.Normalize(id)));
          }
 
          return Task.FromResult<IReadOnlyCollection<bool>>(result);
       }
 
-      public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPaths(ids);
+         GenericValidation.CheckBlobFullPaths(fullPaths);
 
          var result = new List<Blob>();
 
-         foreach (string id in ids)
+         foreach (string fullPath in fullPaths)
          {
-            if (!_idToData.TryGetValue(StoragePath.Normalize(id), out Tag tag))
+            if (!_blobToTag.TryGetValue(StoragePath.Normalize(fullPath), out Tag tag))
             {
                result.Add(null);
             }
             else
             {
-               var r = new Blob(id)
+               var r = new Blob(fullPath)
                {
                   Size = tag.data.Length,
                   MD5 = tag.md5,
@@ -150,7 +156,19 @@ namespace Storage.Net.Blobs
 
       public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
       {
-         throw new NotSupportedException();
+         if(blobs == null)
+            return Task.FromResult(true);
+
+         foreach(Blob blob in blobs)
+         {
+            if(_blobToTag.TryGetValue(blob, out Tag tag))
+            {
+               _blobToTag.Remove(blob);
+               _blobToTag[blob] = tag;
+            }
+         }
+
+         return Task.FromResult(true);
       }
 
       private void Write(string fullPath, Stream sourceStream)
@@ -160,7 +178,7 @@ namespace Storage.Net.Blobs
 
          Tag tag = ToTag(sourceStream);
 
-         _idToData[fullPath] = tag;
+         _blobToTag[fullPath] = tag;
       }
 
       private static Tag ToTag(Stream s)
@@ -182,7 +200,7 @@ namespace Storage.Net.Blobs
       {
          GenericValidation.CheckBlobFullPath(fullPath);
 
-         return _idToData.ContainsKey(fullPath);
+         return _blobToTag.ContainsKey(fullPath);
       }
 
       public void Dispose()
