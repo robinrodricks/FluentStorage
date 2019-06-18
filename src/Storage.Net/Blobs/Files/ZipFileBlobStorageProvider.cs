@@ -164,15 +164,19 @@ namespace Storage.Net.Blobs.Files
             string nid = StoragePath.Normalize(fullPath, false);
 
             ZipArchiveEntry entry = archive.GetEntry(nid);
-            if (entry == null) continue;
-
-            try
+            if(entry != null)
             {
                entry.Delete();
             }
-            catch(NotSupportedException)
+            else
             {
-               //ignore this
+               //try to delete this as a folder
+               string prefix = fullPath + StoragePath.PathSeparatorString;
+               List<ZipArchiveEntry> folderEntries = archive.Entries.Where(e => e.FullName.StartsWith(prefix)).ToList();
+               foreach(ZipArchiveEntry fi in folderEntries)
+               {
+                  fi.Delete();
+               }
             }
          }
 

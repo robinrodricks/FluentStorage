@@ -11,11 +11,6 @@
      <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Azure\**" />
-    <EmbeddedResource Remove="Azure\**" />
-    <None Remove="Azure\**" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\src\Azure\Storage.Net.Microsoft.Azure.Storage\Storage.Net.Microsoft.Azure.Storage.csproj" />
     <ProjectReference Include="..\..\src\Storage.Net\Storage.Net.csproj" />
   </ItemGroup>
