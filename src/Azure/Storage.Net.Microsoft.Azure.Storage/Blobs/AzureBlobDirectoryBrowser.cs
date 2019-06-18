@@ -28,6 +28,26 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return result;
       }
 
+      public async Task RecursiveDeleteAsync(CloudBlobDirectory directory, CancellationToken cancellationToken)
+      {
+         BlobResultSegment segment = await directory.ListBlobsSegmentedAsync(null, cancellationToken).ConfigureAwait(false);
+         foreach(IListBlobItem item in segment.Results)
+         {
+            if(item is CloudBlobDirectory iDir)
+            {
+               await RecursiveDeleteAsync(iDir, cancellationToken).ConfigureAwait(false);
+            }
+            else if(item is CloudBlockBlob iBlob)
+            {
+               await iBlob.DeleteIfExistsAsync().ConfigureAwait(false);
+            }
+            else if(item is CloudAppendBlob iAppendBlob)
+            {
+               await iAppendBlob.DeleteIfExistsAsync().ConfigureAwait(false);
+            }
+         }
+      }
+
       private async Task ListFolderAsync(List<Blob> container, string path, ListOptions options, CancellationToken cancellationToken)
       {
          CloudBlobDirectory dir = GetCloudBlobDirectory(path);

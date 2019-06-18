@@ -17,7 +17,8 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
    class AzureUniversalBlobStorageProvider : IAzureBlobStorage
    {
       private readonly CloudBlobClient _client;
-      private readonly ConcurrentDictionary<string, CloudBlobContainer> _containerNameToContainer = new ConcurrentDictionary<string, CloudBlobContainer>();
+      private readonly ConcurrentDictionary<string, CloudBlobContainer> _containerNameToContainer = 
+         new ConcurrentDictionary<string, CloudBlobContainer>();
 
       public CloudBlobClient NativeBlobClient => _client;
 
@@ -66,7 +67,16 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath, false);
 
          CloudBlockBlob blob = container.GetBlockBlobReference(StoragePath.Normalize(path, false));
-         await blob.DeleteIfExistsAsync();
+         if(await blob.ExistsAsync().ConfigureAwait(false))
+         {
+            await blob.DeleteIfExistsAsync();
+         }
+         else
+         {
+            //try deleting as a folder
+            CloudBlobDirectory dir = container.GetDirectoryReference(StoragePath.Normalize(path, false));
+            await new AzureBlobDirectoryBrowser(container, 3).RecursiveDeleteAsync(dir, cancellationToken).ConfigureAwait(false);
+         }
       }
 
       public void Dispose()
