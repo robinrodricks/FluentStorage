@@ -1,11 +1,11 @@
 ﻿using System;
 using Storage.Net.Messaging;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
-using Microsoft.WindowsAzure.Storage.Queue;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
+using Microsoft.Azure.Storage.Queue;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Auth;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Messaging
 {

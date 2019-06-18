@@ -1,8 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.Azure.Storage.Blob;
 using Storage.Net.Blobs;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blobs

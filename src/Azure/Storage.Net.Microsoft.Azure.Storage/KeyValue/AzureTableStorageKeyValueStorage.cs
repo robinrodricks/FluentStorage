@@ -1,16 +1,15 @@
-﻿using System;
+﻿#if NETSTANDARD20
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
-using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.Azure.Cosmos.Table;
 using NetBox.Extensions;
 using Storage.Net.KeyValue;
-using AzSE = Microsoft.WindowsAzure.Storage.StorageException;
-using IAzTableEntity = Microsoft.WindowsAzure.Storage.Table.ITableEntity;
+using AzSE = Microsoft.Azure.Storage.StorageException;
+using IAzTableEntity = Microsoft.Azure.Cosmos.Table.ITableEntity;
 using MeSE = Storage.Net.StorageException;
 
 namespace Storage.Net.Microsoft.Azure.Storage.KeyValue
@@ -175,7 +174,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.KeyValue
          var entities = new List<DynamicTableEntity>();
          do
          {
-            var queryResults = await table.ExecuteQuerySegmentedAsync(query, token);
+            TableQuerySegment<DynamicTableEntity> queryResults = await table.ExecuteQuerySegmentedAsync(query, token);
             entities.AddRange(queryResults.Results);
             token = queryResults.ContinuationToken;
          } while(token != null);
@@ -457,3 +456,4 @@ namespace Storage.Net.Microsoft.Azure.Storage.KeyValue
       }
    }
 }
+#endif

@@ -1,14 +1,13 @@
 ﻿using System;
 using Storage.Net.Messaging;
-using Microsoft.WindowsAzure.Storage.Queue;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Diagnostics;
-using WSE = Microsoft.WindowsAzure.Storage.StorageException;
+using WSE = Microsoft.Azure.Storage.StorageException;
+using Microsoft.Azure.Storage.Queue;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Auth;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Messaging
 {

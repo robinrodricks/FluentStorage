@@ -1,4 +1,4 @@
-﻿using Microsoft.WindowsAzure.Storage.Queue;
+﻿using Microsoft.Azure.Storage.Queue;
 using NetBox.Extensions;
 using Storage.Net.Messaging;
 using System;
@@ -23,7 +23,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
          if(message.Properties == null || message.Properties.Count == 0)
          {
             var r = new CloudQueueMessage((string)null);
-            r.SetMessageContent(message.Content);
+            r.SetMessageContent2(message.Content);
             return r;
          }
 

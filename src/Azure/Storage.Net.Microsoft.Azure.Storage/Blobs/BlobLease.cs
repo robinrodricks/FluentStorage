@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using AzureStorageException = Microsoft.WindowsAzure.Storage.StorageException;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
+using AzureStorageException = Microsoft.Azure.Storage.StorageException;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 {

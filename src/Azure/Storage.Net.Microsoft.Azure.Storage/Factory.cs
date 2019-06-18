@@ -3,11 +3,14 @@ using Storage.Net.Blobs;
 using Storage.Net.Messaging;
 using Storage.Net.Microsoft.Azure.Storage.Blobs;
 using Storage.Net.Microsoft.Azure.Storage.Messaging;
-using Storage.Net.Microsoft.Azure.Storage.KeyValue;
 using Storage.Net.KeyValue;
 using System.Net;
 using Storage.Net.Microsoft.Azure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.Azure.Storage.Blob;
+#if NETSTANDARD20
+using Storage.Net.Microsoft.Azure.Storage.KeyValue;
+#endif
+
 
 namespace Storage.Net
 {
@@ -24,6 +27,8 @@ namespace Storage.Net
       {
          return factory.Use(new AzureStorageModule());
       }
+
+#if NETSTANDARD20
 
       /// <summary>
       /// Creates an instance of Azure Table Storage using account name and key.
@@ -50,6 +55,8 @@ namespace Storage.Net
       {
          return new AzureTableStorageKeyValueStorage(credential.UserName, credential.Password);
       }
+
+#endif
 
       /// <summary>
       /// Creates a blob storage implementation based on Microsoft Azure Blob Storage using account name and key.
@@ -142,6 +149,7 @@ namespace Storage.Net
          return new AzureStorageQueueReceiver(accountName, storageKey, queueName, messageVisibilityTimeout, messagePollingInterval);
       }
 
+#if NETSTANDARD20
       /// <summary>
       /// Creates an instance of Azure Table Storage using development storage.
       /// </summary>
@@ -151,6 +159,7 @@ namespace Storage.Net
       {
          return new AzureTableStorageKeyValueStorage();
       }
+#endif
 
       /// <summary>
       /// Creates an instance of a publisher to Azure Storage Queues using development storage.
