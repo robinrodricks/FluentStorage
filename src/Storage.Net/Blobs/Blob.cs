@@ -60,11 +60,11 @@ namespace Storage.Net.Blobs
       /// <summary>
       /// Create a new instance
       /// </summary>
-      /// <param name="fullId"></param>
+      /// <param name="fullPath"></param>
       /// <param name="kind"></param>
-      public Blob(string fullId, BlobItemKind kind = BlobItemKind.File)
+      public Blob(string fullPath, BlobItemKind kind = BlobItemKind.File)
       {
-         string path = StoragePath.Normalize(fullId);
+         string path = StoragePath.Normalize(fullPath);
          string[] parts = StoragePath.Split(path);
 
          Id = parts.Last();

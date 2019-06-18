@@ -12,11 +12,19 @@ namespace Storage.Net.Blobs
    public class ListOptions
    {
       private string _prefix;
+      private string _folderPath = StoragePath.RootFolderPath;
 
       /// <summary>
       /// Folder path to start browsing from. When not set scanning starts from the root folder.
       /// </summary>
-      public string FolderPath { get; set; } = StoragePath.RootFolderPath;
+      public string FolderPath
+      {
+         get => _folderPath;
+         set
+         {
+            _folderPath = StoragePath.Normalize(value);
+         }
+      }
 
       /// <summary>
       /// Gets or sets a browsing filter used by some implementations which can filter out results before returning it to you.
@@ -65,9 +73,9 @@ namespace Storage.Net.Blobs
       /// <summary>
       /// Helper method that returns true if a <see cref="Blob"/> matches these list options.
       /// </summary>
-      public bool IsMatch(Blob id)
+      public bool IsMatch(Blob blob)
       {
-         return _prefix == null || id.Kind != BlobItemKind.File || id.Id.StartsWith(_prefix);
+         return _prefix == null || blob.Kind != BlobItemKind.File || blob.Id.StartsWith(_prefix);
       }
 
       /// <summary>

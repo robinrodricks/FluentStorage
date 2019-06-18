@@ -180,7 +180,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       {
          string prefix = RandomGenerator.RandomString;
 
-         int countBefore = (await _storage.ListAsync(new ListOptions { FolderPath = _blobPrefix, FilePrefix = prefix })).Count();
+         int countBefore = (await _storage.ListAsync(new ListOptions { FolderPath = _blobPrefix, FilePrefix = prefix })).Count;
 
          string id1 = RandomBlobPath(prefix);
          string id2 = RandomBlobPath(prefix);
@@ -190,7 +190,7 @@ namespace Storage.Net.Tests.Integration.Blobs
          await _storage.WriteTextAsync(id2, RandomGenerator.RandomString);
          await _storage.WriteTextAsync(id3, RandomGenerator.RandomString);
 
-         List<Blob> items = (await _storage.ListAsync(new ListOptions { FolderPath = _blobPrefix, FilePrefix = prefix })).ToList();
+         IReadOnlyCollection<Blob> items = (await _storage.ListAsync(new ListOptions { FolderPath = _blobPrefix, FilePrefix = prefix }));
          Assert.Equal(2 + countBefore, items.Count); //2 files + containing folder
       }
 

@@ -16,32 +16,48 @@ namespace Storage.Net.Blobs
    {
       struct Tag
       {
+         public Blob blob;
          public byte[] data;
-         public DateTimeOffset lastMod;
-         public string md5;
       }
 
-      private readonly Dictionary<Blob, Tag> _blobToTag = new Dictionary<Blob, Tag>();
+      private readonly Dictionary<string, Tag> _pathToTag = new Dictionary<string, Tag>();
 
       public Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
          if (options == null) options = new ListOptions();
 
-         options.FolderPath = StoragePath.Normalize(options.FolderPath);
+         IEnumerable<KeyValuePair<string, Tag>> query = _pathToTag;
 
-         List<Blob> matches = _blobToTag
+         //limit by folder path
+         if(options.Recurse)
+         {
+            if(!StoragePath.IsRootPath(options.FolderPath))
+            {
+               string prefix = options.FolderPath + StoragePath.PathSeparatorString;
 
-            .Where(e => options.Recurse
-               ? e.Key.FolderPath.StartsWith(options.FolderPath)
-               : StoragePath.ComparePath(e.Key.FolderPath, options.FolderPath))
+               query = query.Where(p => p.Key.StartsWith(prefix));
+            }
+         }
+         else
+         {
+            query = query.Where(p => StoragePath.ComparePath(p.Value.blob.FolderPath, options.FolderPath));
+         }
 
-            .Select(e => e.Key)
-            .Where(options.IsMatch)
-            .Where(e => options.BrowseFilter == null || options.BrowseFilter(e))
-            .Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value)
-            .ToList();
+         //prefix
+         query = query.Where(p => options.IsMatch(p.Value.blob));
 
-         return Task.FromResult((IReadOnlyCollection<Blob>)matches);
+         //browser filter
+         query = query.Where(p => options.BrowseFilter == null || options.BrowseFilter(p.Value.blob));
+
+         //limit
+         if(options.MaxResults != null)
+         {
+            query = query.Take(options.MaxResults.Value);
+         }
+
+         IReadOnlyCollection<Blob> matches = query.Select(p => p.Value.blob).ToList();
+
+         return Task.FromResult(matches);
       }
 
       public Task WriteAsync(string fullPath, Stream sourceStream, bool append, CancellationToken cancellationToken)
@@ -57,10 +73,9 @@ namespace Storage.Net.Blobs
             }
             else
             {
-               Tag tag = _blobToTag[fullPath];
+               Tag tag = _pathToTag[fullPath];
                byte[] data = tag.data.Concat(sourceStream.ToByteArray()).ToArray();
-
-               _blobToTag[fullPath] = ToTag(data);
+               Write(fullPath, new MemoryStream(data));
             }
          }
          else
@@ -91,7 +106,7 @@ namespace Storage.Net.Blobs
          GenericValidation.CheckBlobFullPath(fullPath);
          fullPath = StoragePath.Normalize(fullPath);
 
-         if (!_blobToTag.TryGetValue(fullPath, out Tag tag)) return Task.FromResult<Stream>(null);
+         if (!_pathToTag.TryGetValue(fullPath, out Tag tag)) return Task.FromResult<Stream>(null);
 
          return Task.FromResult<Stream>(new NonCloseableStream(new MemoryStream(tag.data)));
       }
@@ -102,13 +117,22 @@ namespace Storage.Net.Blobs
 
          foreach(string path in fullPaths)
          {
-            string prefix = StoragePath.Normalize(path) + StoragePath.PathSeparatorString;
-
-            List<Blob> candidates = _blobToTag.Where(p => p.Key.FullPath.StartsWith(prefix)).Select(p => p.Key).ToList();
-
-            foreach(Blob candidate in candidates)
+            //try to delete as file firts
+            Blob pb = path;
+            if(_pathToTag.ContainsKey(pb))
             {
-               _blobToTag.Remove(candidate);
+               _pathToTag.Remove(pb);
+            }
+            else
+            {
+               string prefix = StoragePath.Normalize(path) + StoragePath.PathSeparatorString;
+
+               List<Blob> candidates = _pathToTag.Where(p => p.Value.blob.FullPath.StartsWith(prefix)).Select(p => p.Value.blob).ToList();
+
+               foreach(Blob candidate in candidates)
+               {
+                  _pathToTag.Remove(candidate);
+               }
             }
          }
          return Task.FromResult(true);
@@ -120,7 +144,7 @@ namespace Storage.Net.Blobs
 
          foreach (string id in ids)
          {
-            result.Add(_blobToTag.ContainsKey(StoragePath.Normalize(id)));
+            result.Add(_pathToTag.ContainsKey(StoragePath.Normalize(id)));
          }
 
          return Task.FromResult<IReadOnlyCollection<bool>>(result);
@@ -134,20 +158,13 @@ namespace Storage.Net.Blobs
 
          foreach (string fullPath in fullPaths)
          {
-            if (!_blobToTag.TryGetValue(StoragePath.Normalize(fullPath), out Tag tag))
+            if (!_pathToTag.TryGetValue(StoragePath.Normalize(fullPath), out Tag tag))
             {
                result.Add(null);
             }
             else
             {
-               var r = new Blob(fullPath)
-               {
-                  Size = tag.data.Length,
-                  MD5 = tag.md5,
-                  LastModificationTime = tag.lastMod
-               };
-
-               result.Add(r);
+               result.Add(tag.blob);
             }
          }
 
@@ -161,10 +178,9 @@ namespace Storage.Net.Blobs
 
          foreach(Blob blob in blobs)
          {
-            if(_blobToTag.TryGetValue(blob, out Tag tag))
+            if(_pathToTag.TryGetValue(blob, out Tag tag))
             {
-               _blobToTag.Remove(blob);
-               _blobToTag[blob] = tag;
+               tag.blob.Metadata = new Dictionary<string, string>(blob.Metadata);
             }
          }
 
@@ -176,31 +192,38 @@ namespace Storage.Net.Blobs
          GenericValidation.CheckBlobFullPath(fullPath);
          fullPath = StoragePath.Normalize(fullPath);
 
-         Tag tag = ToTag(sourceStream);
+         if(sourceStream is MemoryStream ms)
+            ms.Position = 0;
+         byte[] data = sourceStream.ToByteArray();
 
-         _blobToTag[fullPath] = tag;
-      }
-
-      private static Tag ToTag(Stream s)
-      {
-         if (s is MemoryStream ms) ms.Position = 0;
-         return ToTag(s.ToByteArray());
-      }
-
-      private static Tag ToTag(byte[] data)
-      {
-         var tag = new Tag();
-         tag.data = data;
-         tag.lastMod = DateTimeOffset.UtcNow;
-         tag.md5 = tag.data.GetHash(HashType.Md5).ToHexString();
-         return tag;
+         if(!_pathToTag.TryGetValue(fullPath, out Tag tag))
+         {
+            tag = new Tag
+            {
+               data = data,
+               blob = new Blob(fullPath)
+               {
+                  Size = data.Length,
+                  LastModificationTime = DateTime.UtcNow,
+                  MD5 = data.GetHash(HashType.Md5).ToHexString()
+               }
+            };
+         }
+         else
+         {
+            tag.data = data;
+            tag.blob.Size = data.Length;
+            tag.blob.LastModificationTime = DateTime.UtcNow;
+            tag.blob.MD5 = data.GetHash(HashType.Md5).ToHexString();
+         }
+         _pathToTag[fullPath] = tag;
       }
 
       private bool Exists(string fullPath)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
 
-         return _blobToTag.ContainsKey(fullPath);
+         return _pathToTag.ContainsKey(fullPath);
       }
 
       public void Dispose()
