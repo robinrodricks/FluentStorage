@@ -46,7 +46,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
          if (!StoragePath.IsRootPath(options.FolderPath)) return new List<Blob>();
 
          var secretNames = new List<Blob>();
-         IPage<SecretItem> page = await _vaultClient.GetSecretsAsync(_vaultUri);
+         IPage<SecretItem> page = await _vaultClient.GetSecretsAsync(_vaultUri).ConfigureAwait(false);
 
          do
          {
@@ -62,7 +62,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
                return secretNames.Take(options.MaxResults.Value).ToList();
             }
          }
-         while (page.NextPageLink != null && (page = await _vaultClient.GetSecretsNextAsync(page.NextPageLink)) != null);
+         while (page.NextPageLink != null && (page = await _vaultClient.GetSecretsNextAsync(page.NextPageLink).ConfigureAwait(false)) != null);
 
          return secretNames;
       }
@@ -82,7 +82,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
 
          string value = Encoding.UTF8.GetString(sourceStream.ToByteArray());
 
-         await _vaultClient.SetSecretAsync(_vaultUri, fullPath, value);
+         await _vaultClient.SetSecretAsync(_vaultUri, fullPath, value).ConfigureAwait(false);
       }
 
       public Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
@@ -110,7 +110,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
          SecretBundle secret;
          try
          {
-            secret = await _vaultClient.GetSecretAsync(_vaultUri, fullPath);
+            secret = await _vaultClient.GetSecretAsync(_vaultUri, fullPath).ConfigureAwait(false);
          }
          catch(KeyVaultErrorException ex)
          {
@@ -128,14 +128,14 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
       {
          GenericValidation.CheckBlobFullPaths(ids);
 
-         await Task.WhenAll(ids.Select(id => _vaultClient.DeleteSecretAsync(_vaultUri, id)));
+         await Task.WhenAll(ids.Select(id => _vaultClient.DeleteSecretAsync(_vaultUri, id))).ConfigureAwait(false);
       }
 
       public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
          GenericValidation.CheckBlobFullPaths(ids);
 
-         return await Task.WhenAll(ids.Select(id => ExistsAsync(id)));
+         return await Task.WhenAll(ids.Select(id => ExistsAsync(id))).ConfigureAwait(false);
       }
 
       private async Task<bool> ExistsAsync(string fullPath)
@@ -144,7 +144,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
 
          try
          {
-            secret = await _vaultClient.GetSecretAsync(_vaultUri, fullPath);
+            secret = await _vaultClient.GetSecretAsync(_vaultUri, fullPath).ConfigureAwait(false);
          }
          catch (KeyVaultErrorException)
          {
@@ -158,7 +158,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
       {
          GenericValidation.CheckBlobFullPaths(ids);
 
-         return await Task.WhenAll(ids.Select(id => GetBlobAsync(id)));
+         return await Task.WhenAll(ids.Select(id => GetBlobAsync(id))).ConfigureAwait(false);
       }
 
       public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
@@ -170,7 +170,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
       {
          try
          {
-            SecretBundle secret = await _vaultClient.GetSecretAsync(_vaultUri, fullPath);
+            SecretBundle secret = await _vaultClient.GetSecretAsync(_vaultUri, fullPath).ConfigureAwait(false);
             byte[] data = Encoding.UTF8.GetBytes(secret.Value);
             return new Blob(fullPath)
             {
@@ -198,7 +198,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
       {
          var context = new AuthenticationContext(authority, TokenCache.DefaultShared);
 
-         AuthenticationResult result = await context.AcquireTokenAsync(resource, _credential);
+         AuthenticationResult result = await context.AcquireTokenAsync(resource, _credential).ConfigureAwait(false);
 
          return result.AccessToken;
       }
