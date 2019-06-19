@@ -8,7 +8,6 @@
     <AssemblyName>Storage.Net</AssemblyName>
     <AssemblyOriginatorKeyFile>../storage.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>Storage.Net</PackageId>
     <PackageIconUrl>http://i.isolineltd.com/nuget/storage.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
@@ -44,8 +43,5 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NetBox" Version="2.1.8" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
   </ItemGroup>
 </Project>

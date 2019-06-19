@@ -7,7 +7,6 @@
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <AssemblyOriginatorKeyFile>../../storage.snk</AssemblyOriginatorKeyFile>
       <SignAssembly>true</SignAssembly>
-      <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
       <PackageId>Storage.Net.Microsoft.Azure.ServiceBus</PackageId>
       <PackageIconUrl>http://i.isolineltd.com/nuget/storage.png</PackageIconUrl>
       <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
