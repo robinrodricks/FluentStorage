@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Config.Net;
 using NetBox;
 using NetBox.Extensions;
 using NetBox.Generator;
@@ -14,133 +12,27 @@ using Xunit;
 
 namespace Storage.Net.Tests.Integration.Blobs
 {
-   #region [ Test Variations ]
-
-   public class AzureBlobStorageProviderTest : BlobStorageTest
+   public abstract class BlobTest : IAsyncLifetime
    {
-      public AzureBlobStorageProviderTest() : base("azure", "testcontainer/") { }
-   }
-
-   public class AzureDataLakeBlobStorageProviderTest : BlobStorageTest
-   {
-      public AzureDataLakeBlobStorageProviderTest() : base("azure-datalakestore") { }
-   }
-
-   public class DiskDirectoryBlobStorageProviderTest : BlobStorageTest
-   {
-      public DiskDirectoryBlobStorageProviderTest() : base("disk-directory") { }
-   }
-
-   public class AwsS3BlobStorageProviderTest : BlobStorageTest
-   {
-      public AwsS3BlobStorageProviderTest() : base("aws-s3") { }
-   }
-
-   public class InMemboryBlobStorageProviderTest : BlobStorageTest
-   {
-      public InMemboryBlobStorageProviderTest() : base("inmemory") { }
-   }
-
-   public class AzureKeyVaultBlobStorageProviderTest : BlobStorageTest
-   {
-      public AzureKeyVaultBlobStorageProviderTest() : base("azurekeyvault") { }
-   }
-
-   public class ZipFileBlobStorageProviderTest : BlobStorageTest
-   {
-      public ZipFileBlobStorageProviderTest() : base("zip") { }
-   }
-
-   public class FtpBlobStorageProviderTest : BlobStorageTest
-   {
-      public FtpBlobStorageProviderTest() : base("ftp") { }
-   }
-
-   #endregion
-
-   public abstract class BlobStorageTest : AbstractTestFixture, IAsyncLifetime
-   {
-      private readonly string _type;
-      private readonly string _blobPrefix;
       private readonly IBlobStorage _storage;
-      private readonly ITestSettings _settings;
+      private readonly string _blobPrefix;
+      private readonly BlobFixture _fixture;
 
-      protected BlobStorageTest(string type, string blobPrefix = null)
+      public BlobTest(BlobFixture fixture)
       {
-         StorageFactory.Modules.UseAzureStorage();
-
-         _settings = new ConfigurationBuilder<ITestSettings>()
-            .UseIniFile("c:\\tmp\\integration-tests.ini")
-            .UseEnvironmentVariables()
-            .Build();
-
-         _type = type;
-         _blobPrefix = blobPrefix;
-         switch(_type)
-         {
-            case "azure":
-               _storage = StorageFactory.Blobs.AzureBlobStorage(_settings.AzureStorageName, _settings.AzureStorageKey);
-               break;
-            case "azure-datalakestore":
-               _storage = StorageFactory.Blobs.AzureDataLakeStoreByClientSecret(
-                  _settings.AzureDataLakeStoreAccountName,
-                  _settings.AzureDataLakeTenantId,
-                  _settings.AzureDataLakePrincipalId,
-                  _settings.AzureDataLakePrincipalSecret);
-               break;
-            case "disk-directory":
-               _storage = StorageFactory.Blobs.DirectoryFiles(TestDir);
-               break;
-            case "zip":
-               _storage = StorageFactory.Blobs.ZipFile(Path.Combine(TestDir.FullName, "test.zip"));
-               break;
-            case "aws-s3":
-               _storage = StorageFactory.Blobs.AmazonS3BlobStorage(
-                  _settings.AwsAccessKeyId,
-                  _settings.AwsSecretAccessKey,
-                  _settings.AwsTestBucketName);
-               break;
-            case "inmemory":
-               _storage = StorageFactory.Blobs.InMemory();
-               break;
-            case "azurekeyvault":
-               _storage = StorageFactory.Blobs.AzureKeyVault(
-                  _settings.KeyVaultUri,
-                  _settings.KeyVaultCreds);
-               break;
-            case "ftp":
-               _storage = StorageFactory.Blobs.Ftp(_settings.FtpHostName, new NetworkCredential(_settings.FtpUsername, _settings.FtpPassword));
-               break;
-         }
+         _storage = fixture.Storage;
+         _blobPrefix = fixture.BlobPrefix;
+         _fixture = fixture;
       }
 
-      public async Task InitializeAsync()
+      public Task InitializeAsync()
       {
-         //drop all blobs in test storage
-
-         IReadOnlyCollection<Blob> topLevel = (await _storage.ListAsync(recurse: false)).ToList();
-
-         try
-         {
-            await _storage.DeleteAsync(topLevel.Select(f => f.FullPath));
-         }
-         catch
-         {
-            //absolutely doesn't matter if it fails, this is only a perf improvement on tests
-         }
+         return _fixture.InitAsync();  
       }
 
-      public async Task DisposeAsync()
+      public Task DisposeAsync()
       {
-         try
-         {
-            IReadOnlyCollection<Blob> allFiles = await _storage.ListFilesAsync(null);
-            await _storage.DeleteAsync(allFiles.Select(id => id.FullPath));
-         }
-         catch
-         {
-            //just don't care
-         }
+         return _fixture.DisposeAsync();
       }
 
       private async Task<string> GetRandomStreamIdAsync(string prefix = null)
@@ -298,6 +190,21 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
+      public async Task List_large_number_of_results()
+      {
+         //arrange
+         await Task.WhenAll(
+            Enumerable.Range(0, 1000)
+            .Select(i => _storage.WriteTextAsync(RandomBlobPath(), "123")));
+
+         //act
+         IReadOnlyCollection<Blob> blobs = await _storage.ListAsync(folderPath: _blobPrefix);
+
+         //assert
+         Assert.True(blobs.Count >= 1000, $"expected over 1000, but received only {blobs.Count}");
+      }
+
+      [Fact]
       public async Task GetBlob_for_one_file_succeeds()
       {
          string content = RandomGenerator.GetRandomString(1000, false);
@@ -379,11 +286,11 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task Delete_create_and_delete_doesnt_exist()
       {
-         string id = RandomBlobPath();
-         await _storage.WriteTextAsync(id, "test");
-         await _storage.DeleteAsync(id);
+         string path = RandomBlobPath();
+         await _storage.WriteTextAsync(path, "test");
+         await _storage.DeleteAsync(path);
 
-         Assert.False(await _storage.ExistsAsync(id));
+         Assert.False(await _storage.ExistsAsync(path));
       }
 
       [Fact]
@@ -546,12 +453,6 @@ namespace Storage.Net.Tests.Integration.Blobs
       class TestDocument
       {
          public string M { get; set; }
-      }
-
-      [Fact]
-      public void Dispose_does_not_fail()
-      {
-         _storage.Dispose();
       }
    }
 }

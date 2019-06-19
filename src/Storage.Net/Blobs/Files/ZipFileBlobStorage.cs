@@ -5,19 +5,18 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Storage.Net.Blobs;
 using Storage.Net.Streaming;
 
 namespace Storage.Net.Blobs.Files
 {
-   class ZipFileBlobStorageProvider : IBlobStorage
+   class ZipFileBlobStorage : IBlobStorage
    {
       private Stream _fileStream;
       private ZipArchive _archive;
       private readonly string _filePath;
       private bool? _isWriteMode;
 
-      public ZipFileBlobStorageProvider(string filePath)
+      public ZipFileBlobStorage(string filePath)
       {
          _filePath = filePath;
       }
@@ -196,6 +195,11 @@ namespace Storage.Net.Blobs.Files
 
                Dispose();
             }
+
+            //check that directory exists, and create if not
+            string dirPath = new FileInfo(_filePath).Directory.FullName;
+            if(!Directory.Exists(dirPath))
+               Directory.CreateDirectory(dirPath);
 
             bool exists = File.Exists(_filePath);
 

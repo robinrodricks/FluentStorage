@@ -15,22 +15,20 @@ namespace Storage.Net.Blobs.Files
    /// </summary>
    internal class DiskDirectoryBlobStorage : IBlobStorage
    {
-      private readonly DirectoryInfo _directory;
+      private readonly string _directoryFullName;
       private const string AttributesFileExtension = ".attr";
 
       /// <summary>
       /// Creates an instance in a specific disk directory
-      /// <param name="directory">Root directory</param>
+      /// <param name="directoryFullName">Root directory</param>
       /// </summary>
-      public DiskDirectoryBlobStorage(DirectoryInfo directory)
+      public DiskDirectoryBlobStorage(string directoryFullName)
       {
-         _directory = directory;
-      }
+         if(directoryFullName == null)
+            throw new ArgumentNullException(nameof(directoryFullName));
 
-      /// <summary>
-      /// Original root directory this storage is mapped to
-      /// </summary>
-      public DirectoryInfo RootDirectory => _directory;
+         _directoryFullName = Path.GetFullPath(directoryFullName);
+      }
 
       /// <summary>
       /// Returns the list of blob names in this storage, optionally filtered by prefix
@@ -41,7 +39,7 @@ namespace Storage.Net.Blobs.Files
 
          GenericValidation.CheckBlobPrefix(options.FilePrefix);
 
-         if(!_directory.Exists) return Task.FromResult<IReadOnlyCollection<Blob>>(new List<Blob>());
+         if(!Directory.Exists(_directoryFullName)) return Task.FromResult<IReadOnlyCollection<Blob>>(new List<Blob>());
 
          string fullPath = GetFolder(options?.FolderPath, false);
          if(fullPath == null) return Task.FromResult<IReadOnlyCollection<Blob>>(new List<Blob>());
@@ -73,7 +71,7 @@ namespace Storage.Net.Blobs.Files
 
       private Blob ToBlobItem(string fullPath, BlobItemKind kind, bool includeMeta)
       {
-         fullPath = fullPath.Substring(_directory.FullName.Length);
+         fullPath = fullPath.Substring(_directoryFullName.Length);
          fullPath = fullPath.Replace(Path.DirectorySeparatorChar, StoragePath.PathSeparator);
          fullPath = fullPath.Trim(StoragePath.PathSeparator);
          fullPath = StoragePath.PathSeparatorString + fullPath;
@@ -90,10 +88,10 @@ namespace Storage.Net.Blobs.Files
 
       private string GetFolder(string path, bool createIfNotExists)
       {
-         if(path == null) return _directory.FullName;
+         if(path == null) return _directoryFullName;
          string[] parts = StoragePath.Split(path);
 
-         string fullPath = _directory.FullName;
+         string fullPath = _directoryFullName;
 
          foreach(string part in parts)
          {
@@ -121,28 +119,29 @@ namespace Storage.Net.Blobs.Files
          fullPath = fullPath.Trim(StoragePath.PathSeparator);
          string[] parts = fullPath.Split(StoragePath.PathSeparator).Select(EncodePathPart).ToArray();
          string name = parts[parts.Length - 1];
-         DirectoryInfo dir;
+         string dir;
          if(parts.Length == 1)
          {
-            dir = _directory;
+            dir = _directoryFullName;
          }
          else
          {
             string extraPath = string.Join(StoragePath.PathSeparatorString, parts, 0, parts.Length - 1);
 
-            fullPath = Path.Combine(_directory.FullName, extraPath);
+            fullPath = Path.Combine(_directoryFullName, extraPath);
 
-            dir = new DirectoryInfo(fullPath);
-            if(!dir.Exists) dir.Create();
+            dir = fullPath;
+            if(!Directory.Exists(dir))
+               Directory.CreateDirectory(dir);
          }
 
-         return Path.Combine(dir.FullName, name);
+         return Path.Combine(dir, name);
       }
 
       private Stream CreateStream(string fullPath, bool overwrite = true)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
-         if(!_directory.Exists) _directory.Create();
+         if(!Directory.Exists(_directoryFullName)) Directory.CreateDirectory(_directoryFullName);
          string path = GetFilePath(fullPath);
 
          Stream s = overwrite ? File.Create(path) : File.OpenWrite(path);

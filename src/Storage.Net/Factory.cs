@@ -81,12 +81,12 @@ namespace Storage.Net
       /// <summary>
       /// Creates an instance in a specific disk directory
       /// <param name="factory"></param>
-      /// <param name="directory">Root directory</param>
+      /// <param name="directoryFullName">Root directory</param>
       /// </summary>
       public static IBlobStorage DirectoryFiles(this IBlobStorageFactory factory,
-         DirectoryInfo directory)
+         string directoryFullName)
       {
-         return new DiskDirectoryBlobStorage(directory);
+         return new DiskDirectoryBlobStorage(directoryFullName);
       }
 
       /// <summary>
@@ -94,7 +94,7 @@ namespace Storage.Net
       /// </summary>
       public static IBlobStorage ZipFile(this IBlobStorageFactory blobStorageFactory, string filePath)
       {
-         return new ZipFileBlobStorageProvider(filePath);
+         return new ZipFileBlobStorage(filePath);
       }
 
       /// <summary>

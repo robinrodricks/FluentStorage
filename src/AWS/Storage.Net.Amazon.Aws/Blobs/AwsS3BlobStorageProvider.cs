@@ -94,24 +94,11 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
          GenericValidation.CheckBlobPrefix(options.FilePrefix);
 
-         var request = new ListObjectsV2Request()
-         {
-            BucketName = _bucketName,
-            Prefix = options.FilePrefix ?? null
-         };
-         if (options.MaxResults.HasValue) request.MaxKeys = options.MaxResults.Value;
-
-
-         //todo: paging
          AmazonS3Client client = await GetClientAsync().ConfigureAwait(false);
-         ListObjectsV2Response response = await client.ListObjectsV2Async(request, cancellationToken).ConfigureAwait(false);
 
-         List<Blob> blobs = response.S3Objects
-            .Select(s3Obj => new Blob(StoragePath.RootFolderPath, s3Obj.Key, BlobItemKind.File))
-            .Where(options.IsMatch)
-            .Where(bid => (options.FolderPath == null || bid.FolderPath == options.FolderPath))
-            .Where(bid => options.BrowseFilter == null || options.BrowseFilter(bid))
-            .ToList();
+         IReadOnlyCollection<Blob> blobs = await new AwsS3DirectoryBrowser(client, _bucketName)
+            .ListAsync(options, cancellationToken)
+            .ConfigureAwait(false);
 
          if(options.IncludeAttributes)
          {
@@ -165,18 +152,21 @@ namespace Storage.Net.Amazon.Aws.Blobs
          return new FixedStream(response.ResponseStream, length: response.ContentLength, (Action<FixedStream>)null);
       }
 
-      public Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
+      public async Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         return Task.WhenAll(fullPaths.Select(fullPath => DeleteAsync(fullPath, cancellationToken)));
+         AmazonS3Client client = await GetClientAsync().ConfigureAwait(false);
+
+         await Task.WhenAll(fullPaths.Select(fullPath => DeleteAsync(fullPath, client, cancellationToken))).ConfigureAwait(false);
       }
 
-      private async Task DeleteAsync(string fullPath, CancellationToken cancellationToken = default)
+      private async Task DeleteAsync(string fullPath, AmazonS3Client client, CancellationToken cancellationToken = default)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
 
          fullPath = StoragePath.Normalize(fullPath, false);
-         AmazonS3Client client = await GetClientAsync();
-         await client.DeleteObjectAsync(_bucketName, fullPath, cancellationToken);
+         
+         await client.DeleteObjectAsync(_bucketName, fullPath, cancellationToken).ConfigureAwait(false);
+         await new AwsS3DirectoryBrowser(client, _bucketName).DeleteRecursiveAsync(fullPath, cancellationToken).ConfigureAwait(false);
       }
 
       public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)

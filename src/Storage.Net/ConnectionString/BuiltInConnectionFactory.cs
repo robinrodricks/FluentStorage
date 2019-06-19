@@ -18,7 +18,7 @@ namespace Storage.Net.ConnectionString
          {
             connectionString.GetRequired("path", true, out string path);
 
-            return new DiskDirectoryBlobStorage(new DirectoryInfo(path));
+            return new DiskDirectoryBlobStorage(path);
          }
 
          if(connectionString.Prefix == "inmemory")
@@ -30,7 +30,7 @@ namespace Storage.Net.ConnectionString
          {
             connectionString.GetRequired("path", true, out string path);
 
-            return new ZipFileBlobStorageProvider(path);
+            return new ZipFileBlobStorage(path);
          }
 
          return null;
