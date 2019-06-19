@@ -62,17 +62,20 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             do
             {
                BlobResultSegment segment = await dir.ListBlobsSegmentedAsync(
-                  false, BlobListingDetails.None, null, token, null, null, cancellationToken).ConfigureAwait(false);
+                  false,
+                  //automatically include metadata in the response
+                  options.IncludeAttributes ? BlobListingDetails.Metadata : BlobListingDetails.None,
+                  null, token, null, null, cancellationToken).ConfigureAwait(false);
 
                token = segment.ContinuationToken;
 
-               foreach (IListBlobItem blob in segment.Results)
+               foreach (IListBlobItem listItem in segment.Results)
                {
-                  Blob id = await ToBlobIdAsync(blob, options.IncludeAttributes).ConfigureAwait(false);
+                  Blob blob = ToBlob(listItem);
 
-                  if (options.IsMatch(id) && (options.BrowseFilter == null || options.BrowseFilter(id)))
+                  if (options.IsMatch(blob) && (options.BrowseFilter == null || options.BrowseFilter(blob)))
                   {
-                     batch.Add(id);
+                     batch.Add(blob);
                   }
                }
 
@@ -109,7 +112,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return dir;
       }
 
-      private async Task<Blob> ToBlobIdAsync(IListBlobItem blob, bool attachMetadata)
+      private Blob ToBlob(IListBlobItem blob)
       {
          Blob id;
 
@@ -137,14 +140,14 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          }
 
          //attach metadata if we can
-         if(attachMetadata && blob is CloudBlob cloudBlob)
+         if(blob is CloudBlob cloudBlob)
          {
-            await cloudBlob.FetchAttributesAsync().ConfigureAwait(false);
+            //no need to fetch attributes, parent request includes the details
+            //await cloudBlob.FetchAttributesAsync().ConfigureAwait(false);
             AzureUniversalBlobStorageProvider.AttachBlobMeta(id, cloudBlob);
          }
 
          return id;
-
       }
 
    }

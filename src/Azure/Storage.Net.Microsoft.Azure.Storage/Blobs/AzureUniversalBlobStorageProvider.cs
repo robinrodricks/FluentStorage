@@ -110,7 +110,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
          GenericValidation.CheckBlobFullPaths(fullPaths);
-         return await Task.WhenAll(fullPaths.Select(id => GetBlobAsync(id, cancellationToken)));
+         return await Task.WhenAll(fullPaths.Select(id => GetBlobAsync(id, cancellationToken))).ConfigureAwait(false);
       }
 
       public async Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
@@ -128,16 +128,16 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
       private async Task<Blob> GetBlobAsync(string fullPath, CancellationToken cancellationToken)
       {
-         (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath, false);
+         (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath, false).ConfigureAwait(false);
          if(container == null)
             return null;
 
          CloudBlob blob = container.GetBlobReference(StoragePath.Normalize(path, false));
-         if(!(await blob.ExistsAsync()))
+         if(!(await blob.ExistsAsync().ConfigureAwait(false)))
             return null;
 
          var r = new Blob(fullPath);
-         await blob.FetchAttributesAsync();
+         await blob.FetchAttributesAsync().ConfigureAwait(false);
          AttachBlobMeta(r, blob);
          return r;
       }
@@ -157,7 +157,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          meta.Properties["ContentLanguage"] = blob.Properties.ContentLanguage;
          meta.Properties["ContentType"] = blob.Properties.ContentType;*/
 
-         if(source.Metadata.Count > 0)
+         if(source.Metadata?.Count > 0)
          {
             destination.Metadata = new Dictionary<string, string>(source.Metadata);
          }

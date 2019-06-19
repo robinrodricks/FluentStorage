@@ -72,6 +72,12 @@ namespace Storage.Net.Tests.Integration.Blobs
       public void Dispose()
       {
          Storage.Dispose();
+
+         if(_testDir != null)
+         {
+            Directory.Delete(_testDir, true);
+            _testDir = null;
+         }
       }
    }
 }

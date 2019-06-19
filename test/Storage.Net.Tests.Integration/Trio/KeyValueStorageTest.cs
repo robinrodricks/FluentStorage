@@ -5,6 +5,7 @@ using Xunit;
 using Storage.Net.KeyValue;
 using System.Threading.Tasks;
 using NetBox.Extensions;
+using System.IO;
 
 namespace Storage.Net.Tests.Integration.KeyValue
 {
@@ -32,6 +33,7 @@ namespace Storage.Net.Tests.Integration.KeyValue
       private readonly IKeyValueStorage _tables;
       private readonly string _tableName;
       private readonly ITestSettings _settings;
+      private string _folderToDelete;
 
       protected KeyValueStorageTest(string name)
       {
@@ -41,6 +43,7 @@ namespace Storage.Net.Tests.Integration.KeyValue
 
          if(_name == "csv-files")
          {
+            _folderToDelete = TestDir.FullName;
             _tables = StorageFactory.KeyValue.CsvFiles(TestDir);
          }
          else if(_name == "azure")
@@ -69,6 +72,12 @@ namespace Storage.Net.Tests.Integration.KeyValue
 
       public Task DisposeAsync()
       {
+         if(_folderToDelete != null)
+         {
+            Directory.Delete(_folderToDelete, true);
+            _folderToDelete = null;
+         }
+
          return Task.CompletedTask;
       }
 
