@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
 using NetBox.Extensions;
 using Storage.Net.KeyValue;
-using AzSE = Microsoft.Azure.Storage.StorageException;
+using AzSE = Microsoft.Azure.Cosmos.Table.StorageException;
 using IAzTableEntity = Microsoft.Azure.Cosmos.Table.ITableEntity;
 using MeSE = Storage.Net.StorageException;
 
