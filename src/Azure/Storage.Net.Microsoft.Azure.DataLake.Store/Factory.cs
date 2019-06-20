@@ -1,6 +1,6 @@
 ﻿using Storage.Net.Blobs;
 using Storage.Net.Microsoft.Azure.DataLake.Store;
-using Storage.Net.Microsoft.Azure.DataLake.Store.Blobs;
+using Storage.Net.Microsoft.Azure.DataLake.Store.Gen1;
 using System;
 using System.Net;
 
@@ -11,7 +11,7 @@ namespace Storage.Net
    /// </summary>
    public static class Factory
    {
-      public static IModulesFactory UseAzureDataLakeStore(this IModulesFactory factory)
+      public static IModulesFactory UseAzureDataLakeGen1Store(this IModulesFactory factory)
       {
          return factory.Use(new ExternalModule());
       }
@@ -26,7 +26,7 @@ namespace Storage.Net
       /// <param name="principalSecret">Principal Secret</param>
       /// <param name="listBatchSize">Batch size for list operation for this storage connection. If not set defaults to 5000.</param>
       /// <returns></returns>
-      public static IBlobStorage AzureDataLakeStoreByClientSecret(this IBlobStorageFactory factory,
+      public static IBlobStorage AzureDataLakeGen1StoreByClientSecret(this IBlobStorageFactory factory,
          string accountName,
          string tenantId,
          string principalId,
@@ -45,7 +45,7 @@ namespace Storage.Net
          if (principalSecret == null)
             throw new ArgumentNullException(nameof(principalSecret));
 
-         var client = AzureDataLakeStoreBlobStorageProvider.CreateByClientSecret(accountName, new NetworkCredential(principalId, principalSecret, tenantId));
+         var client = AzureDataLakeGen1Storage.CreateByClientSecret(accountName, new NetworkCredential(principalId, principalSecret, tenantId));
          client.ListBatchSize = listBatchSize;
          return client;
       }

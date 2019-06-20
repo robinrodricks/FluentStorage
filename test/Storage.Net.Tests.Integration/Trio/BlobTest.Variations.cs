@@ -27,11 +27,29 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
    }
 
+   //In fact Gen2 doesn't support blob API (yet)
+
+   /*public class AzureDataLakeGen2Fixture : BlobFixture
+   {
+      protected override IBlobStorage CreateStorage(ITestSettings settings)
+      {
+         return StorageFactory.Blobs.AzureBlobStorage(settings.DataLakeGen2Name, settings.DataLakeGen2Key);
+      }
+   }
+
+   public class AzureDataLakeGen2Test : BlobTest, IClassFixture<AzureDataLakeGen2Fixture>
+   {
+      public AzureDataLakeGen2Test(AzureDataLakeGen2Fixture fixture) : base(fixture)
+      {
+
+      }
+   }*/
+
    public class AzureDataLakeStorageFixture : BlobFixture
    {
       protected override IBlobStorage CreateStorage(ITestSettings settings)
       {
-         return StorageFactory.Blobs.AzureDataLakeStoreByClientSecret(
+         return StorageFactory.Blobs.AzureDataLakeGen1StoreByClientSecret(
                   settings.AzureDataLakeStoreAccountName,
                   settings.AzureDataLakeTenantId,
                   settings.AzureDataLakePrincipalId,

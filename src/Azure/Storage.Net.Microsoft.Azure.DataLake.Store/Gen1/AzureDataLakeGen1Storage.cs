@@ -11,9 +11,9 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Azure.DataLake.Store;
 
-namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
+namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen1
 {
-   class AzureDataLakeStoreBlobStorageProvider : IBlobStorage
+   class AzureDataLakeGen1Storage : IBlobStorage
    {
       private readonly string _accountName;
       private readonly string _domain;
@@ -24,7 +24,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 
       //some info on how to use sdk here: https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-get-started-net-sdk
 
-      private AzureDataLakeStoreBlobStorageProvider(string accountName, string domain, string clientId, string clientSecret, string clientCert)
+      private AzureDataLakeGen1Storage(string accountName, string domain, string clientId, string clientSecret, string clientCert)
       {
          _accountName = accountName ?? throw new ArgumentNullException(nameof(accountName));
 
@@ -41,12 +41,12 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
 
       public int ListBatchSize { get; set; } = 5000;
 
-      public static AzureDataLakeStoreBlobStorageProvider CreateByClientSecret(string accountName, string tenantId, string principalId, string principalSecret)
+      public static AzureDataLakeGen1Storage CreateByClientSecret(string accountName, string tenantId, string principalId, string principalSecret)
       {
          return CreateByClientSecret(accountName, new NetworkCredential(principalId, principalSecret, tenantId));
       }
 
-      public static AzureDataLakeStoreBlobStorageProvider CreateByClientSecret(string accountName, NetworkCredential credential)
+      public static AzureDataLakeGen1Storage CreateByClientSecret(string accountName, NetworkCredential credential)
       {
          if (credential == null) throw new ArgumentNullException(nameof(credential));
 
@@ -59,7 +59,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
          if (string.IsNullOrEmpty(credential.Password))
             throw new ArgumentException("Principal Secret (Password in NetworkCredential) part is required");
 
-         return new AzureDataLakeStoreBlobStorageProvider(accountName, credential.Domain, credential.UserName, credential.Password, null);
+         return new AzureDataLakeGen1Storage(accountName, credential.Domain, credential.UserName, credential.Password, null);
       }
 
       public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken)

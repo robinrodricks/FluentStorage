@@ -2,7 +2,7 @@
 using Storage.Net.ConnectionString;
 using Storage.Net.KeyValue;
 using Storage.Net.Messaging;
-using Storage.Net.Microsoft.Azure.DataLake.Store.Blobs;
+using Storage.Net.Microsoft.Azure.DataLake.Store.Gen1;
 
 namespace Storage.Net.Microsoft.Azure.DataLake.Store
 {
@@ -19,7 +19,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store
 
             int.TryParse(connectionString.Get("listBatchSize"), out int listBatchSize);
 
-            AzureDataLakeStoreBlobStorageProvider client = AzureDataLakeStoreBlobStorageProvider.CreateByClientSecret(
+            AzureDataLakeGen1Storage client = AzureDataLakeGen1Storage.CreateByClientSecret(
                accountName, tenantId, principalId, principalSecret);
 
             if(listBatchSize != 0)

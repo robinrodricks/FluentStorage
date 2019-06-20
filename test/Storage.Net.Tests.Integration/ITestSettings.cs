@@ -14,6 +14,12 @@ namespace Storage.Net.Tests
       [Option(Alias = "Azure.Storage.Key")]
       string AzureStorageKey { get; }
 
+      [Option(Alias = "Azure.DataLakeGen2.Name")]
+      string DataLakeGen2Name { get; }
+
+      [Option(Alias = "Azure.DataLakeGen2.Key")]
+      string DataLakeGen2Key { get; }
+
       [Option(Alias = "Azure.Storage.QueueName", DefaultValue = "local")]
       string AzureStorageQueueName { get; }
 

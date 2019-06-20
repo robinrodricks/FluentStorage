@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Microsoft.Azure.DataLake.Store;
 
-namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
+namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen1
 {
    class AdlsWriteableStream : Stream
    {

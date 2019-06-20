@@ -8,7 +8,7 @@ using Microsoft.Azure.DataLake.Store;
 using Microsoft.Azure.DataLake.Store.RetryPolicies;
 using Storage.Net.Blobs;
 
-namespace Storage.Net.Microsoft.Azure.DataLake.Store.Blobs
+namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen1
 {
    class DirectoryBrowser
    {
