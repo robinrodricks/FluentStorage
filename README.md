@@ -41,7 +41,7 @@ This framework supports `.NET 4.5.2` and `.NET Standard 1.6`, and all of the plu
 
 ## Implementations
 
-![Storagetypes](doc/storagetypes.png)
+![Storagetypes](doc/storagetypes.svg)
 
 Storage.Net defines three different storage types:
 
