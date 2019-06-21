@@ -1,7 +1,6 @@
 ﻿using Storage.Net.Blobs;
 using Storage.Net.Microsoft.Azure.DataLake.Store;
 using Storage.Net.Microsoft.Azure.DataLake.Store.Gen1;
-using Storage.Net.Microsoft.Azure.DataLake.Store.Gen2;
 using System;
 using System.Net;
 
@@ -49,19 +48,6 @@ namespace Storage.Net
          var client = AzureDataLakeGen1Storage.CreateByClientSecret(accountName, new NetworkCredential(principalId, principalSecret, tenantId));
          client.ListBatchSize = listBatchSize;
          return client;
-      }
-
-      public static IBlobStorage AzureDataLakeGen2Storage(this IBlobStorageFactory factory,
-         string accountName,
-         string accountKey)
-      {
-         if(accountName == null)
-            throw new ArgumentNullException(nameof(accountName));
-
-         if(accountKey == null)
-            throw new ArgumentNullException(nameof(accountKey));
-
-         return new AzureDataLakeGen2Storage(accountName, accountKey);
       }
    }
 }

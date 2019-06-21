@@ -27,22 +27,6 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
    }
 
-   public class AzureDataLakeGen2Fixture : BlobFixture
-   {
-      protected override IBlobStorage CreateStorage(ITestSettings settings)
-      {
-         return StorageFactory.Blobs.AzureDataLakeGen2Storage(settings.DataLakeGen2Name, settings.DataLakeGen2Key);
-      }
-   }
-
-   public class AzureDataLakeGen2Test : BlobTest, IClassFixture<AzureDataLakeGen2Fixture>
-   {
-      public AzureDataLakeGen2Test(AzureDataLakeGen2Fixture fixture) : base(fixture)
-      {
-
-      }
-   }
-
    public class AzureDataLakeStorageFixture : BlobFixture
    {
       protected override IBlobStorage CreateStorage(ITestSettings settings)
