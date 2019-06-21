@@ -193,9 +193,16 @@ namespace Storage.Net.Tests.Integration.Blobs
       public async Task List_large_number_of_results()
       {
          //arrange
-         await Task.WhenAll(
-            Enumerable.Range(0, 1000)
-            .Select(i => _storage.WriteTextAsync(RandomBlobPath(), "123")));
+
+         //await Task.WhenAll(
+         //   Enumerable.Range(0, 1000)
+         //   .Select(i => _storage.WriteTextAsync(RandomBlobPath(), "123")));
+
+         //something like FTP doesn't support multiple connections
+         for(int i = 0; i < 1000; i++)
+         {
+            await _storage.WriteTextAsync(RandomBlobPath(), "123");
+         }
 
          //act
          IReadOnlyCollection<Blob> blobs = await _storage.ListAsync(folderPath: _blobPrefix);
