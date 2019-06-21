@@ -106,6 +106,7 @@ namespace Storage.Net.Ftp
             }
             catch(FtpCommandException ex) when(ex.CompletionCode == "550")
             {
+               await client.DeleteDirectoryAsync(path, cancellationToken).ConfigureAwait(false);
                //550 stands for "file not found" or "permission denied".
                //"not found" is fine to ignore, however I'm not happy about ignoring the second error.
             }
