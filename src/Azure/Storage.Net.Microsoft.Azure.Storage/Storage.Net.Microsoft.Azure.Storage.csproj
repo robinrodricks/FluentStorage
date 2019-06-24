@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
     <AssemblyTitle>Storage.Net.Microsoft.Azure.Storage</AssemblyTitle>
     <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
@@ -38,9 +38,6 @@ new feature: Azure Blob Storage supports connection by container SAS URI</Packag
      <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="10.0.3" />
      <PackageReference Include="Microsoft.Azure.Storage.File" Version="10.0.3" />
   </ItemGroup>
-   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-      <Reference Include="System.Net.Http" />
-   </ItemGroup>
    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
       <!-- this is only available for .net standard 2.0 -->
       <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.1" />
