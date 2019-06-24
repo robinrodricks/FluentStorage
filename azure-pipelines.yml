@@ -42,6 +42,17 @@ stages:
     - script: 'housework author src/*.csproj -s build.ini -r'
       displayName: 'author csproj'
 
+    # init SonarCloud
+    - task: SonarSource.sonarcloud.14d9cde6-c1da-4d55-aa01-2965cd301255.SonarCloudPrepare@1
+      displayName: 'Prepare analysis on SonarCloud'
+      inputs:
+        SonarCloud: SonarCloud
+        organization: aloneguid-github
+        projectKey: aloneguid_storage
+        projectName: 'Storage.Net'
+        projectVersion: '$(GitVersion.SemVer)'
+        extraProperties: 'sonar.cs.opencover.reportsPaths=$(Build.StagingDirectory)/coverage.xml'
+
     - task: DotNetCoreCLI@2
       displayName: 'build all'
       inputs:
@@ -49,11 +60,12 @@ stages:
         arguments: '-c release'
 
     - task: DotNetCoreCLI@2
-      displayName: 'unit tests'
+      displayName: 'Integration and Unit Test (with coverlet)'
+      continueOnError: true
       inputs:
         command: test
-        projects: test/Storage.Net.Tests
-        arguments: '-c release'
+        projects: ./src/storage.sln
+        arguments: '/p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Exclude="[xunit*]*%2c[*Test*]*" /p:CoverletOutput=$(Build.StagingDirectory)/coverage.xml'
 
     - task: CopyFiles@2
       displayName: 'copy generated nugets'
@@ -70,35 +82,6 @@ stages:
       inputs:
         ArtifactName: nuget
 
-  - job: Integration
-    pool:
-      vmImage: 'windows-2019'
-
-    steps:
-    - task: gittools.gitversion.gitversion-task.GitVersion@4
-      displayName: GitVersion
-      inputs:
-         preferBundledVersion: false
-
-    # init SonarCloud
-    - task: SonarSource.sonarcloud.14d9cde6-c1da-4d55-aa01-2965cd301255.SonarCloudPrepare@1
-      displayName: 'Prepare analysis on SonarCloud'
-      inputs:
-        SonarCloud: SonarCloud
-        organization: aloneguid-github
-        projectKey: aloneguid_storage
-        projectName: 'Storage.Net'
-        projectVersion: '$(GitVersion.SemVer)'
-        extraProperties: 'sonar.cs.opencover.reportsPaths=$(Build.StagingDirectory)/coverage.xml'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'Integration and Unit Test (with coverlet)'
-      continueOnError: true
-      inputs:
-        command: test
-        projects: ./src/storage.sln
-        arguments: '/p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Exclude="[xunit*]*%2c[*Test*]*" /p:CoverletOutput=$(Build.StagingDirectory)/coverage.xml'
-
     # finish Sonar analysis
     - task: SonarSource.sonarcloud.ce096e50-6155-4de8-8800-4221aaeed4a1.SonarCloudAnalyze@1
       displayName: 'SonarQube: Run Code Analysis'
@@ -107,7 +90,6 @@ stages:
 
 
 - stage: Deploy
-  displayName:
   #condition: "eq(variables['Build.SourceBranch'], 'refs/heads/master')"
   condition: "or( eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/v7') )"
   jobs:
