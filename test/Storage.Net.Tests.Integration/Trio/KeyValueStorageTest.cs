@@ -26,6 +26,7 @@ namespace Storage.Net.Tests.Integration.KeyValue
       public AzureTableEmulatorTest() : base("azure-emulator") { }
    }*/
 
+   [Trait("Category", "KeyValue")]
    public abstract class KeyValueStorageTest : AbstractTestFixture, IAsyncLifetime
    {
       private const string TestTablePrefix = "TableStorageTest";

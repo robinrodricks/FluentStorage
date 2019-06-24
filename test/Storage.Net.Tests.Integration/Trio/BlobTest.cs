@@ -12,6 +12,7 @@ using Xunit;
 
 namespace Storage.Net.Tests.Integration.Blobs
 {
+   [Trait("Category", "Blobs")]
    public abstract class BlobTest : IAsyncLifetime
    {
       private readonly IBlobStorage _storage;

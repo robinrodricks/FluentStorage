@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
-
+   [Trait("Category", "Messaging")]
    public abstract class MessagingTest : IAsyncLifetime
    {
       private readonly MessagingFixture _fixture;
