@@ -93,7 +93,7 @@ stages:
 
     - task: DotNetCoreCLI@2
       displayName: 'Integration and Unit Test (with coverlet)'
-      continueOnError: true
+      #continueOnError: true
       inputs:
         command: test
         projects: ./src/storage.sln
