@@ -70,7 +70,7 @@ stages:
       inputs:
         ArtifactName: nuget
 
-  - job: Integration - Other
+  - job: IntegrationOther
     pool:
       vmImage: 'windows-2019'
 
@@ -82,7 +82,7 @@ stages:
         projects: ./test/Storage.Net.Test.Integration
         arguments: '--filter Category=Other'
 
-  - job: Integration - Blobs
+  - job: IntegrationBlobs
     pool:
       vmImage: 'windows-2019'
 
@@ -95,7 +95,7 @@ stages:
         arguments: '--filter Category=Blobs'
 
         
-  - job: Integration - Messages
+  - job: IntegrationMessages
     pool:
       vmImage: 'windows-2019'
 
@@ -108,7 +108,7 @@ stages:
         arguments: '--filter Category=Messsages'
 
         
-  - job: Integration - KeyValue
+  - job: IntegrationKeyValue
     pool:
       vmImage: 'windows-2019'
 
