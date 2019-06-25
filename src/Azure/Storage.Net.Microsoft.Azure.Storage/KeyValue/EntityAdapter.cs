@@ -1,5 +1,4 @@
-﻿#if NETSTANDARD20
-using System;
+﻿using System;
 using System.Collections.Generic;
 using IAzTableEntity = Microsoft.Azure.Cosmos.Table.ITableEntity;
 using Storage.Net.KeyValue;
@@ -95,4 +94,3 @@ namespace Storage.Net.Microsoft.Azure.Storage.KeyValue
       }
    }
 }
-#endif

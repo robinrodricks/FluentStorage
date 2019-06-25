@@ -1,5 +1,4 @@
-﻿#if NETSTANDARD20
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -456,4 +455,3 @@ namespace Storage.Net.Microsoft.Azure.Storage.KeyValue
       }
    }
 }
-#endif

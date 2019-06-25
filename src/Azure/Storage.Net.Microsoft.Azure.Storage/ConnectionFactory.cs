@@ -4,9 +4,7 @@ using Storage.Net.ConnectionString;
 using Storage.Net.KeyValue;
 using Storage.Net.Messaging;
 using Storage.Net.Microsoft.Azure.Storage.Blobs;
-#if NETSTANDARD20
 using Storage.Net.Microsoft.Azure.Storage.KeyValue;
-#endif
 using Storage.Net.Microsoft.Azure.Storage.Messaging;
 
 namespace Storage.Net.Microsoft.Azure.Storage
@@ -33,7 +31,6 @@ namespace Storage.Net.Microsoft.Azure.Storage
          return null;
       }
 
-#if NETSTANDARD20
       public IKeyValueStorage CreateKeyValueStorage(StorageConnectionString connectionString)
       {
          if(connectionString.Prefix == Constants.AzureTablesConnectionPrefix)
@@ -54,12 +51,6 @@ namespace Storage.Net.Microsoft.Azure.Storage
 
          return null;
       }
-#else
-      public IKeyValueStorage CreateKeyValueStorage(StorageConnectionString connectionString)
-      {
-         return null;
-      }
-#endif
 
       public IMessagePublisher CreateMessagePublisher(StorageConnectionString connectionString)
       {

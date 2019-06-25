@@ -327,15 +327,6 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
-      public async Task Delete_root_folder_empties_all()
-      {
-         await _storage.DeleteAsync(StoragePath.RootFolderPath);
-
-         IReadOnlyCollection<Blob> rootContent = await _storage.ListAsync();
-         Assert.Equal(0, rootContent.Count);
-      }
-
-      [Fact]
       public async Task UserMetadata_write_readsback()
       {
          var blob = new Blob(RandomBlobPath());

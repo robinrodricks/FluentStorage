@@ -117,7 +117,7 @@ namespace Storage.Net.Blobs
 
          foreach(string path in fullPaths)
          {
-            //try to delete as file firts
+            //try to delete as file first
             Blob pb = path;
             if(_pathToTag.ContainsKey(pb))
             {
