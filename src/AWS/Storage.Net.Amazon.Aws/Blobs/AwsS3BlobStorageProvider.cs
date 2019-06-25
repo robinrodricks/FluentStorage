@@ -140,7 +140,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
          GenericValidation.CheckBlobFullPath(fullPath);
 
          fullPath = StoragePath.Normalize(fullPath, false);
-         GetObjectResponse response = await GetObjectAsync(fullPath);
+         GetObjectResponse response = await GetObjectAsync(fullPath).ConfigureAwait(false);
          if (response == null) return null;
 
          return new FixedStream(response.ResponseStream, length: response.ContentLength, (Action<FixedStream>)null);

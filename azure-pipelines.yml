@@ -56,7 +56,7 @@ stages:
         projectKey: aloneguid_storage
         projectName: 'Storage.Net'
         projectVersion: '$(Version)'
-        extraProperties: 'sonar.cs.opencover.reportsPaths=$(Build.StagingDirectory)/coverage.xml'
+        #extraProperties: 'sonar.cs.opencover.reportsPaths=$(Build.StagingDirectory)/coverage.xml'
 
     - task: DotNetCoreCLI@2
       displayName: 'build all'
@@ -70,7 +70,7 @@ stages:
       inputs:
         command: test
         projects: ./src/storage.sln
-        arguments: '/p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Exclude="[xunit*]*%2c[*Test*]*" /p:CoverletOutput=$(Build.StagingDirectory)/coverage.xml'
+        #arguments: '/p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Exclude="[xunit*]*%2c[*Test*]*" /p:CoverletOutput=$(Build.StagingDirectory)/coverage.xml'
 
     - task: CopyFiles@2
       displayName: 'copy generated nugets'
