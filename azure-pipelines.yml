@@ -21,8 +21,7 @@ pr:
 variables:
   - group: 'External Resources'
   - name: vmImage
-    value: 'ubuntu-16.04'
-    # windows-2019
+    value: 'ubuntu-16.04'  # see https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops&tabs=yaml&viewFallbackFrom=vsts
 
 stages:
 - stage: Build
@@ -32,10 +31,9 @@ stages:
       vmImage: $(vmImage)
 
     steps:
-    - task: gittools.gitversion.gitversion-task.GitVersion@4
+    - task: gittools.gitversion-netcore-preview.gitversion-netcore-task.GitVersionNetCore@5
       displayName: GitVersion
-      inputs:
-        preferBundledVersion: false
+
 
     - task: petersendev.dotnet-global-tool-installer.DotnetGlobalToolInstaller.DotnetGlobalToolInstaller@0
       displayName: 'install housework'
