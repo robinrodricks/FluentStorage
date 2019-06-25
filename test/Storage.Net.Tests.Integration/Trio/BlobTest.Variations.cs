@@ -46,6 +46,54 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
    }
 
+   public class AzureDataLakeGen2ClientSecretStorageFixture : BlobFixture
+   {
+      public AzureDataLakeGen2ClientSecretStorageFixture() : base("testfilesystemclientsecret/")
+      {
+
+      }
+
+      protected override IBlobStorage CreateStorage(ITestSettings settings)
+      {
+         return StorageFactory.Blobs.AzureDataLakeGen2StoreByClientSecret(
+            settings.AzureDataLakeGen2Name,
+            settings.AzureDataLakeGen2TenantId,
+            settings.AzureDataLakeGen2PrincipalId,
+            settings.AzureDataLakeGen2PrincipalSecret);
+      }
+   }
+
+   public class AzureDataLakeGen2ClientSecretTest : BlobTest, IClassFixture<AzureDataLakeGen2ClientSecretStorageFixture>
+   {
+      public AzureDataLakeGen2ClientSecretTest(AzureDataLakeGen2ClientSecretStorageFixture fixture) : base(fixture)
+      {
+      }
+   }
+
+   public class AzureDataLakeGen2SharedAccessKeyStorageFixture : BlobFixture
+   {
+      public AzureDataLakeGen2SharedAccessKeyStorageFixture() : base("testfilesystemaccesskey/")
+      {
+
+      }
+
+      protected override IBlobStorage CreateStorage(ITestSettings settings)
+      {
+         return StorageFactory.Blobs.AzureDataLakeGen2StoreBySharedAccessKey(
+            settings.AzureDataLakeGen2Name, 
+            settings.AzureDataLakeGen2Key);
+      }
+   }
+
+   public class AzureDataLakeGen2SharedAccessKeyTest : BlobTest,
+      IClassFixture<AzureDataLakeGen2SharedAccessKeyStorageFixture>
+   {
+      public AzureDataLakeGen2SharedAccessKeyTest(AzureDataLakeGen2SharedAccessKeyStorageFixture fixture) :
+         base(fixture)
+      {
+      }
+   }
+
    public class DiskDirectoryStorageFixture : BlobFixture
    {
       protected override IBlobStorage CreateStorage(ITestSettings settings)
