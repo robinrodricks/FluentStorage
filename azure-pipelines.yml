@@ -37,7 +37,10 @@ stages:
       inputs:
         name: housework
 
-    - script: 'housework author src/*.csproj -s build.ini -r'
+    - script: 'housework  author src/*.csproj -s build.ini -r'
+      displayName: 'set build number'
+
+    - script: 'housework setbuildnumber %Version% -s build.ini'
       displayName: 'author csproj'
 
     # init SonarCloud
