@@ -193,14 +193,11 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task List_large_number_of_results()
       {
+         const int count = 500;
          //arrange
 
-         //await Task.WhenAll(
-         //   Enumerable.Range(0, 1000)
-         //   .Select(i => _storage.WriteTextAsync(RandomBlobPath(), "123")));
-
          //something like FTP doesn't support multiple connections
-         for(int i = 0; i < 500; i++)
+         for(int i = 0; i < count; i++)
          {
             await _storage.WriteTextAsync(RandomBlobPath(), "123");
          }
@@ -209,7 +206,7 @@ namespace Storage.Net.Tests.Integration.Blobs
          IReadOnlyCollection<Blob> blobs = await _storage.ListAsync(folderPath: _blobPrefix);
 
          //assert
-         Assert.True(blobs.Count >= 1000, $"expected over 1000, but received only {blobs.Count}");
+         Assert.True(blobs.Count >= count, $"expected over {count}, but received only {blobs.Count}");
       }
 
       [Fact]
@@ -327,6 +324,15 @@ namespace Storage.Net.Tests.Integration.Blobs
          //assert
          Assert.False(await _storage.ExistsAsync(file1));
          Assert.False(await _storage.ExistsAsync(file2));
+      }
+
+      [Fact]
+      public async Task Delete_root_folder_empties_all()
+      {
+         await _storage.DeleteAsync(StoragePath.RootFolderPath);
+
+         IReadOnlyCollection<Blob> rootContent = await _storage.ListAsync();
+         Assert.Equal(0, rootContent.Count);
       }
 
       [Fact]
