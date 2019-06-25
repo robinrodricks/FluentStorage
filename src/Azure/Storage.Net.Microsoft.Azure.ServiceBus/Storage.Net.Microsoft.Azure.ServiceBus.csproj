@@ -21,6 +21,8 @@
       <RepositoryType>GitHub</RepositoryType>
       <Description>Extension to Storage.Net providing integration with Microsoft Azure Storage for blobs, tables and queues.</Description>
       <LangVersion>latest</LangVersion>
+      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+      <WarningsAsErrors />
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>

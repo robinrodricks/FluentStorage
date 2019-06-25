@@ -65,8 +65,9 @@ namespace Storage.Net.Tests.Integration.Blobs
          _initialised = true;
       }
 
-      public async Task DisposeAsync()
+      public Task DisposeAsync()
       {
+         return Task.CompletedTask;
       }
 
       public void Dispose()

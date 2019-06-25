@@ -383,7 +383,7 @@ namespace Storage.Net.Tests.Integration.Blobs
          //test
          Blob blob2 = await _storage.GetBlobAsync(blob);
          Assert.NotNull(blob2.Metadata);
-         Assert.Equal(1, blob2.Metadata.Count);
+         Assert.Single(blob2.Metadata);
          Assert.Equal("ivan2", blob2.Metadata["user"]);
       }
 

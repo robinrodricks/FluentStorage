@@ -16,6 +16,8 @@
       <SignAssembly>true</SignAssembly>
       <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
       <LangVersion>latest</LangVersion>
+      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+      <WarningsAsErrors />
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>

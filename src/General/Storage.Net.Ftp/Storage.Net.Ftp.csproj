@@ -5,6 +5,8 @@
       <AssemblyOriginatorKeyFile>../../storage.snk</AssemblyOriginatorKeyFile>
       <SignAssembly>true</SignAssembly>
       <LangVersion>latest</LangVersion>
+      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+      <WarningsAsErrors />
    </PropertyGroup>
 
    <ItemGroup>
