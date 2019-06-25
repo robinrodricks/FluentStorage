@@ -65,8 +65,10 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       {
          (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath, false);
 
-         CloudBlockBlob blob = container.GetBlockBlobReference(StoragePath.Normalize(path, false));
-         if(await blob.ExistsAsync().ConfigureAwait(false))
+         CloudBlockBlob blob = string.IsNullOrEmpty(path)
+            ? null
+            : container.GetBlockBlobReference(StoragePath.Normalize(path, false));
+         if(blob != null && await blob.ExistsAsync().ConfigureAwait(false))
          {
             await blob.DeleteIfExistsAsync();
          }

@@ -200,17 +200,13 @@ namespace Storage.Net.Tests.Integration.Blobs
          //   .Select(i => _storage.WriteTextAsync(RandomBlobPath(), "123")));
 
          //something like FTP doesn't support multiple connections
-         for(int i = 0; i < 1000; i++)
+         for(int i = 0; i < 500; i++)
          {
             await _storage.WriteTextAsync(RandomBlobPath(), "123");
          }
 
          //act
          IReadOnlyCollection<Blob> blobs = await _storage.ListAsync(folderPath: _blobPrefix);
-
-         //cleanup
-         IReadOnlyCollection<Blob> topLevel = (await _storage.ListAsync(recurse: false)).ToList();
-         await _storage.DeleteAsync(topLevel.Select(f => f.FullPath));
 
          //assert
          Assert.True(blobs.Count >= 1000, $"expected over 1000, but received only {blobs.Count}");
