@@ -178,5 +178,9 @@ namespace Storage.Net
       {
          return new LargeMessageContentMessageReceiver(messageReceiver, offloadStorage);
       }
+
+      #region [ Data Decorators ]
+
+      #endregion
    }
 }

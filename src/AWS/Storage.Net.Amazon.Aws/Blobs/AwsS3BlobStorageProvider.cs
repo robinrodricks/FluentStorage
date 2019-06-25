@@ -11,6 +11,7 @@ using Amazon.S3.Transfer;
 using System.Threading.Tasks;
 using System.Threading;
 using Storage.Net.Streaming;
+using NetBox.Extensions;
 
 namespace Storage.Net.Amazon.Aws.Blobs
 {
@@ -19,6 +20,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
    /// </summary>
    class AwsS3BlobStorageProvider : IBlobStorage, IAwsS3BlobStorage
    {
+      private const int ListChunkSize = 10;
       private readonly string _bucketName;
       private readonly AmazonS3Client _client;
       private readonly TransferUtility _fileTransferUtility;
@@ -102,7 +104,10 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
          if(options.IncludeAttributes)
          {
-            await Converter.AppendMetadataAsync(client, _bucketName, blobs, cancellationToken).ConfigureAwait(false);
+            foreach(IEnumerable<Blob> page in blobs.Chunk(ListChunkSize))
+            {
+               await Converter.AppendMetadataAsync(client, _bucketName, page, cancellationToken).ConfigureAwait(false);
+            }
          }
 
          return blobs;
