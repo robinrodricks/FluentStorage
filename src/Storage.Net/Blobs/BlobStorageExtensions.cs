@@ -39,7 +39,7 @@ namespace Storage.Net.Blobs
       /// Returns the list of available blobs
       /// </summary>
       /// <param name="blobStorage"></param>
-      /// <param name="folderPath"><see cref="ListOptions.FolderPath"/><</param>
+      /// <param name="folderPath"><see cref="ListOptions.FolderPath"/></param>
       /// <param name="browseFilter"><see cref="ListOptions.BrowseFilter"/></param>
       /// <param name="filePrefix"><see cref="ListOptions.FilePrefix"/></param>
       /// <param name="recurse"><see cref="ListOptions.Recurse"/></param>
@@ -218,6 +218,15 @@ namespace Storage.Net.Blobs
 
       #region [ Streaming ]
 
+      /// <summary>
+      /// Copy data from <paramref name="sourceStream"/> and write to the destination storage
+      /// </summary>
+      /// <param name="storage"></param>
+      /// <param name="fullPath">Full blob path, required.</param>
+      /// <param name="sourceStream">Source stream to copy from, required</param>
+      /// <param name="append">When true, the blob gets overwritten, otherwise the data is appended.</param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
       public static async Task WriteAsync(
          this IBlobStorage storage,
          string fullPath,
@@ -225,6 +234,9 @@ namespace Storage.Net.Blobs
          bool append = false,
          CancellationToken cancellationToken = default)
       {
+         if(sourceStream == null)
+            throw new ArgumentNullException(nameof(sourceStream));
+
          using(Stream dest = await storage.OpenWriteAsync(fullPath, append, cancellationToken).ConfigureAwait(false))
          {
             await sourceStream.CopyToAsync(dest).ConfigureAwait(false);

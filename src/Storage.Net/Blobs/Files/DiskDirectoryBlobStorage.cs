@@ -274,7 +274,7 @@ namespace Storage.Net.Blobs.Files
          return Task.FromResult<IReadOnlyCollection<Blob>>(result);
       }
 
-      public async Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
+      public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
       {
          GenericValidation.CheckBlobFullPaths(blobs);
 
@@ -291,6 +291,8 @@ namespace Storage.Net.Blobs.Files
             string attrPath = GetFilePath(blob.FullPath) + AttributesFileExtension;
             File.WriteAllBytes(attrPath, blob.AttributesToByteArray());
          }
+
+         return Task.CompletedTask;
       }
 
       private void EnrichWithMetadata(Blob blob)

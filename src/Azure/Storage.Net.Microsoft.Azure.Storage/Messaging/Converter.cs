@@ -50,7 +50,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
             }
 
             result = new CloudQueueMessage((string)null);
-            result.SetMessageContent(ms.ToArray());
+            result.SetMessageContent2(ms.ToArray());
          }
 
          return result;
