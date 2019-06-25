@@ -20,13 +20,16 @@ pr:
 
 variables:
   - group: 'External Resources'
+  - name: vmImage
+    value: 'ubuntu-16.04'
+    # windows-2019
 
 stages:
 - stage: Build
   jobs:
   - job: Core
     pool:
-      vmImage: 'windows-2019'
+      vmImage: $(vmImage)
 
     steps:
     - task: gittools.gitversion.gitversion-task.GitVersion@4
@@ -95,7 +98,7 @@ stages:
   jobs:
   - deployment: NugetOrg
     pool:
-      vmImage: 'windows-2019'
+      vmImage: $(vmImage)
     environment: live
     strategy:
       runOnce:
