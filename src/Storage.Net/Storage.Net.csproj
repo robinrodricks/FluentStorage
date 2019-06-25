@@ -29,4 +29,7 @@
     <PackageReference Include="NetBox" Version="2.1.8" />
      <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DataDecorators\" />
+  </ItemGroup>
 </Project>
