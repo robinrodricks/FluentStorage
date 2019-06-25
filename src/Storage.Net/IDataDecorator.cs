@@ -7,8 +7,8 @@ namespace Storage.Net
 {
    public interface IDataDecorator
    {
-      Stream DecorateWriter(Stream parentStream);
+      Stream Transform(Stream parentStream);
 
-      Stream DecorateReader(Stream parentStream);
+      Stream Untransform(Stream parentStream);
    }
 }

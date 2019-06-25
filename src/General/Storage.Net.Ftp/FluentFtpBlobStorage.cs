@@ -187,13 +187,6 @@ namespace Storage.Net.Ftp
          }).ConfigureAwait(false);
       }
 
-      public async Task WriteAsync(string fullPath, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
-      {
-         FtpClient client = await GetClientAsync().ConfigureAwait(false);
-
-         await client.UploadAsync(sourceStream, fullPath, FtpExists.Overwrite, true, null, cancellationToken).ConfigureAwait(false);
-      }
-
       public void Dispose()
       {
          if (_dispose && _client.IsDisposed)

@@ -23,9 +23,6 @@
     <Description>Extension to Storage.Net providing integration with Amazon S3 blobs.</Description>
      <LangVersion>latest</LangVersion>
   </PropertyGroup>
-   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-      <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
-   </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>

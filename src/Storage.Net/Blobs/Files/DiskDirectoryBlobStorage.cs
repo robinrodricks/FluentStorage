@@ -176,21 +176,6 @@ namespace Storage.Net.Blobs.Files
       }
 
       /// <summary>
-      /// Streams into file
-      /// </summary>
-      public async Task WriteAsync(string fullPath, Stream sourceStream, bool append, CancellationToken cancellationToken)
-      {
-         GenericValidation.CheckBlobFullPath(fullPath);
-         GenericValidation.CheckSourceStream(sourceStream);
-
-         fullPath = StoragePath.Normalize(fullPath, false);
-         using(Stream dest = CreateStream(fullPath, !append))
-         {
-            await sourceStream.CopyToAsync(dest).ConfigureAwait(false);
-         }
-      }
-
-      /// <summary>
       /// 
       /// </summary>
       public Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)

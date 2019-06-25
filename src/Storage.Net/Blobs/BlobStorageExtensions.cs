@@ -190,7 +190,10 @@ namespace Storage.Net.Blobs
 
          using (var source = new MemoryStream(data))
          {
-            await provider.WriteAsync(fullPath, source, append, cancellationToken);
+            using(Stream dest = await provider.OpenWriteAsync(fullPath, false, cancellationToken).ConfigureAwait(false))
+            {
+               await source.CopyToAsync(dest).ConfigureAwait(false);
+            }
          }
       }
 
@@ -214,6 +217,19 @@ namespace Storage.Net.Blobs
       #endregion
 
       #region [ Streaming ]
+
+      public static async Task WriteAsync(
+         this IBlobStorage storage,
+         string fullPath,
+         Stream sourceStream,
+         bool append = false,
+         CancellationToken cancellationToken = default)
+      {
+         using(Stream dest = await storage.OpenWriteAsync(fullPath, append, cancellationToken).ConfigureAwait(false))
+         {
+            await sourceStream.CopyToAsync(dest).ConfigureAwait(false);
+         }
+      }
 
       /// <summary>
       /// Downloads blob to a stream

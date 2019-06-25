@@ -123,19 +123,6 @@ namespace Storage.Net.Blobs.Files
          return Task.FromResult(EmptyTransaction.Instance);
       }
 
-      public async Task WriteAsync(string fullPath, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
-      {
-         fullPath = StoragePath.Normalize(fullPath, false);
-         ZipArchive archive = GetArchive(true);
-
-
-         ZipArchiveEntry entry = archive.CreateEntry(fullPath, CompressionLevel.Optimal);
-         using (Stream dest = entry.Open())
-         {
-            await sourceStream.CopyToAsync(dest);
-         }
-      }
-
       public Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
       {
          var callbackStream = new FixedStream(new MemoryStream(), null, fx =>

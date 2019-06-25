@@ -3,6 +3,7 @@ using Microsoft.ServiceFabric.Data.Collections;
 using NetBox;
 using NetBox.Extensions;
 using Storage.Net.Blobs;
+using Storage.Net.Streaming;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -53,23 +54,23 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
          return result;
       }
 
-      public async Task WriteAsync(string fullPath, Stream sourceStream, bool append, CancellationToken cancellationToken)
+      public Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken = default)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
 
-         if (append)
+         return Task.FromResult<Stream>(new FixedStream(new MemoryStream(), null, async fx =>
          {
-            await AppendAsync(fullPath, sourceStream);
-         }
-         else
-         {
-            await WriteAsync(fullPath, sourceStream);
-         }
-      }
+            fx.Parent.Position = 0;
 
-      public Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken = default)
-      {
-         throw new NotImplementedException();
+            if(append)
+            {
+               await AppendAsync(fullPath, fx.Parent);
+            }
+            else
+            {
+               await WriteAsync(fullPath, fx.Parent);
+            }
+         }));
       }
 
       private async Task WriteAsync(Blob blob, Stream sourceStream)

@@ -15,12 +15,12 @@ namespace Storage.Net.DataDecorators
          _compressionLevel = compressionLevel;
       }
 
-      public Stream DecorateReader(Stream parentStream)
+      public Stream Untransform(Stream parentStream)
       {
          return new GZipStream(parentStream, CompressionMode.Decompress, false);
       }
 
-      public Stream DecorateWriter(Stream parentStream)
+      public Stream Transform(Stream parentStream)
       {
          return new GZipStream(parentStream, _compressionLevel);
       }

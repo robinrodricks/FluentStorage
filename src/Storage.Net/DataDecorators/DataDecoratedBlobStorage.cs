@@ -45,20 +45,14 @@ namespace Storage.Net.DataDecorators
          //open stream from parent
          Stream result = await _parent.OpenReadAsync(fullPath, cancellationToken).ConfigureAwait(false);
 
-         return _dataDecorator.DecorateReader(result);
+         return _dataDecorator.Untransform(result);
       }
 
       public async Task<Stream> OpenWriteAsync(string fullPath, bool append = false, CancellationToken cancellationToken = default)
       {
          Stream writeStream = await _parent.OpenWriteAsync(fullPath, append, cancellationToken).ConfigureAwait(false);
 
-         return _dataDecorator.DecorateWriter(writeStream);
-      }
-
-      public async Task WriteAsync(string fullPath, Stream sourceStream, bool append = false, CancellationToken cancellationToken = default)
-      {
-         //await _parent.WriteAsync()
-         throw new NotImplementedException();
+         return _dataDecorator.Transform(writeStream);
       }
 
       #endregion
