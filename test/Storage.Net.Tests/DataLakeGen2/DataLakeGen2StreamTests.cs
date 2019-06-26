@@ -112,7 +112,7 @@ namespace Storage.Net.Tests.DataLakeGen2
          await _sut.ReadAsync(new byte[length], CancellationToken.None);
          await _sut.ReadAsync(new byte[length], CancellationToken.None);
 
-         _client.Verify(x => x.ReadFileAsync(Filesystem, FilePath, length, length * 2 - 1, CancellationToken.None));
+         _client.Verify(x => x.ReadFileAsync(Filesystem, FilePath, length, (length * 2) - 1, CancellationToken.None));
       }
 
       [Fact]

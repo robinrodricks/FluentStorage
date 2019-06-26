@@ -48,7 +48,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 
    public class AzureDataLakeGen2ClientSecretStorageFixture : BlobFixture
    {
-      public AzureDataLakeGen2ClientSecretStorageFixture() : base("testfilesystemclientsecret/")
+      public AzureDataLakeGen2ClientSecretStorageFixture() : base("test/")
       {
 
       }
