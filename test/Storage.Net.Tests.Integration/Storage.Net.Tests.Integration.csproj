@@ -23,15 +23,15 @@
       <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
    </ItemGroup>
 
-   <ItemGroup>
-      <ProjectReference Include="..\..\src\Azure\Storage.Net.Microsoft.Azure.DataLake.Store\Storage.Net.Microsoft.Azure.DataLake.Store.csproj" />
-      <ProjectReference Include="..\..\src\General\Storage.Net.Ftp\Storage.Net.Ftp.csproj" />
-      <ProjectReference Include="..\..\src\Storage.Net\Storage.Net.csproj" />
-      <ProjectReference Include="..\..\src\Azure\Storage.Net.Microsoft.Azure.EventHub\Storage.Net.Microsoft.Azure.EventHub.csproj" />
-      <ProjectReference Include="..\..\src\Azure\Storage.Net.Microsoft.Azure.KeyVault\Storage.Net.Microsoft.Azure.KeyVault.csproj" />
-      <ProjectReference Include="..\..\src\Azure\Storage.Net.Microsoft.Azure.ServiceBus\Storage.Net.Microsoft.Azure.ServiceBus.csproj" />
-      <ProjectReference Include="..\..\src\Azure\Storage.Net.Microsoft.Azure.Storage\Storage.Net.Microsoft.Azure.Storage.csproj" />
-      <ProjectReference Include="..\..\src\AWS\Storage.Net.Amazon.Aws\Storage.Net.Amazon.Aws.csproj" />
-   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Azure\Storage.Net.Microsoft.Azure.DataLake.Store\Storage.Net.Microsoft.Azure.DataLake.Store.csproj" />
+    <ProjectReference Include="..\..\src\General\Storage.Net.Ftp\Storage.Net.Ftp.csproj" />
+    <ProjectReference Include="..\..\src\Storage.Net\Storage.Net.csproj" />
+    <ProjectReference Include="..\..\src\Azure\Storage.Net.Microsoft.Azure.EventHub\Storage.Net.Microsoft.Azure.EventHub.csproj" />
+    <ProjectReference Include="..\..\src\Azure\Storage.Net.Microsoft.Azure.KeyVault\Storage.Net.Microsoft.Azure.KeyVault.csproj" />
+    <ProjectReference Include="..\..\src\Azure\Storage.Net.Microsoft.Azure.ServiceBus\Storage.Net.Microsoft.Azure.ServiceBus.csproj" />
+    <ProjectReference Include="..\..\src\Azure\Storage.Net.Microsoft.Azure.Storage\Storage.Net.Microsoft.Azure.Storage.csproj" />
+    <ProjectReference Include="..\..\src\AWS\Storage.Net.Amazon.Aws\Storage.Net.Amazon.Aws.csproj" />
+  </ItemGroup>
 
 </Project>
