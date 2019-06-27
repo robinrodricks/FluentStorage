@@ -1,7 +1,7 @@
 ﻿using System;
 using Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.Interfaces;
 
-namespace Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.Wrappers
+namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Wrappers
 {
    public class DateTimeWrapper : IDateTimeWrapper
    {

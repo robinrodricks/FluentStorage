@@ -3,9 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.Interfaces;
 
-namespace Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.Wrappers
+namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Wrappers
 {
-   public class HttpClientWrapper : IHttpClientWrapper
+   class HttpClientWrapper : IHttpClientWrapper
    {
       private readonly HttpClient _httpClient;
 

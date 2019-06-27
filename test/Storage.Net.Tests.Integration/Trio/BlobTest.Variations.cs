@@ -72,7 +72,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 
    public class AzureDataLakeGen2SharedAccessKeyStorageFixture : BlobFixture
    {
-      public AzureDataLakeGen2SharedAccessKeyStorageFixture() : base("testfilesystemaccesskey/")
+      public AzureDataLakeGen2SharedAccessKeyStorageFixture() : base("test/")
       {
 
       }

@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using Storage.Net.Blobs;
 using Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.BLL;
 using Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.Interfaces;
-using Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.Models;
+using Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Models;
 
-namespace Storage.Net.Microsoft.Azure.DataLakeGen2.Store
+namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2
 {
    class AzureDataLakeStoreGen2BlobStorageProvider : IAzureDataLakeGen2Storage
    {

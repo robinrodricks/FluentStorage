@@ -5,8 +5,8 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.Interfaces;
-using Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.Models;
-using Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.Wrappers;
+using Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Models;
+using Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Wrappers;
 
 namespace Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.BLL
 {

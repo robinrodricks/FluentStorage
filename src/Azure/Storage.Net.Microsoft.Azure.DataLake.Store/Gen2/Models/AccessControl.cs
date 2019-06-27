@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.Models
+namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Models
 {
    public class AccessControl
    {

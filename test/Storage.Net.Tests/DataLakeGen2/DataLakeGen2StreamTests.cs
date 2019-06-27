@@ -4,9 +4,9 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Moq;
+using Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Models;
 using Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.BLL;
 using Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.Interfaces;
-using Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.Models;
 using Xunit;
 
 namespace Storage.Net.Tests.DataLakeGen2

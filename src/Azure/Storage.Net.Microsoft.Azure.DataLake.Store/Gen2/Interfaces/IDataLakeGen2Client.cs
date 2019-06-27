@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.Models;
+using Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Models;
 
 namespace Storage.Net.Microsoft.Azure.DataLakeGen2.Store.Gen2.Interfaces
 {
