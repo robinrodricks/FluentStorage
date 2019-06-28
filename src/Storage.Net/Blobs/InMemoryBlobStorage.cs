@@ -138,13 +138,13 @@ namespace Storage.Net.Blobs
          return Task.FromResult(true);
       }
 
-      public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken)
       {
          var result = new List<bool>();
 
-         foreach (string id in ids)
+         foreach (string fullPath in fullPaths)
          {
-            result.Add(_pathToTag.ContainsKey(StoragePath.Normalize(id)));
+            result.Add(_pathToTag.ContainsKey(StoragePath.Normalize(fullPath)));
          }
 
          return Task.FromResult<IReadOnlyCollection<bool>>(result);

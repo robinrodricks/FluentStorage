@@ -142,13 +142,13 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen1
          return result;
       }
 
-      public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken)
+      public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken)
       {
-         GenericValidation.CheckBlobFullPaths(ids);
+         GenericValidation.CheckBlobFullPaths(fullPaths);
 
          AdlsClient client = await GetAdlsClientAsync();
 
-         return await Task.WhenAll(ids.Select(id => GetBlobWithMetaAsync(id, client, cancellationToken)));
+         return await Task.WhenAll(fullPaths.Select(fullPath => GetBlobWithMetaAsync(fullPath, client, cancellationToken)));
       }
 
       public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)

@@ -65,8 +65,8 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen1
             if(folders.Count > 0)
             {
                await Task.WhenAll(
-                  folders.Select(bid => BrowseAsync(
-                     StoragePath.Combine(path, bid.Id),
+                  folders.Select(b => BrowseAsync(
+                     StoragePath.Combine(path, b.Name),
                      options,
                      container,
                      token

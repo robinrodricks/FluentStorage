@@ -75,7 +75,7 @@ namespace Storage.Net.Blobs
       /// </summary>
       public bool IsMatch(Blob blob)
       {
-         return _prefix == null || blob.Kind != BlobItemKind.File || blob.Id.StartsWith(_prefix);
+         return _prefix == null || blob.Kind != BlobItemKind.File || blob.Name.StartsWith(_prefix);
       }
 
       /// <summary>

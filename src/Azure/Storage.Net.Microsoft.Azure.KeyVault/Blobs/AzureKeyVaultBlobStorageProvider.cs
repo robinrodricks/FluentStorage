@@ -112,18 +112,18 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
          return value.ToMemoryStream();
       }
 
-      public async Task DeleteAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public async Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         GenericValidation.CheckBlobFullPaths(ids);
+         GenericValidation.CheckBlobFullPaths(fullPaths);
 
-         await Task.WhenAll(ids.Select(id => _vaultClient.DeleteSecretAsync(_vaultUri, id))).ConfigureAwait(false);
+         await Task.WhenAll(fullPaths.Select(fullPath => _vaultClient.DeleteSecretAsync(_vaultUri, fullPath))).ConfigureAwait(false);
       }
 
-      public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         GenericValidation.CheckBlobFullPaths(ids);
+         GenericValidation.CheckBlobFullPaths(fullPaths);
 
-         return await Task.WhenAll(ids.Select(id => ExistsAsync(id))).ConfigureAwait(false);
+         return await Task.WhenAll(fullPaths.Select(fullPath => ExistsAsync(fullPath))).ConfigureAwait(false);
       }
 
       private async Task<bool> ExistsAsync(string fullPath)
@@ -142,11 +142,11 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
          return secret != null;
       }
 
-      public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
+      public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         GenericValidation.CheckBlobFullPaths(ids);
+         GenericValidation.CheckBlobFullPaths(fullPaths);
 
-         return await Task.WhenAll(ids.Select(id => GetBlobAsync(id))).ConfigureAwait(false);
+         return await Task.WhenAll(fullPaths.Select(fullPath => GetBlobAsync(fullPath))).ConfigureAwait(false);
       }
 
       public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)

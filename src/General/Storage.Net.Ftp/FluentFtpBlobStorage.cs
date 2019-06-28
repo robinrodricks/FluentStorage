@@ -59,16 +59,16 @@ namespace Storage.Net.Ftp
                continue;
             }
 
-            Blob bid = ToBlobId(item);
-            if (bid == null) continue;
+            Blob blob = ToBlobId(item);
+            if (blob == null) continue;
 
             if(options.BrowseFilter != null)
             {
-               bool include = options.BrowseFilter(bid);
+               bool include = options.BrowseFilter(blob);
                if (!include) continue;
             }
 
-            results.Add(bid);
+            results.Add(blob);
 
             if (options.MaxResults != null && results.Count >= options.MaxResults.Value) break;
          }

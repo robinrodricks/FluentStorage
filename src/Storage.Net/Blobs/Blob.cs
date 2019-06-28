@@ -22,9 +22,9 @@ namespace Storage.Net.Blobs
       public string FolderPath { get; private set; }
 
       /// <summary>
-      /// Gets the id of this blob, uniqueue within the folder
+      /// Gets the name of this blob, uniqueue within the folder. In most providers this is the same as file name.
       /// </summary>
-      public string Id { get; private set; }
+      public string Name { get; private set; }
 
       /// <summary>
       /// Blob size
@@ -45,7 +45,7 @@ namespace Storage.Net.Blobs
       /// <summary>
       /// Gets full path to this blob which is a combination of folder path and blob name
       /// </summary>
-      public string FullPath => StoragePath.Combine(FolderPath, Id);
+      public string FullPath => StoragePath.Combine(FolderPath, Name);
 
       /// <summary>
       /// Custom provider-specific properties
@@ -67,7 +67,7 @@ namespace Storage.Net.Blobs
          string path = StoragePath.Normalize(fullPath);
          string[] parts = StoragePath.Split(path);
 
-         Id = parts.Last();
+         Name = parts.Last();
          FolderPath = StoragePath.GetParent(path);
 
          Kind = kind;
@@ -76,12 +76,12 @@ namespace Storage.Net.Blobs
       /// <summary>
       /// Creates a new instance
       /// </summary>
-      /// <param name="folderPath"></param>
-      /// <param name="id"></param>
-      /// <param name="kind"></param>
-      public Blob(string folderPath, string id, BlobItemKind kind)
+      /// <param name="folderPath">Folder path to the blob</param>
+      /// <param name="name">Name of the blob withing a specific folder.</param>
+      /// <param name="kind">Blob kind (file or folder)</param>
+      public Blob(string folderPath, string name, BlobItemKind kind)
       {
-         Id = id ?? throw new ArgumentNullException(nameof(id));
+         Name = name ?? throw new ArgumentNullException(nameof(name));
          FolderPath = folderPath;
          Kind = kind;
       }
@@ -93,7 +93,7 @@ namespace Storage.Net.Blobs
       {
          string k = Kind == BlobItemKind.File ? "file" : "folder";
 
-         return $"{k}: {Id}@{FolderPath}";
+         return $"{k}: {Name}@{FolderPath}";
       }
 
       /// <summary>

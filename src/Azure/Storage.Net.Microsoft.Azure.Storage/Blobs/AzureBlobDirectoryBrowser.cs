@@ -97,7 +97,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             await Task.WhenAll(
                folderIds.Select(folderId => ListFolderAsync(
                   container,
-                  StoragePath.Combine(path, folderId.Id),
+                  StoragePath.Combine(path, folderId.Name),
                   options,
                   cancellationToken))).ConfigureAwait(false);
          }
@@ -112,42 +112,42 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return dir;
       }
 
-      private Blob ToBlob(IListBlobItem blob)
+      private Blob ToBlob(IListBlobItem nativeBlob)
       {
-         Blob id;
+         Blob blob;
 
-         if (blob is CloudBlockBlob blockBlob)
+         if (nativeBlob is CloudBlockBlob blockBlob)
          {
             string fullName = StoragePath.Combine(_container.Name, blockBlob.Name);
 
-            id = new Blob(fullName, BlobItemKind.File);
+            blob = new Blob(fullName, BlobItemKind.File);
          }
-         else if (blob is CloudAppendBlob appendBlob)
+         else if (nativeBlob is CloudAppendBlob appendBlob)
          {
             string fullName = StoragePath.Combine(_container.Name, appendBlob.Name);
 
-            id = new Blob(fullName, BlobItemKind.File);
+            blob = new Blob(fullName, BlobItemKind.File);
          }
-         else if (blob is CloudBlobDirectory dirBlob)
+         else if (nativeBlob is CloudBlobDirectory dirBlob)
          {
             string fullName = StoragePath.Combine(_container.Name, dirBlob.Prefix);
 
-            id = new Blob(fullName, BlobItemKind.Folder);
+            blob = new Blob(fullName, BlobItemKind.Folder);
          }
          else
          {
-            throw new InvalidOperationException($"unknown item type {blob.GetType()}");
+            throw new InvalidOperationException($"unknown item type {nativeBlob.GetType()}");
          }
 
          //attach metadata if we can
-         if(blob is CloudBlob cloudBlob)
+         if(nativeBlob is CloudBlob cloudBlob)
          {
             //no need to fetch attributes, parent request includes the details
             //await cloudBlob.FetchAttributesAsync().ConfigureAwait(false);
-            AzureUniversalBlobStorageProvider.AttachBlobMeta(id, cloudBlob);
+            AzureUniversalBlobStorageProvider.AttachBlobMeta(blob, cloudBlob);
          }
 
-         return id;
+         return blob;
       }
 
    }

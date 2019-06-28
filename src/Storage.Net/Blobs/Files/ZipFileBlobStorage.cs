@@ -98,7 +98,7 @@ namespace Storage.Net.Blobs.Files
 
          if (options == null) options = new ListOptions();
          IEnumerable<Blob> ids = archive.Entries.Select(ze => new Blob(ze.FullName, BlobItemKind.File));
-         if (options.FilePrefix != null) ids = ids.Where(id => id.Id.StartsWith(options.FilePrefix));
+         if (options.FilePrefix != null) ids = ids.Where(id => id.Name.StartsWith(options.FilePrefix));
          if (options.BrowseFilter != null) ids = ids.Where(id => options.BrowseFilter(id));
          if (options.MaxResults != null) ids = ids.Take(options.MaxResults.Value);
 
