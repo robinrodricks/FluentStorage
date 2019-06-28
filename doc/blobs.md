@@ -9,6 +9,7 @@ This page lists blob storage providers available in Storage.Net
 - [Zip File](#zip-file)
 - [FTP](#ftp)
 - [Microsoft Azure Blob Storage](#microsoft-azure-blob-storage)
+- [Amazon S3 Storage](#amazon-s3-storage)
 
 ### In-Memory
 
@@ -149,6 +150,48 @@ Where the first parameter is blob id and the second is lease duration. The `Blob
 
 It also exposes `RenewLeaseAsync()` method to renew the lease explicitly, and `LeasedBlob` property that returns a native `CloudBlockBlob` that is leased if you need to explicitly call any methods not supported by this wrapper.
 
+### Amazon S3 Storage
+
+> todo: add more details
+
+To create with a connection string, first reference the module:
+
+```csharp
+StorageFactory.Modules.UseAwsStorage();
+```
+
+Then construct using the following format:
+
+```csharp
+IBlobStorage storage = StorageFactory.Blobs.FromConnectionString("aws.s3://keyId=...;key=...;bucket=...;region=...");
+```
+
+where:
+- **keyId** is access key ID.
+- **key** is secret access key.
+- **bucket** is bucket name.
+- **region** is an optional value and defaults to `EU West 1` if not specified. At the moment of this wring the following regions are supported. However as we are using the official AWS SDK, when region information changes, storage.net gets automatically updated.
+  - `us-east-1`
+  - `us-east-2`
+  - `us-west-1`
+  - `us-west-2`
+  - `eu-north-1`
+  - `eu-west-1`
+  - `eu-west-2`
+  - `eu-west-3`
+  - `eu-central-1`
+  - `ap-northeast-1`
+  - `ap-northeast-2`
+  - `ap-northeast-3`
+  - `ap-south-1`
+  - `ap-southeast-1`
+  - `ap-southeast-2`
+  - `sa-east-1`
+  - `us-gov-east-1`
+  - `us-gov-west-1`
+  - `cn-north-1`
+  - `cn-northwest-1`
+  - `ca-central-1`
 
 
 

@@ -9,12 +9,6 @@ namespace Storage.Net.Microsoft.Azure.Storage
 {
    class AzureStorageModule : IExternalModule
    {
-      public IConnectionFactory ConnectionFactory
-      {
-         get
-         {
-            return new ConnectionFactory();
-         }
-      }
+      public IConnectionFactory ConnectionFactory => new ConnectionFactory();
    }
 }

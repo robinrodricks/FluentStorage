@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{D1BF1B
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		..\azure-pipelines.yml = ..\azure-pipelines.yml
+		..\doc\blobs.md = ..\doc\blobs.md
 		..\build.ini = ..\build.ini
 		JsonExtensions.cs = JsonExtensions.cs
 		..\README.md = ..\README.md

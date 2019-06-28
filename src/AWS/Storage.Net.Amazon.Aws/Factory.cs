@@ -4,6 +4,7 @@ using Storage.Net.Amazon.Aws.Messaging;
 using Storage.Net.Amazon.Aws.Blobs;
 using Storage.Net.Blobs;
 using Storage.Net.Messaging;
+using Storage.Net.Amazon.Aws;
 
 namespace Storage.Net
 {
@@ -12,6 +13,14 @@ namespace Storage.Net
    /// </summary>
    public static class Factory
    {
+
+      /// <summary>
+      /// Register Azure module.
+      /// </summary>
+      public static IModulesFactory UseAwsStorage(this IModulesFactory factory)
+      {
+         return factory.Use(new AwsStorageModule());
+      }
 
       /// <summary>
       /// Creates an Amazon S3 storage
