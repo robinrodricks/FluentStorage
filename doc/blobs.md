@@ -152,7 +152,18 @@ It also exposes `RenewLeaseAsync()` method to renew the lease explicitly, and `L
 
 ### Amazon S3 Storage
 
-> todo: add more details
+In order to use Microsoft Azure blob storage you need to reference [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Amazon.Aws.svg)](https://www.nuget.org/packages/Storage.Net.Amazon.Aws/) package first. The provider wraps around the standard AWS SDK which is updated regularry.
+
+There are a few overloads in this package, for instance:
+
+```csharp
+IBlobStorage storage = StorageFactory.Blobs.AmazonS3BlobStorage(string accessKeyId,
+   string secretAccessKey,
+   string bucketName,
+   RegionEndpoint regionEndpoint = null);
+```
+
+Please see `StorageFactory.Blobs` factory entry for more options.
 
 To create with a connection string, first reference the module:
 
@@ -192,6 +203,10 @@ where:
   - `cn-north-1`
   - `cn-northwest-1`
   - `ca-central-1`
+
+#### Native Operations
+
+Native operations are exposed via [IAwsS3BlobStorageNativeOperations](../src/AWS/Storage.Net.Amazon.Aws/Blobs/IAwsS3BlobStorageNativeOperations.cs) interface.
 
 
 
