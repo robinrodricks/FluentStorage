@@ -303,19 +303,26 @@ namespace Storage.Net.Blobs.Files
 
          var fi = new FileInfo(path);
 
-         using (Stream fs = File.OpenRead(fi.FullName))
+         try
          {
-            blob.MD5 = fs.GetHash(HashType.Md5);
+            using(Stream fs = File.OpenRead(fi.FullName))
+            {
+               blob.MD5 = fs.GetHash(HashType.Md5);
+            }
+
+            blob.Size = fi.Length;
+            blob.LastModificationTime = fi.CreationTimeUtc;
+
+            string attrFilePath = path + AttributesFileExtension;
+            if(File.Exists(attrFilePath))
+            {
+               byte[] content = File.ReadAllBytes(attrFilePath);
+               blob.AppendAttributesFromByteArray(content);
+            }
          }
-
-         blob.Size = fi.Length;
-         blob.LastModificationTime = fi.CreationTimeUtc;
-
-         string attrFilePath = path + AttributesFileExtension;
-         if(File.Exists(attrFilePath))
+         catch(IOException)
          {
-            byte[] content = File.ReadAllBytes(attrFilePath);
-            blob.AppendAttributesFromByteArray(content);
+            //sometimes files are locked, inaccessible etc.
          }
       }
 
