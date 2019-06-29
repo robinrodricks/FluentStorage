@@ -305,10 +305,11 @@ namespace Storage.Net.Blobs.Files
 
          try
          {
-            using(Stream fs = File.OpenRead(fi.FullName))
+            //scans the entire file, disable as it's really expensive and slow
+            /*using(Stream fs = File.OpenRead(fi.FullName))
             {
                blob.MD5 = fs.GetHash(HashType.Md5);
-            }
+            }*/
 
             blob.Size = fi.Length;
             blob.LastModificationTime = fi.CreationTimeUtc;

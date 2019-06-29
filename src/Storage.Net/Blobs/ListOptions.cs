@@ -66,11 +66,6 @@ namespace Storage.Net.Blobs
       public bool IncludeAttributes { get; set; } = false;
 
       /// <summary>
-      /// When supported, sets the maximum number of threads to be used for listing operations
-      /// </summary>
-      public int MaxDegreeOfParalellism { get; set; } = 10;
-
-      /// <summary>
       /// Helper method that returns true if a <see cref="Blob"/> matches these list options.
       /// </summary>
       public bool IsMatch(Blob blob)

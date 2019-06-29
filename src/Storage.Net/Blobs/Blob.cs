@@ -33,7 +33,8 @@ namespace Storage.Net.Blobs
 
       /// <summary>
       /// MD5 content hash of the blob. Note that this property can be null if underlying storage has
-      /// no information about the hash.
+      /// no information about the hash, or it's very expensive to calculate it, for instance it would require
+      /// getting a whole content of the blob to hash it.
       /// </summary>
       public string MD5 { get; set; }
 

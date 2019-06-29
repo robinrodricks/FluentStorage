@@ -16,6 +16,8 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 {
    class AzureUniversalBlobStorageProvider : IAzureBlobStorage
    {
+      private const int BrowserParallelism = 10;
+
       private readonly ConcurrentDictionary<string, CloudBlobContainer> _containerNameToContainer =
          new ConcurrentDictionary<string, CloudBlobContainer>();
 
@@ -233,7 +235,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          ListOptions options,
          CancellationToken cancellationToken)
       {
-         var browser = new AzureBlobDirectoryBrowser(container, options.MaxDegreeOfParalellism);
+         var browser = new AzureBlobDirectoryBrowser(container, BrowserParallelism);
          IReadOnlyCollection<Blob> containerBlobs = await browser.ListFolderAsync(options, cancellationToken);
          if(containerBlobs.Count > 0)
          {
