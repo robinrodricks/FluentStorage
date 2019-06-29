@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Storage.Net
 {
@@ -25,6 +26,11 @@ namespace Storage.Net
       public static readonly string RootFolderPath = "/";
 
       /// <summary>
+      /// Folder name for leveling up the path
+      /// </summary>
+      public static readonly string LevelUpFolderName = "..";
+
+      /// <summary>
       /// Combines parts of path
       /// </summary>
       /// <param name="parts"></param>
@@ -37,11 +43,13 @@ namespace Storage.Net
       }
 
       /// <summary>
-      /// Gets parent path of this item
+      /// Gets parent path of this item.
       /// </summary>
       public static string GetParent(string path)
       {
          if (path == null) return null;
+
+         path = Normalize(path);
 
          string[] parts = Split(path);
          if (parts.Length == 0) return null;
@@ -72,7 +80,25 @@ namespace Storage.Net
       {
          if (path == null) return RootFolderPath;
 
-         path = path.Trim(PathSeparator);
+         string[] parts = Split(path);
+
+         var r = new List<string>(parts.Length);
+         foreach(string part in parts)
+         {
+            if(part == LevelUpFolderName)
+            {
+               if(r.Count > 0)
+               {
+                  r.RemoveAt(r.Count - 1);
+               }
+            }
+            else
+            {
+               r.Add(part);
+            }
+
+         }
+         path = string.Join(PathSeparatorString, r);
 
          return includeTrailingRoot ?
             PathSeparatorString + path
@@ -93,7 +119,8 @@ namespace Storage.Net
 
       /// <summary>
       /// Splits path in parts. Leading and trailing path separators are totally ignored. Note that it returns
-      /// null if input path is null.
+      /// null if input path is null. Parent folder signatures are returned as a part of split, they are not removed.
+      /// If you want to get an absolute normalized path use <see cref="Normalize(string, bool)"/>
       /// </summary>
       public static string[] Split(string path)
       {
