@@ -3,7 +3,7 @@ trigger:
   branches:
     include:
       - master
-      - v7
+      - v6
   paths:
     exclude:
       - README.md
@@ -12,6 +12,7 @@ trigger:
 pr:
   branches:
     include:
+      - v6
       - master
   paths:
     exclude:
