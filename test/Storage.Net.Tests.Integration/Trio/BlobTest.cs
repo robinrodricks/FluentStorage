@@ -448,6 +448,19 @@ namespace Storage.Net.Tests.Integration.Blobs
          Assert.Equal(2, blob2.Metadata.Count);
       }
 
+      [Fact]
+      public async Task GetMd5HashAsync()
+      {
+         var blob = new Blob(RandomBlobPath());
+         string content = RandomGenerator.RandomString;
+         string hash = content.GetHash(HashType.Md5);
+
+         await _storage.WriteTextAsync(blob, content);
+
+         string hash2 = await _storage.GetMD5HashAsync(blob);
+         Assert.Equal(hash, hash2);
+      }
+
       private string RandomBlobPath(string prefix = null)
       {
          return _blobPrefix +

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using NetBox;
 using NetBox.Extensions;
 
 namespace Storage.Net.Blobs
@@ -102,17 +103,17 @@ namespace Storage.Net.Blobs
       /// Converts text to blob content and writes to storage
       /// </summary>
       /// <param name="provider"></param>
-      /// <param name="blob">Blob to write</param>
+      /// <param name="fullPath">Blob to write</param>
       /// <param name="text">Text to write, treated in UTF-8 encoding</param>
       /// <param name="cancellationToken"></param>
       /// <returns></returns>
       public static async Task WriteTextAsync(
          this IBlobStorage provider,
-         Blob blob, string text, CancellationToken cancellationToken = default)
+         string fullPath, string text, CancellationToken cancellationToken = default)
       {
          using (Stream s = text.ToMemoryStream())
          {
-            await provider.WriteAsync(blob, s, false, cancellationToken);
+            await provider.WriteAsync(fullPath, s, false, cancellationToken);
          }
       }
 
@@ -339,6 +340,37 @@ namespace Storage.Net.Blobs
          }
       }
 
+      /// <summary>
+      /// Calculates an MD5 hash of a blob. Comparing to <see cref="Blob.MD5"/> field, it always returns
+      /// a hash, even if the underlying storage doesn't support it natively.
+      /// </summary>
+      public static async Task<string> GetMD5HashAsync(this IBlobStorage blobStorage, Blob blob, CancellationToken cancellationToken = default)
+      {
+         if(blob == null)
+            throw new ArgumentNullException(nameof(blob));
+
+         if(blob.MD5 != null)
+            return blob.MD5;
+
+         blob = await blobStorage.GetBlobAsync(blob.FullPath, cancellationToken);
+
+         if(blob.MD5 != null)
+            return blob.MD5;
+
+         //hash definitely not supported, calculate it manually
+
+         using(Stream s = await blobStorage.OpenReadAsync(blob.FullPath, cancellationToken))
+         {
+            if(s == null)
+               return null;
+
+            string hash = s.GetHash(HashType.Md5);
+
+            return hash;
+         }
+      }
+
       #endregion
+
    }
 }
