@@ -78,7 +78,10 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          {
             //try deleting as a folder
             CloudBlobDirectory dir = container.GetDirectoryReference(StoragePath.Normalize(path, false));
-            await new AzureBlobDirectoryBrowser(container, 3).RecursiveDeleteAsync(dir, cancellationToken).ConfigureAwait(false);
+            using(var browser = new AzureBlobDirectoryBrowser(container, 3))
+            {
+               await browser.RecursiveDeleteAsync(dir, cancellationToken).ConfigureAwait(false);
+            }
          }
       }
 
@@ -235,11 +238,13 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          ListOptions options,
          CancellationToken cancellationToken)
       {
-         var browser = new AzureBlobDirectoryBrowser(container, BrowserParallelism);
-         IReadOnlyCollection<Blob> containerBlobs = await browser.ListFolderAsync(options, cancellationToken);
-         if(containerBlobs.Count > 0)
+         using(var browser = new AzureBlobDirectoryBrowser(container, BrowserParallelism))
          {
-            result.AddRange(containerBlobs);
+            IReadOnlyCollection<Blob> containerBlobs = await browser.ListFolderAsync(options, cancellationToken).ConfigureAwait(false);
+            if(containerBlobs.Count > 0)
+            {
+               result.AddRange(containerBlobs);
+            }
          }
       }
 

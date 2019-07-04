@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -8,7 +9,7 @@ using Storage.Net.Blobs;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 {
-   class AzureBlobDirectoryBrowser
+   class AzureBlobDirectoryBrowser : IDisposable
    {
       private readonly CloudBlobContainer _container;
       private readonly SemaphoreSlim _throttler;
@@ -150,5 +151,12 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return blob;
       }
 
+      public void Dispose()
+      {
+         if(_throttler != null)
+         {
+            _throttler.Dispose();
+         }
+      }
    }
 }
