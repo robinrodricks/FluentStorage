@@ -46,6 +46,7 @@ namespace Storage.Net.ConnectionString
 
 
       private static TInstance Create<TInstance>(string connectionString, Func<IConnectionFactory, StorageConnectionString, TInstance> createAction)
+         where TInstance: class
       {
          if (connectionString == null)
          {
