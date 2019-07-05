@@ -178,7 +178,9 @@ namespace Storage.Net.Tests.Integration.Blobs
    {
       protected override IBlobStorage CreateStorage(ITestSettings settings)
       {
-         return StorageFactory.Blobs.Ftp(settings.FtpHostName, new NetworkCredential(settings.FtpUsername, settings.FtpPassword));
+         return StorageFactory.Blobs.Ftp(
+            settings.FtpHostName,
+            new NetworkCredential(settings.FtpUsername, settings.FtpPassword));
       }
    }
 

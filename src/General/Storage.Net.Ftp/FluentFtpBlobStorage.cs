@@ -18,8 +18,11 @@ namespace Storage.Net.Ftp
       private readonly bool _dispose;
       private static readonly AsyncRetryPolicy retryPolicy = Policy.Handle<FtpException>().RetryAsync(3);
 
-      public FluentFtpBlobStorage(string hostNameOrAddress, NetworkCredential credentials)
-         : this(new FtpClient(hostNameOrAddress, credentials), true)
+      public FluentFtpBlobStorage(
+         string hostNameOrAddress,
+         NetworkCredential credentials,
+         FtpDataConnectionType dataConnectionType = FtpDataConnectionType.AutoActive)
+         : this(new FtpClient(hostNameOrAddress, credentials) { DataConnectionType = dataConnectionType }, true)
       {
          
       }
