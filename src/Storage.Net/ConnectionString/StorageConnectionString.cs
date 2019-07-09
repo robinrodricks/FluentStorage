@@ -32,6 +32,11 @@ namespace Storage.Net.ConnectionString
       public string ConnectionString { get; private set; }
 
       /// <summary>
+      /// Connection string parameters exposed as key-value pairs
+      /// </summary>
+      public Dictionary<string, string> Parameters => _parts;
+
+      /// <summary>
       /// Prefix of this connection string, excluding prefix separator, i.e. for 'disk://something' the prefix is 'disk'
       /// </summary>
       public string Prefix { get; private set; }
@@ -78,7 +83,8 @@ namespace Storage.Net.ConnectionString
 
          if(idx == -1)
          {
-            throw new ArgumentException($"prefix separator ({PrefixSeparator}) not present", nameof(connectionString));
+            Prefix = connectionString;
+            return;
          }
 
          Prefix = connectionString.Substring(0, idx);
@@ -95,6 +101,37 @@ namespace Storage.Net.ConnectionString
             string value = kv.Length == 1 ? string.Empty : kv[1];
             _parts[key] = value;
          }
+      }
+
+      /// <summary>
+      /// Returns a string representation of the connection string
+      /// </summary>
+      /// <returns></returns>
+      public override string ToString()
+      {
+         var sb = new StringBuilder();
+         sb.Append(Prefix);
+         sb.Append(PrefixSeparator);
+
+         bool first = true;
+         foreach(KeyValuePair<string, string> pair in _parts)
+         {
+            if(first)
+            {
+               first = false;
+            }
+            else
+            {
+               sb.Append(PartsSeparators);
+               first = false;
+            }
+
+            sb.Append(pair.Key);
+            sb.Append(PartSeparator);
+            sb.Append(pair.Value);
+         }
+
+         return sb.ToString();
       }
    }
 }

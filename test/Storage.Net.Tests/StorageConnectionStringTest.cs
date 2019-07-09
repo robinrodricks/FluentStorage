@@ -27,5 +27,24 @@ namespace Storage.Net.Tests
          Assert.Equal("keywithequals==", key);
          Assert.Equal("me", container);
       }
+
+      [Fact]
+      public void Construct_with_prefix()
+      {
+         var cs = new StorageConnectionString("disk");
+
+         Assert.Equal("disk", cs.Prefix);
+         Assert.Empty(cs.Parameters);
+      }
+
+      [Fact]
+      public void Build_with_parameter_map()
+      {
+         var cs = new StorageConnectionString("aws.s3");
+         cs.Parameters["key1"] = "value1";
+         cs.Parameters["key2"] = "value2";
+
+         Assert.Equal("aws.s3://key1=value1;key2=value2", cs.ToString());
+      }
    }
 }
