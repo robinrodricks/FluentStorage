@@ -1,4 +1,5 @@
 ﻿using Storage.Net.Blobs;
+using Storage.Net.Microsoft.Azure.KeyVault;
 using Storage.Net.Microsoft.Azure.KeyVault.Blobs;
 using System;
 using System.Net;
@@ -7,6 +8,11 @@ namespace Storage.Net
 {
    public static class Factory
    {
+      public static IModulesFactory UseAzureKeyVault(this IModulesFactory factory)
+      {
+         return factory.Use(new ExternalModule());
+      }
+
       /// <summary>
       /// Azure Key Vault secrets.
       /// </summary>
