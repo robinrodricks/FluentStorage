@@ -7,7 +7,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Models
    {
       [JsonProperty("contentLength")] public int? ContentLength { get; set; }
 
-      [JsonProperty("etag")] public DateTime Etag { get; set; }
+      [JsonProperty("etag")] public string Etag { get; set; }
 
       [JsonProperty("group")] public string Group { get; set; }
 
