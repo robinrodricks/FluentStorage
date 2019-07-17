@@ -1,6 +1,6 @@
 ﻿# Storage.Net
 ### One Interface To Rule Them All
-[![NuGet](https://img.shields.io/nuget/v/Storage.Net.svg)](https://www.nuget.org/packages/Storage.Net/) [![](https://img.shields.io/azure-devops/build/aloneguid/4bab84c0-90f7-4425-afc6-ba077aa9757e/49/master.svg)](https://aloneguid.visualstudio.com/AllPublic/_build?definitionId=49)  [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=aloneguid_storage&metric=ncloc)](https://sonarcloud.io/dashboard?id=aloneguid_storage) [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=aloneguid_storage&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=aloneguid_storage) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=aloneguid_storage&metric=security_rating)](https://sonarcloud.io/dashboard?id=aloneguid_storage) [![open collective backers and sponsors](https://img.shields.io/opencollective/all/storagedotnet.svg)](https://opencollective.com/storagedotnet)
+[![NuGet](https://img.shields.io/nuget/v/Storage.Net.svg)](https://www.nuget.org/packages/Storage.Net/) [![](https://img.shields.io/azure-devops/build/aloneguid/4bab84c0-90f7-4425-afc6-ba077aa9757e/49/master.svg)](https://aloneguid.visualstudio.com/AllPublic/_build?definitionId=49) [![open collective backers and sponsors](https://img.shields.io/opencollective/all/storagedotnet.svg)](https://opencollective.com/storagedotnet)
 
 ![Slide](doc/slide.svg)
 
