@@ -21,6 +21,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.KeyValue
       private const int MaxInsertLimit = 100;
       private const string PartitionKeyName = "PartitionKey";
       private const string RowKeyName = "RowKey";
+      private const string Timestamp = "Timestamp";
       private readonly CloudTableClient _client;
       private static readonly ConcurrentDictionary<string, TableTag> TableNameToTableTag = new ConcurrentDictionary<string, TableTag>();
       private static readonly Regex TableNameRgx = new Regex("^[A-Za-z][A-Za-z0-9]{2,62}$");
@@ -410,6 +411,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.KeyValue
                   break;
             }
          }
+         result[Timestamp] = az.Timestamp;
          return result;
       }
 
