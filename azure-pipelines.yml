@@ -66,11 +66,11 @@ stages:
         arguments: '-c release'
 
     - task: DotNetCoreCLI@2
-      displayName: 'Integration and Unit Test (with coverlet)'
+      displayName: 'Unit Tests'
       continueOnError: true
       inputs:
         command: test
-        projects: ./src/storage.sln
+        projects: test/Storage.Net.Tests/Storage.Net.Tests.csproj
         #arguments: '/p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Exclude="[xunit*]*%2c[*Test*]*" /p:CoverletOutput=$(Build.StagingDirectory)/coverage.xml'
 
     - task: CopyFiles@2
