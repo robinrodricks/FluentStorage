@@ -70,7 +70,31 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
       private static Blob ToBlobId(SecretItem item)
       {
          int idx = item.Id.LastIndexOf('/');
-         return new Blob(item.Id.Substring(idx + 1), BlobItemKind.File);
+         var blob = new Blob(item.Id.Substring(idx + 1), BlobItemKind.File);
+
+         blob.LastModificationTime = item.Attributes.Updated;
+
+         blob.Properties = new Dictionary<string, string>();
+         if(item.Attributes.Created != null)
+            blob.Properties["Created"] = item.Attributes.Created.Value.ToIso8601DateString();
+         if(item.Attributes.Enabled != null)
+            blob.Properties["Enabled"] = item.Attributes.Enabled.Value.ToString();
+         if(item.Attributes.Expires != null)
+            blob.Properties["Expires"] = item.Attributes.Expires.Value.ToIso8601DateString();
+         if(item.Attributes.NotBefore != null)
+            blob.Properties["NotBefore"] = item.Attributes.NotBefore.Value.ToIso8601DateString();
+         if(item.Attributes.RecoveryLevel != null)
+            blob.Properties["RecoveryLevel"] = item.Attributes.RecoveryLevel;
+
+         if(item.ContentType != null)
+            blob.Properties["ContentType"] = item.ContentType;
+         if(item.Managed != null)
+            blob.Properties["Managed"] = item.Managed.Value.ToString();
+
+         if(item.Tags != null && item.Tags.Count > 0)
+            blob.Metadata = new Dictionary<string, string>(item.Tags);
+
+         return blob;
       }
 
       public Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
