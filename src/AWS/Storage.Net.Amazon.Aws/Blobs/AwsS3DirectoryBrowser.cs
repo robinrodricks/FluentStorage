@@ -37,7 +37,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
             List<Blob> blobs = response.S3Objects
                .Where(s3Obj => !s3Obj.Key.EndsWith("/")) //these are "folders" in S3, but they don't always exist
-               .Select(s3Obj => new Blob(StoragePath.RootFolderPath, s3Obj.Key, BlobItemKind.File))
+               .Select(s3Obj => new Blob(StoragePath.RootFolderPath, s3Obj.Key, BlobItemKind.File) { Size = s3Obj.Size } )
                .Where(options.IsMatch)
                .Where(b => (options.FolderPath == null || StoragePath.ComparePath(b.FolderPath, options.FolderPath)))
                .Where(b => options.BrowseFilter == null || options.BrowseFilter(b))
