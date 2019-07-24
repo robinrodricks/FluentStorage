@@ -36,8 +36,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
             ListObjectsV2Response response = await _client.ListObjectsV2Async(request, cancellationToken).ConfigureAwait(false);
 
             List<Blob> blobs = response.S3Objects
-               .Where(s3Obj => !s3Obj.Key.EndsWith("/")) //these are "folders" in S3, but they don't always exist
-               .Select(s3Obj => new Blob(StoragePath.RootFolderPath, s3Obj.Key, BlobItemKind.File) { Size = s3Obj.Size } )
+               .Select(ToBlob)
                .Where(options.IsMatch)
                .Where(b => (options.FolderPath == null || StoragePath.ComparePath(b.FolderPath, options.FolderPath)))
                .Where(b => options.BrowseFilter == null || options.BrowseFilter(b))
@@ -57,6 +56,14 @@ namespace Storage.Net.Amazon.Aws.Blobs
          }
 
          return result;
+      }
+
+      private static Blob ToBlob(S3Object s3Obj)
+      {
+         if(s3Obj.Key.EndsWith("/"))
+            return new Blob(s3Obj.Key, BlobItemKind.Folder);
+
+         return new Blob(StoragePath.RootFolderPath, s3Obj.Key, BlobItemKind.File) { Size = s3Obj.Size };
       }
 
       public async Task DeleteRecursiveAsync(string fullPath, CancellationToken cancellationToken)
