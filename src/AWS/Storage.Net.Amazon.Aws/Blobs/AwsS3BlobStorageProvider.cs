@@ -24,7 +24,9 @@ namespace Storage.Net.Amazon.Aws.Blobs
       private readonly string _bucketName;
       private readonly AmazonS3Client _client;
       private readonly TransferUtility _fileTransferUtility;
-      private bool _initialised;
+      private bool _skipBucketCreation = false;
+      private bool _initialised = false;
+      
 
       /// <summary>
       /// Returns reference to the native AWS S3 blob client.
@@ -33,42 +35,57 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
       //https://github.com/awslabs/aws-sdk-net-samples/blob/master/ConsoleSamples/AmazonS3Sample/AmazonS3Sample/S3Sample.cs
 
+
+      /// <summary>
+      /// Creates a new instance of <see cref="AwsS3BlobStorageProvider"/> for a given region endpoint, and will assume the runnning AWS ECS Task role credentials or Lambda role credentials />
+      /// </summary>
+      public AwsS3BlobStorageProvider(string bucketName, RegionEndpoint regionEndpoint, bool skipBucketCreation = false)
+      {
+
+         _bucketName = bucketName ?? throw new ArgumentNullException(nameof(bucketName));
+         _client = new AmazonS3Client(regionEndpoint);
+         _skipBucketCreation = skipBucketCreation;
+         _fileTransferUtility = new TransferUtility(_client);
+
+      }
+
+
       /// <summary>
       /// Creates a new instance of <see cref="AwsS3BlobStorageProvider"/> for a given region endpoint/>
       /// </summary>
-      public AwsS3BlobStorageProvider(string accessKeyId, string secretAccessKey, string bucketName, RegionEndpoint regionEndpoint)
-         : this(accessKeyId, secretAccessKey, bucketName, new AmazonS3Config { RegionEndpoint = regionEndpoint ?? RegionEndpoint.EUWest1 })
+      public AwsS3BlobStorageProvider(string accessKeyId, string secretAccessKey, string bucketName, RegionEndpoint regionEndpoint, bool skipBucketCreation = false)
+         : this(accessKeyId, secretAccessKey, bucketName, new AmazonS3Config { RegionEndpoint = regionEndpoint ?? RegionEndpoint.EUWest1 }, skipBucketCreation)
       {
       }
 
       /// <summary>
       /// Creates a new instance of <see cref="AwsS3BlobStorageProvider"/> for an S3-compatible storage provider hosted on an alternative service URL/>
       /// </summary>
-      public AwsS3BlobStorageProvider(string accessKeyId, string secretAccessKey, string bucketName, string serviceUrl)
+      public AwsS3BlobStorageProvider(string accessKeyId, string secretAccessKey, string bucketName, string serviceUrl, bool skipBucketCreation = false)
          : this(accessKeyId, secretAccessKey, bucketName, new AmazonS3Config
          {
             RegionEndpoint = RegionEndpoint.USEast1,
             ServiceURL = serviceUrl
-         })
+         }, skipBucketCreation)
       {
       }
 
       /// <summary>
       /// Creates a new instance of <see cref="AwsS3BlobStorageProvider"/> for a given S3 client configuration/>
       /// </summary>
-      public AwsS3BlobStorageProvider(string accessKeyId, string secretAccessKey, string bucketName, AmazonS3Config clientConfig)
+      public AwsS3BlobStorageProvider(string accessKeyId, string secretAccessKey, string bucketName, AmazonS3Config clientConfig, bool skipBucketCreation = false)
       {
          if (accessKeyId == null) throw new ArgumentNullException(nameof(accessKeyId));
          if (secretAccessKey == null) throw new ArgumentNullException(nameof(secretAccessKey));
          _bucketName = bucketName ?? throw new ArgumentNullException(nameof(bucketName));
-
+         _skipBucketCreation = skipBucketCreation;
          _client = new AmazonS3Client(new BasicAWSCredentials(accessKeyId, secretAccessKey), clientConfig);
          _fileTransferUtility = new TransferUtility(_client);
       }
 
       private async Task<AmazonS3Client> GetClientAsync()
       {
-         if (!_initialised)
+         if (!_initialised && !_skipBucketCreation)
          {
             try
             {
