@@ -25,9 +25,13 @@ namespace Storage.Net.Amazon.Aws.Blobs
       {
          var container = new List<Blob>();
 
-         await ListFolderAsync(container, options.FolderPath, options, cancellationToken);
+         await ListFolderAsync(container, options.FolderPath, options, cancellationToken).ConfigureAwait(false);
 
-         return container;
+         return options.MaxResults == null
+            ? container
+            : container.Count > options.MaxResults.Value
+               ? container.Take(options.MaxResults.Value).ToList()
+               : container;
       }
 
       private async Task ListFolderAsync(List<Blob> container, string path, ListOptions options, CancellationToken cancellationToken)
@@ -39,16 +43,27 @@ namespace Storage.Net.Amazon.Aws.Blobs
             Delimiter = "/"   //this tells S3 not to go into the folder recursively
          };
 
+         var folderContainer = new List<Blob>();
+
          while(options.MaxResults == null || (container.Count < options.MaxResults))
          {
             ListObjectsV2Response response = await _client.ListObjectsV2Async(request, cancellationToken).ConfigureAwait(false);
 
-            container.AddRange(ToBlobs(path, response, options));
+            folderContainer.AddRange(ToBlobs(path, response, options));
 
             if(response.NextContinuationToken == null)
                break;
 
             request.ContinuationToken = response.NextContinuationToken;
+         }
+
+         container.AddRange(folderContainer);
+
+         if(options.Recurse)
+         {
+            List<Blob> folders = folderContainer.Where(b => b.Kind == BlobItemKind.Folder).ToList();
+
+            await Task.WhenAll(folders.Select(f => ListFolderAsync(container, f.FullPath, options, cancellationToken))).ConfigureAwait(false);
          }
       }
 
