@@ -115,9 +115,11 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
          AmazonS3Client client = await GetClientAsync().ConfigureAwait(false);
 
-         IReadOnlyCollection<Blob> blobs = await new AwsS3DirectoryBrowser(client, _bucketName)
-            .ListAsync(options, cancellationToken)
-            .ConfigureAwait(false);
+         IReadOnlyCollection<Blob> blobs;
+         using(var browser = new AwsS3DirectoryBrowser(client, _bucketName))
+         {
+            blobs = await browser.ListAsync(options, cancellationToken).ConfigureAwait(false);
+         }
 
          if(options.IncludeAttributes)
          {
@@ -177,7 +179,10 @@ namespace Storage.Net.Amazon.Aws.Blobs
          fullPath = StoragePath.Normalize(fullPath, false);
          
          await client.DeleteObjectAsync(_bucketName, fullPath, cancellationToken).ConfigureAwait(false);
-         await new AwsS3DirectoryBrowser(client, _bucketName).DeleteRecursiveAsync(fullPath, cancellationToken).ConfigureAwait(false);
+         using(var browser = new AwsS3DirectoryBrowser(client, _bucketName))
+         {
+            await browser.DeleteRecursiveAsync(fullPath, cancellationToken).ConfigureAwait(false);
+         }
       }
 
       public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)

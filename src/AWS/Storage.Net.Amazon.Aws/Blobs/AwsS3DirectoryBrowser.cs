@@ -6,14 +6,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
+using NetBox.Async;
 using Storage.Net.Blobs;
 
 namespace Storage.Net.Amazon.Aws.Blobs
 {
-   class AwsS3DirectoryBrowser
+   class AwsS3DirectoryBrowser : IDisposable
    {
       private readonly AmazonS3Client _client;
       private readonly string _bucketName;
+      private readonly AsyncLimiter _limiter = new AsyncLimiter(10);
 
       public AwsS3DirectoryBrowser(AmazonS3Client client, string bucketName)
       {
@@ -47,7 +49,12 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
          while(options.MaxResults == null || (container.Count < options.MaxResults))
          {
-            ListObjectsV2Response response = await _client.ListObjectsV2Async(request, cancellationToken).ConfigureAwait(false);
+            ListObjectsV2Response response;
+
+            using(await _limiter.AcquireOneAsync().ConfigureAwait(false))
+            {
+               response = await _client.ListObjectsV2Async(request, cancellationToken).ConfigureAwait(false);
+            }
 
             folderContainer.AddRange(ToBlobs(path, response, options));
 
@@ -132,6 +139,11 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
             request.ContinuationToken = response.NextContinuationToken;
          }
+      }
+
+      public void Dispose()
+      {
+         _limiter.Dispose();
       }
    }
 }
