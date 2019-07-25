@@ -210,6 +210,20 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
+      public async Task List_folder_nonrecursively_no_children()
+      {
+         await _storage.WriteTextAsync("/sub/one.txt", "test");
+         await _storage.WriteTextAsync("/sub/sub/two.txt", "test");
+
+         IReadOnlyCollection<Blob> subItems = await _storage.ListAsync(recurse: false, folderPath: "sub");
+         Assert.Equal(2, subItems.Count);
+
+
+         Assert.Contains(new Blob("/sub/one.txt"), subItems);
+         Assert.Contains(new Blob("/sub/sub", BlobItemKind.Folder), subItems);
+      }
+
+      [Fact]
       public async Task GetBlob_for_one_file_succeeds()
       {
          string content = RandomGenerator.GetRandomString(1000, false);

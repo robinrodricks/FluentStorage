@@ -83,7 +83,8 @@ namespace Storage.Net.Blobs
       public Blob(string folderPath, string name, BlobItemKind kind)
       {
          Name = name ?? throw new ArgumentNullException(nameof(name));
-         FolderPath = folderPath;
+         Name = StoragePath.NormalizePart(Name);
+         FolderPath = StoragePath.Normalize(folderPath);
          Kind = kind;
       }
 

@@ -23,39 +23,70 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
       public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken)
       {
-         var result = new List<Blob>();
+         var container = new List<Blob>();
 
+         await ListFolderAsync(container, options.FolderPath, options, cancellationToken);
+
+         return container;
+      }
+
+      private async Task ListFolderAsync(List<Blob> container, string path, ListOptions options, CancellationToken cancellationToken)
+      {
          var request = new ListObjectsV2Request()
          {
             BucketName = _bucketName,
-            Prefix = options.FilePrefix ?? null
+            Prefix = FormatFolderPrefix(path),
+            Delimiter = "/"   //this tells S3 not to go into the folder recursively
          };
 
-         while(options.MaxResults == null || (result.Count < options.MaxResults))
+         while(options.MaxResults == null || (container.Count < options.MaxResults))
          {
             ListObjectsV2Response response = await _client.ListObjectsV2Async(request, cancellationToken).ConfigureAwait(false);
 
-            List<Blob> blobs = response.S3Objects
-               .Select(ToBlob)
-               .Where(options.IsMatch)
-               .Where(b => (options.FolderPath == null || StoragePath.ComparePath(b.FolderPath, options.FolderPath)))
-               .Where(b => options.BrowseFilter == null || options.BrowseFilter(b))
-               .ToList();
-
-            result.AddRange(blobs);
+            container.AddRange(ToBlobs(path, response, options));
 
             if(response.NextContinuationToken == null)
                break;
 
             request.ContinuationToken = response.NextContinuationToken;
          }
+      }
 
-         if(options.MaxResults != null && result.Count > options.MaxResults)
-         {
-            result = result.Take((int)options.MaxResults).ToList();
-         }
+      private static IReadOnlyCollection<Blob> ToBlobs(string path, ListObjectsV2Response response, ListOptions options)
+      {
+         var result = new List<Blob>();
+
+         //the files are listed as the S3Objects member, but they don't specifically contain folders,
+         //but even if they do, they need to be filtered out
+
+         result.AddRange(
+            response.S3Objects
+               .Where(b => !b.Key.EndsWith("/")) //check if this is "virtual folder" as S3 console creates them (rubbish)
+               .Select(ToBlob)
+               .Where(options.IsMatch)
+               .Where(b => options.BrowseFilter == null || options.BrowseFilter(b)));
+
+         //subfolders are listed in another field (what a funny name!)
+
+         //prefix is absolute too
+         result.AddRange(
+            response.CommonPrefixes
+               .Select(p => new Blob(p, BlobItemKind.Folder)));
 
          return result;
+      }
+
+      private static string FormatFolderPrefix(string folderPath)
+      {
+         folderPath = StoragePath.Normalize(folderPath);
+
+         if(StoragePath.IsRootPath(folderPath))
+            return null;
+
+         if(!folderPath.EndsWith("/"))
+            folderPath += "/";
+
+         return folderPath;
       }
 
       private static Blob ToBlob(S3Object s3Obj)
@@ -63,7 +94,8 @@ namespace Storage.Net.Amazon.Aws.Blobs
          if(s3Obj.Key.EndsWith("/"))
             return new Blob(s3Obj.Key, BlobItemKind.Folder);
 
-         return new Blob(StoragePath.RootFolderPath, s3Obj.Key, BlobItemKind.File) { Size = s3Obj.Size };
+         //Key is an absolute path
+         return new Blob(s3Obj.Key, BlobItemKind.File) { Size = s3Obj.Size };
       }
 
       public async Task DeleteRecursiveAsync(string fullPath, CancellationToken cancellationToken)
