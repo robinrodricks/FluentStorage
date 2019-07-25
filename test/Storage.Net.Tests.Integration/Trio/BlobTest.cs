@@ -105,9 +105,10 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task List_FilesInFolder_Recursive()
       {
-         string id1 = RandomBlobPath();
-         string id2 = StoragePath.Combine(RandomBlobPath(), RandomGenerator.RandomString);
-         string id3 = StoragePath.Combine(RandomBlobPath(), RandomGenerator.RandomString, RandomGenerator.RandomString);
+         string folderPath = RandomBlobPath();
+         string id1 = StoragePath.Combine(folderPath, "1.txt");
+         string id2 = StoragePath.Combine(folderPath, "sub", "2.txt");
+         string id3 = StoragePath.Combine(folderPath, "sub", "3.txt");
 
          try
          {
@@ -115,7 +116,9 @@ namespace Storage.Net.Tests.Integration.Blobs
             await _storage.WriteTextAsync(id2, RandomGenerator.RandomString);
             await _storage.WriteTextAsync(id3, RandomGenerator.RandomString);
 
-            await _storage.ListAsync(new ListOptions { Recurse = true });
+            IReadOnlyCollection<Blob> items = await _storage.ListAsync(recurse: true, folderPath: folderPath);
+            Assert.Equal(4, items.Count); //1.txt + sub (folder) + 2.txt + 3.txt
+
          }
          catch(NotSupportedException)
          {
@@ -207,6 +210,27 @@ namespace Storage.Net.Tests.Integration.Blobs
 
          //assert
          Assert.True(blobs.Count >= count, $"expected over {count}, but received only {blobs.Count}");
+      }
+
+      [Fact]
+      public async Task List_folder_nonrecursively_no_children()
+      {
+         try
+         {
+            await _storage.WriteTextAsync("/sub/one.txt", "test");
+            await _storage.WriteTextAsync("/sub/sub/two.txt", "test");
+
+            IReadOnlyCollection<Blob> subItems = await _storage.ListAsync(recurse: false, folderPath: "sub");
+            Assert.Equal(2, subItems.Count);
+
+
+            Assert.Contains(new Blob("/sub/one.txt"), subItems);
+            Assert.Contains(new Blob("/sub/sub", BlobItemKind.Folder), subItems);
+         }
+         catch(NotSupportedException)
+         {
+            //hierarchy not supported
+         }
       }
 
       [Fact]

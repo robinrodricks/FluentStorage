@@ -217,6 +217,21 @@ namespace Storage.Net.Blobs
             tag.blob.MD5 = data.GetHash(HashType.Md5).ToHexString();
          }
          _pathToTag[fullPath] = tag;
+
+         AddVirtualFolderHierarchy(tag.blob);
+      }
+
+      private void AddVirtualFolderHierarchy(Blob fileBlob)
+      {
+         string path = fileBlob.FolderPath;
+
+         while(!StoragePath.IsRootPath(path))
+         {
+            var vf = new Blob(path, BlobItemKind.Folder);
+            _pathToTag[path] = new Tag { blob = vf };
+
+            path = StoragePath.GetParent(path);
+         }
       }
 
       private bool Exists(string fullPath)

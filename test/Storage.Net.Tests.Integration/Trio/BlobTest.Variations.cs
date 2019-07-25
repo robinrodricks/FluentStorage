@@ -46,7 +46,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
    }
 
-   public class AzureDataLakeGen2ClientSecretStorageFixture : BlobFixture
+   /*public class AzureDataLakeGen2ClientSecretStorageFixture : BlobFixture
    {
       public AzureDataLakeGen2ClientSecretStorageFixture() : base("test/")
       {
@@ -92,7 +92,7 @@ namespace Storage.Net.Tests.Integration.Blobs
          base(fixture)
       {
       }
-   }
+   }*/
 
    public class DiskDirectoryStorageFixture : BlobFixture
    {

@@ -78,7 +78,7 @@ namespace Storage.Net
       /// <param name="includeTrailingRoot">When true, includes trailing '/' as path prefix</param>
       public static string Normalize(string path, bool includeTrailingRoot = false)
       {
-         if (path == null) return RootFolderPath;
+         if (StoragePath.IsRootPath(path)) return RootFolderPath;
 
          string[] parts = Split(path);
 
