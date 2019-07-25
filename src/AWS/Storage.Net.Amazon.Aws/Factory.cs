@@ -22,6 +22,24 @@ namespace Storage.Net
          return factory.Use(new AwsStorageModule());
       }
 
+
+      /// <summary>
+      /// Creates an Amazon S3 storage using assumed role permissions (useful when running the code wform within ECS tasks or lambda where you don't need to provide and manage accessKeys and secrets as the permissions are assumed via the IAM role the lambda or ecs tasks has assigned to it)
+      /// </summary>
+      /// <param name="factory">Factory reference</param>
+      /// <param name="bucketName">Bucket name</param>
+      /// <param name="regionEndpoint">Optionally set region endpoint. When not specified defaults to EU West</param>
+      /// <param name="skipBucketCreation">Directive to skip the creation of the S3 bucket if one does not exist</param>
+      /// <returns>A reference to the created storage</returns>
+      public static IBlobStorage AmazonS3BlobStorage(this IBlobStorageFactory factory,
+         string bucketName,
+         RegionEndpoint regionEndpoint = null,
+         bool skipBucketCreation = false)
+      {
+         return new AwsS3BlobStorageProvider(bucketName, regionEndpoint, skipBucketCreation);
+      }
+
+
       /// <summary>
       /// Creates an Amazon S3 storage
       /// </summary>
