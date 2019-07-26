@@ -49,14 +49,14 @@ namespace Storage.Net.Blobs
       public string FullPath => StoragePath.Combine(FolderPath, Name);
 
       /// <summary>
-      /// Custom provider-specific properties
+      /// Custom provider-specific properties. Key names are case-insensitive.
       /// </summary>
-      public Dictionary<string, string> Properties { get; set; }
+      public Dictionary<string, string> Properties { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
       /// <summary>
-      /// User defined metadata
+      /// User defined metadata. Key names are case-insensitive.
       /// </summary>
-      public Dictionary<string, string> Metadata { get; set; }
+      public Dictionary<string, string> Metadata { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
       /// <summary>
       /// Create a new instance
@@ -200,7 +200,6 @@ namespace Storage.Net.Blobs
                int count = b.ReadInt32();
                if(count > 0)
                {
-                  Metadata = new Dictionary<string, string>();
                   for(int i = 0; i < count; i++)
                   {
                      string key = b.ReadString();
