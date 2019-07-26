@@ -80,14 +80,6 @@ stages:
   jobs:
   - job: Platform
     displayName: 'Tests'
-    strategy:
-      matrix:
-        Windows:
-           image: 'windows-2019'
-        Linux:
-           image: 'ubuntu-16.04'
-        MacOSX:
-           image: 'macOS-10.14'
     pool:
       vmImage: $(image)
     steps:
@@ -100,7 +92,7 @@ stages:
 
 
 - stage: Deploy
-  dependsOn: ['Build', 'Test'] 
+  dependsOn: ['Build'] 
   condition: "eq(variables['Build.SourceBranch'], 'refs/heads/master')"
   #condition: "and( or( eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/v7') ), succeeded('Build') )"
   jobs:
