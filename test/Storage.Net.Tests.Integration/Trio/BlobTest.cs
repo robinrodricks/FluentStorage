@@ -201,7 +201,10 @@ namespace Storage.Net.Tests.Integration.Blobs
 
          //something like FTP doesn't support multiple connections, however this should be implemented in FTP provider itself
 
-         await Task.WhenAll(Enumerable.Range(0, count).Select(i => _storage.WriteTextAsync(RandomBlobPath(), "123")));
+         for(int it = 0; it < 50; it++)
+         {
+            await Task.WhenAll(Enumerable.Range(0, 10).Select(i => _storage.WriteTextAsync(RandomBlobPath(), "123")));
+         }
 
          //act
          IReadOnlyCollection<Blob> blobs = await _storage.ListAsync(folderPath: _blobPrefix);
