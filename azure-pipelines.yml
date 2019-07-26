@@ -81,7 +81,7 @@ stages:
   - job: Platform
     displayName: 'Tests'
     pool:
-      vmImage: $(image)
+      vmImage: $(vmImage)
     steps:
     - task: DotNetCoreCLI@2
       displayName: 'run tests'
