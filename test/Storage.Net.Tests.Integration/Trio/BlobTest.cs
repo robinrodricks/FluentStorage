@@ -443,6 +443,9 @@ namespace Storage.Net.Tests.Integration.Blobs
          try
          {
             await _storage.SetBlobAsync(blob);
+
+            //sometime because of eventual consistency you have to wait
+            await Task.Delay(2000);
          }
          catch(NotSupportedException)
          {
