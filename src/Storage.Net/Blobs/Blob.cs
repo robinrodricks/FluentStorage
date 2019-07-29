@@ -89,6 +89,11 @@ namespace Storage.Net.Blobs
       }
 
       /// <summary>
+      /// Returns true if this item is a folder and it's a root folder
+      /// </summary>
+      public bool IsRootFolder => Kind == BlobItemKind.Folder && StoragePath.IsRootPath(FolderPath);
+
+      /// <summary>
       /// Full blob info, i.e type, id and path
       /// </summary>
       public override string ToString()
