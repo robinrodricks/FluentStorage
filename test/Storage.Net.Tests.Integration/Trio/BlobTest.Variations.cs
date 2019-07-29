@@ -184,11 +184,12 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
    }
 
+   /* i don't have an ftp server anymore
    public class FtpTest : BlobTest, IClassFixture<FtpFixture>
    {
       public FtpTest(FtpFixture fixture) : base(fixture)
       {
 
       }
-   }
+   }*/
 }
