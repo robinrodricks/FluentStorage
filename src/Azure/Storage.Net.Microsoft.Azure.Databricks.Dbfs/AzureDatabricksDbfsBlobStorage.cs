@@ -31,12 +31,12 @@ namespace Storage.Net.Microsoft.Azure.Databricks.Dbfs
 
       public Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
-      public void Dispose()
+      public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-
+         throw new NotImplementedException();
       }
-      public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-      public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+      public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) => throw new NotSupportedException();
 
       public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default)
       {
@@ -69,13 +69,33 @@ namespace Storage.Net.Microsoft.Azure.Databricks.Dbfs
 
          var ms = new MemoryStream(0);
          await _dbfs.Download(fullPath, ms);
+         ms.Position = 0;
 
          return ms;
       }
 
       public Task<ITransaction> OpenTransactionAsync() => Task.FromResult(EmptyTransaction.Instance);
 
-      public Task<Stream> OpenWriteAsync(string fullPath, bool append = false, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-      public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public Task<Stream> OpenWriteAsync(string fullPath, bool append = false, CancellationToken cancellationToken = default)
+      {
+         CheckReadOnly();
+
+         throw new NotImplementedException();
+      }
+
+      public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
+      public void Dispose()
+      {
+
+      }
+
+      private void CheckReadOnly()
+      {
+         if(_isReadOnly)
+         {
+            throw new InvalidOperationException("file system is read-only");
+         }
+      }
    }
 }
