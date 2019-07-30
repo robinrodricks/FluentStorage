@@ -192,4 +192,21 @@ namespace Storage.Net.Tests.Integration.Blobs
 
       }
    }*/
+
+   public class AzdbfsFixture : BlobFixture
+   {
+      protected override IBlobStorage CreateStorage(ITestSettings settings)
+      {
+         return StorageFactory.Blobs.AzureDatabricksDbfs(settings.DatabricksBaseUri, settings.DatabricksToken, true);
+      }
+   }
+
+#if DEBUG
+   public class AzdbfsTest : BlobTest, IClassFixture<AzdbfsFixture>
+   {
+      public AzdbfsTest(AzdbfsFixture fixture) : base(fixture)
+      {
+      }
+   }
+#endif
 }
