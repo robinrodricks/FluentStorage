@@ -25,12 +25,14 @@ namespace Storage.Net
       /// <param name="factory"></param>
       /// <param name="baseUri"></param>
       /// <param name="token"></param>
+      /// <param name="isReadOnly">When true, all the write operations will throw <see cref="InvalidOperationException"/></param>
       /// <returns></returns>
       public static IBlobStorage AzureDatabricksDbfs(this IBlobStorageFactory factory,
          string baseUri,
-         string token)
+         string token,
+         bool isReadOnly)
       {
-         return new AzureDatabricksDbfsBlobStorage(baseUri, token);
+         return new AzureDatabricksDbfsBlobStorage(baseUri, token, isReadOnly);
       }
    }
 }

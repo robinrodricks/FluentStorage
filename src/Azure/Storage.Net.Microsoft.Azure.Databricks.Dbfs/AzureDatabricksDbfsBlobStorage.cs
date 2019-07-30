@@ -15,8 +15,9 @@ namespace Storage.Net.Microsoft.Azure.Databricks.Dbfs
    {
       private readonly DatabricksClient _client;
       private readonly IDbfsApi _dbfs;
+      private readonly bool _isReadOnly;
 
-      public AzureDatabricksDbfsBlobStorage(string baseUri, string token)
+      public AzureDatabricksDbfsBlobStorage(string baseUri, string token, bool isReadOnly)
       {
          if(baseUri is null)
             throw new ArgumentNullException(nameof(baseUri));
@@ -25,6 +26,7 @@ namespace Storage.Net.Microsoft.Azure.Databricks.Dbfs
 
          _client = DatabricksClient.CreateClient(baseUri, token);
          _dbfs = _client.Dbfs;
+         _isReadOnly = isReadOnly;
       }
 
       public Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) => throw new NotImplementedException();
@@ -61,8 +63,18 @@ namespace Storage.Net.Microsoft.Azure.Databricks.Dbfs
          }
       }
 
-      public Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-      public Task<ITransaction> OpenTransactionAsync() => throw new NotImplementedException();
+      public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
+      {
+         fullPath = StoragePath.Normalize(fullPath, true);
+
+         var ms = new MemoryStream(0);
+         await _dbfs.Download(fullPath, ms);
+
+         return ms;
+      }
+
+      public Task<ITransaction> OpenTransactionAsync() => Task.FromResult(EmptyTransaction.Instance);
+
       public Task<Stream> OpenWriteAsync(string fullPath, bool append = false, CancellationToken cancellationToken = default) => throw new NotImplementedException();
       public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) => throw new NotImplementedException();
    }
