@@ -121,7 +121,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
          if(options.IncludeAttributes)
          {
-            foreach(IEnumerable<Blob> page in blobs.Chunk(ListChunkSize))
+            foreach(IEnumerable<Blob> page in blobs.Where(b => !b.IsFolder).Chunk(ListChunkSize))
             {
                await Converter.AppendMetadataAsync(client, _bucketName, page, cancellationToken).ConfigureAwait(false);
             }
