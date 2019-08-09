@@ -440,8 +440,6 @@ namespace Storage.Net.Tests.Integration.Blobs
          blob.Metadata["fun"] = "no";
          await _storage.WriteTextAsync(blob, "test2");
 
-         await _storage.WriteTextAsync(StoragePath.Combine(RandomBlobPath(), Guid.NewGuid().ToString()), "subfolder");
-
          try
          {
             await _storage.SetBlobAsync(blob);
@@ -474,11 +472,12 @@ namespace Storage.Net.Tests.Integration.Blobs
          Assert.Equal(hash, hash2);
       }
 
-      private string RandomBlobPath(string prefix = null)
+      private string RandomBlobPath(string prefix = null, string subfolder = null, string extension = "")
       {
-         return _blobPrefix +
-            (prefix == null ? string.Empty : prefix) +
-            Guid.NewGuid().ToString();
+         return StoragePath.Combine(
+            _blobPrefix,
+            subfolder,
+            (prefix ?? "") + Guid.NewGuid().ToString() + extension);
       }
 
       class TestDocument

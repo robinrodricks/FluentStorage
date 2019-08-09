@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Models
+namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Rest.Model
 {
    class FilesystemItem
    {

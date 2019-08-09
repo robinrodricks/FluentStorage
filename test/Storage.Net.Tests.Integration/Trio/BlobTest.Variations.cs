@@ -48,7 +48,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 
    public class AdlsGen2Fixture : BlobFixture
    {
-      public AdlsGen2Fixture() : base("test/")
+      public AdlsGen2Fixture() : base("integration")
       {
 
       }
@@ -59,38 +59,12 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
    }
 
-#if DEBUG
    public class AdlsGen2Test : BlobTest, IClassFixture<AdlsGen2Fixture>
    {
       public AdlsGen2Test(AdlsGen2Fixture fixture) : base(fixture)
       {
       }
    }
-#endif
-
-   /*public class AzureDataLakeGen2SharedAccessKeyStorageFixture : BlobFixture
-   {
-      public AzureDataLakeGen2SharedAccessKeyStorageFixture() : base("test/")
-      {
-
-      }
-
-      protected override IBlobStorage CreateStorage(ITestSettings settings)
-      {
-         return StorageFactory.Blobs.AzureDataLakeGen2StoreBySharedAccessKey(
-            settings.AzureDataLakeGen2Name, 
-            settings.AzureDataLakeGen2Key);
-      }
-   }
-
-   public class AzureDataLakeGen2SharedAccessKeyTest : BlobTest,
-      IClassFixture<AzureDataLakeGen2SharedAccessKeyStorageFixture>
-   {
-      public AzureDataLakeGen2SharedAccessKeyTest(AzureDataLakeGen2SharedAccessKeyStorageFixture fixture) :
-         base(fixture)
-      {
-      }
-   }*/
 
    public class DiskDirectoryStorageFixture : BlobFixture
    {
