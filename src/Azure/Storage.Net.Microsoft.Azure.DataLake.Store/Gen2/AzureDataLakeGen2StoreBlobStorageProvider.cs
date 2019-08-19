@@ -123,7 +123,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2
             return null;
          }
 
-         return new BufferedStream(new ReadStream(_restApi, (long)pp.Length, fs, rp), 4096);
+         return new BufferedStream(new ReadStream(_restApi, (long)pp.Length, fs, rp));
       }
 
       public Task<Stream> OpenWriteAsync(string fullPath, bool append = false, CancellationToken cancellationToken = default)
@@ -131,7 +131,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2
          DecomposePath(fullPath, out string filesystemName, out string relativePath);
 
          //FlushingStream already handles missing filesystem and attempts to create it on error
-         return Task.FromResult<Stream>(new WriteStream(_restApi, filesystemName, relativePath));
+         return Task.FromResult<Stream>(new BufferedStream(new WriteStream(_restApi, filesystemName, relativePath)));
       }
 
       private void DecomposePath(string path, out string filesystemName, out string relativePath)

@@ -218,15 +218,17 @@ namespace Storage.Net.Tests.Integration.Blobs
       {
          try
          {
-            await _storage.WriteTextAsync("/sub/one.txt", "test");
-            await _storage.WriteTextAsync("/sub/sub/two.txt", "test");
+            string sub = RandomBlobPath() + "/";
 
-            IReadOnlyCollection<Blob> subItems = await _storage.ListAsync(recurse: false, folderPath: "sub");
+            await _storage.WriteTextAsync(sub + "one.txt", "test");
+            await _storage.WriteTextAsync(sub + "sub/two.txt", "test");
+
+            IReadOnlyCollection<Blob> subItems = await _storage.ListAsync(recurse: false, folderPath: sub);
             Assert.Equal(2, subItems.Count);
 
 
-            Assert.Contains(new Blob("/sub/one.txt"), subItems);
-            Assert.Contains(new Blob("/sub/sub", BlobItemKind.Folder), subItems);
+            Assert.Contains(new Blob(sub + "one.txt"), subItems);
+            Assert.Contains(new Blob(sub + "sub", BlobItemKind.Folder), subItems);
          }
          catch(NotSupportedException)
          {
