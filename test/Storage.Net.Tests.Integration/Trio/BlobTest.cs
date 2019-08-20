@@ -361,9 +361,14 @@ namespace Storage.Net.Tests.Integration.Blobs
          blob.Metadata["fun"] = "no";
 
          await _storage.WriteTextAsync(blob, "test");
+         Blob blob2 = await _storage.GetBlobAsync(blob);
+         Assert.True(blob2.Size > 0);
+
          try
          {
             await _storage.SetBlobAsync(blob);
+            blob2 = await _storage.GetBlobAsync(blob);
+            Assert.True(blob2.Size > 0);
          }
          catch(NotSupportedException)
          {
@@ -371,7 +376,7 @@ namespace Storage.Net.Tests.Integration.Blobs
          }
 
          //test
-         Blob blob2 = await _storage.GetBlobAsync(blob);
+         blob2 = await _storage.GetBlobAsync(blob);
          Assert.NotNull(blob2.Metadata);
          Assert.Equal("ivan", blob2.Metadata["user"]);
          Assert.Equal("no", blob2.Metadata["fun"]);

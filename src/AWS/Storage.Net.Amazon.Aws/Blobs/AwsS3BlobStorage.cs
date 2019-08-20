@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Storage.Net.Streaming;
 using NetBox.Extensions;
+using System.Net;
 
 namespace Storage.Net.Amazon.Aws.Blobs
 {
@@ -186,64 +187,47 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
       public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         return await Task.WhenAll(fullPaths.Select(ExistsAsync));
+         AmazonS3Client client = await GetClientAsync().ConfigureAwait(false);
+
+         return await Task.WhenAll(fullPaths.Select(fullPath => ExistsAsync(client, fullPath, cancellationToken))).ConfigureAwait(false);
       }
 
-      private async Task<bool> ExistsAsync(string fullPath)
+      private async Task<bool> ExistsAsync(AmazonS3Client client, string fullPath, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
 
          try
          {
             fullPath = StoragePath.Normalize(fullPath, false);
-            using (GetObjectResponse response = await GetObjectAsync(fullPath).ConfigureAwait(false))
-            {
-               if (response == null) return false;
-            }
+            await client.GetObjectMetadataAsync(_bucketName, fullPath, cancellationToken).ConfigureAwait(false);
+            return true;
          }
-         catch (StorageException ex)
+         catch(AmazonS3Exception ex) when(ex.StatusCode == HttpStatusCode.NotFound)
          {
-            if (ex.ErrorCode == ErrorCode.NotFound) return false;
+            
          }
 
-         return true;
+         return false;
       }
 
       public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         Blob[] blobs = await Task.WhenAll(fullPaths.Select(GetBlobAsync)).ConfigureAwait(false);
-
-         await Converter.AppendMetadataAsync(
-            await GetClientAsync().ConfigureAwait(false),
-            _bucketName,
-            blobs,
-            cancellationToken).ConfigureAwait(false);
-
-         return blobs;
+         return await Task.WhenAll(fullPaths.Select(GetBlobAsync)).ConfigureAwait(false);
       }
 
       private async Task<Blob> GetBlobAsync(string fullPath)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
+         fullPath = StoragePath.Normalize(fullPath, false);
+
+         AmazonS3Client client = await GetClientAsync().ConfigureAwait(false);
 
          try
          {
-            fullPath = StoragePath.Normalize(fullPath, false);
-            using (GetObjectResponse obj = await GetObjectAsync(fullPath).ConfigureAwait(false))
-            {
-               //ETag contains actual MD5 hash, not sure why!
-
-               if(obj != null)
-               {
-                  var r = new Blob(fullPath);
-                  r.MD5 = obj.ETag.Trim('\"');
-                  r.Size = obj.ContentLength;
-                  r.LastModificationTime = obj.LastModified.ToUniversalTime();
-                  return r;
-               }
-            }
+            GetObjectMetadataResponse meta = await client.GetObjectMetadataAsync(_bucketName, fullPath).ConfigureAwait(false);
+            return meta.ToBlob(fullPath);
          }
-         catch (StorageException ex) when (ex.ErrorCode == ErrorCode.NotFound)
+         catch(AmazonS3Exception ex) when(ex.StatusCode == HttpStatusCode.NotFound)
          {
             //if blob is not found, don't return any information
          }
