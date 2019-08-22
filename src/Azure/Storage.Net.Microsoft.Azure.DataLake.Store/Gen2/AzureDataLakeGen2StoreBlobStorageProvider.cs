@@ -134,14 +134,14 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2
          return Task.FromResult<Stream>(new BufferedStream(new WriteStream(_restApi, filesystemName, relativePath)));
       }
 
-      private void DecomposePath(string path, out string filesystemName, out string relativePath)
+      private void DecomposePath(string path, out string filesystemName, out string relativePath, bool requireRelativePath = true)
       {
          GenericValidation.CheckBlobFullPath(path);
          string[] parts = StoragePath.Split(path);
 
-         if(parts.Length == 1)
+         if(requireRelativePath && parts.Length < 2)
          {
-            throw new ArgumentException($"path {path} must include filesystem name as root folder", nameof(path));
+            throw new ArgumentException($"path '{path}' must include filesystem name as root folder, i.e. 'filesystem/path'", nameof(path));
          }
 
          filesystemName = parts[0];
@@ -181,7 +181,23 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2
 
       private async Task<Blob> GetBlobAsync(string fullPath, CancellationToken cancellationToken)
       {
-         DecomposePath(fullPath, out string fs, out string rp);
+         DecomposePath(fullPath, out string fs, out string rp, false);
+
+         if(StoragePath.IsRootPath(rp))
+         {
+            try
+            {
+               ApiResponse<string> response = await _restApi.GetFilesystemProperties(fs);
+               await response.EnsureSuccessStatusCodeAsync();
+               var fsProps = new PathProperties(response);
+               return LConvert.ToBlob(fs, fsProps);
+            }
+            catch(ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+               return null;
+            }
+         }
+
          PathProperties pp;
 
          try

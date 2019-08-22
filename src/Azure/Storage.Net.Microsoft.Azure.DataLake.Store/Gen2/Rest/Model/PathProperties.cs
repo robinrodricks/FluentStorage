@@ -27,7 +27,14 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Rest.Model
 
       public PathProperties(ApiResponse<string> refitResponse)
       {
-         Length = refitResponse.ContentHeaders.ContentLength;
+         try
+         {
+            Length = refitResponse.ContentHeaders.ContentLength;
+         }
+         catch(ObjectDisposedException)
+         {
+            //if content is not present, you can't access the length
+         }
          LastModified = refitResponse.ContentHeaders.LastModified;
          ETag = refitResponse.Headers.ETag?.ToString();
 

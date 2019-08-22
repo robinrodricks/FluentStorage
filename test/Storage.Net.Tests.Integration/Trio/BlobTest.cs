@@ -267,6 +267,16 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
+      public async Task GetBlob_Root_doesnt_exist_returns_null()
+      {
+         string id = "/" + Guid.NewGuid().ToString();
+         //string id = "test";
+
+         Assert.Null(await _storage.GetBlobAsync(id));
+      }
+
+
+      [Fact]
       public async Task Open_doesnt_exist_returns_null()
       {
          string id = RandomBlobPath();

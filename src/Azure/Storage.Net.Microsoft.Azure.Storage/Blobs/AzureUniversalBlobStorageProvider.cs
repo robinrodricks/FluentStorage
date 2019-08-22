@@ -253,10 +253,14 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       {
          var result = new List<CloudBlobContainer>();
 
-         ContainerResultSegment firstPage = await NativeBlobClient.ListContainersSegmentedAsync(null);
-         result.AddRange(firstPage.Results);
+         ContainerResultSegment page = null;
+         do
+         {
+            page = await NativeBlobClient.ListContainersSegmentedAsync(page?.ContinuationToken).ConfigureAwait(false);
+            result.AddRange(page.Results);
 
-         //todo: list more containers
+         }
+         while(page?.ContinuationToken != null);
 
          return result;
       }
