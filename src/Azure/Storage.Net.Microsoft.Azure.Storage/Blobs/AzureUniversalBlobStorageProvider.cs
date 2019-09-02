@@ -140,14 +140,23 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          if(container == null)
             return null;
 
-         CloudBlob blob = container.GetBlobReference(StoragePath.Normalize(path, false));
-         if(!(await blob.ExistsAsync().ConfigureAwait(false)))
-            return null;
+         if(string.IsNullOrEmpty(path))
+         {
+            //looks like it's a container reference
+            await container.FetchAttributesAsync().ConfigureAwait(false);
+            return AzConvert.ToBlob(container);
+         }
+         else
+         {
+            CloudBlob blob = container.GetBlobReference(StoragePath.Normalize(path, false));
+            if(!(await blob.ExistsAsync().ConfigureAwait(false)))
+               return null;
 
-         var r = new Blob(fullPath);
-         await blob.FetchAttributesAsync().ConfigureAwait(false);
-         AttachBlobMeta(r, blob);
-         return r;
+            var r = new Blob(fullPath);
+            await blob.FetchAttributesAsync().ConfigureAwait(false);
+            AttachBlobMeta(r, blob);
+            return r;
+         }
       }
 
       internal static void AttachBlobMeta(Blob destination, CloudBlob source)
