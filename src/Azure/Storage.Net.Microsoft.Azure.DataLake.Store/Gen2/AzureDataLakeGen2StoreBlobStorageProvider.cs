@@ -53,7 +53,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2
 
          var provider = new AzureDataLakeStoreGen2BlobStorageProvider(
             DataLakeApiFactory.CreateApiWithServicePrincipal(accountName, tenantId, clientId, clientSecret));
-         provider.Graph = new GraphService(tenantId, clientId, clientSecret);
+         //provider.Graph = new GraphService(tenantId, clientId, clientSecret);
 
          return provider;
       }
@@ -68,8 +68,6 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2
       }
 
       private Stream EmptyStream => new MemoryStream(new byte[0]);
-
-      internal GraphService Graph { get; set; }
 
       public async Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
@@ -271,12 +269,12 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2
             acl: accessControl.ToString());
       }
 
-      public async Task<AccessControl> GetAccessControlAsync(string fullPath)
+      public async Task<AccessControl> GetAccessControlAsync(string fullPath, bool getUpn)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
          DecomposePath(fullPath, out string fs, out string rp);
 
-         ApiResponse<string> response = await _restApi.GetPathPropertiesAsync(fs, rp, "getAccessControl").ConfigureAwait(false);
+         ApiResponse<string> response = await _restApi.GetPathPropertiesAsync(fs, rp, "getAccessControl", upn: getUpn).ConfigureAwait(false);
          await response.EnsureSuccessStatusCodeAsync().ConfigureAwait(false);
 
          return new AccessControl(
@@ -300,17 +298,6 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2
       {
          FilesystemList list = await _restApi.ListFilesystemsAsync().ConfigureAwait(false);
          return list.Filesystems.Select(x => x.Name);
-      }
-
-      public async Task<string> AclObjectIdToUpnAsync(string objectId)
-      {
-         if(objectId is null)
-            throw new ArgumentNullException(nameof(objectId));
-
-         if(Graph == null)
-            throw new ApplicationException("graph service is not available with current authentication type");
-
-         return await Graph.GetUpnById(objectId);
       }
 
       #endregion

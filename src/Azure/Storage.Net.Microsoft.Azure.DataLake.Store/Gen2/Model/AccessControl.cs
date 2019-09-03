@@ -84,7 +84,7 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Model
 
             var entry = new AclEntry(processForm);
 
-            if(entry.ObjectId == null)
+            if(entry.Identity == null)
             {
                //special entry
                if(entry.Type == "user")

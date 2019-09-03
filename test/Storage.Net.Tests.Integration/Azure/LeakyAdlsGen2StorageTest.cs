@@ -69,7 +69,7 @@ namespace Storage.Net.Tests.Integration.Azure
 
          //check that user has no permissions
          AccessControl access = await _storage.GetAccessControlAsync(path);
-         Assert.DoesNotContain(access.Acl, x => x.ObjectId == userId);
+         Assert.DoesNotContain(access.Acl, x => x.Identity == userId);
 
          //assign user a write permission
          access.Acl.Add(new AclEntry(ObjectType.User, userId, false, true, false));
@@ -77,10 +77,32 @@ namespace Storage.Net.Tests.Integration.Azure
 
          //check user has permissions now
          access = await _storage.GetAccessControlAsync(path);
-         AclEntry userAcl = access.Acl.First(e => e.ObjectId == userId);
+         AclEntry userAcl = access.Acl.First(e => e.Identity == userId);
          Assert.False(userAcl.CanRead);
          Assert.True(userAcl.CanWrite);
          Assert.False(userAcl.CanExecute);
+      }
+
+      [Fact]
+      public async Task Acl_get_with_upn()
+      {
+         string path = StoragePath.Combine(Filesystem, Guid.NewGuid().ToString());
+         string userId = _settings.AzureDataLakeGen2TestObjectId;
+
+         //write something
+         await _storage.WriteTextAsync(path, "perm?");
+
+         //check that user has no permissions
+         AccessControl access = await _storage.GetAccessControlAsync(path, true);
+         Assert.DoesNotContain(access.Acl, x => x.Identity == userId);
+
+         //assign user a write permission
+         access.Acl.Add(new AclEntry(ObjectType.User, userId, false, true, false));
+         await _storage.SetAccessControlAsync(path, access);
+
+         //check user has permissions now
+         access = await _storage.GetAccessControlAsync(path, true);
+         Assert.True(access.Acl.First().Identity.Contains('@'));
       }
 
       [Fact]
@@ -95,7 +117,7 @@ namespace Storage.Net.Tests.Integration.Azure
 
          //check that user has no permissions
          AccessControl access = await _storage.GetAccessControlAsync(directoryPath);
-         Assert.DoesNotContain(access.Acl, x => x.ObjectId == userId);
+         Assert.DoesNotContain(access.Acl, x => x.Identity == userId);
 
          //assign user a write permission
          access.Acl.Add(new AclEntry(ObjectType.User, userId, false, true, false));
@@ -103,7 +125,7 @@ namespace Storage.Net.Tests.Integration.Azure
 
          //check user has permissions now
          access = await _storage.GetAccessControlAsync(directoryPath);
-         AclEntry userAcl = access.Acl.First(e => e.ObjectId == userId);
+         AclEntry userAcl = access.Acl.First(e => e.Identity == userId);
          Assert.False(userAcl.CanRead);
          Assert.True(userAcl.CanWrite);
          Assert.False(userAcl.CanExecute);
@@ -121,7 +143,7 @@ namespace Storage.Net.Tests.Integration.Azure
 
          //check that user has no permissions
          AccessControl access = await _storage.GetAccessControlAsync(directoryPath);
-         Assert.DoesNotContain(access.Acl, x => x.ObjectId == userId);
+         Assert.DoesNotContain(access.Acl, x => x.Identity == userId);
 
          //assign user a write permission
          access.DefaultAcl.Add(new AclEntry(ObjectType.User, userId, false, true, false));
@@ -129,7 +151,7 @@ namespace Storage.Net.Tests.Integration.Azure
 
          //check user has permissions now
          access = await _storage.GetAccessControlAsync(directoryPath);
-         AclEntry userAcl = access.DefaultAcl.First(e => e.ObjectId == userId);
+         AclEntry userAcl = access.DefaultAcl.First(e => e.Identity == userId);
          Assert.False(userAcl.CanRead);
          Assert.True(userAcl.CanWrite);
          Assert.False(userAcl.CanExecute);
