@@ -202,4 +202,23 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
    }
 #endif
+
+   public class GcpFixture : BlobFixture
+   {
+      protected override IBlobStorage CreateStorage(ITestSettings settings)
+      {
+         return StorageFactory.Blobs.GoogleCloudStorageFromJson(
+            settings.GcpStorageBucketName,
+            settings.GcpStorageJsonCreds,
+            true);
+      }
+   }
+
+   public class GcpTest : BlobTest, IClassFixture<GcpFixture>
+   {
+      public GcpTest(GcpFixture fixture) : base(fixture)
+      {
+
+      }
+   }
 }
