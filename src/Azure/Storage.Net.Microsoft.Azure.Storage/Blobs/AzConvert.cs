@@ -16,7 +16,8 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             "ETag", share.Properties.ETag,
             "LastModified", share.Properties.LastModified?.ToString(),
             "Quota", share.Properties.Quota?.ToString(),
-            "SnapshotTime", share.SnapshotTime?.ToString());
+            "SnapshotTime", share.SnapshotTime?.ToString(),
+            "IsShare", "True");
          blob.Metadata.MergeRange(share.Metadata);
          return blob;
       }
