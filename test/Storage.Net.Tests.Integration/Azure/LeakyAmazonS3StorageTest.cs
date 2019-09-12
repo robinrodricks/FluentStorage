@@ -16,7 +16,7 @@ namespace Storage.Net.Tests.Integration.Azure
       {
          _settings = Settings.Instance;
 
-         _storage = (IAwsS3BlobStorage)StorageFactory.Blobs.AmazonS3BlobStorage(
+         _storage = (IAwsS3BlobStorage)StorageFactory.Blobs.AwsS3(
             _settings.AwsAccessKeyId, _settings.AwsSecretAccessKey, _settings.AwsTestBucketName);
       }
    }

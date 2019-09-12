@@ -64,4 +64,27 @@ namespace Storage.Net.Tests.Integration.Messaging
 
    #endregion
 
+   #region [ AWS SQS ]
+
+   public class AwsSQSFixture : MessagingFixture
+   {
+      protected override IMessenger CreateMessenger(ITestSettings settings)
+      {
+         return StorageFactory.Messages.AwsSQS(
+            settings.AwsAccessKeyId,
+            settings.AwsSecretAccessKey,
+            "https://sqs.us-east-1.amazonaws.com",
+            RegionEndpoint.USEast1);
+      }
+   }
+
+
+   public class AwsSQSTest : MessagingTest, IClassFixture<AwsSQSFixture>
+   {
+      public AwsSQSTest(AwsSQSFixture fixture) : base(fixture)
+      {
+      }
+   }
+   #endregion
+
 }

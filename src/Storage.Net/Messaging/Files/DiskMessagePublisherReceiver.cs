@@ -60,6 +60,18 @@ namespace Storage.Net.Messaging.Files
          return Task.FromResult<IReadOnlyCollection<string>>(new DirectoryInfo(_root).GetDirectories().Select(d => d.Name).ToList());
       }
 
+      public Task DeleteChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default)
+      {
+         foreach(string channelName in channelNames)
+         {
+            string dir = Path.Combine(_root, channelName);
+            if(Directory.Exists(dir))
+               Directory.Delete(dir, true);
+         }
+
+         return Task.CompletedTask;
+      }
+
       public Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default)
       {
          return Task.FromResult<long>(GetMessageFiles(channelName).Count);
@@ -109,7 +121,6 @@ namespace Storage.Net.Messaging.Files
 
       }
 
-      public Task DeleteChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
       #endregion
    }

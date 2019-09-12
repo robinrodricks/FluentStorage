@@ -29,6 +29,16 @@ namespace Storage.Net.Messaging
          return Task.FromResult<IReadOnlyCollection<string>>(_queues.Select(q => q.Key).ToList());
       }
 
+      public Task DeleteChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default)
+      {
+         foreach(string cn in channelNames)
+         {
+            _queues.TryRemove(cn, out ConcurrentQueue<QueueMessage> v);
+         }
+
+         return Task.CompletedTask;
+      }
+
       public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) => throw new NotImplementedException();
       public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
@@ -65,6 +75,5 @@ namespace Storage.Net.Messaging
          return messenger;
       }
 
-      public Task DeleteChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default) => throw new NotImplementedException();
    }
 }

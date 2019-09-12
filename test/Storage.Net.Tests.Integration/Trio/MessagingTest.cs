@@ -66,5 +66,21 @@ namespace Storage.Net.Tests.Integration.Messaging
          Assert.Contains(channelName, channels);
       }
 
+      [Fact]
+      public async Task Channels_delete_goesaway()
+      {
+         string channelName = Guid.NewGuid().ToString();
+
+         //send one message so channel gets created
+         await _msg.SendAsync(channelName, QueueMessage.FromText("test"));
+
+         await _msg.DeleteChannelAsync(channelName);
+
+         IReadOnlyCollection<string> channels = await _msg.ListChannelsAsync();
+
+         Assert.DoesNotContain(channelName, channels);
+
+      }
+
    }
 }

@@ -22,5 +22,17 @@ namespace Storage.Net.Messaging
 
          return messenger.SendAsync(channelName, new[] { message }, cancellationToken);
       }
+
+      /// <summary>
+      /// Deletes a single channel
+      /// </summary>
+      /// <param name="messenger"></param>
+      /// <param name="channelName"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      public static Task DeleteChannelAsync(this IMessenger messenger, string channelName, CancellationToken cancellationToken = default)
+      {
+         return messenger.DeleteChannelsAsync(new[] { channelName }, cancellationToken);
+      }
    }
 }

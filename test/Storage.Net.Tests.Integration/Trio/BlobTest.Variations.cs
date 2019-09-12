@@ -121,7 +121,7 @@ namespace Storage.Net.Tests.Integration.Blobs
    {
       protected override IBlobStorage CreateStorage(ITestSettings settings)
       {
-         return StorageFactory.Blobs.AmazonS3BlobStorage(
+         return StorageFactory.Blobs.AwsS3(
                   settings.AwsAccessKeyId,
                   settings.AwsSecretAccessKey,
                   settings.AwsTestBucketName);

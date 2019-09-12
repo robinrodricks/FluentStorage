@@ -31,7 +31,7 @@ namespace Storage.Net
       /// <param name="regionEndpoint">Optionally set region endpoint. When not specified defaults to EU West</param>
       /// <param name="skipBucketCreation">Directive to skip the creation of the S3 bucket if one does not exist</param>
       /// <returns>A reference to the created storage</returns>
-      public static IBlobStorage AmazonS3BlobStorage(this IBlobStorageFactory factory,
+      public static IBlobStorage AwsS3(this IBlobStorageFactory factory,
          string bucketName,
          RegionEndpoint regionEndpoint = null,
          bool skipBucketCreation = false)
@@ -50,7 +50,7 @@ namespace Storage.Net
       /// <param name="regionEndpoint">Optionally set region endpoint. When not specified defaults to EU West</param>
       /// <param name="skipBucketCreation">Directive to skip the creation of the S3 bucket if one does not exist</param>
       /// <returns>A reference to the created storage</returns>
-      public static IBlobStorage AmazonS3BlobStorage(this IBlobStorageFactory factory,
+      public static IBlobStorage AwsS3(this IBlobStorageFactory factory,
          string accessKeyId,
          string secretAccessKey,
          string bucketName,
@@ -87,7 +87,7 @@ namespace Storage.Net
       /// <param name="bucketName">Bucket name</param>
       /// <param name="clientConfig">S3 client configuration</param>
       /// <returns>A reference to the created storage</returns>
-      public static IBlobStorage AmazonS3BlobStorage(this IBlobStorageFactory factory,
+      public static IBlobStorage AwsS3(this IBlobStorageFactory factory,
          string accessKeyId,
          string secretAccessKey,
          string bucketName,
@@ -103,37 +103,15 @@ namespace Storage.Net
       /// <param name="accessKeyId">Access key ID</param>
       /// <param name="secretAccessKey">Secret access key</param>
       /// <param name="serviceUrl"></param>
-      /// <param name="queueName"></param>
       /// <param name="regionEndpoint"></param>
       /// <returns></returns>
-      public static IMessagePublisher AmazonSQSMessagePublisher(this IMessagingFactory factory,
+      public static IMessenger AwsSQS(this IMessagingFactory factory,
          string accessKeyId,
          string secretAccessKey,
          string serviceUrl,
-         string queueName,
          RegionEndpoint regionEndpoint = null)
       {
-         return new AwsS3MessagePublisher(accessKeyId, secretAccessKey, serviceUrl, queueName, regionEndpoint);
-      }
-
-      /// <summary>
-      /// Creates Amazon Simple Queue Service receiver
-      /// </summary>
-      /// <param name="factory"></param>
-      /// <param name="accessKeyId">Access key ID</param>
-      /// <param name="secretAccessKey">Secret access key</param>
-      /// <param name="serviceUrl"></param>
-      /// <param name="queueName"></param>
-      /// <param name="regionEndpoint"></param>
-      /// <returns></returns>
-      public static IMessageReceiver AmazonSQSMessageReceiver(this IMessagingFactory factory,
-         string accessKeyId,
-         string secretAccessKey,
-         string serviceUrl,
-         string queueName,
-         RegionEndpoint regionEndpoint = null)
-      {
-         return new AwsS3MessageReceiver(accessKeyId, secretAccessKey, serviceUrl, queueName, regionEndpoint);
+         return new AwsSQSMessenger(accessKeyId, secretAccessKey, serviceUrl, regionEndpoint);
       }
    }
 }
