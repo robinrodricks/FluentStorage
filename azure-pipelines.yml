@@ -75,7 +75,7 @@ stages:
       inputs:
         ArtifactName: nuget
 
-- stage: Test
+- stage: BlobsTest
   dependsOn: []
   jobs:
   - job: Platform
@@ -90,6 +90,22 @@ stages:
         command: test
         projects: test/Storage.Net.Tests.Integration/Storage.Net.Tests.Integration.csproj
         arguments: '-c release --filter Category=Blobs'
+
+- stage: MessagingTest
+  dependsOn: []
+  jobs:
+  - job: Platform
+    displayName: 'Tests'
+    pool:
+      vmImage: $(vmImage)
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: 'run tests'
+      continueOnError: true
+      inputs:
+        command: test
+        projects: test/Storage.Net.Tests.Integration/Storage.Net.Tests.Integration.csproj
+        arguments: '-c release --filter Category=Messenger'
 
 
 - stage: Deploy

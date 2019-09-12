@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
-   [Trait("Category", "Messaging")]
+   [Trait("Category", "Messenger")]
    public abstract class MessagingTest : IAsyncLifetime
    {
       private readonly MessagingFixture _fixture;
