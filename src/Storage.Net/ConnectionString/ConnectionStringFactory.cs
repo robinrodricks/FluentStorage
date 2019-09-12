@@ -34,14 +34,9 @@ namespace Storage.Net.ConnectionString
          return Create(connectionString, (factory, cs) => factory.CreateKeyValueStorage(cs));
       }
 
-      public static IMessagePublisher CreateMessagePublisher(string connectionString)
+      public static IMessenger CreateMessager(string connectionString)
       {
-         return Create(connectionString, (factory, cs) => factory.CreateMessagePublisher(cs));
-      }
-
-      public static IMessageReceiver CreateMessageReceiver(string connectionString)
-      {
-         return Create(connectionString, (factory, cs) => factory.CreateMessageReceiver(cs));
+         return Create(connectionString, (factory, cs) => factory.CreateMessenger(cs));
       }
 
 

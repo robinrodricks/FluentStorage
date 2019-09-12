@@ -1,22 +1,26 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Storage.Net.Messaging
 {
    /// <summary>
-   /// Extensions for IMessagePublisher
+   /// Extensions for <see cref="IMessenger"/>
    /// </summary>
-   public static class MessagePublisherExtensions
+   public static class MessengerExtensions
    {
       /// <summary>
       /// Puts a new message to the back of the queue.
       /// </summary>
-      public static Task PutMessageAsync(this IMessagePublisher messagePublisher, QueueMessage message)
+      public static Task SendAsync(this IMessenger messenger, string channelName, QueueMessage message, CancellationToken cancellationToken = default)
       {
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
+
          if(message == null)
             throw new ArgumentNullException(nameof(message));
 
-         return messagePublisher.PutMessagesAsync(new[] { message });
+         return messenger.SendAsync(channelName, new[] { message }, cancellationToken);
       }
    }
 }

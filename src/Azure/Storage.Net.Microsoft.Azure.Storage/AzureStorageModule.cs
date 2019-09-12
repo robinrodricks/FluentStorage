@@ -77,64 +77,17 @@ namespace Storage.Net.Microsoft.Azure.Storage
          return null;
       }
 
-      public IMessagePublisher CreateMessagePublisher(StorageConnectionString connectionString)
+      public IMessenger CreateMessenger(StorageConnectionString connectionString)
       {
          if(connectionString.Prefix == Constants.AzureQueueConnectionPrefix)
          {
-            connectionString.GetRequired(Constants.QueueParam, true, out string queueName);
+            connectionString.GetRequired(AccountParam, true, out string accountName);
+            connectionString.GetRequired(KeyParam, true, out string key);
 
-            if(bool.TryParse(connectionString.Get(Constants.UseDevelopmentStorage), out bool useDevelopment)
-               && useDevelopment)
-            {
-               return new AzureStorageQueuePublisher(queueName);
-            }
-            else
-            {
-               connectionString.GetRequired(AccountParam, true, out string accountName);
-               connectionString.GetRequired(KeyParam, true, out string key);
-
-               return new AzureStorageQueuePublisher(accountName, key, queueName);
-            }
+            return new AzureStorageQueueMessenger(accountName, key);
          }
 
          return null;
       }
-
-      public IMessageReceiver CreateMessageReceiver(StorageConnectionString connectionString)
-      {
-         if(connectionString.Prefix == Constants.AzureQueueConnectionPrefix)
-         {
-            connectionString.GetRequired(Constants.QueueParam, true, out string queueName);
-
-            string invisibilityString = connectionString.Get(Constants.InvisibilityParam);
-            string pollingTimeoutString = connectionString.Get(Constants.PollParam);
-
-            if(!TimeSpan.TryParse(invisibilityString, out TimeSpan invisibility))
-            {
-               invisibility = TimeSpan.FromMinutes(1);
-            }
-
-            if(!TimeSpan.TryParse(pollingTimeoutString, out TimeSpan polling))
-            {
-               polling = TimeSpan.FromMinutes(1);
-            }
-
-            if(bool.TryParse(connectionString.Get(Constants.UseDevelopmentStorage), out bool useDevelopment)
-               && useDevelopment)
-            {
-               return new AzureStorageQueueReceiver(queueName, invisibility, polling);
-            }
-            else
-            {
-               connectionString.GetRequired(AccountParam, true, out string accountName);
-               connectionString.GetRequired(KeyParam, true, out string key);
-
-               return new AzureStorageQueueReceiver(accountName, key, queueName, invisibility, polling);
-            }
-         }
-
-         return null;
-      }
-
    }
 }

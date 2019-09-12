@@ -43,8 +43,7 @@ namespace Storage.Net.Amazon.Aws
          return null;
       }
 
-      public IKeyValueStorage CreateKeyValueStorage(StorageConnectionString connectionString) => throw new NotImplementedException();
-      public IMessagePublisher CreateMessagePublisher(StorageConnectionString connectionString) => throw new NotImplementedException();
-      public IMessageReceiver CreateMessageReceiver(StorageConnectionString connectionString) => throw new NotImplementedException();
+      public IKeyValueStorage CreateKeyValueStorage(StorageConnectionString connectionString) => null;
+      public IMessenger CreateMessenger(StorageConnectionString connectionString) => null;
    }
 }

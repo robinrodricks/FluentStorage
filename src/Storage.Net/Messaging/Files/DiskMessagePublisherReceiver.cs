@@ -11,58 +11,16 @@ namespace Storage.Net.Messaging.Files
    /// <summary>
    /// Messages themselves can be human readable. THe speed is not an issue because the main bottleneck is disk anyway.
    /// </summary>
-   class DiskMessagePublisherReceiver : PollingMessageReceiver, IMessagePublisher
+   class LocalDiskMessenger : IMessenger
    {
       private const string FileExtension = ".snm";
 
       private readonly string _root;
 
-      public DiskMessagePublisherReceiver(string directoryPath)
+      public LocalDiskMessenger(string directoryPath)
       {
          _root = directoryPath ?? throw new ArgumentNullException(nameof(directoryPath));
-
-         if(!Directory.Exists(_root))
-            Directory.CreateDirectory(_root);
       }
-
-      #region [ Publisher ]
-
-      public Task PutMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default)
-      {
-         if(messages == null)
-            return Task.FromResult(true);
-
-         foreach (QueueMessage msg in messages)
-         {
-            if(msg == null)
-               throw new ArgumentNullException(nameof(msg));
-
-            string filePath = Path.Combine(_root, GenerateDiskId());
-
-            File.WriteAllBytes(filePath, msg.ToByteArray());
-         }
-
-         return Task.FromResult(true);
-      }
-
-      #endregion
-
-      #region [ Receiver ]
-
-      protected override Task<IReadOnlyCollection<QueueMessage>> ReceiveMessagesAsync(int maxBatchSize, CancellationToken cancellationToken)
-      {
-         //get all files (not efficient, but we hope there won't be many)
-         IReadOnlyCollection<FileInfo> files = GetMessageFiles();
-
-         //sort files so that oldest appear first, take max and return
-         return Task.FromResult<IReadOnlyCollection<QueueMessage>>(files
-            .OrderBy(f => f.Name)
-            .Take(maxBatchSize)
-            .Select(ToQueueMessage)
-            .ToList());
-      }
-
-      #endregion
 
       private static string GenerateDiskId()
       {
@@ -81,30 +39,73 @@ namespace Storage.Net.Messaging.Files
          return result;
       }
 
-      private IReadOnlyCollection<FileInfo> GetMessageFiles()
+      private IReadOnlyCollection<FileInfo> GetMessageFiles(string channelName)
       {
-         return new DirectoryInfo(_root).GetFiles("*" + FileExtension, SearchOption.TopDirectoryOnly);
+         return new DirectoryInfo(Path.Combine(_root, channelName)).GetFiles("*" + FileExtension, SearchOption.TopDirectoryOnly);
       }
 
-      public override Task<int> GetMessageCountAsync()
+      private string GetMessagePath(string channelName)
       {
-         IReadOnlyCollection<FileInfo> files = GetMessageFiles();
+         string dir = Path.Combine(_root, channelName);
+         if(!Directory.Exists(dir))
+            Directory.CreateDirectory(dir);
 
-         return Task.FromResult(files.Count);
+         return Path.Combine(dir, GenerateDiskId());
       }
 
-      public override Task ConfirmMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default)
+      #region [ IMessenger ]
+
+      public Task<IReadOnlyCollection<string>> ListChannelsAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+      public Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default)
       {
-         foreach(QueueMessage qm in messages)
+         return Task.FromResult<long>(GetMessageFiles(channelName).Count);
+      }
+
+      public Task SendAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
+      {
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
+
+         if(messages is null)
+            throw new ArgumentNullException(nameof(messages));
+
+         foreach(QueueMessage msg in messages)
          {
-            string fullPath = Path.Combine(_root, qm.Id + FileExtension);
-            if(File.Exists(fullPath))
-               File.Delete(fullPath);
+            if(msg == null)
+               throw new ArgumentNullException(nameof(msg));
+
+            string filePath = GetMessagePath(channelName);
+
+            File.WriteAllBytes(filePath, msg.ToByteArray());
          }
 
          return Task.FromResult(true);
       }
 
-      public override Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+      public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(
+         string channelName,
+         int count = 100,
+         TimeSpan? visibility = null,
+         CancellationToken cancellationToken = default)
+      {
+         //get all files (not efficient, but we hope there won't be many)
+         IReadOnlyCollection<FileInfo> files = GetMessageFiles(channelName);
+
+         //sort files so that oldest appear first, take max and return
+         return Task.FromResult<IReadOnlyCollection<QueueMessage>>(files
+            .OrderBy(f => f.Name)
+            .Take(count)
+            .Select(ToQueueMessage)
+            .ToList());
+      }
+
+      public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public void Dispose()
+      {
+
+      }
+
+      #endregion
    }
 }
