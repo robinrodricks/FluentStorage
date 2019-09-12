@@ -62,6 +62,9 @@ namespace Storage.Net.Messaging.Files
 
       public Task DeleteChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default)
       {
+         if(channelNames is null)
+            throw new ArgumentNullException(nameof(channelNames));
+
          foreach(string channelName in channelNames)
          {
             string dir = Path.Combine(_root, channelName);

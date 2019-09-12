@@ -31,6 +31,9 @@ namespace Storage.Net.Messaging
 
       public Task DeleteChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default)
       {
+         if(channelNames is null)
+            throw new ArgumentNullException(nameof(channelNames));
+
          foreach(string cn in channelNames)
          {
             _queues.TryRemove(cn, out ConcurrentQueue<QueueMessage> v);

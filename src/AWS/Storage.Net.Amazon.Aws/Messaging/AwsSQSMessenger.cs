@@ -56,6 +56,9 @@ namespace Storage.Net.Amazon.Aws.Messaging
 
       public async Task DeleteChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default)
       {
+         if(channelNames is null)
+            throw new ArgumentNullException(nameof(channelNames));
+
          foreach(string queueName in channelNames)
          {
             await _client.DeleteQueueAsync(GetQueueUri(queueName), cancellationToken).ConfigureAwait(false);

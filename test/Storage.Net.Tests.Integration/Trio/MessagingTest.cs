@@ -82,5 +82,11 @@ namespace Storage.Net.Tests.Integration.Messaging
 
       }
 
+      [Fact]
+      public async Task Channels_delete_null_list_argument_exception()
+      {
+         await Assert.ThrowsAsync<ArgumentNullException>(() => _msg.DeleteChannelsAsync(null));
+      }
+
    }
 }

@@ -68,6 +68,9 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
 
       public async Task DeleteChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default)
       {
+         if(channelNames is null)
+            throw new ArgumentNullException(nameof(channelNames));
+
          foreach(string queueName in channelNames)
          {
             CloudQueue queue = _client.GetQueueReference(queueName);
