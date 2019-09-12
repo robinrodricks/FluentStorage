@@ -2,9 +2,6 @@
 using Storage.Net.Messaging;
 using System;
 using System.Threading.Tasks;
-using System.Linq;
-using NetBox.Generator;
-using System.Diagnostics;
 using System.Collections.Generic;
 
 namespace Storage.Net.Tests.Integration.Messaging
@@ -14,6 +11,7 @@ namespace Storage.Net.Tests.Integration.Messaging
    {
       private readonly MessagingFixture _fixture;
       private readonly IMessenger _msg;
+      private readonly string _qn = Guid.NewGuid().ToString();
 
       protected MessagingTest(MessagingFixture fixture)
       {
@@ -23,14 +21,24 @@ namespace Storage.Net.Tests.Integration.Messaging
 
       public Task InitializeAsync() => Task.CompletedTask;
 
-      public Task DisposeAsync() => Task.CompletedTask;
+      public async Task DisposeAsync()
+      {
+         //clear up all the channels
+
+         try
+         {
+            IReadOnlyCollection<string> channels = await _msg.ListChannelsAsync();
+            await _msg.DeleteChannelsAsync(channels);
+         }
+         catch { }
+      }
 
       [Fact]
       public async Task SendMessage_OneMessage_DoesntCrash()
       {
          var qm = QueueMessage.FromText("test");
 
-         await _msg.SendAsync("test", qm);
+         await _msg.SendAsync(_qn, qm);
       }
 
       [Fact]
@@ -42,7 +50,20 @@ namespace Storage.Net.Tests.Integration.Messaging
       [Fact]
       public async Task SendMessage_NullMessages_ArgumentException()
       {
-         await Assert.ThrowsAsync<ArgumentNullException>(() => _msg.SendAsync("test", null));
+         await Assert.ThrowsAsync<ArgumentNullException>(() => _msg.SendAsync(_qn, null));
+      }
+
+      [Fact]
+      public async Task Channels_Create_list_contains_created_channel()
+      {
+         string channelName = Guid.NewGuid().ToString();
+
+         //send one message so channel gets created
+         await _msg.SendAsync(channelName, QueueMessage.FromText("test"));
+
+         IReadOnlyCollection<string> channels = await _msg.ListChannelsAsync();
+
+         Assert.Contains(channelName, channels);
       }
 
    }

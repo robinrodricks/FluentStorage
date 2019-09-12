@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +15,14 @@ namespace Storage.Net.Messaging
       /// </summary>
       /// <returns></returns>
       Task<IReadOnlyCollection<string>> ListChannelsAsync(CancellationToken cancellationToken = default);
+
+      /// <summary>
+      /// Physically deletes channels
+      /// </summary>
+      /// <param name="channelNames"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      Task DeleteChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Gets message count in a channel.

@@ -76,6 +76,8 @@ namespace Storage.Net.Messaging.Large
          }
       }
 
+      public Task DeleteChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
       #endregion
    }
 }

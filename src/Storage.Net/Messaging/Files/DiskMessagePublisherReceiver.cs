@@ -55,7 +55,10 @@ namespace Storage.Net.Messaging.Files
 
       #region [ IMessenger ]
 
-      public Task<IReadOnlyCollection<string>> ListChannelsAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public Task<IReadOnlyCollection<string>> ListChannelsAsync(CancellationToken cancellationToken = default)
+      {
+         return Task.FromResult<IReadOnlyCollection<string>>(new DirectoryInfo(_root).GetDirectories().Select(d => d.Name).ToList());
+      }
 
       public Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default)
       {
@@ -105,6 +108,8 @@ namespace Storage.Net.Messaging.Files
       {
 
       }
+
+      public Task DeleteChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
       #endregion
    }

@@ -21,17 +21,61 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       public AzureStorageQueueMessenger(
          string accountName, string storageKey)
       {
+         if(accountName is null)
+            throw new ArgumentNullException(nameof(accountName));
+         if(storageKey is null)
+            throw new ArgumentNullException(nameof(storageKey));
+
          var account = new CloudStorageAccount(new StorageCredentials(accountName, storageKey), true);
          _client = account.CreateCloudQueueClient();
-
-         //_queue = _client.GetQueueReference(queueName);
-         //_queue.CreateIfNotExistsAsync().Wait();
-         //_messageVisibilityTimeout = messageVisibilityTimeout;
-         //_messagePumpPollingTimeout = messagePumpPollingTimeout;
       }
 
+      private async Task<CloudQueue> GetQueueAsync(string channelName)
+      {
+         if(_channelNameToQueue.TryGetValue(channelName, out CloudQueue queue))
+            return queue;
+
+         queue = _client.GetQueueReference(channelName);
+         await queue.CreateIfNotExistsAsync().ConfigureAwait(false);
+
+         _channelNameToQueue[channelName] = queue;
+         return queue;
+      }
+
+      #region [ IMessenger ]
+
       public Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-      public Task<IReadOnlyCollection<string>> ListChannelsAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+      public async Task<IReadOnlyCollection<string>> ListChannelsAsync(CancellationToken cancellationToken = default)
+      {
+         var queueNames = new List<string>();
+
+         QueueContinuationToken token = null;
+
+         do
+         {
+            QueueResultSegment page = await _client.ListQueuesSegmentedAsync(token).ConfigureAwait(false);
+
+            queueNames.AddRange(page.Results.Select(q => q.Name));
+
+            token = page.ContinuationToken;
+
+         }
+         while(token != null);
+
+         return queueNames;
+      }
+
+      public async Task DeleteChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default)
+      {
+         foreach(string queueName in channelNames)
+         {
+            CloudQueue queue = _client.GetQueueReference(queueName);
+            await queue.DeleteIfExistsAsync(cancellationToken).ConfigureAwait(false);
+         }
+      }
+
+
       public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) => throw new NotImplementedException();
       public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
@@ -47,22 +91,12 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
          })).ConfigureAwait(false);
       }
 
-      private async Task<CloudQueue> GetQueueAsync(string channelName)
-      {
-         if(_channelNameToQueue.TryGetValue(channelName, out CloudQueue queue))
-            return queue;
-
-         queue = _client.GetQueueReference(channelName);
-         await queue.CreateIfNotExistsAsync().ConfigureAwait(false);
-
-         _channelNameToQueue[channelName] = queue;
-         return queue;
-      }
-
       public void Dispose()
       {
 
       }
+
+      #endregion
 
    }
 }
