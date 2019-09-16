@@ -30,19 +30,29 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
          _client = account.CreateCloudQueueClient();
       }
 
-      private async Task<CloudQueue> GetQueueAsync(string channelName)
+      private async Task<CloudQueue> GetQueueAsync(string channelName, bool createIfNotExists = false)
       {
          if(_channelNameToQueue.TryGetValue(channelName, out CloudQueue queue))
             return queue;
 
          queue = _client.GetQueueReference(channelName);
-         await queue.CreateIfNotExistsAsync().ConfigureAwait(false);
+
+         if(createIfNotExists)
+         {
+            await queue.CreateIfNotExistsAsync().ConfigureAwait(false);
+         }
 
          _channelNameToQueue[channelName] = queue;
          return queue;
       }
 
       #region [ IMessenger ]
+
+      public async Task CreateChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default)
+      {
+         await Task.WhenAll(channelNames.Select(cn => GetQueueAsync(cn, true))).ConfigureAwait(false);
+      }
+
 
       public Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
@@ -98,6 +108,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       {
 
       }
+
 
       #endregion
 

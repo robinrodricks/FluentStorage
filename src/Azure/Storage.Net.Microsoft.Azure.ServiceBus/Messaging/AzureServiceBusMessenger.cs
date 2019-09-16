@@ -1,0 +1,152 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Core;
+using Microsoft.Azure.ServiceBus.Management;
+using Storage.Net.Messaging;
+
+namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
+{
+   class AzureServiceBusMessenger : IAzureServiceBusMessenger
+   {
+      private const string TopicPrefix = "t/";
+      private const string QueuePrefix = "q/";
+
+      private readonly ManagementClient _mgmt;
+
+      private readonly string _connectionString;
+      private readonly string _entityPath;
+
+      public AzureServiceBusMessenger(string connectionString)
+      {
+         _connectionString = connectionString;
+         _entityPath = GetEntityPath(connectionString);
+         if(_entityPath == null)
+         {
+            _mgmt = new ManagementClient(connectionString);
+         }
+      }
+
+      private static string GetEntityPath(string cs)
+      {
+         return null;
+      }
+
+      ISenderClient CreateSenderClient(string channelName)
+      {
+         Decompose(channelName, out string entityPath, out bool isQueue);
+
+         if(isQueue)
+            return new QueueClient(_connectionString, entityPath);
+
+         return new TopicClient(_connectionString, entityPath);
+      }
+
+      private static void Decompose(string channelName, out string entityPath, out bool isQueue)
+      {
+         if(channelName.StartsWith(QueuePrefix))
+         {
+            entityPath = channelName.Substring(2);
+            isQueue = true;
+            return;
+         }
+
+         if(channelName.StartsWith(TopicPrefix))
+         {
+            entityPath = channelName.Substring(2);
+            isQueue = false;
+            return;
+         }
+
+         throw new ArgumentException(
+            $"Channel '{channelName}' is not a valid channel name. It should start with '{QueuePrefix}' for queues or '{TopicPrefix}' for topics",
+            nameof(channelName));
+      }
+
+      #region [ IMessenger ]
+
+      public async Task CreateChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default)
+      {
+         foreach(string channelName in channelNames)
+         {
+            Decompose(channelName, out string entityPath, out bool isQueue);
+
+            if(isQueue)
+            {
+               await _mgmt.CreateQueueAsync(entityPath, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+               await _mgmt.CreateTopicAsync(entityPath, cancellationToken).ConfigureAwait(false);
+            }
+         }
+      }
+
+
+      public async Task SendAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
+      {
+         ISenderClient client = CreateSenderClient(channelName);
+
+         IList<Message> sbmsg = messages.Select(Converter.ToMessage).ToList();
+         await client.SendAsync(sbmsg).ConfigureAwait(false);
+      }
+
+      public async Task DeleteChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default)
+      {
+         if(channelNames is null)
+            throw new ArgumentNullException(nameof(channelNames));
+
+         foreach(string cn in channelNames)
+         {
+            Decompose(cn, out string entityPath, out bool isQueue);
+
+            if(isQueue)
+               await _mgmt.DeleteQueueAsync(entityPath, cancellationToken).ConfigureAwait(false);
+            else
+               await _mgmt.DeleteQueueAsync(entityPath, cancellationToken).ConfigureAwait(false);
+         }
+      }
+
+      public Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+      public async Task<IReadOnlyCollection<string>> ListChannelsAsync(CancellationToken cancellationToken = default)
+      {
+         if(_entityPath != null)
+            return new List<string> { _entityPath };
+
+         var channels = new List<string>();
+
+         IList<QueueDescription> queues = await _mgmt.GetQueuesAsync().ConfigureAwait(false);
+         IList<TopicDescription> topics = await _mgmt.GetTopicsAsync().ConfigureAwait(false);
+
+         channels.AddRange(queues.Select(d => $"{QueuePrefix}{d.Path}"));
+         channels.AddRange(topics.Select(d => $"{TopicPrefix}{d.Path}"));
+
+         return channels;
+      }
+
+      public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+      public void Dispose()
+      {
+
+      }
+
+      #endregion
+
+      #region [ IAzureServiceBusMessenger ]
+
+      public async Task CreateQueueAsync(string name)
+      {
+         await _mgmt.CreateQueueAsync(name).ConfigureAwait(false);
+      }
+
+
+      #endregion
+   }
+}

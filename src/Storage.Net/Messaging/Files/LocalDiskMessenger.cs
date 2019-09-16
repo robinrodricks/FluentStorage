@@ -55,6 +55,19 @@ namespace Storage.Net.Messaging.Files
 
       #region [ IMessenger ]
 
+      public Task CreateChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellation = default)
+      {
+         foreach(string channelName in channelNames)
+         {
+            string path = Path.Combine(_root, channelName);
+            if(!Directory.Exists(path))
+               Directory.CreateDirectory(path);
+         }
+
+         return Task.CompletedTask;
+      }
+
+
       public Task<IReadOnlyCollection<string>> ListChannelsAsync(CancellationToken cancellationToken = default)
       {
          return Task.FromResult<IReadOnlyCollection<string>>(new DirectoryInfo(_root).GetDirectories().Select(d => d.Name).ToList());
@@ -123,7 +136,6 @@ namespace Storage.Net.Messaging.Files
       {
 
       }
-
 
       #endregion
    }

@@ -17,9 +17,14 @@ namespace Storage.Net.Messaging
 
       #region [ IMessenger ]
 
-      public void Dispose()
+      public Task CreateChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default)
       {
+         foreach(string channelName in channelNames)
+         {
+            _queues[channelName] = new ConcurrentQueue<QueueMessage>();
+         }
 
+         return Task.CompletedTask;
       }
 
       public Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default) => throw new NotImplementedException();
@@ -61,6 +66,12 @@ namespace Storage.Net.Messaging
          return Task.CompletedTask;
       }
 
+      public void Dispose()
+      {
+
+      }
+
+
       #endregion
 
       private ConcurrentQueue<QueueMessage> GetQueue(string channelName)
@@ -77,6 +88,5 @@ namespace Storage.Net.Messaging
          _nameToMessenger[name] = messenger;
          return messenger;
       }
-
    }
 }

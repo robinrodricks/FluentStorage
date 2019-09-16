@@ -3,6 +3,7 @@ using Storage.Net.Messaging;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Storage.Net.Microsoft.Azure.ServiceBus;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
@@ -10,16 +11,27 @@ namespace Storage.Net.Tests.Integration.Messaging
    public abstract class MessagingTest : IAsyncLifetime
    {
       private readonly MessagingFixture _fixture;
+      private readonly string _channelPrefix;
       private readonly IMessenger _msg;
-      private readonly string _qn = Guid.NewGuid().ToString();
+      private readonly string _qn;
 
-      protected MessagingTest(MessagingFixture fixture)
+      protected MessagingTest(MessagingFixture fixture, string channelPrefix = null)
       {
          _fixture = fixture;
+         _channelPrefix = channelPrefix;
+         _qn = NewChannelName();
          _msg = fixture.Messenger;
       }
 
-      public Task InitializeAsync() => Task.CompletedTask;
+      public async Task InitializeAsync()
+      {
+         await _msg.CreateChannelAsync(_qn);
+      }
+
+      private string NewChannelName()
+      {
+         return $"{_channelPrefix}{Guid.NewGuid().ToString()}";
+      }
 
       public async Task DisposeAsync()
       {
@@ -54,12 +66,18 @@ namespace Storage.Net.Tests.Integration.Messaging
       }
 
       [Fact]
+      public async Task Channels_list_doesnt_crash()
+      {
+         await _msg.ListChannelsAsync();
+      }
+
+      [Fact]
       public async Task Channels_Create_list_contains_created_channel()
       {
-         string channelName = Guid.NewGuid().ToString();
+         string channelName = NewChannelName();
 
          //send one message so channel gets created
-         await _msg.SendAsync(channelName, QueueMessage.FromText("test"));
+         await _msg.CreateChannelAsync(channelName);
 
          IReadOnlyCollection<string> channels = await _msg.ListChannelsAsync();
 
@@ -69,10 +87,9 @@ namespace Storage.Net.Tests.Integration.Messaging
       [Fact]
       public async Task Channels_delete_goesaway()
       {
-         string channelName = Guid.NewGuid().ToString();
+         string channelName = NewChannelName();
 
-         //send one message so channel gets created
-         await _msg.SendAsync(channelName, QueueMessage.FromText("test"));
+         await _msg.CreateChannelAsync(channelName);
 
          await _msg.DeleteChannelAsync(channelName);
 

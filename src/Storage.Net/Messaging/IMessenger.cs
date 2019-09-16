@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,14 @@ namespace Storage.Net.Messaging
    /// </summary>
    public interface IMessenger : IDisposable
    {
+      /// <summary>
+      /// Create one or more channels
+      /// </summary>
+      /// <param name="channelNames"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      Task CreateChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default);
+
       /// <summary>
       /// List available channels
       /// </summary>

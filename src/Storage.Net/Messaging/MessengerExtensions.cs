@@ -10,6 +10,18 @@ namespace Storage.Net.Messaging
    public static class MessengerExtensions
    {
       /// <summary>
+      /// Create a channel
+      /// </summary>
+      /// <param name="messenger"></param>
+      /// <param name="channelName"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      public static Task CreateChannelAsync(this IMessenger messenger, string channelName, CancellationToken cancellationToken = default)
+      {
+         return messenger.CreateChannelsAsync(new[] { channelName }, cancellationToken);
+      }
+
+      /// <summary>
       /// Puts a new message to the back of the queue.
       /// </summary>
       public static Task SendAsync(this IMessenger messenger, string channelName, QueueMessage message, CancellationToken cancellationToken = default)

@@ -87,4 +87,31 @@ namespace Storage.Net.Tests.Integration.Messaging
    }
    #endregion
 
+   #region [ Azure Service Bus Topics ]
+
+   public class AzureServiceBusFixture : MessagingFixture
+   {
+      protected override IMessenger CreateMessenger(ITestSettings settings)
+      {
+         return StorageFactory.Messages.AzureServiceBus(settings.ServiceBusConnectionString);
+
+      }
+   }
+
+   public class AzureServiceBusTopicTest : MessagingTest, IClassFixture<AzureServiceBusFixture>
+   {
+      public AzureServiceBusTopicTest(AzureServiceBusFixture fixture) : base(fixture, "t/")
+      {
+      }
+   }
+
+   public class AzureServiceBusQueueTest : MessagingTest, IClassFixture<AzureServiceBusFixture>
+   {
+      public AzureServiceBusQueueTest(AzureServiceBusFixture fixture) : base(fixture, "q/")
+      {
+      }
+   }
+
+   #endregion
+
 }

@@ -47,6 +47,11 @@ namespace Storage.Net.Amazon.Aws.Messaging
 
       #region [ IMessenger ]
 
+      public async Task CreateChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default)
+      {
+         await Task.WhenAll(channelNames.Select(cn => _client.CreateQueueAsync(cn, cancellationToken))).ConfigureAwait(false);
+      }
+
       public async Task<IReadOnlyCollection<string>> ListChannelsAsync(CancellationToken cancellationToken = default)
       {
          ListQueuesResponse queues = await _client.ListQueuesAsync(new ListQueuesRequest { }).ConfigureAwait(false);
@@ -89,18 +94,8 @@ namespace Storage.Net.Amazon.Aws.Messaging
             }
             catch(AmazonSQSException ex) when(ex.ErrorCode == "AWS.SimpleQueueService.NonExistentQueue")
             {
-               //try to create the queue and send again
-               try
-               {
-                  await _client.CreateQueueAsync(channelName, cancellationToken);
-               }
-               catch(Exception exi)
-               {
-                  throw new InvalidOperationException(
-                     $"the queue '{channelName}' didn't exist, so we tried to create it. Unfortunately the operation has failed, probably due to permission issues.", exi);
-               }
-
-               await _client.SendMessageBatchAsync(request, cancellationToken);
+               throw new InvalidOperationException(
+                  $"the queue '{channelName}' doesn't exist.", ex);
             }
          }
       }
