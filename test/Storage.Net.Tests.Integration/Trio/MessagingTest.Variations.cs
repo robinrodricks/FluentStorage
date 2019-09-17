@@ -114,4 +114,23 @@ namespace Storage.Net.Tests.Integration.Messaging
 
    #endregion
 
+   #region [ Azure Event Hubs ]
+
+   public class AzureEventHubFixture : MessagingFixture
+   {
+      protected override IMessenger CreateMessenger(ITestSettings settings)
+      {
+         return StorageFactory.Messages.AzureEventHubPublisher(settings.EventHubConnectionString);
+      }
+   }
+
+   public class AzureEventHubTest : MessagingTest, IClassFixture<AzureEventHubFixture>
+   {
+      public AzureEventHubTest(AzureEventHubFixture fixture) : base(fixture)
+      {
+      }
+   }
+
+   #endregion
+
 }

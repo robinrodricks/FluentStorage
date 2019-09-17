@@ -11,7 +11,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
    /// <summary>
    /// Publishes messages to Azure Event Hub
    /// </summary>
-   public class AzureEventHubPublisher : IMessagePublisher
+   class AzureEventHubMessenger : IMessenger
    {
       private readonly EventHubClient _client;
 
@@ -19,17 +19,10 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// Creates an instance of event hub publisher by full connection string
       /// </summary>
       /// <param name="connectionString">Full connection string</param>
-      public AzureEventHubPublisher(string connectionString)
+      public AzureEventHubMessenger(string connectionString)
       {
-         ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
-
          _client = EventHubClient.CreateFromConnectionString(connectionString);
       }
-
-      /// <summary>
-      /// Full connection string used to connect to EventHub
-      /// </summary>
-      public string ConnectionString { get; private set; }
 
       /// <summary>
       /// Create with connection string and entity path
@@ -37,7 +30,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <param name="connectionString">Connection string</param>
       /// <param name="path">Entity path</param>
       /// <returns></returns>
-      public static AzureEventHubPublisher Create(string connectionString, string path)
+      public static AzureEventHubMessenger Create(string connectionString, string path)
       {
          if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
          if (path == null) throw new ArgumentNullException(nameof(path));
@@ -47,27 +40,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
             EntityPath = path
          };
 
-         return new AzureEventHubPublisher(csb.ToString());
-      }
-
-      /// <summary>
-      /// The most detailed method with full fragmentation
-      /// </summary>
-      /// <param name="endpointAddress">Endpoint address</param>
-      /// <param name="entityPath">Entity path</param>
-      /// <param name="sharedAccessKeyName">Shared access key name</param>
-      /// <param name="sharedAccessKey">Shared access key value</param>
-      /// <returns></returns>
-      public static AzureEventHubPublisher Create(Uri endpointAddress, string entityPath, string sharedAccessKeyName, string sharedAccessKey)
-      {
-         if (endpointAddress == null) throw new ArgumentNullException(nameof(endpointAddress));
-         if (entityPath == null) throw new ArgumentNullException(nameof(entityPath));
-         if (sharedAccessKeyName == null) throw new ArgumentNullException(nameof(sharedAccessKeyName));
-         if (sharedAccessKey == null) throw new ArgumentNullException(nameof(sharedAccessKey));
-
-         var csb = new EventHubsConnectionStringBuilder(endpointAddress, entityPath, sharedAccessKeyName, sharedAccessKey);
-
-         return new AzureEventHubPublisher(csb.ToString());
+         return new AzureEventHubMessenger(csb.ToString());
       }
 
       /// <summary>
@@ -87,5 +60,25 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       {
          _client.CloseAsync().Wait();
       }
+
+      #region [ IMessenger ]
+
+      public Task CreateChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public Task<IReadOnlyCollection<string>> ListChannelsAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public Task DeleteChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+      public async Task SendAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
+      {
+         if(messages == null)
+            return;
+
+         await _client.SendAsync(messages.Select(Converter.ToEventData)).ConfigureAwait(false);
+      }
+
+      public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+      #endregion
    }
 }

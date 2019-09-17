@@ -17,21 +17,11 @@ namespace Storage.Net
       /// Creates a new instance of Azure Service Bus Queue by connection string and queue name
       /// </summary>
       /// <param name="factory">Factory reference</param>
-      /// <param name="connectionString">Service Bus connection string pointing to namespace or entity</param>
+      /// <param name="connectionString">Service Bus connection string pointing to a namespace or an entity</param>
       public static IMessenger AzureServiceBus(this IMessagingFactory factory,
          string connectionString)
       {
          return new AzureServiceBusMessenger(connectionString);
-      }
-
-      /// <summary>
-      /// Creates an instance of Azure Service Bus Topic publisher.
-      /// </summary>
-      public static IMessagePublisher AzureServiceBusTopicPublisher(this IMessagingFactory factory,
-         string connectionString,
-         string topicName)
-      {
-         return new AzureServiceBusTopicPublisher(connectionString, topicName);
       }
 
       /// <summary>

@@ -4,6 +4,7 @@ trigger:
     include:
       - master
       - v6
+      - queuesvnext
   paths:
     exclude:
       - README.md

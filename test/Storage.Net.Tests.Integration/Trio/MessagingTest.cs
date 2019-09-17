@@ -105,5 +105,17 @@ namespace Storage.Net.Tests.Integration.Messaging
          await Assert.ThrowsAsync<ArgumentNullException>(() => _msg.DeleteChannelsAsync(null));
       }
 
+      [Fact]
+      public async Task MessageCount_Send_One_Count_Changes()
+      {
+         long count1 = await _msg.GetMessageCountAsync(_qn);
+
+         await _msg.SendAsync(_qn, QueueMessage.FromText("bla bla"));
+
+         long count2 = await _msg.GetMessageCountAsync(_qn);
+
+         Assert.NotEqual(count1, count2);
+      }
+
    }
 }

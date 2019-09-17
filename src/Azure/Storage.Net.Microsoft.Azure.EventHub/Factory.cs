@@ -5,9 +5,6 @@ using Storage.Net.KeyValue;
 using System.Net;
 using Storage.Net.Microsoft.Azure.EventHub;
 using System.Collections.Generic;
-using EHP = Storage.Net.Microsoft.Azure.EventHub.AzureEventHubPublisher;
-using EHR = Storage.Net.Microsoft.Azure.EventHub.AzureEventHubReceiver;
-
 namespace Storage.Net
 {
    /// <summary>
@@ -16,39 +13,13 @@ namespace Storage.Net
    public static class Factory
    {
       /// <summary>
-      /// Creates Azure Event Hub publisher by namespace connection string and hub path
-      /// </summary>
-      /// <param name="factory">Factory reference</param>
-      /// <param name="connectionString">Connection string</param>
-      /// <param name="hubPath">Hub path (name)</param>
-      /// <returns>Message publisher</returns>
-      public static IMessagePublisher AzureEventHubPublisher(this IMessagingFactory factory, string connectionString, string hubPath)
-      {
-         return EHP.Create(connectionString, hubPath);
-      }
-
-      /// <summary>
       /// Create Azure Event Hub publisher by full connection string
       /// </summary>
       /// <param name="factory">Factory reference</param>
       /// <param name="fullConnectionString">Connection string</param>
-      public static IMessagePublisher AzureEventHubPublisher(this IMessagingFactory factory, string fullConnectionString)
+      public static IMessenger AzureEventHubPublisher(this IMessagingFactory factory, string fullConnectionString)
       {
-         return new EHP(fullConnectionString);
-      }
-
-      /// <summary>
-      /// The most detailed method with full fragmentation
-      /// </summary>
-      /// <param name="factory">Factory reference</param>
-      /// <param name="endpointAddress">Endpoint address</param>
-      /// <param name="entityPath">Entity path</param>
-      /// <param name="sharedAccessKeyName">Shared access key name</param>
-      /// <param name="sharedAccessKey">Shared access key value</param>
-      /// <returns></returns>
-      public static IMessagePublisher AzureEventHubPublisher(this IMessagingFactory factory, Uri endpointAddress, string entityPath, string sharedAccessKeyName, string sharedAccessKey)
-      {
-         return EHP.Create(endpointAddress, entityPath, sharedAccessKeyName, sharedAccessKey);
+         return new AzureEventHubMessenger(fullConnectionString);
       }
 
       /// <summary>

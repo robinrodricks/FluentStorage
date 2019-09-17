@@ -67,6 +67,19 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
             nameof(channelName));
       }
 
+      private static void DecomposeSubscription(string channelName, out string topicPath, out string subscriptionName)
+      {
+         Decompose(channelName, out string allPath, out bool isQueue);
+
+         int idx = allPath.IndexOf('/');
+         if(idx == -1)
+         {
+            throw new ArgumentException($"channel '{channelName}' does not contain topic and subscription name", nameof(channelName));
+         }
+         topicPath = allPath.Substring(0, idx);
+         subscriptionName = allPath.Substring(idx + 1);
+      }
+
       #region [ IMessenger ]
 
       public async Task CreateChannelsAsync(IEnumerable<string> channelNames, CancellationToken cancellationToken = default)
@@ -111,7 +124,23 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
          }
       }
 
-      public Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public async Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default)
+      {
+         Decompose(channelName, out string entityPath, out bool isQueue);
+
+         if(isQueue)
+         {
+            QueueRuntimeInfo qinfo = await _mgmt.GetQueueRuntimeInfoAsync(entityPath, cancellationToken).ConfigureAwait(false);
+            return qinfo.MessageCount;
+         }
+
+         DecomposeSubscription(channelName, out string topicPath, out string subscriptionName);
+
+         SubscriptionRuntimeInfo info = await _mgmt.GetSubscriptionRuntimeInfoAsync(topicPath, subscriptionName, cancellationToken).ConfigureAwait(false);
+         return info.MessageCount;
+
+         throw new NotSupportedException($"message count for topics is not supported, you should get a count on a subscription instead");
+      }
 
       public async Task<IReadOnlyCollection<string>> ListChannelsAsync(CancellationToken cancellationToken = default)
       {
@@ -144,6 +173,11 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
       public async Task CreateQueueAsync(string name)
       {
          await _mgmt.CreateQueueAsync(name).ConfigureAwait(false);
+
+         await _mgmt.CreateQueueAsync(new QueueDescription(name)
+         {
+            MaxSizeInMB = 10
+         });
       }
 
 
