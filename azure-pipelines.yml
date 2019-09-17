@@ -111,8 +111,8 @@ stages:
 
 - stage: Deploy
   dependsOn: ['Build', 'BlobsTest', 'MessagingTest'] 
-  condition: "eq(variables['Build.SourceBranch'], 'refs/heads/master')"
-  #condition: "and( or( eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/v7') ), succeeded('Build') )"
+  #condition: "eq(variables['Build.SourceBranch'], 'refs/heads/master')"
+  condition: "or( eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/queuesvnext') )"
   jobs:
   - deployment: NugetOrg
     pool:
