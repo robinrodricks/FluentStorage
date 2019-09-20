@@ -87,7 +87,15 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Rest.Model
          if(_flushed)
             return;
 
-         _api.UpdatePathAsync(_filesystemName, _relativePath, "flush", _pos, body: EmptyStream).Wait();
+         FlushAsync().Wait();
+      }
+
+      public override async Task FlushAsync(CancellationToken cancellationToken = default)
+      {
+         if(_flushed)
+            return;
+
+         await _api.UpdatePathAsync(_filesystemName, _relativePath, "flush", _pos, body: EmptyStream).ConfigureAwait(false);
 
          _flushed = true;
       }
