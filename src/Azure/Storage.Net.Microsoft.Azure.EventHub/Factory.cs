@@ -1,8 +1,5 @@
-﻿using System;
-using Storage.Net.Blobs;
+﻿using Storage.Net.Blobs;
 using Storage.Net.Messaging;
-using Storage.Net.KeyValue;
-using System.Net;
 using Storage.Net.Microsoft.Azure.EventHub;
 using System.Collections.Generic;
 namespace Storage.Net
@@ -16,10 +13,11 @@ namespace Storage.Net
       /// Create Azure Event Hub publisher by full connection string
       /// </summary>
       /// <param name="factory">Factory reference</param>
-      /// <param name="fullConnectionString">Connection string</param>
-      public static IMessenger AzureEventHubPublisher(this IMessagingFactory factory, string fullConnectionString)
+      /// <param name="connectionString">Connection string</param>
+      /// <param name="eventHubName"></param>
+      public static IMessenger AzureEventHubMessenger(this IMessagingFactory factory, string connectionString, string eventHubName)
       {
-         return new AzureEventHubMessenger(fullConnectionString);
+         return new AzureEventHubMessenger(connectionString, eventHubName);
       }
 
       /// <summary>

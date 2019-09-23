@@ -17,17 +17,24 @@ namespace Storage.Net.Tests.Integration.Messaging
       private readonly IMessenger _msg;
       private readonly string _qn;
 
-      protected MessagingTest(MessagingFixture fixture, string channelPrefix = null)
+      protected MessagingTest(MessagingFixture fixture, string channelPrefix = null, string channelFixedName = null)
       {
          _fixture = fixture;
          _channelPrefix = channelPrefix;
-         _qn = NewChannelName();
+         _qn = channelFixedName ?? NewChannelName();
          _msg = fixture.Messenger;
       }
 
       public async Task InitializeAsync()
       {
-         await _msg.CreateChannelAsync(_qn);
+         try
+         {
+            await _msg.CreateChannelAsync(_qn);
+         }
+         catch(NotSupportedException)
+         {
+
+         }
       }
 
       private string NewChannelName()
@@ -78,7 +85,14 @@ namespace Storage.Net.Tests.Integration.Messaging
       {
          string channelName = NewChannelName();
 
-         await _msg.CreateChannelAsync(channelName);
+         try
+         {
+            await _msg.CreateChannelAsync(channelName);
+         }
+         catch(NotSupportedException)
+         {
+            return;
+         }
 
          //some providers don't list channels immediately as they are eventually consistent
 
@@ -102,7 +116,14 @@ namespace Storage.Net.Tests.Integration.Messaging
       {
          string channelName = NewChannelName();
 
-         await _msg.CreateChannelAsync(channelName);
+         try
+         {
+            await _msg.CreateChannelAsync(channelName);
+         }
+         catch(NotSupportedException)
+         {
+            return;
+         }
 
          await _msg.DeleteChannelAsync(channelName);
 
@@ -121,7 +142,16 @@ namespace Storage.Net.Tests.Integration.Messaging
       [Fact]
       public async Task MessageCount_Send_One_Count_Changes()
       {
-         long count1 = await _msg.GetMessageCountAsync(_qn);
+         long count1;
+
+         try
+         {
+            count1 = await _msg.GetMessageCountAsync(_qn);
+         }
+         catch(NotSupportedException)
+         {
+            return;
+         }
 
          await _msg.SendAsync(_qn, QueueMessage.FromText("bla bla"));
 
@@ -139,7 +169,14 @@ namespace Storage.Net.Tests.Integration.Messaging
       [Fact]
       public async Task MessageCount_NonExistentQueue_Return0()
       {
-         Assert.Equal(0, await _msg.GetMessageCountAsync(NewChannelName()));
+         try
+         {
+            Assert.Equal(0, await _msg.GetMessageCountAsync(NewChannelName()));
+         }
+         catch(NotSupportedException)
+         {
+
+         }
       }
 
    }

@@ -120,13 +120,13 @@ namespace Storage.Net.Tests.Integration.Messaging
    {
       protected override IMessenger CreateMessenger(ITestSettings settings)
       {
-         return StorageFactory.Messages.AzureEventHubPublisher(settings.EventHubConnectionString);
+         return StorageFactory.Messages.AzureEventHubMessenger(settings.EventHubConnectionString, settings.EventHubPath);
       }
    }
 
    public class AzureEventHubTest : MessagingTest, IClassFixture<AzureEventHubFixture>
    {
-      public AzureEventHubTest(AzureEventHubFixture fixture) : base(fixture)
+      public AzureEventHubTest(AzureEventHubFixture fixture) : base(fixture, channelFixedName: "integration")
       {
       }
    }
