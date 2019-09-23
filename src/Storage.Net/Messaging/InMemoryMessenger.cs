@@ -27,7 +27,14 @@ namespace Storage.Net.Messaging
          return Task.CompletedTask;
       }
 
-      public Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default)
+      {
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
+
+         ConcurrentQueue<QueueMessage> queue = GetQueue(channelName);
+         return Task.FromResult((long)queue.Count);
+      }
 
       public Task<IReadOnlyCollection<string>> ListChannelsAsync(CancellationToken cancellationToken = default)
       {

@@ -126,18 +126,36 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
 
       public async Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default)
       {
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
+
          Decompose(channelName, out string entityPath, out bool isQueue);
 
          if(isQueue)
          {
-            QueueRuntimeInfo qinfo = await _mgmt.GetQueueRuntimeInfoAsync(entityPath, cancellationToken).ConfigureAwait(false);
-            return qinfo.MessageCount;
+
+            try
+            {
+               QueueRuntimeInfo qinfo = await _mgmt.GetQueueRuntimeInfoAsync(entityPath, cancellationToken).ConfigureAwait(false);
+               return qinfo.MessageCount;
+            }
+            catch(MessagingEntityNotFoundException)
+            {
+               return 0;
+            }
          }
 
          DecomposeSubscription(channelName, out string topicPath, out string subscriptionName);
 
-         SubscriptionRuntimeInfo info = await _mgmt.GetSubscriptionRuntimeInfoAsync(topicPath, subscriptionName, cancellationToken).ConfigureAwait(false);
-         return info.MessageCount;
+         try
+         {
+            SubscriptionRuntimeInfo info = await _mgmt.GetSubscriptionRuntimeInfoAsync(topicPath, subscriptionName, cancellationToken).ConfigureAwait(false);
+            return info.MessageCount;
+         }
+         catch(MessagingEntityNotFoundException)
+         {
+            return 0;
+         }
 
          throw new NotSupportedException($"message count for topics is not supported, you should get a count on a subscription instead");
       }

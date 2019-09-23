@@ -72,10 +72,20 @@ namespace Storage.Net.Amazon.Aws.Messaging
 
       public async Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default)
       {
-         GetQueueAttributesResponse attributes =
-            await _client.GetQueueAttributesAsync(GetQueueUri(channelName), new List<string> { "All" }, cancellationToken).ConfigureAwait(false);
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
 
-         return attributes.ApproximateNumberOfMessages;
+         try
+         {
+            GetQueueAttributesResponse attributes =
+               await _client.GetQueueAttributesAsync(GetQueueUri(channelName), new List<string> { "All" }, cancellationToken).ConfigureAwait(false);
+
+            return attributes.ApproximateNumberOfMessages;
+         }
+         catch(AmazonSQSException ex) when (ex.ErrorCode == "AWS.SimpleQueueService.NonExistentQueue")
+         {
+            return 0;
+         }
       }
 
       public async Task SendAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)

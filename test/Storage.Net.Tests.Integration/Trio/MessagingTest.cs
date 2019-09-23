@@ -82,7 +82,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          //some providers don't list channels immediately as they are eventually consistent
 
-         const int maxRetries = 5;
+         const int maxRetries = 50;
 
          for(int i = 0; i < maxRetries; i++)
          {
@@ -128,6 +128,18 @@ namespace Storage.Net.Tests.Integration.Messaging
          long count2 = await _msg.GetMessageCountAsync(_qn);
 
          Assert.NotEqual(count1, count2);
+      }
+
+      [Fact]
+      public async Task MessageCount_Null_ThrowsArgumentNull()
+      {
+         await Assert.ThrowsAsync<ArgumentNullException>(() => _msg.GetMessageCountAsync(null));
+      }
+
+      [Fact]
+      public async Task MessageCount_NonExistentQueue_Return0()
+      {
+         Assert.Equal(0, await _msg.GetMessageCountAsync(NewChannelName()));
       }
 
    }

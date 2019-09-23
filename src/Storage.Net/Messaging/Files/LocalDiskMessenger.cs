@@ -41,7 +41,12 @@ namespace Storage.Net.Messaging.Files
 
       private IReadOnlyCollection<FileInfo> GetMessageFiles(string channelName)
       {
-         return new DirectoryInfo(Path.Combine(_root, channelName)).GetFiles("*" + FileExtension, SearchOption.TopDirectoryOnly);
+         string directoryPath = Path.Combine(_root, channelName);
+
+         if(!Directory.Exists(directoryPath))
+            return new List<FileInfo>();
+
+         return new DirectoryInfo(directoryPath).GetFiles("*" + FileExtension, SearchOption.TopDirectoryOnly);
       }
 
       private string GetMessagePath(string channelName)

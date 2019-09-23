@@ -9,6 +9,7 @@ using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Auth;
 using Microsoft.Azure.Storage.Queue;
 using Storage.Net.Messaging;
+using WSE = Microsoft.Azure.Storage.StorageException;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Messaging
 {
@@ -54,7 +55,27 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
       }
 
 
-      public Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public async Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default)
+      {
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
+
+         CloudQueue queue = await GetQueueAsync(channelName, false).ConfigureAwait(false);
+
+         if(queue == null)
+            return 0;
+
+         try
+         {
+            await queue.FetchAttributesAsync().ConfigureAwait(false);
+         }
+         catch(WSE ex) when(ex.RequestInformation.HttpStatusCode == 404)
+         {
+            return 0;
+         }
+
+         return queue.ApproximateMessageCount ?? 0;
+      }
 
       public async Task<IReadOnlyCollection<string>> ListChannelsAsync(CancellationToken cancellationToken = default)
       {
