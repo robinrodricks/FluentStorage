@@ -69,7 +69,7 @@ namespace Storage.Net
       /// <param name="bucketName">Bucket name</param>
       /// <param name="serviceUrl">S3-compatible service location</param>
       /// <returns>A reference to the created storage</returns>
-      public static IBlobStorage AmazonS3BlobStorage(this IBlobStorageFactory factory,
+      public static IBlobStorage AwsS3(this IBlobStorageFactory factory,
          string accessKeyId,
          string secretAccessKey,
          string bucketName,
