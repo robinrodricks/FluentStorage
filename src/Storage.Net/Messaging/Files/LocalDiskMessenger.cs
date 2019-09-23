@@ -125,23 +125,37 @@ namespace Storage.Net.Messaging.Files
          TimeSpan? visibility = null,
          CancellationToken cancellationToken = default)
       {
-         //get all files (not efficient, but we hope there won't be many)
-         IReadOnlyCollection<FileInfo> files = GetMessageFiles(channelName);
-
-         //sort files so that oldest appear first, take max and return
-         return Task.FromResult<IReadOnlyCollection<QueueMessage>>(files
-            .OrderBy(f => f.Name)
-            .Take(count)
-            .Select(ToQueueMessage)
-            .ToList());
+         return Task.FromResult(GetMessages(channelName, count));
       }
 
-      public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default)
+      {
+         return Task.FromResult(GetMessages(channelName, count));
+      }
+
       public void Dispose()
       {
 
       }
 
+      public Task DeleteAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
       #endregion
+
+      private IReadOnlyCollection<QueueMessage> GetMessages(
+         string channelName,
+         int count)
+      {
+         //get all files (not efficient, but we hope there won't be many)
+         IReadOnlyCollection<FileInfo> files = GetMessageFiles(channelName);
+
+         //sort files so that oldest appear first, take max and return
+         return files
+            .OrderBy(f => f.Name)
+            .Take(count)
+            .Select(ToQueueMessage)
+            .ToList();
+      }
+
    }
 }

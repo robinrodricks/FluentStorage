@@ -116,13 +116,30 @@ namespace Storage.Net.Amazon.Aws.Messaging
          }
       }
 
-      public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public async Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default)
+      {
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
+
+         var request = new ReceiveMessageRequest(GetQueueUri(channelName))
+         {
+            MessageAttributeNames = new List<string> { ".*" },
+            MaxNumberOfMessages = Math.Min(10, count)
+         };
+
+         ReceiveMessageResponse messages = await _client.ReceiveMessageAsync(request, cancellationToken).ConfigureAwait(false);
+
+         return messages.Messages.Select(Converter.ToQueueMessage).ToList();
+      }
+
       public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
       public void Dispose()
       {
 
       }
+
+      public Task DeleteAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
       #endregion
    }

@@ -75,5 +75,17 @@ namespace Storage.Net.Messaging
          string channelName,
          int count = 100,
          CancellationToken cancellationToken = default);
+
+      /// <summary>
+      /// Deletes messages from the channel
+      /// </summary>
+      /// <param name="channelName"></param>
+      /// <param name="messages"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      Task DeleteAsync(
+         string channelName,
+         IEnumerable<QueueMessage> messages,
+         CancellationToken cancellationToken = default);
    }
 }

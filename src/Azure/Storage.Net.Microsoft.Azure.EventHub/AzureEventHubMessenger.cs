@@ -106,6 +106,8 @@ namespace Storage.Net.Microsoft.Azure.EventHub
          }
       }
 
+      public Task DeleteAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
       #endregion
    }
 }

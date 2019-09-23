@@ -179,5 +179,32 @@ namespace Storage.Net.Tests.Integration.Messaging
          }
       }
 
+      [Fact]
+      public async Task Receive_SendOne_Received()
+      {
+         string tag = await SendAsync();
+
+         IReadOnlyCollection<QueueMessage> messages = await _msg.ReceiveAsync(_qn);
+
+         Assert.Contains(messages, m => m.Properties.TryGetValue("tag", out string itag) && itag == tag);
+      }
+
+      [Fact]
+      public async Task Receive_NullChannel_ArgumentNullException()
+      {
+         await Assert.ThrowsAsync<ArgumentNullException>(() => _msg.ReceiveAsync(null));
+      }
+
+      private async Task<string> SendAsync()
+      {
+         string tag = Guid.NewGuid().ToString();
+
+         var msg = QueueMessage.FromText("hm");
+         msg.Properties["tag"] = tag;
+
+         await _msg.SendAsync(_qn, msg);
+
+         return tag;
+      }
    }
 }

@@ -109,10 +109,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
          }
       }
 
-
-      public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-      public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
       public async Task SendAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
       {
          CloudQueue queue = await GetQueueAsync(channelName).ConfigureAwait(false);
@@ -125,10 +121,47 @@ namespace Storage.Net.Microsoft.Azure.Storage.Messaging
          })).ConfigureAwait(false);
       }
 
+      public async Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default)
+      {
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
+
+         CloudQueue queue = await GetQueueAsync(channelName).ConfigureAwait(false);
+
+         IEnumerable<CloudQueueMessage> batch = await queue.PeekMessagesAsync(count).ConfigureAwait(false);
+
+         return batch.Select(Converter.ToQueueMessage).ToList();
+
+      }
+
+      public async Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(
+         string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default)
+      {
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
+
+         //storage queue can get up to 32 messages
+         if(count > 32)
+            count = 32;
+
+         CloudQueue queue = await GetQueueAsync(channelName).ConfigureAwait(false);
+
+         IEnumerable<CloudQueueMessage> batch = await queue.GetMessagesAsync(count, visibility, null, null, cancellationToken).ConfigureAwait(false);
+
+         if(batch == null)
+            return new QueueMessage[0];
+
+         List<QueueMessage> result = batch.Select(Converter.ToQueueMessage).ToList();
+         return result;
+      }
+
+
       public void Dispose()
       {
 
       }
+
+      public Task DeleteAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
 
       #endregion

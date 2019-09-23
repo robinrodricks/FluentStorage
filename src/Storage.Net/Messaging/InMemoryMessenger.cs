@@ -95,5 +95,7 @@ namespace Storage.Net.Messaging
          _nameToMessenger[name] = messenger;
          return messenger;
       }
+
+      public Task DeleteAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotImplementedException();
    }
 }
