@@ -4,6 +4,8 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Storage.Net.Microsoft.Azure.ServiceBus;
+using System.Linq;
+using System.Threading;
 
 namespace Storage.Net.Tests.Integration.Messaging
 {
@@ -76,12 +78,23 @@ namespace Storage.Net.Tests.Integration.Messaging
       {
          string channelName = NewChannelName();
 
-         //send one message so channel gets created
          await _msg.CreateChannelAsync(channelName);
 
-         IReadOnlyCollection<string> channels = await _msg.ListChannelsAsync();
+         //some providers don't list channels immediately as they are eventually consistent
 
-         Assert.Contains(channelName, channels);
+         const int maxRetries = 5;
+
+         for(int i = 0; i < maxRetries; i++)
+         {
+            IReadOnlyCollection<string> channels = await _msg.ListChannelsAsync();
+
+            if(channels.Contains(channelName))
+               return;
+
+            await Task.Delay(TimeSpan.FromSeconds(5));
+         }
+
+         Assert.True(false, $"channel not found after {maxRetries} retries.");
       }
 
       [Fact]

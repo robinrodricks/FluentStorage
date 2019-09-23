@@ -70,7 +70,13 @@ namespace Storage.Net.Amazon.Aws.Messaging
          }
       }
 
-      public Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public async Task<long> GetMessageCountAsync(string channelName, CancellationToken cancellationToken = default)
+      {
+         GetQueueAttributesResponse attributes =
+            await _client.GetQueueAttributesAsync(GetQueueUri(channelName), new List<string> { "All" }, cancellationToken).ConfigureAwait(false);
+
+         return attributes.ApproximateNumberOfMessages;
+      }
 
       public async Task SendAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
       {
