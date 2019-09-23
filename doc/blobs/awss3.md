@@ -1,8 +1,10 @@
 # AWS S3
 
-In order to use Microsoft Azure blob storage you need to reference [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Amazon.Aws.svg)](https://www.nuget.org/packages/Storage.Net.Amazon.Aws/) package first. The provider wraps around the standard AWS SDK which is updated regularly.
+In order to use **S3** you need to reference [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Amazon.Aws.svg)](https://www.nuget.org/packages/Storage.Net.Amazon.Aws/) package first. The provider wraps around the standard AWS SDK which is updated regularly, but adds a lot of untrivial workarounds that makes your life painless.
 
+## Connecting
 
+Unfortunately, AWS is not as good in permission management as Azure Active Directory, therefore you have the following options:
 
 There are a few overloads in this package, for instance:
 

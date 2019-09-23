@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,6 +22,15 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
       private readonly string _connectionString;
       private readonly string _entityPath;
 
+      private readonly ConcurrentDictionary<string, QueueClient> _channelNameToQueueClient =
+         new ConcurrentDictionary<string, QueueClient>();
+
+      private readonly ConcurrentDictionary<string, TopicClient> _channelNameToTopicClient =
+         new ConcurrentDictionary<string, TopicClient>();
+
+      private readonly ConcurrentDictionary<string, MessageReceiver> _channelNameToMessageReceiver =
+         new ConcurrentDictionary<string, MessageReceiver>();
+
       public AzureServiceBusMessenger(string connectionString)
       {
          _connectionString = connectionString;
@@ -36,15 +46,36 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
          return null;
       }
 
-      ISenderClient CreateSenderClient(string channelName)
+      ISenderClient CreateOrGetSenderClient(string channelName)
       {
          Decompose(channelName, out string entityPath, out bool isQueue);
 
          if(isQueue)
-            return new QueueClient(_connectionString, entityPath);
+            return _channelNameToQueueClient.GetOrAdd(channelName, cn => new QueueClient(_connectionString, entityPath, ReceiveMode.PeekLock));
 
-         return new TopicClient(_connectionString, entityPath);
+         return _channelNameToTopicClient.GetOrAdd(channelName, cn => new TopicClient(_connectionString, entityPath));
       }
+
+      IReceiverClient CreateOrGetReceiverClient(string channelName)
+      {
+         Decompose(channelName, out string entityPath, out bool isQueue);
+
+         if(isQueue)
+            return _channelNameToQueueClient.GetOrAdd(channelName, cn => new QueueClient(_connectionString, entityPath, ReceiveMode.PeekLock));
+
+         throw new NotImplementedException();
+      }
+
+      MessageReceiver CreateMessageReceiver(string channelName)
+      {
+         Decompose(channelName, out string entityPath, out bool isQueue);
+
+         if(isQueue)
+            return _channelNameToMessageReceiver.GetOrAdd(channelName, cn => new MessageReceiver(_connectionString, entityPath, ReceiveMode.PeekLock));
+
+         throw new NotImplementedException();
+      }
+
 
       private static void Decompose(string channelName, out string entityPath, out bool isQueue)
       {
@@ -102,7 +133,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
 
       public async Task SendAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
       {
-         ISenderClient client = CreateSenderClient(channelName);
+         ISenderClient client = CreateOrGetSenderClient(channelName);
 
          IList<Message> sbmsg = messages.Select(Converter.ToMessage).ToList();
          await client.SendAsync(sbmsg).ConfigureAwait(false);
@@ -177,7 +208,18 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
       }
 
       public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-      public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+      public async Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(
+         string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default)
+      {
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
+
+         MessageReceiver receiver = CreateMessageReceiver(channelName);
+         IList<Message> messages = await receiver.ReceiveAsync(count).ConfigureAwait(false);
+
+         return messages.Select(Converter.ToQueueMessage).ToList();
+      }
 
       public void Dispose()
       {
@@ -191,11 +233,6 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
       public async Task CreateQueueAsync(string name)
       {
          await _mgmt.CreateQueueAsync(name).ConfigureAwait(false);
-
-         await _mgmt.CreateQueueAsync(new QueueDescription(name)
-         {
-            MaxSizeInMB = 10
-         });
       }
 
       public Task DeleteAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotImplementedException();

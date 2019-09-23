@@ -92,8 +92,22 @@ namespace Storage.Net.Microsoft.Azure.EventHub
          await client.SendAsync(messages.Select(Converter.ToEventData)).ConfigureAwait(false);
       }
 
-      public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-      public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(
+         string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default)
+      {
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
+
+         throw new NotSupportedException();
+      }
+
+      public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default)
+      {
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
+
+         throw new NotImplementedException();
+      }
 
       /// <summary>
       /// Closes the receiver
@@ -102,6 +116,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       {
          foreach(KeyValuePair<string, EventHubClient> client in _entityNameToClient)
          {
+            //close in forgettable fashion - it's better than deadlocking at least.
             client.Value.CloseAsync().Forget();
          }
       }

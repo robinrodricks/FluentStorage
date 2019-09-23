@@ -24,6 +24,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
       private const int ListChunkSize = 10;
       private readonly string _bucketName;
       private readonly AmazonS3Client _client;
+      private readonly AmazonS3Client _neutralClient;
       private readonly TransferUtility _fileTransferUtility;
       private readonly bool _skipBucketCreation = false;
       private bool _initialised = false;
@@ -35,6 +36,12 @@ namespace Storage.Net.Amazon.Aws.Blobs
       public IAmazonS3 NativeBlobClient => _client;
 
       //https://github.com/awslabs/aws-sdk-net-samples/blob/master/ConsoleSamples/AmazonS3Sample/AmazonS3Sample/S3Sample.cs
+
+      public AwsS3BlobStorage(string accessKeyId, string secretAccessKey)
+         : this(accessKeyId, secretAccessKey, (string)null, (RegionEndpoint)null)
+      {
+
+      }
 
 
       /// <summary>
@@ -53,7 +60,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
       /// Creates a new instance of <see cref="AwsS3BlobStorage"/> for a given region endpoint
       /// </summary>
       public AwsS3BlobStorage(string accessKeyId, string secretAccessKey, string bucketName, RegionEndpoint regionEndpoint, bool skipBucketCreation = false)
-         : this(accessKeyId, secretAccessKey, bucketName, new AmazonS3Config { RegionEndpoint = regionEndpoint ?? RegionEndpoint.EUWest1 }, skipBucketCreation)
+         : this(accessKeyId, secretAccessKey, bucketName, new AmazonS3Config { RegionEndpoint = regionEndpoint }, skipBucketCreation)
       {
       }
 
@@ -76,10 +83,15 @@ namespace Storage.Net.Amazon.Aws.Blobs
       {
          if (accessKeyId == null) throw new ArgumentNullException(nameof(accessKeyId));
          if (secretAccessKey == null) throw new ArgumentNullException(nameof(secretAccessKey));
-         _bucketName = bucketName ?? throw new ArgumentNullException(nameof(bucketName));
+
+         _bucketName = bucketName;
          _skipBucketCreation = skipBucketCreation;
-         _client = new AmazonS3Client(new BasicAWSCredentials(accessKeyId, secretAccessKey), clientConfig);
+         var cred = new BasicAWSCredentials(accessKeyId, secretAccessKey);
+         _client = new AmazonS3Client(cred, clientConfig);
+         _neutralClient = new AmazonS3Client(cred, RegionEndpoint.USEast1);   //can be any region
          _fileTransferUtility = new TransferUtility(_client);
+
+         // probably can connect to any region, then use GetBucketLocationAsync
       }
 
       private async Task<AmazonS3Client> GetClientAsync()
@@ -109,6 +121,20 @@ namespace Storage.Net.Amazon.Aws.Blobs
       /// </summary>
       public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default)
       {
+         if(_bucketName != null)
+         {
+            return await ListAsync(_bucketName, options, cancellationToken).ConfigureAwait(false);
+         }
+
+         throw new NotImplementedException();
+      }
+
+
+      /// <summary>
+      /// Lists all buckets, optionaly filtering by prefix. Prefix filtering happens on client side.
+      /// </summary>
+      public async Task<IReadOnlyCollection<Blob>> ListAsync(string bucketName, ListOptions options = null, CancellationToken cancellationToken = default)
+      {
          if (options == null) options = new ListOptions();
 
          GenericValidation.CheckBlobPrefix(options.FilePrefix);
@@ -130,6 +156,13 @@ namespace Storage.Net.Amazon.Aws.Blobs
          }
 
          return blobs;
+      }
+
+      private async Task<RegionEndpoint> GetBucketRegionEndpointAsync(string bucketName)
+      {
+         GetBucketLocationResponse location = await _neutralClient.GetBucketLocationAsync(bucketName);
+
+         return RegionEndpoint.GetBySystemName(location.Location.Value);
       }
 
       /// <summary>

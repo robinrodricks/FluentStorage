@@ -55,7 +55,45 @@ namespace Storage.Net.Messaging
       }
 
       public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-      public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(
+         string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default)
+      {
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
+
+         return Task.FromResult<IReadOnlyCollection<QueueMessage>>(GetMessages(channelName, count, visibility));
+      }
+
+      private List<QueueMessage> GetMessages(string channelName, int count, TimeSpan? visibility)
+      {
+         var result = new List<QueueMessage>();
+         ConcurrentQueue<QueueMessage> queue = GetQueue(channelName);
+
+         DateTime now = DateTime.UtcNow;
+         DateTimeOffset nextVisible = now + (visibility ?? TimeSpan.FromMinutes(1));
+         while(result.Count < count)
+         {
+            if(!queue.TryDequeue(out QueueMessage msg))
+               break;
+
+            bool isVisible = msg.NextVisibleTime == null || (msg.NextVisibleTime.Value >= now);
+
+            if(isVisible)
+            {
+               result.Add(msg);
+
+               msg.NextVisibleTime = nextVisible;
+               queue.Enqueue(msg);
+            }
+            else
+            {
+               queue.Enqueue(msg);
+            }
+         }
+
+         return result;
+
+      }
 
       public Task SendAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
       {
