@@ -15,6 +15,7 @@ This page lists blob storage providers available in Storage.Net
   - [Gen 1](#gen-1) 
   - [Gen 2](#gen-2) 
 - [Google Cloud Storage](#google-cloud-storage)
+- [Azure Key Vault](#azure-key-vault)
 
 ### In-Memory
 
@@ -338,3 +339,9 @@ IBlobStorage storage = StorageFactory.Blobs.FromConnectionString("google.storage
 ```
 
 Where **cred** is a *BASE64* encoded credential string.
+
+### Azure Key Vault
+
+In order to use Key Vault reference [![NuGet](https://img.shields.io/nuget/v/Storage.Net.Microsoft.Azure.KeyVault.svg)](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.KeyVault) package first.
+
+> todo

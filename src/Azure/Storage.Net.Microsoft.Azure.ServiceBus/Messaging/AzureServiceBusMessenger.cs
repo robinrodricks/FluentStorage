@@ -105,7 +105,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
          int idx = allPath.IndexOf('/');
          if(idx == -1)
          {
-            throw new ArgumentException($"channel '{channelName}' does not contain topic and subscription name", nameof(channelName));
+            throw new ArgumentException($"channel '{channelName}' does not contain topic and subscription name, it should look like '{TopicPrefix}/topic_name/subscription_name'", nameof(channelName));
          }
          topicPath = allPath.Substring(0, idx);
          subscriptionName = allPath.Substring(idx + 1);

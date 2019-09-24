@@ -87,5 +87,13 @@ namespace Storage.Net.Messaging
          string channelName,
          IEnumerable<QueueMessage> messages,
          CancellationToken cancellationToken = default);
+
+      /// <summary>
+      /// Starts message processor which listens for new messages asynchronously and passes to the processing host.
+      /// </summary>
+      /// <param name="channelName">Name of the channel</param>
+      /// <param name="messageProcessor">Message processor implementation</param>
+      /// <returns></returns>
+      Task StartMessageProcessorAsync(string channelName, IMessageProcessor messageProcessor);
    }
 }

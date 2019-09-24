@@ -16,6 +16,7 @@ using NetBox;
 using System.Net;
 using Storage.Net.Streaming;
 using Storage.Net.Blobs;
+using Microsoft.Azure.Services.AppAuthentication;
 
 namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
 {
@@ -28,9 +29,19 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
 
       public AzureKeyVaultBlobStorageProvider(Uri vaultUri, string azureAadClientId, string azureAadClientSecret)
       {
+         
          _credential = new ClientCredential(azureAadClientId, azureAadClientSecret);
 
          _vaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(GetAccessTokenAsync), GetHttpClient());
+
+         _vaultUri = vaultUri.ToString().Trim('/');
+      }
+
+      public AzureKeyVaultBlobStorageProvider(Uri vaultUri)
+      {
+         var astp = new AzureServiceTokenProvider();
+
+         _vaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(astp.KeyVaultTokenCallback));
 
          _vaultUri = vaultUri.ToString().Trim('/');
       }
