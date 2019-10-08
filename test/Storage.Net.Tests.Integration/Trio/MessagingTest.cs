@@ -14,14 +14,16 @@ namespace Storage.Net.Tests.Integration.Messaging
    {
       private readonly MessagingFixture _fixture;
       private readonly string _channelPrefix;
+      private readonly string _receiveChannelSuffix;
       private readonly IMessenger _msg;
       private readonly string _qn;
 
-      protected MessagingTest(MessagingFixture fixture, string channelPrefix = null, string channelFixedName = null)
+      protected MessagingTest(MessagingFixture fixture, string channelPrefix = null, string channelFixedName = null, string receiveChannelSuffix = null)
       {
          _fixture = fixture;
          _channelPrefix = channelPrefix;
          _qn = channelFixedName ?? NewChannelName();
+         _receiveChannelSuffix = receiveChannelSuffix;
          _msg = fixture.Messenger;
       }
 
@@ -146,7 +148,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          try
          {
-            count1 = await _msg.GetMessageCountAsync(_qn);
+            count1 = await _msg.GetMessageCountAsync(_qn + _receiveChannelSuffix);
          }
          catch(NotSupportedException)
          {
@@ -155,7 +157,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          await _msg.SendAsync(_qn, QueueMessage.FromText("bla bla"));
 
-         long count2 = await _msg.GetMessageCountAsync(_qn);
+         long count2 = await _msg.GetMessageCountAsync(_qn + _receiveChannelSuffix);
 
          Assert.NotEqual(count1, count2);
       }
@@ -171,7 +173,7 @@ namespace Storage.Net.Tests.Integration.Messaging
       {
          try
          {
-            Assert.Equal(0, await _msg.GetMessageCountAsync(NewChannelName()));
+            Assert.Equal(0, await _msg.GetMessageCountAsync(NewChannelName() + _receiveChannelSuffix));
          }
          catch(NotSupportedException)
          {
@@ -184,9 +186,16 @@ namespace Storage.Net.Tests.Integration.Messaging
       {
          string tag = await SendAsync();
 
-         IReadOnlyCollection<QueueMessage> messages = await _msg.ReceiveAsync(_qn);
+         try
+         {
+            IReadOnlyCollection<QueueMessage> messages = await _msg.ReceiveAsync(_qn);
 
-         Assert.Contains(messages, m => m.Properties.TryGetValue("tag", out string itag) && itag == tag);
+            Assert.Contains(messages, m => m.Properties.TryGetValue("tag", out string itag) && itag == tag);
+         }
+         catch(NotSupportedException)
+         {
+
+         }
       }
 
       [Fact]

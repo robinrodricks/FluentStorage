@@ -73,7 +73,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
          if(isQueue)
             return _channelNameToMessageReceiver.GetOrAdd(channelName, cn => new MessageReceiver(_connectionString, entityPath, ReceiveMode.PeekLock));
 
-         throw new NotImplementedException();
+         throw new NotSupportedException();
       }
 
 
@@ -105,7 +105,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
          int idx = allPath.IndexOf('/');
          if(idx == -1)
          {
-            throw new ArgumentException($"channel '{channelName}' does not contain topic and subscription name, it should look like '{TopicPrefix}/topic_name/subscription_name'", nameof(channelName));
+            throw new ArgumentException($"channel '{channelName}' does not contain topic and subscription name, it should look like '{TopicPrefix}topic_name/subscription_name'", nameof(channelName));
          }
          topicPath = allPath.Substring(0, idx);
          subscriptionName = allPath.Substring(idx + 1);
@@ -177,8 +177,9 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
          }
 
          DecomposeSubscription(channelName, out string topicPath, out string subscriptionName);
+         throw new NotSupportedException();
 
-         try
+         /*try
          {
             SubscriptionRuntimeInfo info = await _mgmt.GetSubscriptionRuntimeInfoAsync(topicPath, subscriptionName, cancellationToken).ConfigureAwait(false);
             return info.MessageCount;
@@ -186,9 +187,7 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
          catch(MessagingEntityNotFoundException)
          {
             return 0;
-         }
-
-         throw new NotSupportedException($"message count for topics is not supported, you should get a count on a subscription instead");
+         }*/
       }
 
       public async Task<IReadOnlyCollection<string>> ListChannelsAsync(CancellationToken cancellationToken = default)
