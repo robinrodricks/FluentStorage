@@ -67,6 +67,20 @@ namespace Storage.Net
       }
 
       /// <summary>
+      /// Creates a blob storage implementation using Shared Access Signature.
+      /// </summary>
+      /// <param name="factory">Reference to factory</param>
+      /// <param name="accountName"></param>
+      /// <param name="sharedAccessSignature"></param>
+      /// <returns></returns>
+      public static IBlobStorage AzureBlobStorageFromSas(this IBlobStorageFactory factory,
+         string accountName,
+         string sharedAccessSignature)
+      {
+         return AzureUniversalBlobStorageProvider.CreateFromSas(accountName, sharedAccessSignature);
+      }
+
+      /// <summary>
       /// Creates a blob storage implementation based on Microsoft Azure Files.
       /// </summary>
       /// <param name="factory">Reference to factory</param>
@@ -99,7 +113,7 @@ namespace Storage.Net
          if(cloudBlobClient == null)
             throw new ArgumentNullException(nameof(cloudBlobClient));
 
-         return new AzureUniversalBlobStorageProvider(cloudBlobClient);
+         return new AzureUniversalBlobStorageProvider(cloudBlobClient, null);
       }
 
       /// <summary>
