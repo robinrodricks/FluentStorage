@@ -370,6 +370,36 @@ namespace Storage.Net.Blobs
          }
       }
 
+      /// <summary>
+      /// Rename a blob (folder, file etc.).
+      /// </summary>
+      /// <param name="blobStorage"></param>
+      /// <param name="oldPath"></param>
+      /// <param name="newPath"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      public static async Task RenameAsync(this IBlobStorage blobStorage,
+         string oldPath, string newPath, CancellationToken cancellationToken = default)
+      {
+         //todo: try to use extended client here
+
+         //this needs to be done recursively
+         foreach(Blob item in await blobStorage.ListAsync(oldPath, recurse: true))
+         {
+            if(item.IsFile)
+            {
+               string renamedPath = item.FullPath.Replace(oldPath, newPath);
+
+               await blobStorage.CopyToAsync(item, blobStorage, renamedPath, cancellationToken);
+               await blobStorage.DeleteAsync(item, cancellationToken);
+            }
+         }
+
+         //rename self
+         await blobStorage.CopyToAsync(oldPath, blobStorage, newPath, cancellationToken);
+         await blobStorage.DeleteAsync(oldPath, cancellationToken);
+      }
+
       #endregion
 
       #region [ Folders ]

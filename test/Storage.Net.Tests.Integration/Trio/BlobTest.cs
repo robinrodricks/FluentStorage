@@ -381,6 +381,37 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
+      public async Task Rename_File_Renames()
+      {
+         string prefix = RandomBlobPath();
+         string file = StoragePath.Combine(prefix, "1");
+
+         await _storage.WriteTextAsync(file, "test");
+         await _storage.RenameAsync(file, StoragePath.Combine(prefix, "2"));
+         IReadOnlyCollection<Blob> list = await _storage.ListAsync(prefix);
+
+         Assert.True(list.Count == 1);
+         Assert.True(list.First().Name == "2");
+      }
+
+      [Fact]
+      public async Task Rename_Folder_Renames()
+      {
+         string prefix = RandomBlobPath();
+         string file1 = StoragePath.Combine(prefix, "old", "1");
+         string file11 = StoragePath.Combine(prefix, "old", "1", "1");
+         string file111 = StoragePath.Combine(prefix, "old", "1", "1", "1");
+
+         await _storage.WriteTextAsync(file1, string.Empty);
+         await _storage.WriteTextAsync(file11, string.Empty);
+         await _storage.WriteTextAsync(file11, string.Empty);
+
+         await _storage.RenameAsync(StoragePath.Combine(prefix, "old"), StoragePath.Combine(prefix, "new"));
+
+         IReadOnlyCollection<Blob> list = await _storage.ListAsync(prefix);
+      }
+
+      [Fact]
       public async Task UserMetadata_write_readsback()
       {
          var blob = new Blob(RandomBlobPath());
