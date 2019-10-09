@@ -40,22 +40,6 @@ namespace Storage.Net
       }
 
       /// <summary>
-      /// 
-      /// </summary>
-      /// <param name="factory"></param>
-      /// <param name="accessKeyId"></param>
-      /// <param name="secretAccessKey"></param>
-      /// <returns></returns>
-      public static IBlobStorage AwsS3(this IBlobStorageFactory factory,
-         string accessKeyId,
-         string secretAccessKey)
-      {
-         return new AwsS3BlobStorage(accessKeyId, secretAccessKey);
-      }
-
-
-
-      /// <summary>
       /// Creates an Amazon S3 storage
       /// </summary>
       /// <param name="factory">Factory reference</param>

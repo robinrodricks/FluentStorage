@@ -506,6 +506,24 @@ namespace Storage.Net.Tests.Integration.Blobs
          Assert.Equal(hash, hash2);
       }
 
+      [Fact]
+      public async Task Hierarchy_CreateFolder_Exists()
+      {
+         string folderPath = RandomBlobPath();
+
+         try
+         {
+            await _storage.CreateFolderAsync(folderPath);
+
+            IReadOnlyCollection<Blob> files = await _storage.ListAsync(folderPath);
+            Assert.True(files.Any());  //check dummy file exists
+         }
+         catch(NotSupportedException)
+         {
+
+         }
+      }
+
       private string RandomBlobPath(string prefix = null, string subfolder = null, string extension = "")
       {
          return StoragePath.Combine(

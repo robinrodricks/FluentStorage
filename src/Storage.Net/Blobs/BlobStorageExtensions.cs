@@ -372,5 +372,31 @@ namespace Storage.Net.Blobs
 
       #endregion
 
+      #region [ Folders ]
+
+      /// <summary>
+      /// Creates a new folder in this storage. If storage supports hierarchy, the folder is created as is, otherwise a folder is created by putting a dummy zero size file in that folder.
+      /// </summary>
+      /// <param name="blobStorage"></param>
+      /// <param name="folderPath">Path to the folder</param>
+      /// <param name="dummyFileName">If storage doesn't support hierary, you can override the dummy file name created in that empty folder.</param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      public static async Task CreateFolderAsync(
+         this IBlobStorage blobStorage, string folderPath, string dummyFileName = null, CancellationToken cancellationToken = default)
+      {
+         if(blobStorage is IHierarchicalBlobStorage hierarchicalBlobStorage)
+         {
+            await hierarchicalBlobStorage.CreateFolderAsync(folderPath, cancellationToken);
+         }
+         else
+         {
+            string fullPath = StoragePath.Combine(folderPath, dummyFileName ?? ".empty");
+
+            await blobStorage.WriteTextAsync(fullPath, string.Empty, cancellationToken);
+         }
+      }
+
+      #endregion
    }
 }

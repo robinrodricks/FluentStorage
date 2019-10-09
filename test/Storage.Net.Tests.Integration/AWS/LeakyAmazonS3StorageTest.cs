@@ -30,14 +30,5 @@ namespace Storage.Net.Tests.Integration.AWS
 
          await storage.ListAsync();
       }
-
-      [Fact]
-      public async Task ListBuckets_WithPermissions_Lists()
-      {
-         IBlobStorage storage = StorageFactory.Blobs.AwsS3(
-            _settings.AwsAccessKeyId, _settings.AwsSecretAccessKey);
-
-         await storage.ListAsync();
-      }
    }
 }
