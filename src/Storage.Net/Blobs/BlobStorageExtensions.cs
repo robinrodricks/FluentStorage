@@ -429,7 +429,10 @@ namespace Storage.Net.Blobs
          {
             string fullPath = StoragePath.Combine(folderPath, dummyFileName ?? ".empty");
 
-            await blobStorage.WriteTextAsync(fullPath, string.Empty, cancellationToken);
+            await blobStorage.WriteTextAsync(
+               fullPath,
+               "created as a workaround by Storage.Net when creating an empty parent folder",
+               cancellationToken);
          }
       }
 
