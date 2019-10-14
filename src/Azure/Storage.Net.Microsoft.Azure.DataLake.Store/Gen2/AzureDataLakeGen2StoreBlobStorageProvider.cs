@@ -79,9 +79,23 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2
 
       private async Task DeleteAsync(string fullPath, CancellationToken cancellationToken)
       {
-         DecomposePath(fullPath, out string fs, out string rp);
+         DecomposePath(fullPath, out string fs, out string rp, false);
 
-         await _restApi.DeletePathAsync(fs, rp, true).ConfigureAwait(false);
+         if(StoragePath.IsRootPath(rp))
+         {
+            await _restApi.DeleteFilesystemAsync(fs).ConfigureAwait(false);
+         }
+         else
+         {
+            try
+            {
+               await _restApi.DeletePathAsync(fs, rp, true).ConfigureAwait(false);
+            }
+            catch(ApiException ex) when(ex.StatusCode == HttpStatusCode.NotFound)
+            {
+               // file not found, ignore
+            }
+         }
       }
 
       public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default)

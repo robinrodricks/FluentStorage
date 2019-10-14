@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
 namespace Storage.Net.Blobs
@@ -9,7 +6,7 @@ namespace Storage.Net.Blobs
    /// <summary>
    /// Extended blob storage operations that may be supported natively by a provider as are slow otherwise.
    /// </summary>
-   public interface IExtendedBlobStorage
+   public interface IExtendedBlobStorage : IBlobStorage
    {
       /// <summary>
       /// Rename a blob (folder or file)

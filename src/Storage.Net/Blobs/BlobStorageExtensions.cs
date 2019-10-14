@@ -381,23 +381,29 @@ namespace Storage.Net.Blobs
       public static async Task RenameAsync(this IBlobStorage blobStorage,
          string oldPath, string newPath, CancellationToken cancellationToken = default)
       {
-         //todo: try to use extended client here
-
-         //this needs to be done recursively
-         foreach(Blob item in await blobStorage.ListAsync(oldPath, recurse: true))
+         //try to use extended client here
+         if(blobStorage is IExtendedBlobStorage extendedBlobStorage)
          {
-            if(item.IsFile)
-            {
-               string renamedPath = item.FullPath.Replace(oldPath, newPath);
-
-               await blobStorage.CopyToAsync(item, blobStorage, renamedPath, cancellationToken);
-               await blobStorage.DeleteAsync(item, cancellationToken);
-            }
+            await extendedBlobStorage.RenameAsync(oldPath, newPath, cancellationToken).ConfigureAwait(false);
          }
+         else
+         {
+            //this needs to be done recursively
+            foreach(Blob item in await blobStorage.ListAsync(oldPath, recurse: true).ConfigureAwait(false))
+            {
+               if(item.IsFile)
+               {
+                  string renamedPath = item.FullPath.Replace(oldPath, newPath);
 
-         //rename self
-         await blobStorage.CopyToAsync(oldPath, blobStorage, newPath, cancellationToken);
-         await blobStorage.DeleteAsync(oldPath, cancellationToken);
+                  await blobStorage.CopyToAsync(item, blobStorage, renamedPath, cancellationToken).ConfigureAwait(false);
+                  await blobStorage.DeleteAsync(item, cancellationToken).ConfigureAwait(false);
+               }
+            }
+
+            //rename self
+            await blobStorage.CopyToAsync(oldPath, blobStorage, newPath, cancellationToken).ConfigureAwait(false);
+            await blobStorage.DeleteAsync(oldPath, cancellationToken).ConfigureAwait(false);
+         }
       }
 
       #endregion
