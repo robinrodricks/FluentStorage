@@ -4,6 +4,7 @@ trigger:
     include:
       - master
       - v6
+      - queuesvnext
   paths:
     exclude:
       - README.md
@@ -75,7 +76,7 @@ stages:
       inputs:
         ArtifactName: nuget
 
-- stage: Test
+- stage: BlobsTest
   dependsOn: []
   jobs:
   - job: Platform
@@ -91,11 +92,27 @@ stages:
         projects: test/Storage.Net.Tests.Integration/Storage.Net.Tests.Integration.csproj
         arguments: '-c release --filter Category=Blobs'
 
+- stage: MessagingTest
+  dependsOn: []
+  jobs:
+  - job: Platform
+    displayName: 'Tests'
+    pool:
+      vmImage: $(vmImage)
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: 'run tests'
+      continueOnError: true
+      inputs:
+        command: test
+        projects: test/Storage.Net.Tests.Integration/Storage.Net.Tests.Integration.csproj
+        arguments: '-c release --filter Category=Messenger'
+
 
 - stage: Deploy
-  dependsOn: ['Build'] 
-  condition: "eq(variables['Build.SourceBranch'], 'refs/heads/master')"
-  #condition: "and( or( eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/v7') ), succeeded('Build') )"
+  dependsOn: ['Build', 'BlobsTest', 'MessagingTest'] 
+  #condition: "eq(variables['Build.SourceBranch'], 'refs/heads/master')"
+  condition: "or( eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/queuesvnext') )"
   jobs:
   - deployment: NugetOrg
     pool:

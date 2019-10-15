@@ -48,41 +48,21 @@ namespace Storage.Net.ConnectionString
          return null;
       }
 
-      public IMessagePublisher CreateMessagePublisher(StorageConnectionString connectionString)
+      public IMessenger CreateMessenger(StorageConnectionString connectionString)
       {
          if(connectionString.Prefix == "inmemory")
          {
             connectionString.GetRequired("name", true, out string name);
 
-            return InMemoryMessagePublisherReceiver.CreateOrGet(name);
+            return InMemoryMessenger.CreateOrGet(name);
          }
 
          if(connectionString.Prefix == "disk")
          {
             connectionString.GetRequired("path", true, out string path);
 
-            return new DiskMessagePublisherReceiver(path);
+            return new LocalDiskMessenger(path);
          }
-
-         return null;
-      }
-
-      public IMessageReceiver CreateMessageReceiver(StorageConnectionString connectionString)
-      {
-         if(connectionString.Prefix == "inmemory")
-         {
-            connectionString.GetRequired("name", true, out string name);
-
-            return InMemoryMessagePublisherReceiver.CreateOrGet(name);
-         }
-
-         if(connectionString.Prefix == "disk")
-         {
-            connectionString.GetRequired("path", true, out string path);
-
-            return new DiskMessagePublisherReceiver(path);
-         }
-
 
          return null;
       }

@@ -370,7 +370,72 @@ namespace Storage.Net.Blobs
          }
       }
 
+      /// <summary>
+      /// Rename a blob (folder, file etc.).
+      /// </summary>
+      /// <param name="blobStorage"></param>
+      /// <param name="oldPath"></param>
+      /// <param name="newPath"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      public static async Task RenameAsync(this IBlobStorage blobStorage,
+         string oldPath, string newPath, CancellationToken cancellationToken = default)
+      {
+         //try to use extended client here
+         if(blobStorage is IExtendedBlobStorage extendedBlobStorage)
+         {
+            await extendedBlobStorage.RenameAsync(oldPath, newPath, cancellationToken).ConfigureAwait(false);
+         }
+         else
+         {
+            //this needs to be done recursively
+            foreach(Blob item in await blobStorage.ListAsync(oldPath, recurse: true).ConfigureAwait(false))
+            {
+               if(item.IsFile)
+               {
+                  string renamedPath = item.FullPath.Replace(oldPath, newPath);
+
+                  await blobStorage.CopyToAsync(item, blobStorage, renamedPath, cancellationToken).ConfigureAwait(false);
+                  await blobStorage.DeleteAsync(item, cancellationToken).ConfigureAwait(false);
+               }
+            }
+
+            //rename self
+            await blobStorage.CopyToAsync(oldPath, blobStorage, newPath, cancellationToken).ConfigureAwait(false);
+            await blobStorage.DeleteAsync(oldPath, cancellationToken).ConfigureAwait(false);
+         }
+      }
+
       #endregion
 
+      #region [ Folders ]
+
+      /// <summary>
+      /// Creates a new folder in this storage. If storage supports hierarchy, the folder is created as is, otherwise a folder is created by putting a dummy zero size file in that folder.
+      /// </summary>
+      /// <param name="blobStorage"></param>
+      /// <param name="folderPath">Path to the folder</param>
+      /// <param name="dummyFileName">If storage doesn't support hierary, you can override the dummy file name created in that empty folder.</param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      public static async Task CreateFolderAsync(
+         this IBlobStorage blobStorage, string folderPath, string dummyFileName = null, CancellationToken cancellationToken = default)
+      {
+         if(blobStorage is IHierarchicalBlobStorage hierarchicalBlobStorage)
+         {
+            await hierarchicalBlobStorage.CreateFolderAsync(folderPath, cancellationToken);
+         }
+         else
+         {
+            string fullPath = StoragePath.Combine(folderPath, dummyFileName ?? ".empty");
+
+            await blobStorage.WriteTextAsync(
+               fullPath,
+               "created as a workaround by Storage.Net when creating an empty parent folder",
+               cancellationToken);
+         }
+      }
+
+      #endregion
    }
 }

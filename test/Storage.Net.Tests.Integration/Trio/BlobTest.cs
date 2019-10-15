@@ -381,6 +381,52 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
+      public async Task Rename_File_Renames()
+      {
+         string prefix = RandomBlobPath();
+         string file = StoragePath.Combine(prefix, "1");
+
+         try
+         {
+            await _storage.WriteTextAsync(file, "test");
+            await _storage.RenameAsync(file, StoragePath.Combine(prefix, "2"));
+            IReadOnlyCollection<Blob> list = await _storage.ListAsync(prefix);
+
+            Assert.True(list.Count == 1);
+            Assert.True(list.First().Name == "2");
+         }
+         catch(NotSupportedException)
+         {
+
+         }
+      }
+
+      [Fact]
+      public async Task Rename_Folder_Renames()
+      {
+         string prefix = RandomBlobPath();
+         string file1 = StoragePath.Combine(prefix, "old", "1.txt");
+         string file11 = StoragePath.Combine(prefix, "old", "1", "1.txt");
+         string file111 = StoragePath.Combine(prefix, "old", "1", "1", "1.txt");
+
+         try
+         {
+            await _storage.WriteTextAsync(file1, string.Empty);
+         }
+         catch(NotSupportedException)
+         {
+            return;
+         }
+
+         await _storage.WriteTextAsync(file11, string.Empty);
+         await _storage.WriteTextAsync(file111, string.Empty);
+
+         await _storage.RenameAsync(StoragePath.Combine(prefix, "old"), StoragePath.Combine(prefix, "new"));
+
+         IReadOnlyCollection<Blob> list = await _storage.ListAsync(prefix);
+      }
+
+      [Fact]
       public async Task UserMetadata_write_readsback()
       {
          var blob = new Blob(RandomBlobPath());
@@ -504,6 +550,24 @@ namespace Storage.Net.Tests.Integration.Blobs
 
          string hash2 = await _storage.GetMD5HashAsync(blob);
          Assert.Equal(hash, hash2);
+      }
+
+      [Fact]
+      public async Task Hierarchy_CreateFolder_Exists()
+      {
+         string folderPath = RandomBlobPath();
+
+         try
+         {
+            await _storage.CreateFolderAsync(folderPath);
+
+            IReadOnlyCollection<Blob> files = await _storage.ListAsync(folderPath);
+            Assert.True(files.Any());  //check dummy file exists
+         }
+         catch(NotSupportedException)
+         {
+
+         }
       }
 
       private string RandomBlobPath(string prefix = null, string subfolder = null, string extension = "")

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Storage.Net.Amazon.Aws.Blobs;
+using Storage.Net.Blobs;
 using Xunit;
 
-namespace Storage.Net.Tests.Integration.Azure
+namespace Storage.Net.Tests.Integration.AWS
 {
    [Trait("Category", "Blobs")]
    public class LeakyAmazonS3StorageTest
@@ -16,8 +18,17 @@ namespace Storage.Net.Tests.Integration.Azure
       {
          _settings = Settings.Instance;
 
-         _storage = (IAwsS3BlobStorage)StorageFactory.Blobs.AmazonS3BlobStorage(
+         _storage = (IAwsS3BlobStorage)StorageFactory.Blobs.AwsS3(
             _settings.AwsAccessKeyId, _settings.AwsSecretAccessKey, _settings.AwsTestBucketName);
+      }
+
+      [Fact]
+      public async Task Connect_NoRegionEndpoint()
+      {
+         IBlobStorage storage = StorageFactory.Blobs.AwsS3(
+            _settings.AwsAccessKeyId, _settings.AwsSecretAccessKey, _settings.AwsTestBucketName);
+
+         await storage.ListAsync();
       }
    }
 }

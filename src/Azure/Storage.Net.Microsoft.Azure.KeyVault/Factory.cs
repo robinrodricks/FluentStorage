@@ -40,5 +40,16 @@ namespace Storage.Net
          return new AzureKeyVaultBlobStorageProvider(vaultUri, cred.UserName, cred.Password);
       }
 
+      /// <summary>
+      /// Azure Key Vault secrets
+      /// </summary>
+      /// <param name="factory"></param>
+      /// <param name="vaultUri"></param>
+      /// <returns></returns>
+      public static IBlobStorage AzureKeyVaultWithManagedIdentity(this IBlobStorageFactory factory, Uri vaultUri)
+      {
+         return new AzureKeyVaultBlobStorageProvider(vaultUri);
+      }
+
    }
 }

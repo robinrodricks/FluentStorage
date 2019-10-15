@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using Amazon;
 using Storage.Net.Blobs;
 using Xunit;
 
@@ -121,10 +122,11 @@ namespace Storage.Net.Tests.Integration.Blobs
    {
       protected override IBlobStorage CreateStorage(ITestSettings settings)
       {
-         return StorageFactory.Blobs.AmazonS3BlobStorage(
+         return StorageFactory.Blobs.AwsS3(
                   settings.AwsAccessKeyId,
                   settings.AwsSecretAccessKey,
-                  settings.AwsTestBucketName);
+                  settings.AwsTestBucketName,
+                  RegionEndpoint.EUWest1);
       }
    }
 
@@ -194,14 +196,14 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
    }
 
-#if DEBUG
+   /* highly experimental
    public class AzdbfsTest : BlobTest, IClassFixture<AzdbfsFixture>
    {
       public AzdbfsTest(AzdbfsFixture fixture) : base(fixture)
       {
       }
    }
-#endif
+   */
 
    public class GcpFixture : BlobFixture
    {

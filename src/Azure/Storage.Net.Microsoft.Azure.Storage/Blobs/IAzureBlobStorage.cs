@@ -17,6 +17,12 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       CloudBlobClient NativeBlobClient { get; }
 
       /// <summary>
+      /// Gets Shared Access Signature for the entire storage account
+      /// </summary>
+      /// <returns></returns>
+      Task<string> GetStorageSasAsync(SasPolicy accountPolicy);
+
+      /// <summary>
       /// Returns Uri to Azure Blob with Shared Access Token.
       /// </summary>
       Task<string> GetSasUriAsync(string fullPath,

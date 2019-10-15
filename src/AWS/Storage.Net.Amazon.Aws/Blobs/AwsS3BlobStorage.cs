@@ -27,7 +27,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
       private readonly TransferUtility _fileTransferUtility;
       private readonly bool _skipBucketCreation = false;
       private bool _initialised = false;
-      
+
 
       /// <summary>
       /// Returns reference to the native AWS S3 blob client.
@@ -74,8 +74,10 @@ namespace Storage.Net.Amazon.Aws.Blobs
       /// </summary>
       public AwsS3BlobStorage(string accessKeyId, string secretAccessKey, string bucketName, AmazonS3Config clientConfig, bool skipBucketCreation = false)
       {
-         if (accessKeyId == null) throw new ArgumentNullException(nameof(accessKeyId));
-         if (secretAccessKey == null) throw new ArgumentNullException(nameof(secretAccessKey));
+         if(accessKeyId == null)
+            throw new ArgumentNullException(nameof(accessKeyId));
+         if(secretAccessKey == null)
+            throw new ArgumentNullException(nameof(secretAccessKey));
          _bucketName = bucketName ?? throw new ArgumentNullException(nameof(bucketName));
          _skipBucketCreation = skipBucketCreation;
          _client = new AmazonS3Client(new BasicAWSCredentials(accessKeyId, secretAccessKey), clientConfig);
@@ -84,7 +86,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
       private async Task<AmazonS3Client> GetClientAsync()
       {
-         if (!_initialised && !_skipBucketCreation)
+         if(!_initialised && !_skipBucketCreation)
          {
             try
             {
@@ -94,7 +96,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
                _initialised = true;
             }
-            catch (AmazonS3Exception ex) when (ex.ErrorCode == "BucketAlreadyOwnedByYou")
+            catch(AmazonS3Exception ex) when(ex.ErrorCode == "BucketAlreadyOwnedByYou")
             {
                //ignore this error as bucket already exists
                _initialised = true;
@@ -109,7 +111,8 @@ namespace Storage.Net.Amazon.Aws.Blobs
       /// </summary>
       public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default)
       {
-         if (options == null) options = new ListOptions();
+         if(options == null)
+            options = new ListOptions();
 
          GenericValidation.CheckBlobPrefix(options.FilePrefix);
 
@@ -137,7 +140,8 @@ namespace Storage.Net.Amazon.Aws.Blobs
       /// </summary>
       public Task<Stream> OpenWriteAsync(string fullPath, bool append = false, CancellationToken cancellationToken = default)
       {
-         if (append) throw new NotSupportedException();
+         if(append)
+            throw new NotSupportedException();
          GenericValidation.CheckBlobFullPath(fullPath);
          fullPath = StoragePath.Normalize(fullPath, false);
 
@@ -160,7 +164,8 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
          fullPath = StoragePath.Normalize(fullPath, false);
          GetObjectResponse response = await GetObjectAsync(fullPath).ConfigureAwait(false);
-         if (response == null) return null;
+         if(response == null)
+            return null;
 
          return new FixedStream(response.ResponseStream, length: response.ContentLength, (Action<FixedStream>)null);
       }
@@ -177,7 +182,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
          GenericValidation.CheckBlobFullPath(fullPath);
 
          fullPath = StoragePath.Normalize(fullPath, false);
-         
+
          await client.DeleteObjectAsync(_bucketName, fullPath, cancellationToken).ConfigureAwait(false);
          using(var browser = new AwsS3DirectoryBrowser(client, _bucketName))
          {
@@ -204,7 +209,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
          }
          catch(AmazonS3Exception ex) when(ex.StatusCode == HttpStatusCode.NotFound)
          {
-            
+
          }
 
          return false;
@@ -265,9 +270,10 @@ namespace Storage.Net.Amazon.Aws.Blobs
             GetObjectResponse response = await client.GetObjectAsync(request).ConfigureAwait(false);
             return response;
          }
-         catch (AmazonS3Exception ex)
+         catch(AmazonS3Exception ex)
          {
-            if (IsDoesntExist(ex)) return null;
+            if(IsDoesntExist(ex))
+               return null;
 
             TryHandleException(ex);
             throw;
@@ -277,7 +283,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
       private static bool TryHandleException(AmazonS3Exception ex)
       {
-         if (IsDoesntExist(ex))
+         if(IsDoesntExist(ex))
          {
             throw new StorageException(ErrorCode.NotFound, ex);
          }

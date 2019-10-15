@@ -21,11 +21,14 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       private readonly ConcurrentDictionary<string, CloudBlobContainer> _containerNameToContainer =
          new ConcurrentDictionary<string, CloudBlobContainer>();
 
+      private readonly CloudStorageAccount _account;
+
       public CloudBlobClient NativeBlobClient { get; private set; }
 
-      public AzureUniversalBlobStorageProvider(CloudBlobClient cloudBlobClient)
+      public AzureUniversalBlobStorageProvider(CloudBlobClient cloudBlobClient, CloudStorageAccount account)
       {
          NativeBlobClient = cloudBlobClient ?? throw new ArgumentNullException(nameof(cloudBlobClient));
+         _account = account;
       }
 
       public static AzureUniversalBlobStorageProvider CreateFromAccountNameAndKey(string accountName, string key)
@@ -40,14 +43,24 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             new StorageCredentials(accountName, key),
             true);
 
-         return new AzureUniversalBlobStorageProvider(account.CreateCloudBlobClient());
+         return new AzureUniversalBlobStorageProvider(account.CreateCloudBlobClient(), account);
+      }
+
+      public static AzureUniversalBlobStorageProvider CreateFromSas(string accountName, string sas)
+      {
+         if(sas is null)
+            throw new ArgumentNullException(nameof(sas));
+
+         CloudStorageAccount account = new CloudStorageAccount(new StorageCredentials(sas), accountName, null, true);
+
+         return new AzureUniversalBlobStorageProvider(account.CreateCloudBlobClient(), null);
       }
 
       public static AzureUniversalBlobStorageProvider CreateForLocalEmulator()
       {
          if(CloudStorageAccount.TryParse(Constants.UseDevelopmentStorageConnectionString, out CloudStorageAccount account))
          {
-            return new AzureUniversalBlobStorageProvider(account.CreateCloudBlobClient());
+            return new AzureUniversalBlobStorageProvider(account.CreateCloudBlobClient(), account);
          }
          else
          {
@@ -395,6 +408,21 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
 
       #region [ Native Operations ] 
+
+      public Task<string> GetStorageSasAsync(SasPolicy accountPolicy)
+      {
+         if(accountPolicy is null)
+            throw new ArgumentNullException(nameof(accountPolicy));
+
+         if(_account == null)
+            throw new NotSupportedException($"cannot create Shared Access Signature with current connection method");
+
+         string sas = _account.GetSharedAccessSignature(accountPolicy.ToSharedAccessAccountPolicy());
+
+         //sas = _account.BlobStorageUri.PrimaryUri + sas;
+
+         return Task.FromResult(sas);
+      }
 
       public async Task<string> GetSasUriAsync(
          string fullPath,

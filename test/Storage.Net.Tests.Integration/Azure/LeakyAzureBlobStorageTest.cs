@@ -22,6 +22,19 @@ namespace Storage.Net.Tests.Integration.Azure
       }
 
       [Fact]
+      public async Task GetAccountSas()
+      {
+         var policy = new SasPolicy(DateTime.UtcNow, TimeSpan.FromHours(1));
+         string sas = await _native.GetStorageSasAsync(policy);
+         Assert.NotNull(sas);
+
+         //check we can connect and list containers
+         IBlobStorage sasInstance = StorageFactory.Blobs.AzureBlobStorageFromSas(Settings.Instance.AzureStorageName, sas);
+         IReadOnlyCollection<Blob> containers = await sasInstance.ListAsync(StoragePath.RootFolderPath);
+         Assert.True(containers.Count > 0);
+      }
+
+      [Fact]
       public async Task GetReadOnlySasUriAsync()
       {
          string id = "test/single.txt";

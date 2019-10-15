@@ -25,11 +25,6 @@ namespace Storage.Net.ConnectionString
       /// <summary>
       /// Creates a message publisher
       /// </summary>
-      IMessagePublisher CreateMessagePublisher(StorageConnectionString connectionString);
-
-      /// <summary>
-      /// Creates a message receiver
-      /// </summary>
-      IMessageReceiver CreateMessageReceiver(StorageConnectionString connectionString);
+      IMessenger CreateMessenger(StorageConnectionString connectionString);
    }
 }

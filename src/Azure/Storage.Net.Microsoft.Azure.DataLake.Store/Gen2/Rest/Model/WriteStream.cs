@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +19,6 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Rest.Model
       private readonly IDataLakeApi _api;
       private readonly string _filesystemName;
       private readonly string _relativePath;
-      private bool _flushed;
 
       public WriteStream(IDataLakeApi api, string filesystemName, string relativePath)
       {
@@ -75,34 +75,17 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Rest.Model
 
          await _api.UpdatePathAsync(_filesystemName, _relativePath, "append",
             _pos,
-            body: new MemoryStream(buffer, offset, count));
+            body: new MemoryStream(buffer, offset, count)).ConfigureAwait(false);
 
          _pos += count;
+
+         await _api.UpdatePathAsync(_filesystemName, _relativePath, "flush",
+            _pos, body: EmptyStream).ConfigureAwait(false);
+
       }
+
+      public override void Flush() { }
 
       private Stream EmptyStream => new MemoryStream(new byte[0]);
-
-      public override void Flush()
-      {
-         if(_flushed)
-            return;
-
-         FlushAsync().Wait();
-      }
-
-      public override async Task FlushAsync(CancellationToken cancellationToken = default)
-      {
-         if(_flushed)
-            return;
-
-         await _api.UpdatePathAsync(_filesystemName, _relativePath, "flush", _pos, body: EmptyStream).ConfigureAwait(false);
-
-         _flushed = true;
-      }
-
-      protected override void Dispose(bool disposing)
-      {
-         Flush();
-      }
    }
 }
