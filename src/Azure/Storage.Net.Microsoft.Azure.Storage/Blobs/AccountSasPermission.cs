@@ -8,7 +8,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
    /// Specifies the set of possible permissions for a shared access account policy.
    /// </summary>
    [Flags]
-   public enum SasPermission
+   public enum AccountSasPermission
    {
       /// <summary>
       /// On a container: read the content, properties, metadata or block list of any blob in the container. Use any blob in the container as the source of a copy operation.

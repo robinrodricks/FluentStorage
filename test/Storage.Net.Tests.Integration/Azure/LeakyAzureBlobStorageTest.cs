@@ -24,8 +24,8 @@ namespace Storage.Net.Tests.Integration.Azure
       [Fact]
       public async Task GetAccountSas()
       {
-         var policy = new SasPolicy(DateTime.UtcNow, TimeSpan.FromHours(1));
-         string sas = await _native.GetStorageSasAsync(policy);
+         var policy = new AccountSasPolicy(DateTime.UtcNow, TimeSpan.FromHours(1));
+         string sas = await _native.GetStorageSasAsync(policy, false);
          Assert.NotNull(sas);
 
          //check we can connect and list containers
@@ -35,14 +35,12 @@ namespace Storage.Net.Tests.Integration.Azure
       }
 
       [Fact]
-      public async Task GetReadOnlySasUriAsync()
+      public async Task GetContainerSas()
       {
-         string id = "test/single.txt";
-         await _native.WriteTextAsync(id, "test");
+         var policy = new ContainerSasPolicy(DateTime.UtcNow, TimeSpan.FromHours(1));
+         string sas = await _native.GetContainerSasAsync("test", policy, true);
 
-         string uri = await _native.GetReadOnlySasUriAsync(id);
-         string content = await new WebClient().DownloadStringTaskAsync(new Uri(uri));
-         Assert.Equal("test", content);
+         //todo: connect via sas
       }
 
       [Fact]

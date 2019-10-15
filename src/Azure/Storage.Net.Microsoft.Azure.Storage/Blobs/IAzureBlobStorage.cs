@@ -20,43 +20,13 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       /// Gets Shared Access Signature for the entire storage account
       /// </summary>
       /// <returns></returns>
-      Task<string> GetStorageSasAsync(SasPolicy accountPolicy);
+      Task<string> GetStorageSasAsync(AccountSasPolicy accountPolicy, bool includeUrl);
 
       /// <summary>
-      /// Returns Uri to Azure Blob with Shared Access Token.
+      /// Gets Shared Access Signature for a blob container
       /// </summary>
-      Task<string> GetSasUriAsync(string fullPath,
-         SharedAccessBlobPolicy sasConstraints,
-         SharedAccessBlobHeaders headers = null,
-         bool createContainer = false,
-         CancellationToken cancellationToken = default);
-
-      /// <summary>
-      /// Returns Uri to Azure Blob with read-only Shared Access Token.
-      /// </summary>
-      Task<string> GetReadOnlySasUriAsync(
-         string fullPath,
-         SharedAccessBlobHeaders headers = null,
-         int minutesToExpiration = 30,
-         CancellationToken cancellationToken = default);
-
-      /// <summary>
-      /// Returns Uri to Azure Blob with write-only Shared Access Token.
-      /// </summary>
-      Task<string> GetWriteOnlySasUriAsync(
-         string fullPath,
-         SharedAccessBlobHeaders headers = null,
-         int minutesToExpiration = 30,
-         CancellationToken cancellationToken = default);
-
-      /// <summary>
-      /// Returns Uri to Azure Blob with read-write Shared Access Token.
-      /// </summary>
-      Task<string> GetReadWriteSasUriAsync(
-         string fullPath,
-         SharedAccessBlobHeaders headers = null,
-         int minutesToExpiration = 30,
-         CancellationToken cancellationToken = default);
+      /// <returns></returns>
+      Task<string> GetContainerSasAsync(string containerName, ContainerSasPolicy containerSasPolicy, bool includeUrl);
 
       /// <summary>
       /// Acquires a lease
