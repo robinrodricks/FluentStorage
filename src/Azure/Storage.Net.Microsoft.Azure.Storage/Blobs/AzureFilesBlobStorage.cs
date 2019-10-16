@@ -202,10 +202,10 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          {
             string sub = parts[i];
             dir = dir.GetDirectoryReference(sub);
-         }
 
-         if(createParents)
-            await dir.CreateIfNotExistsAsync().ConfigureAwait(false);
+            if(createParents)
+               await dir.CreateIfNotExistsAsync().ConfigureAwait(false);
+         }
 
          return dir.GetFileReference(parts[parts.Length - 1]);
       }

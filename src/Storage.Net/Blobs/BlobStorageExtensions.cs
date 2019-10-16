@@ -33,7 +33,7 @@ namespace Storage.Net.Blobs
       {
          IReadOnlyCollection<Blob> all = await blobStorage.ListAsync(options, cancellationToken);
 
-         return all.Where(i => i.IsFile).ToList();
+         return all.Where(i => i!= null && i.IsFile).ToList();
       }
 
       /// <summary>

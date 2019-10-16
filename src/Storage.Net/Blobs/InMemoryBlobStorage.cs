@@ -106,7 +106,7 @@ namespace Storage.Net.Blobs
          GenericValidation.CheckBlobFullPath(fullPath);
          fullPath = StoragePath.Normalize(fullPath);
 
-         if (!_pathToTag.TryGetValue(fullPath, out Tag tag)) return Task.FromResult<Stream>(null);
+         if (!_pathToTag.TryGetValue(fullPath, out Tag tag) || tag.data == null) return Task.FromResult<Stream>(null);
 
          return Task.FromResult<Stream>(new NonCloseableStream(new MemoryStream(tag.data)));
       }
