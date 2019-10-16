@@ -11,8 +11,8 @@ namespace Storage.Net.Microsoft.Azure.Storage
 {
    class Module : IExternalModule, IConnectionFactory
    {
-      private const string BlobPrefix = "azure.blob";
-      private const string FilesPrefix = "azure.file";
+      public const string BlobPrefix = "azure.blob";
+      public const string FilesPrefix = "azure.file";
       public const string AccountParam = "account";
       public const string KeyParam = "key";
 

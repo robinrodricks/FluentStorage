@@ -8,7 +8,7 @@ using System.Net;
 using Storage.Net.Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Storage.Net.Microsoft.Azure.Storage.KeyValue;
-
+using Storage.Net.ConnectionString;
 
 namespace Storage.Net
 {
@@ -139,5 +139,22 @@ namespace Storage.Net
       {
          return new AzureTableStorageKeyValueStorage();
       }
+
+      #region [ Connection Strings ]
+
+      /// <summary>
+      /// Create connection string for azure blob storage
+      /// </summary>
+      public static StorageConnectionString ForAzureBlobStorage(this IConnectionStringFactory factory,
+         string accountName,
+         string accountKey)
+      {
+         var cs = new StorageConnectionString(Module.BlobPrefix + "://");
+         cs.Parameters[Module.AccountParam] = accountName;
+         cs.Parameters[Module.KeyParam] = accountKey;
+         return cs;
+      }
+
+      #endregion
    }
 }
