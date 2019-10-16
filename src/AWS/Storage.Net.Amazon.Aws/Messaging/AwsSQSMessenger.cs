@@ -30,10 +30,12 @@ namespace Storage.Net.Amazon.Aws.Messaging
       /// <param name="regionEndpoint">Optional regional endpoint</param>
       public AwsSQSMessenger(string accessKeyId, string secretAccessKey, string serviceUrl, RegionEndpoint regionEndpoint)
       {
+         if(regionEndpoint is null)
+            throw new ArgumentNullException(nameof(regionEndpoint));
          var config = new AmazonSQSConfig
          {
             ServiceURL = serviceUrl,
-            RegionEndpoint = regionEndpoint ?? RegionEndpoint.USEast1
+            RegionEndpoint = regionEndpoint
          };
 
          _client = new AmazonSQSClient(new BasicAWSCredentials(accessKeyId, secretAccessKey), config);

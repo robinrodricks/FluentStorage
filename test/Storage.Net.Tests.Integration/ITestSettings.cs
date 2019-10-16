@@ -93,6 +93,9 @@ namespace Storage.Net.Tests
       [Option(Alias = "Aws.TestBucketName")]
       string AwsTestBucketName { get; }
 
+      [Option(Alias = "Aws.TestBucketRegion", DefaultValue = "eu-west-1")]
+      string AwsTestBucketRegion { get; }
+
       #endregion
 
       #region [ Google Cloud Platform ]

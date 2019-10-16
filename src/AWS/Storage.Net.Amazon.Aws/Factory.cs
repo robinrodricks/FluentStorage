@@ -28,15 +28,13 @@ namespace Storage.Net
       /// </summary>
       /// <param name="factory">Factory reference</param>
       /// <param name="bucketName">Bucket name</param>
-      /// <param name="regionEndpoint">Optionally set region endpoint. When not specified defaults to EU West</param>
-      /// <param name="skipBucketCreation">Directive to skip the creation of the S3 bucket if one does not exist</param>
+      /// <param name="region">Required regional endpoint.</param>
       /// <returns>A reference to the created storage</returns>
       public static IBlobStorage AwsS3(this IBlobStorageFactory factory,
          string bucketName,
-         RegionEndpoint regionEndpoint = null,
-         bool skipBucketCreation = false)
+         string region)
       {
-         return new AwsS3BlobStorage(bucketName, regionEndpoint, skipBucketCreation);
+         return new AwsS3BlobStorage(bucketName, region);
       }
 
       /// <summary>
@@ -46,35 +44,17 @@ namespace Storage.Net
       /// <param name="accessKeyId">Access key ID</param>
       /// <param name="secretAccessKey">Secret access key</param>
       /// <param name="bucketName">Bucket name</param>
-      /// <param name="regionEndpoint">Optionally set region endpoint. When not specified defaults to EU West</param>
-      /// <param name="skipBucketCreation">Directive to skip the creation of the S3 bucket if one does not exist</param>
-      /// <returns>A reference to the created storage</returns>
-      public static IBlobStorage AwsS3(this IBlobStorageFactory factory,
-         string accessKeyId,
-         string secretAccessKey,
-         string bucketName,
-         RegionEndpoint regionEndpoint = null,
-         bool skipBucketCreation = false)
-      {
-         return new AwsS3BlobStorage(accessKeyId, secretAccessKey, bucketName, regionEndpoint, skipBucketCreation);
-      }
-
-      /// <summary>
-      /// Creates an Amazon S3 storage provider for a custom S3-compatible storage server
-      /// </summary>
-      /// <param name="factory">Factory reference</param>
-      /// <param name="accessKeyId">Access key ID</param>
-      /// <param name="secretAccessKey">Secret access key</param>
-      /// <param name="bucketName">Bucket name</param>
+      /// <param name="region">Region endpoint</param>
       /// <param name="serviceUrl">S3-compatible service location</param>
       /// <returns>A reference to the created storage</returns>
       public static IBlobStorage AwsS3(this IBlobStorageFactory factory,
          string accessKeyId,
          string secretAccessKey,
          string bucketName,
-         string serviceUrl)
+         string region,
+         string serviceUrl = null)
       {
-         return new AwsS3BlobStorage(accessKeyId, secretAccessKey, bucketName, serviceUrl);
+         return new AwsS3BlobStorage(accessKeyId, secretAccessKey, bucketName, region, serviceUrl);
       }
 
       /// <summary>

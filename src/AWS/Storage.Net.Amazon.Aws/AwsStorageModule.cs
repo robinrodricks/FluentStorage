@@ -27,16 +27,14 @@ namespace Storage.Net.Amazon.Aws
             }
 
             connectionString.GetRequired("bucket", true, out string bucket);
-            string region = connectionString.Get("region");
-
-            RegionEndpoint endpoint = RegionEndpoint.GetBySystemName(string.IsNullOrEmpty(region) ? "eu-west-1" : region);
+            connectionString.GetRequired("region", true, out string region);
 
             if(string.IsNullOrEmpty(keyId))
             {
-               return new AwsS3BlobStorage(bucket, endpoint);
+               return new AwsS3BlobStorage(bucket, region);
             }
 
-            return new AwsS3BlobStorage(keyId, key, bucket, endpoint);
+            return new AwsS3BlobStorage(keyId, key, bucket, region, null);
          }
 
 
@@ -44,6 +42,7 @@ namespace Storage.Net.Amazon.Aws
       }
 
       public IKeyValueStorage CreateKeyValueStorage(StorageConnectionString connectionString) => null;
+
       public IMessenger CreateMessenger(StorageConnectionString connectionString) => null;
    }
 }

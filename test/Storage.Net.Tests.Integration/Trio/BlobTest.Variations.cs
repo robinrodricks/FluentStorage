@@ -126,7 +126,7 @@ namespace Storage.Net.Tests.Integration.Blobs
                   settings.AwsAccessKeyId,
                   settings.AwsSecretAccessKey,
                   settings.AwsTestBucketName,
-                  RegionEndpoint.EUWest1);
+                  settings.AwsTestBucketRegion);
       }
    }
 
