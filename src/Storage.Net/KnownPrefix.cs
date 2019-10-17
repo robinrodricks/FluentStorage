@@ -33,5 +33,16 @@ namespace Storage.Net
       /// Azure Key Vault
       /// </summary>
       public static string AzureKeyVault = "azure.keyvault";
+
+      /// <summary>
+      /// Azure Blob Storage
+      /// </summary>
+      public const string AzureBlobStorage = "azure.blob";
+
+      /// <summary>
+      /// Azure File Storage
+      /// </summary>
+      public const string AzureFilesStorage = "azure.file";
+
    }
 }

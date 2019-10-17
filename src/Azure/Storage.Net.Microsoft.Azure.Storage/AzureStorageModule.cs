@@ -11,8 +11,6 @@ namespace Storage.Net.Microsoft.Azure.Storage
 {
    class Module : IExternalModule, IConnectionFactory
    {
-      public const string BlobPrefix = "azure.blob";
-      public const string FilesPrefix = "azure.file";
       public const string AccountParam = "account";
       public const string KeyParam = "key";
 
@@ -20,7 +18,7 @@ namespace Storage.Net.Microsoft.Azure.Storage
 
       public IBlobStorage CreateBlobStorage(StorageConnectionString connectionString)
       {
-         if(connectionString.Prefix == BlobPrefix)
+         if(connectionString.Prefix == KnownPrefix.AzureBlobStorage)
          {
             if(bool.TryParse(connectionString.Get(Constants.UseDevelopmentStorage), out bool useDevelopment) && useDevelopment)
             {
@@ -34,7 +32,7 @@ namespace Storage.Net.Microsoft.Azure.Storage
                return AzureUniversalBlobStorageProvider.CreateFromAccountNameAndKey(accountName, key);
             }
          }
-         else if(connectionString.Prefix == FilesPrefix)
+         else if(connectionString.Prefix == KnownPrefix.AzureFilesStorage)
          {
             connectionString.GetRequired(AccountParam, true, out string accountName);
             connectionString.GetRequired(KeyParam, true, out string key);
@@ -44,7 +42,7 @@ namespace Storage.Net.Microsoft.Azure.Storage
          else
          {
             //try to re-parse native connection string
-            var newcs = new StorageConnectionString(BlobPrefix + "://" + connectionString.Prefix);
+            var newcs = new StorageConnectionString(KnownPrefix.AzureBlobStorage + "://" + connectionString.Prefix);
 
             if(newcs.Parameters.TryGetValue("AccountName", out string accountName) &&
                newcs.Parameters.TryGetValue("AccountKey", out string accountKey))
