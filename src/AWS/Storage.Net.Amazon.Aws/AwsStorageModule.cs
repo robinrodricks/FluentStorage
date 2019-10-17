@@ -16,7 +16,7 @@ namespace Storage.Net.Amazon.Aws
 
       public IBlobStorage CreateBlobStorage(StorageConnectionString connectionString)
       {
-         if(connectionString.Prefix == "aws.s3")
+         if(connectionString.Prefix == KnownPrefix.AwsS3)
          {
             string keyId = connectionString.Get("keyId");
             string key = connectionString.Get("key");

@@ -15,7 +15,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault
 
       public IBlobStorage CreateBlobStorage(StorageConnectionString connectionString)
       {
-         if(connectionString.Prefix == "azure.keyvault")
+         if(connectionString.Prefix == KnownPrefix.AzureKeyVault)
          {
             connectionString.GetRequired("vaultUri", true, out string uri);
 
