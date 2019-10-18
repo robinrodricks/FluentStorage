@@ -46,7 +46,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return new AzureUniversalBlobStorageProvider(account.CreateCloudBlobClient(), account);
       }
 
-      public static AzureUniversalBlobStorageProvider CreateFromSas(string accountName, string sas)
+      public static AzureUniversalBlobStorageProvider CreateFromAccountSas(string accountName, string sas)
       {
          if(sas is null)
             throw new ArgumentNullException(nameof(sas));

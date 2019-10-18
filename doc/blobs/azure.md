@@ -18,6 +18,10 @@ IBlobStorage storage = StorageFactory.Blobs.FromConnectionString("azure.file://a
 
 ## Blob Storage
 
+- [Native Operations](#native-operations)
+  - [Shared Access Signature Tokens](#sas-tokens)
+  - [Blob Lease](#blob-lease)
+
 There are a few overloads in this package, for instance:
 
 ```csharp
@@ -58,7 +62,37 @@ You can obtain a SAS (Shared Access Signature) tokens to the following objects:
 
 ##### Storage Account
 
-> todo
+Getting SAS token for an account involves granting limited access to entire account. To grant it, for instance, for one hour from now, create a policy first:
+
+```csharp
+var policy = new AccountSasPolicy(DateTime.UtcNow, TimeSpan.FromHours(1));
+```
+
+By default the policy is configured to give only `List` and `Read` permissions, meaning that users will be able to list containers and blobs, and also read them. You can customise policy permissions by modifying the `Permissions` flag property, for instance to also have `Write` permission you could explicitly assign it:
+
+```csharp
+policy.Permissions =
+   AccountSasPermission.List |
+   AccountSasPermission.Read |
+   AccountSasPermission.Write;
+```
+
+Then get the policy signature:
+
+```csharp
+string sas = await _native.GetStorageSasAsync(policy, false);
+```
+
+The second boolean parameter indicates whether to return full URL to the storage with SAS policy or only the policy itself. Setting it to `true` is useful if you want to use this URL in say `Azure Storage Explorer` to attach that account directly.
+
+To connect to an account using a policy, use the following factory method:
+
+```csharp
+IBlobStorage sasInstance = StorageFactory.Blobs.AzureBlobStorageFromAccountSas("accountName", sas);
+```
+
+Note that the `sas` policy should not contain URL.
+
 
 ##### Container
 
@@ -68,7 +102,7 @@ You can obtain a SAS (Shared Access Signature) tokens to the following objects:
 
 > todo
 
-#### Blob Lease (aka Lock)
+#### Blob Lease
 
 There is a helper utility method to acquire a block blob lease, which is useful for virtual transactions support. For instance:
 

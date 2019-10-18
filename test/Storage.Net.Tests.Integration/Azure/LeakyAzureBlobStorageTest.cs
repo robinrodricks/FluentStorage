@@ -25,11 +25,15 @@ namespace Storage.Net.Tests.Integration.Azure
       public async Task GetAccountSas()
       {
          var policy = new AccountSasPolicy(DateTime.UtcNow, TimeSpan.FromHours(1));
+         policy.Permissions =
+            AccountSasPermission.List |
+            AccountSasPermission.Read |
+            AccountSasPermission.Write;
          string sas = await _native.GetStorageSasAsync(policy, false);
          Assert.NotNull(sas);
 
          //check we can connect and list containers
-         IBlobStorage sasInstance = StorageFactory.Blobs.AzureBlobStorageFromSas(Settings.Instance.AzureStorageName, sas);
+         IBlobStorage sasInstance = StorageFactory.Blobs.AzureBlobStorageFromAccountSas(Settings.Instance.AzureStorageName, sas);
          IReadOnlyCollection<Blob> containers = await sasInstance.ListAsync(StoragePath.RootFolderPath);
          Assert.True(containers.Count > 0);
       }

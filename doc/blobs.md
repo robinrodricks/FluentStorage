@@ -8,7 +8,7 @@ This page lists blob storage providers available in Storage.Net
 - [Local Disk](#local-disk)
 - [Zip File](#zip-file)
 - [FTP](#ftp)
-- [Microsoft Azure Blob and File Storage](blobs\azure.md)
+- [Microsoft Azure Blob and File Storage](blobs/azure.md)
 - [Amazon S3 Storage](blobs/awss3.md)
 - [Azure Data Lake Store](#azure-data-lake-store)
   - [Gen 1](#gen-1) 
