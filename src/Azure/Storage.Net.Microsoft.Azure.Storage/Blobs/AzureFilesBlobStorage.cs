@@ -146,6 +146,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             if(await dir.ExistsAsync().ConfigureAwait(false))
             {
                await DeleteDirectoryAsync(dir, cancellationToken).ConfigureAwait(false);
+               await dir.DeleteIfExistsAsync().ConfigureAwait(false);
             }
          }
       }
@@ -166,7 +167,8 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
                }
                else if(item is CloudFileDirectory subdir)
                {
-                  await DeleteDirectoryAsync(subdir, cancellationToken);
+                  await DeleteDirectoryAsync(subdir, cancellationToken).ConfigureAwait(false);
+                  await subdir.DeleteIfExistsAsync().ConfigureAwait(false);
                }
             }
 

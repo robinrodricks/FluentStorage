@@ -11,9 +11,6 @@ namespace Storage.Net.Microsoft.Azure.Storage
 {
    class Module : IExternalModule, IConnectionFactory
    {
-      public const string AccountParam = "account";
-      public const string KeyParam = "key";
-
       public IConnectionFactory ConnectionFactory => this;
 
       public IBlobStorage CreateBlobStorage(StorageConnectionString connectionString)
@@ -26,16 +23,16 @@ namespace Storage.Net.Microsoft.Azure.Storage
             }
             else
             {
-               connectionString.GetRequired(AccountParam, true, out string accountName);
-               connectionString.GetRequired(KeyParam, true, out string key);
+               connectionString.GetRequired(KnownParameter.AccountName, true, out string accountName);
+               connectionString.GetRequired(KnownParameter.KeyOrPassword, true, out string key);
 
                return AzureUniversalBlobStorageProvider.CreateFromAccountNameAndKey(accountName, key);
             }
          }
          else if(connectionString.Prefix == KnownPrefix.AzureFilesStorage)
          {
-            connectionString.GetRequired(AccountParam, true, out string accountName);
-            connectionString.GetRequired(KeyParam, true, out string key);
+            connectionString.GetRequired(KnownParameter.AccountName, true, out string accountName);
+            connectionString.GetRequired(KnownParameter.KeyOrPassword, true, out string key);
 
             return AzureFilesBlobStorage.CreateFromAccountNameAndKey(accountName, key);
          }
@@ -65,8 +62,8 @@ namespace Storage.Net.Microsoft.Azure.Storage
             }
             else
             {
-               connectionString.GetRequired(AccountParam, true, out string accountName);
-               connectionString.GetRequired(KeyParam, true, out string key);
+               connectionString.GetRequired(KnownParameter.AccountName, true, out string accountName);
+               connectionString.GetRequired(KnownParameter.KeyOrPassword, true, out string key);
 
                return new AzureTableStorageKeyValueStorage(accountName, key);
             }
@@ -79,8 +76,8 @@ namespace Storage.Net.Microsoft.Azure.Storage
       {
          if(connectionString.Prefix == Constants.AzureQueueConnectionPrefix)
          {
-            connectionString.GetRequired(AccountParam, true, out string accountName);
-            connectionString.GetRequired(KeyParam, true, out string key);
+            connectionString.GetRequired(KnownParameter.AccountName, true, out string accountName);
+            connectionString.GetRequired(KnownParameter.KeyOrPassword, true, out string key);
 
             return new AzureStorageQueueMessenger(accountName, key);
          }

@@ -353,12 +353,12 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
-      public async Task Delete_folder_removes_all_files()
+      public async Task Delete_folder_removes_everything()
       {
          //setup
          string prefix = RandomBlobPath();
          string file1 = StoragePath.Combine(prefix, "1.txt");
-         string file2 = StoragePath.Combine(prefix, "2.txt");
+         string file2 = StoragePath.Combine(prefix, "sub", "2.txt");
 
 
          try
@@ -376,8 +376,8 @@ namespace Storage.Net.Tests.Integration.Blobs
          }
 
          //assert
-         Assert.False(await _storage.ExistsAsync(file1));
-         Assert.False(await _storage.ExistsAsync(file2));
+         IReadOnlyCollection<Blob> files = await _storage.ListAsync(prefix, recurse: true);
+         Assert.True(files.Count == 0);
       }
 
       [Fact]

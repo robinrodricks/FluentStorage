@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Storage.Net
+﻿namespace Storage.Net
 {
    /// <summary>
    /// Known storage account prefixes

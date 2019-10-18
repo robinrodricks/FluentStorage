@@ -149,9 +149,9 @@ namespace Storage.Net
          string accountName,
          string accountKey)
       {
-         var cs = new StorageConnectionString(Module.BlobPrefix + "://");
-         cs.Parameters[Module.AccountParam] = accountName;
-         cs.Parameters[Module.KeyParam] = accountKey;
+         var cs = new StorageConnectionString(KnownPrefix.AzureBlobStorage + "://");
+         cs.Parameters[KnownParameter.AccountName] = accountName;
+         cs.Parameters[KnownParameter.KeyOrPassword] = accountKey;
          return cs;
       }
 
