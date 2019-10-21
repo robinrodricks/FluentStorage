@@ -24,11 +24,11 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       private readonly CloudStorageAccount _account;
       private string _containerName;   // when limited to a single container
 
-      public CloudBlobClient NativeBlobClient { get; private set; }
+      private readonly CloudBlobClient _client;
 
       public AzureUniversalBlobStorageProvider(CloudBlobClient cloudBlobClient, CloudStorageAccount account)
       {
-         NativeBlobClient = cloudBlobClient ?? throw new ArgumentNullException(nameof(cloudBlobClient));
+         _client = cloudBlobClient ?? throw new ArgumentNullException(nameof(cloudBlobClient));
          _account = account;
       }
 
@@ -336,7 +336,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          ContainerResultSegment page = null;
          do
          {
-            page = await NativeBlobClient.ListContainersSegmentedAsync(page?.ContinuationToken).ConfigureAwait(false);
+            page = await _client.ListContainersSegmentedAsync(page?.ContinuationToken).ConfigureAwait(false);
             result.AddRange(page.Results);
 
          }
@@ -461,7 +461,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
       public async Task<string> GetContainerSasAsync(string containerName, ContainerSasPolicy containerSasPolicy, bool includeUrl)
       {
-         (CloudBlobContainer container, _) = await GetPartsAsync(containerName, true);
+         (CloudBlobContainer container, _) = await GetPartsAsync(containerName, true).ConfigureAwait(false);
 
          string sas = container.GetSharedAccessSignature(containerSasPolicy.ToSharedAccessBlobPolicy());
 
@@ -473,6 +473,27 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return sas;
       }
 
+      public async Task<ContainerPublicAccessType> GetContainerPublicAccessAsync(string containerName, CancellationToken cancellationToken = default)
+      {
+         (CloudBlobContainer container, _) = await GetPartsAsync(containerName, true).ConfigureAwait(false);
+
+         BlobContainerPermissions perm = await container.GetPermissionsAsync(cancellationToken).ConfigureAwait(false);
+
+         return (ContainerPublicAccessType)(int)perm.PublicAccess;
+      }
+
+      public async Task SetContainerPublicAccessAsync(string containerName, ContainerPublicAccessType containerPublicAccessType, CancellationToken cancellationToken = default)
+      {
+         (CloudBlobContainer container, _) = await GetPartsAsync(containerName, true).ConfigureAwait(false);
+
+         BlobContainerPermissions perm = await container.GetPermissionsAsync(cancellationToken).ConfigureAwait(false);
+
+         perm.PublicAccess = (BlobContainerPublicAccessType)(int)containerPublicAccessType;
+
+         await container.SetPermissionsAsync(perm, cancellationToken).ConfigureAwait(false);
+      }
+
+      //todo: deprecate in favor of a more human readable signature
       public async Task<string> GetSasUriAsync(
          string fullPath,
          SharedAccessBlobPolicy sasConstraints,
@@ -583,7 +604,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
          if(!_containerNameToContainer.TryGetValue(containerName, out CloudBlobContainer container))
          {
-            container = NativeBlobClient.GetContainerReference(containerName);
+            container = _client.GetContainerReference(containerName);
             if(_containerName == null)
             {
                if(!(await container.ExistsAsync().ConfigureAwait(false)))

@@ -57,6 +57,21 @@ namespace Storage.Net.Tests.Integration.Azure
       }
 
       [Fact]
+      public async Task ContainerPublicAccess()
+      {
+         //make sure container exists
+         await _native.WriteTextAsync("test/one", "test");
+
+         ContainerPublicAccessType pa = await _native.GetContainerPublicAccessAsync("test");
+         Assert.Equal(ContainerPublicAccessType.Off, pa);   //it's off by default
+
+         //set to public
+         await _native.SetContainerPublicAccessAsync("test", ContainerPublicAccessType.Container);
+         pa = await _native.GetContainerPublicAccessAsync("test");
+         Assert.Equal(ContainerPublicAccessType.Container, pa);
+      }
+
+      [Fact]
       public async Task Lease_CanAcquireAndRelease()
       {
          string id = $"test/{nameof(Lease_CanAcquireAndRelease)}.lck";

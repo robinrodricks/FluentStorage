@@ -12,11 +12,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
    public interface IAzureBlobStorage : IBlobStorage
    {
       /// <summary>
-      /// Returns reference to the native Azure SD blob client.
-      /// </summary>
-      CloudBlobClient NativeBlobClient { get; }
-
-      /// <summary>
       /// Gets Shared Access Signature for the entire storage account
       /// </summary>
       /// <returns></returns>
@@ -37,5 +32,22 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       /// <param name="cancellationToken"></param>
       /// <returns></returns>
       Task<BlobLease> AcquireBlobLeaseAsync(string fullPath, TimeSpan maxLeaseTime, bool waitForRelease = false, CancellationToken cancellationToken = default);
+
+      /// <summary>
+      /// Gets public access type for a specific blob container
+      /// </summary>
+      /// <param name="containerName"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      Task<ContainerPublicAccessType> GetContainerPublicAccessAsync(string containerName, CancellationToken cancellationToken = default);
+
+      /// <summary>
+      /// Sets public access type for a specific blob container
+      /// </summary>
+      /// <param name="containerName"></param>
+      /// <param name="containerPublicAccessType"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      Task SetContainerPublicAccessAsync(string containerName, ContainerPublicAccessType containerPublicAccessType, CancellationToken cancellationToken = default);
    }
 }
