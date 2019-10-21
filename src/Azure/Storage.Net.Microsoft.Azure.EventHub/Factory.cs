@@ -1,7 +1,5 @@
-﻿using Storage.Net.Blobs;
-using Storage.Net.Messaging;
+﻿using Storage.Net.Messaging;
 using Storage.Net.Microsoft.Azure.EventHub;
-using System.Collections.Generic;
 namespace Storage.Net
 {
    /// <summary>
@@ -14,30 +12,24 @@ namespace Storage.Net
       /// </summary>
       /// <param name="factory">Factory reference</param>
       /// <param name="connectionString">Connection string</param>
-      /// <param name="eventHubName"></param>
-      public static IMessenger AzureEventHubMessenger(this IMessagingFactory factory, string connectionString, string eventHubName)
+      public static IMessenger AzureEventHub(this IMessagingFactory factory, string connectionString)
       {
-         return new AzureEventHubMessenger(connectionString, eventHubName);
+         return new AzureEventHubMessenger(connectionString);
       }
 
       /// <summary>
-      /// Creates Azure Event Hub receiver
+      /// 
       /// </summary>
-      /// <param name="factory">Factory reference</param>
-      /// <param name="connectionString"></param>
-      /// <param name="hubPath"></param>
-      /// <param name="partitionIds"></param>
-      /// <param name="consumerGroupName"></param>
-      /// <param name="stateStorage"></param>
+      /// <param name="factory"></param>
+      /// <param name="namespaceName"></param>
+      /// <param name="entityName"></param>
+      /// <param name="keyName"></param>
+      /// <param name="key"></param>
       /// <returns></returns>
-      public static IMessageReceiver AzureEventHubReceiver(this IMessagingFactory factory,
-         string connectionString, string hubPath,
-         IEnumerable<string> partitionIds = null,
-         string consumerGroupName = null,
-         IBlobStorage stateStorage = null
-         )
+      public static IMessenger AzureEventHub(this IMessagingFactory factory,
+         string namespaceName, string entityName, string keyName, string key)
       {
-         return new AzureEventHubReceiver(connectionString, hubPath, partitionIds, consumerGroupName, stateStorage);
+         return new AzureEventHubMessenger(namespaceName, entityName, keyName, key);
       }
    }
 }

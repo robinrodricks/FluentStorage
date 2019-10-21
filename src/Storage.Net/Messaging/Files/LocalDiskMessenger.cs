@@ -157,5 +157,6 @@ namespace Storage.Net.Messaging.Files
             .ToList();
       }
 
+      public Task StartMessageProcessorAsync(string channelName, IMessageProcessor messageProcessor) => throw new NotImplementedException();
    }
 }

@@ -50,9 +50,6 @@ namespace Storage.Net.Tests
       [Option(Alias = "Azure.EventHub.ConnectionString")]
       string EventHubConnectionString { get; }
 
-      [Option(Alias = "Azure.EventHub.Path")]
-      string EventHubPath { get; }
-
       [Option(Alias = "Azure.DataLake.TenantId")]
       string AzureDataLakeTenantId { get; }
 

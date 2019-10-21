@@ -14,32 +14,34 @@ namespace Storage.Net.Microsoft.Azure.EventHub
    /// </summary>
    class AzureEventHubMessenger : IMessenger
    {
-      private readonly Dictionary<string, EventHubClient> _entityNameToClient = new Dictionary<string, EventHubClient>();
+      private readonly EventHubClient _client;
       private readonly string _connectionString;
       private readonly string _entityName;
 
       /// <summary>
       /// Creates an instance of event hub publisher by full connection string
       /// </summary>
-      /// <param name="connectionString">Full connection string</param>
-      /// <param name="entityName"></param>
-      public AzureEventHubMessenger(string connectionString, string entityName)
+      /// <param name="connectionString">Full connection string, including entity name</param>
+      public AzureEventHubMessenger(string connectionString)
       {
          _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
+
+         var csb = new EventHubsConnectionStringBuilder(connectionString);
+         _client = EventHubClient.CreateFromConnectionString(connectionString);
+         _entityName = csb.EntityPath;
+      }
+
+      public AzureEventHubMessenger(string namespaceName, string entityName, string keyName, string key)
+      {
+         var csb = new EventHubsConnectionStringBuilder(
+            new Uri($"{namespaceName}.servicebus.windows.net"), entityName, keyName, key);
          _entityName = entityName;
+         _client = EventHubClient.CreateFromConnectionString(csb.ToString());
       }
 
       private EventHubClient GetClient(string channelName)
       {
-         if(_entityNameToClient.TryGetValue(channelName, out EventHubClient client))
-            return client;
-
-         var csb = new EventHubsConnectionStringBuilder(_connectionString)
-         {
-            EntityPath = channelName
-         };
-
-         return EventHubClient.CreateFromConnectionString(csb.ToString());
+         return _client;
       }
 
       private static Task ThrowManagementNotSupportedException()
@@ -106,7 +108,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
          if(channelName is null)
             throw new ArgumentNullException(nameof(channelName));
 
-         throw new NotImplementedException();
+         throw new NotSupportedException();
       }
 
       /// <summary>
@@ -114,14 +116,23 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// </summary>
       public void Dispose()
       {
-         foreach(KeyValuePair<string, EventHubClient> client in _entityNameToClient)
-         {
-            //close in forgettable fashion - it's better than deadlocking at least.
-            client.Value.CloseAsync().Forget();
-         }
+         _client.Close();
       }
 
-      public Task DeleteAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public Task DeleteAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
+      public async Task StartMessageProcessorAsync(string channelName, IMessageProcessor messageProcessor)
+      {
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
+         if(messageProcessor is null)
+            throw new ArgumentNullException(nameof(messageProcessor));
+
+         if(channelName != _entityName)
+            throw new ArgumentException($"You can only process messages on '{_entityName}' channel", nameof(channelName));
+
+         await new EventHubMessageProcessor(messageProcessor).StartAsync();
+      }
 
       #endregion
    }
