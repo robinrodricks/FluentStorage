@@ -5,7 +5,6 @@ using Storage.Net.Messaging;
 using Microsoft.Azure.EventHubs;
 using System;
 using System.Threading;
-using NetBox.Extensions;
 
 namespace Storage.Net.Microsoft.Azure.EventHub
 {
@@ -15,7 +14,6 @@ namespace Storage.Net.Microsoft.Azure.EventHub
    class AzureEventHubMessenger : IMessenger
    {
       private readonly EventHubClient _client;
-      private readonly string _connectionString;
       private readonly string _entityName;
 
       /// <summary>
@@ -24,8 +22,8 @@ namespace Storage.Net.Microsoft.Azure.EventHub
       /// <param name="connectionString">Full connection string, including entity name</param>
       public AzureEventHubMessenger(string connectionString)
       {
-         _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
-
+         if(connectionString is null)
+            throw new ArgumentNullException(nameof(connectionString));
          var csb = new EventHubsConnectionStringBuilder(connectionString);
          _client = EventHubClient.CreateFromConnectionString(connectionString);
          _entityName = csb.EntityPath;
@@ -37,11 +35,6 @@ namespace Storage.Net.Microsoft.Azure.EventHub
             new Uri($"{namespaceName}.servicebus.windows.net"), entityName, keyName, key);
          _entityName = entityName;
          _client = EventHubClient.CreateFromConnectionString(csb.ToString());
-      }
-
-      private EventHubClient GetClient(string channelName)
-      {
-         return _client;
       }
 
       private static Task ThrowManagementNotSupportedException()
@@ -89,9 +82,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
          if(channelName != _entityName)
             throw new ArgumentException($"You can only send messages to '{_entityName}' channel", nameof(channelName));
 
-         EventHubClient client = GetClient(channelName);
-
-         await client.SendAsync(messages.Select(Converter.ToEventData)).ConfigureAwait(false);
+         await _client.SendAsync(messages.Select(Converter.ToEventData)).ConfigureAwait(false);
       }
 
       public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(
@@ -131,7 +122,7 @@ namespace Storage.Net.Microsoft.Azure.EventHub
          if(channelName != _entityName)
             throw new ArgumentException($"You can only process messages on '{_entityName}' channel", nameof(channelName));
 
-         await new EventHubMessageProcessor(messageProcessor).StartAsync();
+         await new EventHubMessageProcessor(null, messageProcessor).StartAsync();
       }
 
       #endregion

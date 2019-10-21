@@ -22,6 +22,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          new ConcurrentDictionary<string, CloudBlobContainer>();
 
       private readonly CloudStorageAccount _account;
+      private string _containerName;   // when limited to a single container
 
       public CloudBlobClient NativeBlobClient { get; private set; }
 
@@ -46,14 +47,39 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return new AzureUniversalBlobStorageProvider(account.CreateCloudBlobClient(), account);
       }
 
-      public static AzureUniversalBlobStorageProvider CreateFromAccountSas(string accountName, string sas)
+      public static AzureUniversalBlobStorageProvider CreateFromSasUrl(string sasUrl)
       {
-         if(sas is null)
-            throw new ArgumentNullException(nameof(sas));
+         if(sasUrl is null)
+            throw new ArgumentNullException(nameof(sasUrl));
 
-         CloudStorageAccount account = new CloudStorageAccount(new StorageCredentials(sas), accountName, null, true);
+         if(!TryParseSasUrl(sasUrl, out string accountName, out string containerName, out string sas))
+            throw new ArgumentException("invalid url", nameof(sasUrl));
 
-         return new AzureUniversalBlobStorageProvider(account.CreateCloudBlobClient(), null);
+         var account = new CloudStorageAccount(new StorageCredentials(sas), accountName, null, true);
+
+         return new AzureUniversalBlobStorageProvider(account.CreateCloudBlobClient(), null) { _containerName = containerName };
+      }
+
+      private static bool TryParseSasUrl(string url, out string accountName, out string containerName, out string sas)
+      {
+         try
+         {
+            var u = new Uri(url);
+
+            accountName = u.Host.Substring(0, u.Host.IndexOf('.'));
+            containerName = u.Segments.Length == 2 ? u.Segments[1] : null;
+            sas = u.Query;
+
+            return true;
+         }
+         catch
+         {
+            accountName = null;
+            containerName = null;
+            sas = null;
+            return false;
+         }
+
       }
 
       public static AzureUniversalBlobStorageProvider CreateForLocalEmulator()
@@ -91,7 +117,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          {
             //try deleting as a folder
             CloudBlobDirectory dir = container.GetDirectoryReference(StoragePath.Normalize(path, false));
-            using(var browser = new AzureBlobDirectoryBrowser(container, 3))
+            using(var browser = new AzureBlobDirectoryBrowser(container, _containerName == null, 3))
             {
                await browser.RecursiveDeleteAsync(dir, cancellationToken).ConfigureAwait(false);
             }
@@ -179,9 +205,15 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          destination.Size = source.Properties.Length;
          destination.LastModificationTime = source.Properties.LastModified;
 
-         destination.Properties["BlobType"] = source.BlobType.ToString();
-         destination.Properties["IsDeleted"] = source.IsDeleted.ToString();
-         destination.Properties["IsSnapshot"] = source.IsSnapshot.ToString();
+         string blobType = source.BlobType.ToString();
+         if(blobType.EndsWith("Blob"))
+            blobType = blobType.Substring(0, blobType.Length - 4).ToLower();
+
+         destination.TryAddProperties(
+            "BlobType", blobType,
+            "IsDeleted", source.IsDeleted.ToString(),
+            "IsSnapshot", source.IsSnapshot.ToString());
+
          if(source.Properties != null)
          {
             BlobProperties props = source.Properties;
@@ -251,7 +283,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          var result = new List<Blob>();
          var containers = new List<CloudBlobContainer>();
 
-         if(StoragePath.IsRootPath(options.FolderPath))
+         if(StoragePath.IsRootPath(options.FolderPath) && _containerName == null)
          {
             // list all of the containers
             containers.AddRange(await GetCloudBlobContainersAsync(cancellationToken));
@@ -287,7 +319,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          ListOptions options,
          CancellationToken cancellationToken)
       {
-         using(var browser = new AzureBlobDirectoryBrowser(container, BrowserParallelism))
+         using(var browser = new AzureBlobDirectoryBrowser(container, _containerName == null, BrowserParallelism))
          {
             IReadOnlyCollection<Blob> containerBlobs = await browser.ListFolderAsync(options, cancellationToken).ConfigureAwait(false);
             if(containerBlobs.Count > 0)
@@ -527,31 +559,43 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          if(fullPath == null)
             throw new ArgumentNullException(nameof(fullPath));
 
-         int idx = fullPath.IndexOf(StoragePath.PathSeparator);
          string containerName, relativePath;
-         if(idx == -1)
+
+         if(_containerName == null)
          {
-            containerName = fullPath;
-            relativePath = string.Empty;
+            int idx = fullPath.IndexOf(StoragePath.PathSeparator);
+            if(idx == -1)
+            {
+               containerName = fullPath;
+               relativePath = string.Empty;
+            }
+            else
+            {
+               containerName = fullPath.Substring(0, idx);
+               relativePath = fullPath.Substring(idx + 1);
+            }
          }
          else
          {
-            containerName = fullPath.Substring(0, idx);
-            relativePath = fullPath.Substring(idx + 1);
+            containerName = _containerName;
+            relativePath = fullPath;
          }
 
          if(!_containerNameToContainer.TryGetValue(containerName, out CloudBlobContainer container))
          {
             container = NativeBlobClient.GetContainerReference(containerName);
-            if(!(await container.ExistsAsync()))
+            if(_containerName == null)
             {
-               if(createContainer)
+               if(!(await container.ExistsAsync().ConfigureAwait(false)))
                {
-                  await container.CreateIfNotExistsAsync();
-               }
-               else
-               {
-                  return (null, null);
+                  if(createContainer)
+                  {
+                     await container.CreateIfNotExistsAsync().ConfigureAwait(false);
+                  }
+                  else
+                  {
+                     return (null, null);
+                  }
                }
             }
 

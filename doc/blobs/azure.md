@@ -80,23 +80,32 @@ policy.Permissions =
 Then get the policy signature:
 
 ```csharp
-string sas = await _native.GetStorageSasAsync(policy, false);
+string sasUrl = await _native.GetStorageSasAsync(policy, true);
 ```
 
-The second boolean parameter indicates whether to return full URL to the storage with SAS policy or only the policy itself. Setting it to `true` is useful if you want to use this URL in say `Azure Storage Explorer` to attach that account directly.
+The second boolean parameter indicates whether to return full URL to the storage with SAS policy or only the policy itself. Setting it to `true` is useful if you want to use this URL in say `Azure Storage Explorer` to attach that account directly. Also, in order to connect to blob storage with SAS, you need the full URL:
 
 To connect to an account using a policy, use the following factory method:
 
 ```csharp
-IBlobStorage sasInstance = StorageFactory.Blobs.AzureBlobStorageFromAccountSas("accountName", sas);
+IBlobStorage sasInstance = StorageFactory.Blobs.AzureBlobStorageFromSas(sasUrl);
 ```
-
-Note that the `sas` policy should not contain URL.
-
 
 ##### Container
 
-> todo
+You can get container's *Shared Access Signature* in the same way as account's one, by calling to
+
+```csharp
+string sasUrl = await _native.GetContainerSasAsync(containerName, policy, true);
+```
+
+This returns SAS URL that can be used in Azure Storage Explorer, or you can use it to connect in this library itself:
+
+```csharp
+IBlobStorage sasInstance = StorageFactory.Blobs.AzureBlobStorageFromSas(sasUrl);
+```
+
+Note that the method's signature is identical to account's one, actually it's the same method. Storage.Net takes care of figuring out whether SAS URL is for a container or for a storage account automatically. However, in case of a container SAS, the root folder in `IBlobStorage` instance is the container itself.
 
 ##### Blob
 

@@ -20,13 +20,13 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       /// Gets Shared Access Signature for the entire storage account
       /// </summary>
       /// <returns></returns>
-      Task<string> GetStorageSasAsync(AccountSasPolicy accountPolicy, bool includeUrl);
+      Task<string> GetStorageSasAsync(AccountSasPolicy accountPolicy, bool includeUrl = true);
 
       /// <summary>
       /// Gets Shared Access Signature for a blob container
       /// </summary>
       /// <returns></returns>
-      Task<string> GetContainerSasAsync(string containerName, ContainerSasPolicy containerSasPolicy, bool includeUrl);
+      Task<string> GetContainerSasAsync(string containerName, ContainerSasPolicy containerSasPolicy, bool includeUrl = true);
 
       /// <summary>
       /// Acquires a lease
