@@ -75,7 +75,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
                foreach (IListBlobItem listItem in segment.Results)
                {
-                  Blob blob = ToBlob(listItem);
+                  Blob blob = AzConvert.ToBlob(_prependContainerName ? _container.Name : null, listItem);
 
                   if (options.IsMatch(blob) && (options.BrowseFilter == null || options.BrowseFilter(blob)))
                   {
@@ -121,44 +121,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return _prependContainerName
             ? StoragePath.Combine(_container.Name, name)
             : name;
-      }
-
-      private Blob ToBlob(IListBlobItem nativeBlob)
-      {
-         Blob blob;
-
-         if (nativeBlob is CloudBlockBlob blockBlob)
-         {
-            string fullName = GetFullName(blockBlob.Name);
-
-            blob = new Blob(fullName, BlobItemKind.File);
-         }
-         else if (nativeBlob is CloudAppendBlob appendBlob)
-         {
-            string fullName = GetFullName(appendBlob.Name);
-
-            blob = new Blob(fullName, BlobItemKind.File);
-         }
-         else if (nativeBlob is CloudBlobDirectory dirBlob)
-         {
-            string fullName = GetFullName(dirBlob.Prefix);
-
-            blob = new Blob(fullName, BlobItemKind.Folder);
-         }
-         else
-         {
-            throw new InvalidOperationException($"unknown item type {nativeBlob.GetType()}");
-         }
-
-         //attach metadata if we can
-         if(nativeBlob is CloudBlob cloudBlob)
-         {
-            //no need to fetch attributes, parent request includes the details
-            //await cloudBlob.FetchAttributesAsync().ConfigureAwait(false);
-            AzureUniversalBlobStorageProvider.AttachBlobMeta(blob, cloudBlob);
-         }
-
-         return blob;
       }
 
       public void Dispose()

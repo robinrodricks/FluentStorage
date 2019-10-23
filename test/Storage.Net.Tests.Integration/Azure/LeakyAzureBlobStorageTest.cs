@@ -120,14 +120,27 @@ namespace Storage.Net.Tests.Integration.Azure
       [Fact]
       public async Task Delete_container()
       {
-         await _native.WriteTextAsync("test/test.txt", "test");
+         string containerName = Guid.NewGuid().ToString();
+         await _native.WriteTextAsync($"{containerName}/test.txt", "test");
 
          IReadOnlyCollection<Blob> containers = await _native.ListAsync();
-         Assert.Contains(containers, c => c.Name == "test");
+         Assert.Contains(containers, c => c.Name == containerName);
 
-         await _native.DeleteAsync("test");
+         await _native.DeleteAsync(containerName);
          containers = await _native.ListAsync();
-         Assert.DoesNotContain(containers, c => c.Name == "test");
+         Assert.DoesNotContain(containers, c => c.Name == containerName);
+      }
+
+      [Fact]
+      public async Task Snapshots_create()
+      {
+         string path = "test/test.txt";
+
+         await _native.WriteTextAsync(path, "test");
+
+         Blob snapshot = await _native.CreateSnapshotAsync(path);
+
+         Assert.NotNull(snapshot);
       }
    }
 }

@@ -49,5 +49,13 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       /// <param name="cancellationToken"></param>
       /// <returns></returns>
       Task SetContainerPublicAccessAsync(string containerName, ContainerPublicAccessType containerPublicAccessType, CancellationToken cancellationToken = default);
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="fullPath"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      Task<Blob> CreateSnapshotAsync(string fullPath, CancellationToken cancellationToken = default);
    }
 }

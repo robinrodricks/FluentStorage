@@ -191,72 +191,17 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          if(string.IsNullOrEmpty(path))
          {
             //looks like it's a container reference
-            await container.FetchAttributesAsync().ConfigureAwait(false);
+            await container.FetchAttributesAsync(cancellationToken).ConfigureAwait(false);
             return AzConvert.ToBlob(container);
          }
          else
          {
             CloudBlob blob = container.GetBlobReference(StoragePath.Normalize(path, false));
-            if(!(await blob.ExistsAsync().ConfigureAwait(false)))
+            if(!(await blob.ExistsAsync(cancellationToken).ConfigureAwait(false)))
                return null;
 
-            var r = new Blob(fullPath);
-            await blob.FetchAttributesAsync().ConfigureAwait(false);
-            AttachBlobMeta(r, blob);
-            return r;
-         }
-      }
-
-      internal static void AttachBlobMeta(Blob destination, CloudBlob source)
-      {
-         //ContentMD5 is base64-encoded hash, whereas we work with HEX encoded ones
-         destination.MD5 = source.Properties.ContentMD5.Base64DecodeAsBytes().ToHexString();
-         destination.Size = source.Properties.Length;
-         destination.LastModificationTime = source.Properties.LastModified;
-
-         string blobType = source.BlobType.ToString();
-         if(blobType.EndsWith("Blob"))
-            blobType = blobType.Substring(0, blobType.Length - 4).ToLower();
-
-         destination.TryAddProperties(
-            "BlobType", blobType,
-            "IsDeleted", source.IsDeleted.ToString(),
-            "IsSnapshot", source.IsSnapshot.ToString());
-
-         if(source.Properties != null)
-         {
-            BlobProperties props = source.Properties;
-            if(props.ContentDisposition != null)
-               destination.Properties["ContentDisposition"] = props.ContentDisposition;
-            if(props.ContentEncoding != null)
-               destination.Properties["ContentEncoding"] = props.ContentEncoding;
-            if(props.ContentLanguage != null)
-               destination.Properties["ContentLanguage"] = props.ContentLanguage;
-            if(props.ContentType != null)
-               destination.Properties["ContentType"] = props.ContentType;
-            if(props.ContentMD5 != null)
-               destination.Properties["ContentMD5"] = props.ContentMD5;
-            if(props.ETag != null)
-               destination.Properties["ETag"] = props.ETag;
-            destination.Properties["IsIncrementalCopy"] = props.IsIncrementalCopy.ToString();
-            destination.Properties["IsServerEncrypted"] = props.IsServerEncrypted.ToString();
-            destination.Properties["LeaseDuration"] = props.LeaseDuration.ToString();
-            destination.Properties["LeaseState"] = props.LeaseState.ToString();
-            destination.Properties["LeaseStatus"] = props.LeaseStatus.ToString();
-            if(props.RehydrationStatus != null)
-               destination.Properties["RehydrationStatus"] = props.RehydrationStatus.Value.ToString();
-            if(props.RemainingDaysBeforePermanentDelete != null)
-               destination.Properties["RemainingDaysBeforePermanentDelete"] = props.RemainingDaysBeforePermanentDelete.Value.ToString();
-            if(props.StandardBlobTier != null)
-               destination.Properties["StandardBlobTier"] = props.StandardBlobTier.ToString();
-            if(props.PremiumPageBlobTier != null)
-               destination.Properties["PremiumPageBlobTier"] = props.PremiumPageBlobTier.ToString();
-
-         }
-
-         if(source.Metadata?.Count > 0)
-         {
-            destination.Metadata.MergeRange(source.Metadata);
+            await blob.FetchAttributesAsync(cancellationToken).ConfigureAwait(false);
+            return AzConvert.ToBlob(_containerName == null ? container.Name : null, blob);
          }
       }
 
@@ -575,6 +520,19 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          }
 
          return new BlobLease(leaseBlob, leaseId);
+      }
+
+      public async Task<Blob> CreateSnapshotAsync(string fullPath, CancellationToken cancellationToken)
+      {
+         (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath).ConfigureAwait(false);
+
+         CloudBlockBlob blob = container.GetBlockBlobReference(path);
+
+         CloudBlob snapshot = await blob.SnapshotAsync(cancellationToken);
+
+         return AzConvert.ToBlob(_containerName == null ? container.Name : null, snapshot);
+
+         //BlobResultSegment snaps = await container.ListBlobsSegmentedAsync(path, true, BlobListingDetails.Snapshots, null, null, null, null, cancellationToken);
       }
 
       #endregion
