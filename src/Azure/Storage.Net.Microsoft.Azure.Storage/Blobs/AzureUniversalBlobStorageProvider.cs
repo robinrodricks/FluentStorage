@@ -106,20 +106,29 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       {
          (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath, false);
 
-         CloudBlockBlob blob = string.IsNullOrEmpty(path)
-            ? null
-            : container.GetBlockBlobReference(StoragePath.Normalize(path, false));
-         if(blob != null && await blob.ExistsAsync().ConfigureAwait(false))
+         if(StoragePath.IsRootPath(path))
          {
-            await blob.DeleteIfExistsAsync();
+            //deleting the entire container
+            await container.DeleteIfExistsAsync(cancellationToken).ConfigureAwait(false);
          }
          else
          {
-            //try deleting as a folder
-            CloudBlobDirectory dir = container.GetDirectoryReference(StoragePath.Normalize(path, false));
-            using(var browser = new AzureBlobDirectoryBrowser(container, _containerName == null, 3))
+
+            CloudBlockBlob blob = string.IsNullOrEmpty(path)
+               ? null
+               : container.GetBlockBlobReference(StoragePath.Normalize(path, false));
+            if(blob != null && await blob.ExistsAsync().ConfigureAwait(false))
             {
-               await browser.RecursiveDeleteAsync(dir, cancellationToken).ConfigureAwait(false);
+               await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, null, null, null, cancellationToken);
+            }
+            else
+            {
+               //try deleting as a folder
+               CloudBlobDirectory dir = container.GetDirectoryReference(StoragePath.Normalize(path, false));
+               using(var browser = new AzureBlobDirectoryBrowser(container, _containerName == null, 3))
+               {
+                  await browser.RecursiveDeleteAsync(dir, cancellationToken).ConfigureAwait(false);
+               }
             }
          }
       }

@@ -42,7 +42,8 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             }
             else if(item is CloudBlockBlob iBlob)
             {
-               await iBlob.DeleteIfExistsAsync().ConfigureAwait(false);
+               await iBlob.DeleteIfExistsAsync(
+                  DeleteSnapshotsOption.IncludeSnapshots, null, null, null, cancellationToken).ConfigureAwait(false);
             }
             else if(item is CloudAppendBlob iAppendBlob)
             {

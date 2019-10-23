@@ -116,5 +116,18 @@ namespace Storage.Net.Tests.Integration.Azure
             Assert.Equal("True", container.Properties["IsContainer"]);
          }
       }
+
+      [Fact]
+      public async Task Delete_container()
+      {
+         await _native.WriteTextAsync("test/test.txt", "test");
+
+         IReadOnlyCollection<Blob> containers = await _native.ListAsync();
+         Assert.Contains(containers, c => c.Name == "test");
+
+         await _native.DeleteAsync("test");
+         containers = await _native.ListAsync();
+         Assert.DoesNotContain(containers, c => c.Name == "test");
+      }
    }
 }
