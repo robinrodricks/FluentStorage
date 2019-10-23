@@ -69,21 +69,29 @@ namespace Storage.Net.Blobs.Files
          return Task.FromResult<IReadOnlyCollection<Blob>>(result);
       }
 
+      private static string FormatFlags(FileAttributes fa)
+      {
+         return string.Join("",
+            fa.ToString().Split(',').Select(v => v.Trim().Substring(0, 1).ToUpper()).OrderBy(l => l));
+      }
+
       private Blob ToBlobItem(string fullPath, BlobItemKind kind, bool includeMeta)
       {
+         var fi = new FileInfo(fullPath);
+
          fullPath = fullPath.Substring(_directoryFullName.Length);
          fullPath = fullPath.Replace(Path.DirectorySeparatorChar, StoragePath.PathSeparator);
          fullPath = fullPath.Trim(StoragePath.PathSeparator);
          fullPath = StoragePath.PathSeparatorString + fullPath;
 
          var blob = new Blob(fullPath, kind);
-
-         var fi = new FileInfo(fullPath);
+         blob.Size = fi.Length;
+         blob.LastModificationTime = fi.CreationTimeUtc;
          blob.TryAddProperties(
             "IsReadOnly", fi.IsReadOnly.ToString(),
             "LastAccessTimeUtc", fi.LastAccessTimeUtc.ToString(),
             "LastWriteTimeUtc", fi.LastWriteTimeUtc.ToString(),
-            "Attributes", fi.Attributes.ToString());
+            "Attributes", FormatFlags(fi.Attributes));
 
          if(includeMeta)
          {
@@ -314,15 +322,6 @@ namespace Storage.Net.Blobs.Files
 
          try
          {
-            //scans the entire file, disable as it's really expensive and slow
-            /*using(Stream fs = File.OpenRead(fi.FullName))
-            {
-               blob.MD5 = fs.GetHash(HashType.Md5);
-            }*/
-
-            blob.Size = fi.Length;
-            blob.LastModificationTime = fi.CreationTimeUtc;
-
             string attrFilePath = path + AttributesFileExtension;
             if(File.Exists(attrFilePath))
             {
