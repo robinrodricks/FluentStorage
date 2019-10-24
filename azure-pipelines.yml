@@ -8,7 +8,7 @@ trigger:
   paths:
     exclude:
       - README.md
-      - /doc/**/*
+      - doc/*
 
 pr:
   branches:
@@ -18,7 +18,7 @@ pr:
   paths:
     exclude:
       - README.md
-      - /doc/**/*
+      - doc/*
 
 variables:
   - group: 'External Resources'
