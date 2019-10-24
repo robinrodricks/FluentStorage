@@ -470,39 +470,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          await container.SetPermissionsAsync(perm, cancellationToken).ConfigureAwait(false);
       }
 
-      //todo: deprecate in favor of a more human readable signature
-      public async Task<string> GetSasUriAsync(
-         string fullPath,
-         SharedAccessBlobPolicy sasConstraints,
-         SharedAccessBlobHeaders headers,
-         bool createContainer,
-         CancellationToken cancellationToken)
-      {
-         GenericValidation.CheckBlobFullPath(fullPath);
-
-         (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath, createContainer);
-
-         if(container == null)
-            return null;
-
-         CloudBlockBlob blob = container.GetBlockBlobReference(StoragePath.Normalize(path, false));
-
-         try
-         {
-            return $@"{blob.Uri}{blob.GetSharedAccessSignature(sasConstraints, headers)}";
-         }
-         catch(AzureStorageException ex)
-         {
-            if(AzureStorageValidation.IsDoesntExist(ex))
-               return null;
-
-            if(!AzureStorageValidation.TryHandleStorageException(ex))
-               throw;
-         }
-
-         throw new InvalidOperationException("must not be here");
-      }
-
       public async Task<BlobLease> AcquireBlobLeaseAsync(
          string fullPath,
          TimeSpan maxLeaseTime,
