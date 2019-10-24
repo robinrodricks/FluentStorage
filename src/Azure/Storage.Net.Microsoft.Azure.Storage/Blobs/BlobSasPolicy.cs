@@ -6,31 +6,38 @@ using Microsoft.Azure.Storage.Blob;
 namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 {
    /// <summary>
-   /// Defines a SAS policy for a container
+   /// Defines a SAS policy for a blob
    /// </summary>
-   public class ContainerSasPolicy : OffsetSasPolicy
+   public class BlobSasPolicy : OffsetSasPolicy
    {
       /// <summary>
       /// 
       /// </summary>
       /// <param name="startTime"></param>
       /// <param name="duration"></param>
-      public ContainerSasPolicy(DateTimeOffset? startTime, TimeSpan? duration) : base(startTime, duration)
+      public BlobSasPolicy(DateTimeOffset? startTime, TimeSpan duration) : base(startTime, duration)
       {
-       
       }
 
       /// <summary>
-      /// Permissions granted
+      /// 
       /// </summary>
-      public ContainerSasPermission Permissions { get; set; } = ContainerSasPermission.List | ContainerSasPermission.Read;
+      public BlobSasPolicy(TimeSpan duration) : base(null, duration)
+      {
+
+      }
+
+      /// <summary>
+      /// Permissions for this sas policy
+      /// </summary>
+      public BlobSasPermission Permissions { get; set; } = BlobSasPermission.Read;
 
       internal SharedAccessBlobPolicy ToSharedAccessBlobPolicy()
       {
          return new SharedAccessBlobPolicy
          {
             SharedAccessStartTime = StartTime,
-            SharedAccessExpiryTime = StartTime + Duration,
+            SharedAccessExpiryTime = ExpiryTime,
             Permissions = (SharedAccessBlobPermissions)(int)Permissions
          };
       }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -61,6 +62,7 @@ namespace Storage.Net.Tests.Integration.Azure
       {
          //make sure container exists
          await _native.WriteTextAsync("test/one", "test");
+         await _native.SetContainerPublicAccessAsync("test", ContainerPublicAccessType.Off);
 
          ContainerPublicAccessType pa = await _native.GetContainerPublicAccessAsync("test");
          Assert.Equal(ContainerPublicAccessType.Off, pa);   //it's off by default
@@ -69,6 +71,26 @@ namespace Storage.Net.Tests.Integration.Azure
          await _native.SetContainerPublicAccessAsync("test", ContainerPublicAccessType.Container);
          pa = await _native.GetContainerPublicAccessAsync("test");
          Assert.Equal(ContainerPublicAccessType.Container, pa);
+      }
+
+      [Fact]
+      public async Task BlobPublicAccess()
+      {
+         string path = StoragePath.Combine("test", Guid.NewGuid().ToString() + ".txt");
+
+         await _native.WriteTextAsync(path, "read me!");
+
+         var policy = new BlobSasPolicy(TimeSpan.FromHours(12))
+         {
+            Permissions = BlobSasPermission.Read | BlobSasPermission.Write
+         };
+
+         string publicUrl = await _native.GetBlobSasAsync(path);
+
+         Assert.NotNull(publicUrl);
+
+         string text = await new HttpClient().GetStringAsync(publicUrl);
+         Assert.Equal("read me!", text);
       }
 
       [Fact]

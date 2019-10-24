@@ -1,37 +1,21 @@
 ﻿using System;
 using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 {
    /// <summary>
    /// Generic Shared Access Signature policy
    /// </summary>
-   public class AccountSasPolicy
+   public class AccountSasPolicy : OffsetSasPolicy
    {
       /// <summary>
       /// 
       /// </summary>
       /// <param name="startTime"></param>
       /// <param name="duration"></param>
-      public AccountSasPolicy(DateTimeOffset startTime, TimeSpan duration)
+      public AccountSasPolicy(DateTimeOffset? startTime, TimeSpan? duration) : base(startTime, duration)
       {
-         if(duration.TotalSeconds < 0)
-            throw new ArgumentException("duration cannot be negative", nameof(duration));
-
-         StartTime = startTime;
-         Duration = duration;
       }
-
-      /// <summary>
-      /// Time when this policy starts
-      /// </summary>
-      public DateTimeOffset? StartTime { get; set; }
-
-      /// <summary>
-      /// Total duration of the SAS policy
-      /// </summary>
-      public TimeSpan? Duration { get; set; }
 
       /// <summary>
       /// Permissions required.
@@ -43,7 +27,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return new SharedAccessAccountPolicy
          {
             SharedAccessStartTime = StartTime,
-            SharedAccessExpiryTime = StartTime + Duration,
+            SharedAccessExpiryTime = ExpiryTime,
             Protocols = SharedAccessProtocol.HttpsOnly,
             Services = SharedAccessAccountServices.Blob,
             Permissions = (SharedAccessAccountPermissions)(int)Permissions,

@@ -427,6 +427,29 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return sas;
       }
 
+      public async Task<string> GetBlobSasAsync(
+         string fullPath, BlobSasPolicy blobSasPolicy,
+         bool includeUrl = true, CancellationToken cancellationToken = default)
+      {
+         (CloudBlobContainer container, string relativePath) = await GetPartsAsync(fullPath, false).ConfigureAwait(false);
+
+         if(container == null)
+            return null;
+
+         CloudBlockBlob blob = container.GetBlockBlobReference(relativePath);
+
+         blobSasPolicy ??= new BlobSasPolicy(TimeSpan.FromHours(1));
+
+         string sas = blob.GetSharedAccessSignature(blobSasPolicy.ToSharedAccessBlobPolicy());
+
+         if(includeUrl)
+         {
+            sas = blob.Uri + sas;
+         }
+
+         return sas;
+      }
+
       public async Task<ContainerPublicAccessType> GetContainerPublicAccessAsync(string containerName, CancellationToken cancellationToken = default)
       {
          (CloudBlobContainer container, _) = await GetPartsAsync(containerName, true).ConfigureAwait(false);

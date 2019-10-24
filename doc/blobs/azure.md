@@ -109,7 +109,25 @@ Note that the method's signature is identical to account's one, actually it's th
 
 ##### Blob
 
-> todo
+In order to get a signature for a specific *blob*, you can use use `GetBlobSasAsync` method. Calling it without any parameters for a blob, returns a *read-only URL valid for 1 hour from now*:
+
+```csharp
+string publicUrl = await _native.GetBlobSasAsync(path);
+```
+
+You can then redistribute this URL amongst other users so they can download the content.
+
+To customise the policy, pass additional parameters. For instance, to grant *read/write access for 12 hours* you can write the following code:
+
+```csharp
+var policy = new BlobSasPolicy(TimeSpan.FromHours(12))
+{
+   Permissions = BlobSasPermission.Read | BlobSasPermission.Write
+};
+
+string publicUrl = await _native.GetBlobSasAsync(path, policy);
+```
+
 
 #### Blob Lease
 

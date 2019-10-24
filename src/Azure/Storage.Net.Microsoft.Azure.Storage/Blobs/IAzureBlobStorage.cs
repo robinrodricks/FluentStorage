@@ -24,6 +24,18 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       Task<string> GetContainerSasAsync(string containerName, ContainerSasPolicy containerSasPolicy, bool includeUrl = true);
 
       /// <summary>
+      /// Gets Shared Access Signature for a single blob
+      /// </summary>
+      /// <param name="fullPath"></param>
+      /// <param name="blobSasPolicy">Access policy, by default set to unlimited read for 1 hour.</param>
+      /// <param name="includeUrl"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      Task<string> GetBlobSasAsync(
+         string fullPath, BlobSasPolicy blobSasPolicy = null,
+         bool includeUrl = true, CancellationToken cancellationToken = default);
+
+      /// <summary>
       /// Acquires a lease
       /// </summary>
       /// <param name="fullPath"></param>
