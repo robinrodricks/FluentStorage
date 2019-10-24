@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Auth;
 using Microsoft.Azure.Storage.Blob;
-using NetBox.Extensions;
 using Storage.Net.Blobs;
 using AzureStorageException = Microsoft.Azure.Storage.StorageException;
 
@@ -58,6 +57,14 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          var account = new CloudStorageAccount(new StorageCredentials(sas), accountName, null, true);
 
          return new AzureUniversalBlobStorageProvider(account.CreateCloudBlobClient(), null) { _containerName = containerName };
+      }
+
+      public static AzureUniversalBlobStorageProvider CreateWithAadToken(string accountName, string token)
+      {
+         var tokenCred = new TokenCredential(token);
+         var account = new CloudStorageAccount(new StorageCredentials(tokenCred), accountName, null, true);
+
+         return new AzureUniversalBlobStorageProvider(account.CreateCloudBlobClient(), null);
       }
 
       private static bool TryParseSasUrl(string url, out string accountName, out string containerName, out string sas)

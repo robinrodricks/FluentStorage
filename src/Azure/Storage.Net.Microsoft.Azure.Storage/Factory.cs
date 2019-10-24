@@ -79,6 +79,20 @@ namespace Storage.Net
       }
 
       /// <summary>
+      /// Creates a blob storage implementation using a bearer token
+      /// </summary>
+      /// <param name="factory"></param>
+      /// <param name="accountName"></param>
+      /// <param name="token"></param>
+      /// <returns></returns>
+      public static IBlobStorage AzureBlobStorageFromAadToken(this IBlobStorageFactory factory,
+         string accountName,
+         string token)
+      {
+         return AzureUniversalBlobStorageProvider.CreateWithAadToken(accountName, token);
+      }
+
+      /// <summary>
       /// Creates a blob storage implementation based on Microsoft Azure Files.
       /// </summary>
       /// <param name="factory">Reference to factory</param>
