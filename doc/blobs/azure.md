@@ -20,6 +20,9 @@ IBlobStorage storage = StorageFactory.Blobs.FromConnectionString("azure.file://a
 
 - [Native Operations](#native-operations)
   - [Shared Access Signature Tokens](#sas-tokens)
+    - [Storage Account](#storage-account)
+    - [Container](#container)
+    - [Blob](#blob)
   - [Blob Lease](#blob-lease)
 
 There are a few overloads in this package, for instance:
