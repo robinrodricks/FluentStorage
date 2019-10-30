@@ -1,16 +1,20 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Storage.Net.Amazon.Aws;
+using Storage.Net.Blobs;
 
 namespace Storage.Net.ConsoleRunner
 {
    class Program
    {
-      static void Main(string[] args)
+      static async Task Main(string[] args)
       {
-         Console.WriteLine("Hello World!");
+         IReadOnlyCollection<string> profiles = AwsCliCredentials.EnumerateProfiles();
 
-         var all = Assembly.GetEntryAssembly().GetReferencedAssemblies().Select(Assembly.Load).ToList();
+         IBlobStorage bs = StorageFactory.Blobs.AwsS3("***", "***", "eu-west-1");
+         IReadOnlyCollection<Blob> all = await bs.ListAsync();
+
+         //var ibs = StorageFactory.Blobs.AwsS3()
       }
    }
 }

@@ -36,6 +36,20 @@ namespace Storage.Net.Amazon.Aws.Blobs
       //https://github.com/awslabs/aws-sdk-net-samples/blob/master/ConsoleSamples/AmazonS3Sample/AmazonS3Sample/S3Sample.cs
 
 
+#if !NET16
+      public static AwsS3BlobStorage FromAwsCliProfile(string profileName, string bucketName, string region)
+      {
+         return new AwsS3BlobStorage(bucketName, region, AwsCliCredentials.GetCredentials(profileName));
+      }
+#endif
+
+      public AwsS3BlobStorage(string bucketName, string region, AWSCredentials credentials)
+      {
+         _bucketName = bucketName;
+         _client = new AmazonS3Client(credentials, CreateConfig(region, null));
+         _fileTransferUtility = new TransferUtility(_client);
+      }
+
       /// <summary>
       /// Creates a new instance of <see cref="AwsS3BlobStorage"/> for a given region endpoint, and will assume the running AWS ECS Task role credentials or Lambda role credentials 
       /// </summary>
