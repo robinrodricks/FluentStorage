@@ -81,11 +81,14 @@ namespace Storage.Net.Blobs
       /// </summary>
       /// <param name="provider"></param>
       /// <param name="fullPath">Blob id</param>
+      /// <param name="textEncoding">Optional text encoding. When not specified, <see cref="UTF8Encoding"/> is used.</param>
       /// <param name="cancellationToken"></param>
       /// <returns></returns>
       public static async Task<string> ReadTextAsync(
          this IBlobStorage provider,
-         string fullPath, CancellationToken cancellationToken = default)
+         string fullPath,
+         Encoding textEncoding = null,
+         CancellationToken cancellationToken = default)
       {
          Stream src = await provider.OpenReadAsync(fullPath, cancellationToken);
          if (src == null) return null;
@@ -96,7 +99,7 @@ namespace Storage.Net.Blobs
             await src.CopyToAsync(ms);
          }
 
-         return Encoding.UTF8.GetString(ms.ToArray());
+         return (textEncoding ?? Encoding.UTF8).GetString(ms.ToArray());
       }
 
       /// <summary>
@@ -105,13 +108,16 @@ namespace Storage.Net.Blobs
       /// <param name="provider"></param>
       /// <param name="fullPath">Blob to write</param>
       /// <param name="text">Text to write, treated in UTF-8 encoding</param>
+      /// <param name="textEncoding">Optional text encoding. When not specified, <see cref="UTF8Encoding"/> is used.</param>
       /// <param name="cancellationToken"></param>
       /// <returns></returns>
       public static async Task WriteTextAsync(
          this IBlobStorage provider,
-         string fullPath, string text, CancellationToken cancellationToken = default)
+         string fullPath, string text,
+         Encoding textEncoding = null,
+         CancellationToken cancellationToken = default)
       {
-         using (Stream s = text.ToMemoryStream())
+         using (Stream s = text.ToMemoryStream(textEncoding ?? Encoding.UTF8))
          {
             await provider.WriteAsync(fullPath, s, false, cancellationToken);
          }
@@ -432,6 +438,7 @@ namespace Storage.Net.Blobs
             await blobStorage.WriteTextAsync(
                fullPath,
                "created as a workaround by Storage.Net when creating an empty parent folder",
+               null,
                cancellationToken);
          }
       }

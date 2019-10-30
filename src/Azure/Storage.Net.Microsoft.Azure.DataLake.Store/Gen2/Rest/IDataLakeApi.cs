@@ -120,7 +120,11 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Rest
       /// </summary>
       /// <param name="filesystem"></param>
       /// <param name="path"></param>
-      /// <param name="range">The HTTP Range request header specifies one or more byte ranges of the resource to be retrieved.</param>
+      /// <param name="range">
+      /// The HTTP Range request header specifies one or more byte ranges of the resource to be retrieved.
+      /// should be as follows: "bytes=[start]-[end]"
+      /// for instance, to get first 10 bytes: "bytes=0-9", next 10 bytes: "bytes=10-19" and so on.
+      /// </param>
       /// <param name="body">Body must be present but must be empty</param>
       /// <param name="timeoutSeconds"></param>
       /// <returns></returns>

@@ -427,6 +427,25 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
+      public async Task Read_larger_file()
+      {
+         string text = RandomGenerator.GetRandomString(1024 * 1024, false);
+
+         try
+         {
+            await _storage.WriteTextAsync("test/test", text);
+
+            string text2 = await _storage.ReadTextAsync("test/test");
+
+            Assert.Equal(text, text2);
+         }
+         catch(NotSupportedException)
+         {
+
+         }
+      }
+
+      [Fact]
       public async Task UserMetadata_write_readsback()
       {
          var blob = new Blob(RandomBlobPath());

@@ -53,11 +53,17 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Rest.Model
 
       public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
       {
-         if(_pos >= _length) return 0;
+         if(_pos >= _length)
+            return 0;
 
-         if(_pos + count >= _length) count = (int)(_length - _pos - 1);
+         if(_pos + count >= _length)
+            count = (int)(_length - _pos);
 
-         string range = $"bytes={_pos}-{count}";
+         if(count == 0)
+            return 0;
+
+         // must conform to HTTP specs on "Range" header, for details see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
+         string range = $"bytes={_pos}-{_pos + count - 1}";
 
          using(Stream chunk = await _api.ReadPathAsync(_filesystemName, _path, range, EmptyStream).ConfigureAwait(false))
          {
