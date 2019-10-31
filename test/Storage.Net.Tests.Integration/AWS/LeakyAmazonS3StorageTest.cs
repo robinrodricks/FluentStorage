@@ -20,7 +20,7 @@ namespace Storage.Net.Tests.Integration.AWS
          _settings = Settings.Instance;
 
          _storage = (IAwsS3BlobStorage)StorageFactory.Blobs.AwsS3(
-            _settings.AwsAccessKeyId, _settings.AwsSecretAccessKey, _settings.AwsTestBucketName, _settings.AwsTestBucketRegion);
+            _settings.AwsAccessKeyId, _settings.AwsSecretAccessKey, null, _settings.AwsTestBucketName, _settings.AwsTestBucketRegion);
       }
    }
 }
