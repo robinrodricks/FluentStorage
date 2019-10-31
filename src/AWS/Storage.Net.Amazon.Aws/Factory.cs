@@ -43,6 +43,7 @@ namespace Storage.Net
       /// <param name="factory">Factory reference</param>
       /// <param name="accessKeyId">Access key ID</param>
       /// <param name="secretAccessKey">Secret access key</param>
+      /// /// <param name="sessionToken">Optional. Only required when using session credentials.</param>
       /// <param name="bucketName">Bucket name</param>
       /// <param name="region">Region endpoint</param>
       /// <param name="serviceUrl">S3-compatible service location</param>
@@ -50,11 +51,12 @@ namespace Storage.Net
       public static IBlobStorage AwsS3(this IBlobStorageFactory factory,
          string accessKeyId,
          string secretAccessKey,
+         string sessionToken,
          string bucketName,
          string region,
          string serviceUrl = null)
       {
-         return new AwsS3BlobStorage(accessKeyId, secretAccessKey, null, bucketName, region, serviceUrl);
+         return new AwsS3BlobStorage(accessKeyId, secretAccessKey, sessionToken, bucketName, region, serviceUrl);
       }
 
       /// <summary>
@@ -63,16 +65,18 @@ namespace Storage.Net
       /// <param name="factory">Factory reference</param>
       /// <param name="accessKeyId">Access key ID</param>
       /// <param name="secretAccessKey">Secret access key</param>
+      /// <param name="sessionToken">Optional. Only required when using session credentials.</param>
       /// <param name="bucketName">Bucket name</param>
       /// <param name="clientConfig">S3 client configuration</param>
       /// <returns>A reference to the created storage</returns>
       public static IBlobStorage AwsS3(this IBlobStorageFactory factory,
          string accessKeyId,
          string secretAccessKey,
+         string sessionToken,
          string bucketName,
          AmazonS3Config clientConfig)
       {
-         return new AwsS3BlobStorage(accessKeyId, secretAccessKey, null, bucketName, clientConfig);
+         return new AwsS3BlobStorage(accessKeyId, secretAccessKey, sessionToken, bucketName, clientConfig);
       }
 
 #if !NET16

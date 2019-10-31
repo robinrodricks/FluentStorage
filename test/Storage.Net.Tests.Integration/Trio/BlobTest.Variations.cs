@@ -125,6 +125,7 @@ namespace Storage.Net.Tests.Integration.Blobs
          return StorageFactory.Blobs.AwsS3(
                   settings.AwsAccessKeyId,
                   settings.AwsSecretAccessKey,
+                  null,
                   settings.AwsTestBucketName,
                   settings.AwsTestBucketRegion);
       }
