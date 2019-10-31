@@ -18,8 +18,8 @@ namespace Storage.Net.Amazon.Aws
       {
          if(connectionString.Prefix == KnownPrefix.AwsS3)
          {
-            string keyId = connectionString.Get("keyId");
-            string key = connectionString.Get("key");
+            string keyId = connectionString.Get(KnownParameter.KeyId);
+            string key = connectionString.Get(KnownParameter.KeyOrPassword);
 
             if(string.IsNullOrEmpty(keyId) != string.IsNullOrEmpty(key))
             {
@@ -34,7 +34,8 @@ namespace Storage.Net.Amazon.Aws
                return new AwsS3BlobStorage(bucket, region);
             }
 
-            return new AwsS3BlobStorage(keyId, key, bucket, region, null);
+            string sessionToken = connectionString.Get(KnownParameter.SessionToken);
+            return new AwsS3BlobStorage(keyId, key, sessionToken, bucket, region, null);
          }
 
 

@@ -15,5 +15,14 @@
       /// </summary>
       public static readonly string KeyOrPassword = "key";
 
+      /// <summary>
+      /// Key ID
+      /// </summary>
+      public static readonly string KeyId = "keyId";
+
+      /// <summary>
+      /// Session token
+      /// </summary>
+      public static readonly string SessionToken = "st";
    }
 }

@@ -63,8 +63,8 @@ namespace Storage.Net.Amazon.Aws.Blobs
       /// <summary>
       /// Creates a new instance of <see cref="AwsS3BlobStorage"/> for a given region endpoint
       /// </summary>
-      public AwsS3BlobStorage(string accessKeyId, string secretAccessKey, string bucketName, string region, string serviceUrl)
-         : this(accessKeyId, secretAccessKey, bucketName, CreateConfig(region, serviceUrl))
+      public AwsS3BlobStorage(string accessKeyId, string secretAccessKey, string sessionToken, string bucketName, string region, string serviceUrl)
+         : this(accessKeyId, secretAccessKey, sessionToken, bucketName, CreateConfig(region, serviceUrl))
       {
       }
 
@@ -81,14 +81,21 @@ namespace Storage.Net.Amazon.Aws.Blobs
       /// <summary>
       /// Creates a new instance of <see cref="AwsS3BlobStorage"/> for a given S3 client configuration
       /// </summary>
-      public AwsS3BlobStorage(string accessKeyId, string secretAccessKey, string bucketName, AmazonS3Config clientConfig)
+      public AwsS3BlobStorage(string accessKeyId, string secretAccessKey, string sessionToken,
+         string bucketName, AmazonS3Config clientConfig)
       {
          if(accessKeyId == null)
             throw new ArgumentNullException(nameof(accessKeyId));
          if(secretAccessKey == null)
             throw new ArgumentNullException(nameof(secretAccessKey));
          _bucketName = bucketName ?? throw new ArgumentNullException(nameof(bucketName));
-         _client = new AmazonS3Client(new BasicAWSCredentials(accessKeyId, secretAccessKey), clientConfig);
+
+         AWSCredentials awsCreds = (sessionToken == null)
+            ? (AWSCredentials)new BasicAWSCredentials(accessKeyId, secretAccessKey)
+            : new SessionAWSCredentials(accessKeyId, secretAccessKey, sessionToken);
+
+         _client = new AmazonS3Client(awsCreds, clientConfig);
+
          _fileTransferUtility = new TransferUtility(_client);
       }
 

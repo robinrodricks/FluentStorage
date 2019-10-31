@@ -54,7 +54,7 @@ namespace Storage.Net
          string region,
          string serviceUrl = null)
       {
-         return new AwsS3BlobStorage(accessKeyId, secretAccessKey, bucketName, region, serviceUrl);
+         return new AwsS3BlobStorage(accessKeyId, secretAccessKey, null, bucketName, region, serviceUrl);
       }
 
       /// <summary>
@@ -72,7 +72,7 @@ namespace Storage.Net
          string bucketName,
          AmazonS3Config clientConfig)
       {
-         return new AwsS3BlobStorage(accessKeyId, secretAccessKey, bucketName, clientConfig);
+         return new AwsS3BlobStorage(accessKeyId, secretAccessKey, null, bucketName, clientConfig);
       }
 
 #if !NET16
