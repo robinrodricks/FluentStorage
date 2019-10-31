@@ -27,6 +27,23 @@ namespace Storage.Net.Amazon.Aws
       }
 
       /// <summary>
+      /// Creates a raw form of credentials as key-value pairs.
+      /// </summary>
+      /// <param name="profileName"></param>
+      /// <returns></returns>
+      public static IDictionary<string, string> GetRawCredentials(string profileName)
+      {
+         Dictionary<string, Dictionary<string, string>> profiles = ReadProfiles(GetCredentialsPath());
+
+         if(!profiles.TryGetValue(profileName, out Dictionary<string, string> profile))
+         {
+            throw new ArgumentException($"profile '{profileName}' does not exist", nameof(profileName));
+         }
+
+         return profile;
+      }
+
+      /// <summary>
       /// Creates a native <see cref="AWSCredentials"/> base on profile data
       /// </summary>
       /// <param name="profileName"></param>
