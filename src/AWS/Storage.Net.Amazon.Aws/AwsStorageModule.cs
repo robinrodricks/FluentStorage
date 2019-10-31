@@ -18,24 +18,35 @@ namespace Storage.Net.Amazon.Aws
       {
          if(connectionString.Prefix == KnownPrefix.AwsS3)
          {
-            string keyId = connectionString.Get(KnownParameter.KeyId);
-            string key = connectionString.Get(KnownParameter.KeyOrPassword);
+            string cliProfileName = connectionString.Get(KnownParameter.LocalProfileName);
+            connectionString.GetRequired(KnownParameter.BucketName, true, out string bucket);
+            connectionString.GetRequired(KnownParameter.Region, true, out string region);
 
-            if(string.IsNullOrEmpty(keyId) != string.IsNullOrEmpty(key))
+            if(string.IsNullOrEmpty(cliProfileName))
             {
-               throw new ArgumentException($"connection string requires both 'key' and 'keyId' parameters, or neither.");
+               string keyId = connectionString.Get(KnownParameter.KeyId);
+               string key = connectionString.Get(KnownParameter.KeyOrPassword);
+
+               if(string.IsNullOrEmpty(keyId) != string.IsNullOrEmpty(key))
+               {
+                  throw new ArgumentException($"connection string requires both 'key' and 'keyId' parameters, or neither.");
+               }
+
+
+               if(string.IsNullOrEmpty(keyId))
+               {
+                  return new AwsS3BlobStorage(bucket, region);
+               }
+
+               string sessionToken = connectionString.Get(KnownParameter.SessionToken);
+               return new AwsS3BlobStorage(keyId, key, sessionToken, bucket, region, null);
             }
-
-            connectionString.GetRequired("bucket", true, out string bucket);
-            connectionString.GetRequired("region", true, out string region);
-
-            if(string.IsNullOrEmpty(keyId))
+#if !NET16
+            else
             {
-               return new AwsS3BlobStorage(bucket, region);
+               return AwsS3BlobStorage.FromAwsCliProfile(cliProfileName, bucket, region);
             }
-
-            string sessionToken = connectionString.Get(KnownParameter.SessionToken);
-            return new AwsS3BlobStorage(keyId, key, sessionToken, bucket, region, null);
+#endif
          }
 
 
