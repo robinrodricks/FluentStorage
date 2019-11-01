@@ -28,6 +28,29 @@ namespace Storage.Net.ConnectionString
       }
 
       /// <summary>
+      /// Gets or sets connection string parameters
+      /// </summary>
+      /// <param name="key"></param>
+      /// <returns></returns>
+      public string this[string key]
+      {
+         get
+         {
+            if(key == null)
+               return null;
+            _parts.TryGetValue(key, out string value);
+            return value;
+         }
+         set
+         {
+            if(key == null)
+               return;
+
+            _parts[key] = value;
+         }
+      }
+
+      /// <summary>
       /// Original connection string
       /// </summary>
       public string ConnectionString { get; private set; }

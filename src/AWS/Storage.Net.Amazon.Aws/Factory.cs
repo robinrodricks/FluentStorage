@@ -5,6 +5,7 @@ using Storage.Net.Amazon.Aws.Blobs;
 using Storage.Net.Blobs;
 using Storage.Net.Messaging;
 using Storage.Net.Amazon.Aws;
+using Storage.Net.ConnectionString;
 
 namespace Storage.Net
 {
@@ -115,5 +116,35 @@ namespace Storage.Net
       {
          return new AwsSQSMessenger(accessKeyId, secretAccessKey, serviceUrl, regionEndpoint);
       }
+
+      #region [ Connection Strings ]
+
+      /// <summary>
+      /// Creates a connection string from AWS CLI profile name
+      /// </summary>
+      /// <param name="factory"></param>
+      /// <param name="profileName"></param>
+      /// <param name="bucketName"></param>
+      /// <param name="region"></param>
+      /// <returns></returns>
+      public static StorageConnectionString ForAwsS3FromCliProfile(this IConnectionStringFactory factory,
+         string profileName,
+         string bucketName,
+         string region)
+      {
+         if(profileName is null)
+            throw new System.ArgumentNullException(nameof(profileName));
+         if(bucketName is null)
+            throw new System.ArgumentNullException(nameof(bucketName));
+         if(region is null)
+            throw new System.ArgumentNullException(nameof(region));
+         var cs = new StorageConnectionString(KnownPrefix.AwsS3 + "://");
+         cs[KnownParameter.LocalProfileName] = profileName;
+         cs[KnownParameter.BucketName] = bucketName;
+         cs[KnownParameter.Region] = region;
+         return cs;
+      }
+
+      #endregion
    }
 }
