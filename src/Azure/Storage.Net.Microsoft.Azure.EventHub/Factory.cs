@@ -1,5 +1,6 @@
 ﻿using Storage.Net.Messaging;
 using Storage.Net.Microsoft.Azure.EventHub;
+
 namespace Storage.Net
 {
    /// <summary>
@@ -8,13 +9,37 @@ namespace Storage.Net
    public static class Factory
    {
       /// <summary>
-      /// Create Azure Event Hub publisher by full connection string
+      /// Register Azure module.
+      /// </summary>
+      public static IModulesFactory UseAzureEventHubs(this IModulesFactory factory)
+      {
+         return factory.Use(new Module());
+      }
+
+
+      /// <summary>
+      /// Create Azure Event Hub messenger by full connection string and provide all the information for receiving end.
       /// </summary>
       /// <param name="factory">Factory reference</param>
-      /// <param name="connectionString">Connection string</param>
-      public static IMessenger AzureEventHub(this IMessagingFactory factory, string connectionString)
+      /// <param name="connectionString">Full connection string, including entity path</param>
+      /// <param name="azureBlobStorageConnectionString">Native Azure Blob Storage connection string. Event Hub receiver requires this for internal state management, therefore you need to provide it if you plan to receive messages, and not just send them.</param>
+      /// <param name="consumerGroupName">Name of of the consumer group, defaults to "$Default" when not passed, however it's a good practive to create a new consumer group.</param>
+      /// <param name="leaseContainerName">Name of the container to use for internal state, defaults to "eventhubs".</param>
+      /// <param name="storageBlobPrefix">If you are planning to use the same container for multiple event hubs, you can pass an optional prefix here.</param>
+      public static IMessenger AzureEventHub(this IMessagingFactory factory,
+         string connectionString,
+         string azureBlobStorageConnectionString = null,
+         string consumerGroupName = null,
+         string leaseContainerName = null,
+         string storageBlobPrefix = null
+         )
       {
-         return new AzureEventHubMessenger(connectionString);
+         return new AzureEventHubMessenger(
+            connectionString,
+            azureBlobStorageConnectionString,
+            consumerGroupName,
+            leaseContainerName,
+            storageBlobPrefix);
       }
 
       /// <summary>

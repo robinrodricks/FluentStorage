@@ -3,8 +3,6 @@ trigger:
   branches:
     include:
       - master
-      - v6
-      - queuesvnext
   paths:
     exclude:
       - README.md
@@ -71,6 +69,16 @@ stages:
         OverWrite: true
         flattenFolders: true
 
+    # we don't care if tests in other stages are not successful, we want to public this to internal testing
+    - task: NuGetCommand@2
+      displayName: 'push to internal feed'
+      inputs:
+        command: 'push'
+        packagesToPush: '$(build.artifactstagingdirectory)/**/*.nupkg'
+        nuGetFeedType: 'internal'
+        publishVstsFeed: '4bab84c0-90f7-4425-afc6-ba077aa9757e/d26176f7-ae69-43db-8342-99ce408538ec'
+
+
     - task: PublishBuildArtifacts@1
       displayName: 'publish nugets'
       inputs:
@@ -111,10 +119,11 @@ stages:
 
 - stage: Deploy
   dependsOn: ['Build', 'BlobsTest', 'MessagingTest'] 
-  #condition: "eq(variables['Build.SourceBranch'], 'refs/heads/master')"
-  condition: "or( eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/queuesvnext') )"
+  condition: "eq(variables['Build.SourceBranch'], 'refs/heads/master')"
+  #condition: "or( eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/queuesvnext') )"
   jobs:
-  - deployment: NugetOrg
+  - deployment: Nuget
+    displayName: 'Push packages'
     pool:
       vmImage: $(vmImage)
     environment: live
@@ -129,6 +138,7 @@ stages:
               artifactName: 'nuget'
               downloadPath: '$(System.ArtifactsDirectory)'
           - task: NuGetCommand@2
+            #condition: "or( eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/queuesvnext') )"
             displayName: nuget.org
             inputs:
               command: push
