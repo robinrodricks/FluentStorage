@@ -479,19 +479,27 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          await container.SetPermissionsAsync(perm, cancellationToken).ConfigureAwait(false);
       }
 
-      public async Task<BlobLease> AcquireBlobLeaseAsync(
+      public async Task<AzureStorageLease> AcquireLeaseAsync(
          string fullPath,
          TimeSpan? maxLeaseTime = null,
          string proposedLeaseId = null,
          bool waitForRelease = false,
          CancellationToken cancellationToken = default)
       {
+         if(maxLeaseTime != null)
+         {
+            if(maxLeaseTime.Value < TimeSpan.FromSeconds(15) || maxLeaseTime.Value >= TimeSpan.FromMinutes(1))
+            {
+               throw new ArgumentException(nameof(maxLeaseTime), $"When specifying lease time, make sure it's between 15 seconds and 1 minute, was: {maxLeaseTime.Value}");
+            }
+         }
+
          (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath);
 
-         CloudBlockBlob leaseBlob = container.GetBlockBlobReference(path);
+         CloudBlockBlob leaseBlob = string.IsNullOrEmpty(path) ? null : container.GetBlockBlobReference(path);
 
          //if blob doesn't exist, just create an empty one
-         if(!(await leaseBlob.ExistsAsync().ConfigureAwait(false)))
+         if(leaseBlob != null && !(await leaseBlob.ExistsAsync().ConfigureAwait(false)))
          {
             await WriteAsync(fullPath, new MemoryStream(), false, cancellationToken).ConfigureAwait(false);
          }
@@ -502,7 +510,9 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          {
             try
             {
-               leaseId = await leaseBlob.AcquireLeaseAsync(maxLeaseTime, proposedLeaseId, cancellationToken).ConfigureAwait(false);
+               leaseId = leaseBlob == null
+                  ? await container.AcquireLeaseAsync(maxLeaseTime, proposedLeaseId, cancellationToken).ConfigureAwait(false)
+                  : await leaseBlob.AcquireLeaseAsync(maxLeaseTime, proposedLeaseId, cancellationToken).ConfigureAwait(false);
 
                break;
             }
@@ -519,8 +529,36 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             }
          }
 
-         return new BlobLease(leaseBlob, leaseId);
+         return new AzureStorageLease(container, leaseBlob, leaseId);
       }
+
+      public async Task BreakLeaseAsync(string fullPath, bool ignoreErrors = false, CancellationToken cancellationToken = default)
+      {
+         GenericValidation.CheckBlobFullPath(fullPath);
+
+         (CloudBlobContainer container, string path) = await GetPartsAsync(fullPath);
+
+         CloudBlockBlob leaseBlob = string.IsNullOrEmpty(path) ? null : container.GetBlockBlobReference(path);
+
+         try
+         {
+            if(leaseBlob == null)
+            {
+               await container.BreakLeaseAsync(null, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+               await leaseBlob.BreakLeaseAsync(null, cancellationToken);
+            }
+         }
+         catch
+         {
+            if(!ignoreErrors)
+               throw;
+         }
+
+      }
+
 
       public async Task ChangeLeaseAsync(
          string fullPath, string oldLeaseId, string newLeaseId, CancellationToken cancellationToken = default)
@@ -602,6 +640,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
          return (container, relativePath);
       }
+
 
       #endregion
    }

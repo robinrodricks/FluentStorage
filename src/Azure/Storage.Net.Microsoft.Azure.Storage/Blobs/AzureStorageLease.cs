@@ -9,12 +9,14 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
    /// <summary>
    /// Represents a blob lease
    /// </summary>
-   public class BlobLease : IDisposable
+   public class AzureStorageLease : IDisposable
    {
+      private readonly CloudBlobContainer _container;
       private readonly CloudBlockBlob _blob;
 
-      internal BlobLease(CloudBlockBlob blob, string leaseId)
+      internal AzureStorageLease(CloudBlobContainer container, CloudBlockBlob blob, string leaseId)
       {
+         _container = container;
          _blob = blob;
          LeaseId = leaseId;
       }
@@ -25,7 +27,12 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       public string LeaseId { get; private set; }
 
       /// <summary>
-      /// Original blob that is leased
+      /// Original container, or container that is leased.
+      /// </summary>
+      internal CloudBlobContainer LeaseContainer => _container;
+
+      /// <summary>
+      /// Original blob that is leased, or null if contianer is leased.
       /// </summary>
       internal CloudBlockBlob LeasedBlob => _blob;
 
@@ -35,7 +42,14 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       /// <returns></returns>
       public async Task RenewLeaseAsync()
       {
-         await _blob.RenewLeaseAsync(AccessCondition.GenerateLeaseCondition(LeaseId));
+         if(_blob == null)
+         {
+            await _container.RenewLeaseAsync(AccessCondition.GenerateLeaseCondition(LeaseId)).ConfigureAwait(false);
+         }
+         else
+         {
+            await _blob.RenewLeaseAsync(AccessCondition.GenerateLeaseCondition(LeaseId)).ConfigureAwait(false);
+         }
       }
 
       /// <summary>
@@ -45,7 +59,15 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       {
          try
          {
-            _blob.ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(LeaseId)).Wait();
+            if(_blob == null)
+            {
+               _container.ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(LeaseId)).Wait();
+            }
+            else
+            {
+               _blob.ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(LeaseId)).Wait();
+
+            }
          }
          catch(AggregateException egex)
             when(

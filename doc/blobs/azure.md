@@ -134,18 +134,18 @@ string publicUrl = await _native.GetBlobSasAsync(path, policy);
 
 #### Blob Lease
 
-There is a helper utility method to acquire a block blob lease, which is useful for virtual transactions support. For instance:
+There is a helper utility method to acquire a block blob lease or a container lease, which is useful for virtual transactions support. For instance:
 
 
 ```csharp
-using(BlobLease lease = await _blobs.AcquireBlobLeaseAsync(id, timeSpan))
+using(AzureStorageLease lease = await _blobs.AcquireLeaseAsync(id, timeSpan))
 {
    // your code
 }
 ```
 
-Where the first parameter is blob id and the second is lease duration. The `BlobLease` returned implements `IDisposable` pattern so that on exit the lease is returned. Note that if blob doesn't exist, current implementation will create a zero-size file and then acquire a least, just for your convenience. The blob is not deleted automatically though.
+Where the first parameter is blob id or container name, and the second is lease duration. The `BlobLease` returned implements `IDisposable` pattern so that on exit the lease is returned. Note that if blob doesn't exist, current implementation will create a zero-size file and then acquire a least, just for your convenience. The blob is not deleted automatically though.
 
-`AcquireBlobLeaseAsync` also has an option to wait for the lease to be returned (third optional argument) which when set to true causes this library to try to acquire a lease every second until it's released, and re-lease it.
+`AcquireLeaseAsync` also has an option to wait for the lease to be returned (third optional argument) which when set to true causes this library to try to acquire a lease every second until it's released, and re-lease it.
 
-It also exposes `RenewLeaseAsync()` method to renew the lease explicitly, and `LeasedBlob` property that returns a native `CloudBlockBlob` that is leased if you need to explicitly call any methods not supported by this wrapper.
+It also exposes `RenewLeaseAsync()` method to renew the lease explicitly.

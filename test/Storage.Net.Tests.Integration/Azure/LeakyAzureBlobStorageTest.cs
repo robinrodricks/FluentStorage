@@ -98,10 +98,22 @@ namespace Storage.Net.Tests.Integration.Azure
       {
          string id = $"test/{nameof(Lease_CanAcquireAndRelease)}.lck";
 
-         using(BlobLease lease = await _native.AcquireBlobLeaseAsync(id, TimeSpan.FromSeconds(20)))
+         await _native.BreakLeaseAsync(id, true);
+
+         using(AzureStorageLease lease = await _native.AcquireLeaseAsync(id, TimeSpan.FromSeconds(20)))
          {
             
          }
+      }
+
+      [Fact]
+      public async Task Lease_Break()
+      {
+         string id = $"test/{nameof(Lease_Break)}.lck";
+
+         await _native.AcquireLeaseAsync(id, TimeSpan.FromSeconds(20));
+
+         await _native.BreakLeaseAsync(id);
       }
 
       [Fact]
@@ -109,9 +121,9 @@ namespace Storage.Net.Tests.Integration.Azure
       {
          string id = $"test/{nameof(Lease_FailsOnAcquiredLeasedBlob)}.lck";
 
-         using(BlobLease lease1 = await _native.AcquireBlobLeaseAsync(id, TimeSpan.FromSeconds(20)))
+         using(AzureStorageLease lease1 = await _native.AcquireLeaseAsync(id, TimeSpan.FromSeconds(20)))
          {
-            await Assert.ThrowsAsync<StorageException>(() => _native.AcquireBlobLeaseAsync(id, TimeSpan.FromSeconds(20)));
+            await Assert.ThrowsAsync<StorageException>(() => _native.AcquireLeaseAsync(id, TimeSpan.FromSeconds(20)));
          }
       }
 
@@ -120,10 +132,31 @@ namespace Storage.Net.Tests.Integration.Azure
       {
          string id = $"test/{nameof(Lease_WaitsToReleaseAcquiredLease)}.lck";
 
-         using(BlobLease lease1 = await _native.AcquireBlobLeaseAsync(id, TimeSpan.FromSeconds(20)))
+         using(AzureStorageLease lease1 = await _native.AcquireLeaseAsync(id, TimeSpan.FromSeconds(20)))
          {
-            await _native.AcquireBlobLeaseAsync(id, TimeSpan.FromSeconds(20), null, true);
+            await _native.AcquireLeaseAsync(id, TimeSpan.FromSeconds(20), null, true);
          }
+      }
+
+      [Fact]
+      public async Task Lease_Container_CanAcquireAndRelease()
+      {
+         string id = "test";
+
+         using(AzureStorageLease lease = await _native.AcquireLeaseAsync(id, TimeSpan.FromSeconds(15)))
+         {
+
+         }
+      }
+
+      [Fact]
+      public async Task Lease_Container_Break()
+      {
+         string id = "test";
+
+         await _native.AcquireLeaseAsync(id, TimeSpan.FromSeconds(15));
+
+         await _native.BreakLeaseAsync(id);
       }
 
       [Fact]
