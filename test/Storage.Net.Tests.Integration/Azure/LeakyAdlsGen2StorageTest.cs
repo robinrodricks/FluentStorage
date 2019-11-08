@@ -14,7 +14,7 @@ namespace Storage.Net.Tests.Integration.Azure
    {
       private readonly ITestSettings _settings;
       private readonly IAzureDataLakeGen2BlobStorage _storage;
-      private const string Filesystem = "test";
+      private const string Filesystem = "leaks";
 
       public LeakyAdlsGen2StorageTest()
       {
