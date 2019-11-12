@@ -104,11 +104,12 @@ namespace Storage.Net.ConnectionString
       /// Get connection string parameter by name
       /// </summary>
       /// <param name="parameterName"></param>
-      /// <returns>Parameter value. If parameter is not set returns an empty string</returns>
+      /// <returns>Parameter value. If parameter is not set returns null.</returns>
       public string Get(string parameterName)
       {
-         if (parameterName == null) return string.Empty;
-         if (!_parts.TryGetValue(parameterName, out string value)) return string.Empty;
+         if(parameterName == null)
+            return null;
+         if (!_parts.TryGetValue(parameterName, out string value)) return null;
          return value;
       }
 
