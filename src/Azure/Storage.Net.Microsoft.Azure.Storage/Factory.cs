@@ -167,6 +167,19 @@ namespace Storage.Net
          return cs;
       }
 
+      /// <summary>
+      /// Create connection string for Azure File storage with account name and key
+      /// </summary>
+      public static StorageConnectionString ForAzureFileStorage(this IConnectionStringFactory factory,
+         string accountName,
+         string accountKey)
+      {
+         var cs = new StorageConnectionString(KnownPrefix.AzureFilesStorage + "://");
+         cs.Parameters[KnownParameter.AccountName] = accountName;
+         cs.Parameters[KnownParameter.KeyOrPassword] = accountKey;
+         return cs;
+      }
+
       #endregion
    }
 }
