@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Storage.Net.Blobs;
@@ -15,6 +17,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
    class AzureBlobStorage : IAzureBlobStorage12
    {
+      private const int BrowserParallelism = 10;
       private readonly BlobServiceClient _client;
       private readonly string _containerName;
       private readonly Dictionary<string, BlobContainerClient> _containerNameToContainerClient =
@@ -25,18 +28,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          _client = blobServiceClient;
       }
 
-      private async Task<IReadOnlyCollection<Blob>> ListContainersAsync(CancellationToken cancellationToken)
-      {
-         var r = new List<Blob>();
-
-         await foreach(BlobContainerItem container in _client.GetBlobContainersAsync(BlobContainerTraits.Metadata).ConfigureAwait(false))
-         {
-            r.Add(AzConvert.ToBlob(container));
-         }
-
-         return r;
-      }
-
       #region [ Interface Methods ]
 
       public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default)
@@ -44,13 +35,33 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          if(options == null)
             options = new ListOptions();
 
-         var containers = new List<Blob>();
+         var result = new List<Blob>();
+         var containers = new List<BlobContainerClient>();
 
          if(StoragePath.IsRootPath(options.FolderPath) && _containerName == null)
          {
             // list all of the containers
-            containers.AddRange(await ListContainersAsync(cancellationToken));
+            containers.AddRange(await ListContainersAsync(cancellationToken).ConfigureAwait(false));
+            result.AddRange(containers.Select(AzConvert.ToBlob));
 
+            if(!options.Recurse)
+               return result;
+         }
+         else
+         {
+            (BlobContainerClient container, string path) = await GetPartsAsync(options.FolderPath, false).ConfigureAwait(false);
+            if(container == null)
+               return new List<Blob>();
+            options = options.Clone();
+            options.FolderPath = path; //scan from subpath now
+            containers.Add(container);
+         }
+
+         await Task.WhenAll(containers.Select(c => ListAsync(c, result, options, cancellationToken))).ConfigureAwait(false);
+
+         if(options.MaxResults != null)
+         {
+            result = result.Take(options.MaxResults.Value).ToList();
          }
 
          return null;
@@ -67,6 +78,40 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
       #endregion
+
+      private async Task<IReadOnlyCollection<BlobContainerClient>> ListContainersAsync(CancellationToken cancellationToken)
+      {
+         var r = new List<BlobContainerClient>();
+
+         await foreach(BlobContainerItem container in _client.GetBlobContainersAsync(BlobContainerTraits.Metadata).ConfigureAwait(false))
+         {
+            (BlobContainerClient client, _) = await GetPartsAsync(container.Name, false).ConfigureAwait(false);
+
+            if(client != null)
+               r.Add(client);
+         }
+
+         return r;
+      }
+
+      private async Task ListAsync(BlobContainerClient container,
+         List<Blob> result,
+         ListOptions options,
+         CancellationToken cancellationToken)
+      {
+         using(var browser = new AzureContainerBrowser(container, _containerName == null, BrowserParallelism))
+         {
+            IReadOnlyCollection<Blob> containerBlobs =
+               await browser.ListFolderAsync(options, cancellationToken)
+                  .ConfigureAwait(false);
+
+            if(containerBlobs.Count > 0)
+            {
+               result.AddRange(containerBlobs);
+            }
+         }
+      }
+
 
       private async Task<(BlobContainerClient, string)> GetPartsAsync(string fullPath, bool createContainer = true)
       {
@@ -103,13 +148,22 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             container = _client.GetBlobContainerClient(containerName);
             if(_containerName == null)
             {
-               if(createContainer)
+               try
                {
-                  await container.CreateIfNotExistsAsync().ConfigureAwait(false);
+                  //check if container exists
+                  await container.GetPropertiesAsync().ConfigureAwait(false);
+
                }
-               else
+               catch(RequestFailedException ex) when (ex.ErrorCode == "ContainerNotFound")
                {
-                  return (null, null);
+                  if(createContainer)
+                  {
+                     await container.CreateIfNotExistsAsync().ConfigureAwait(false);
+                  }
+                  else
+                  {
+                     return (null, null);
+                  }
                }
             }
 
