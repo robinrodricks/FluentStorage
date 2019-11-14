@@ -11,7 +11,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 {
    public class AzureBlobStorageFixture : BlobFixture
    {
-      public AzureBlobStorageFixture() : base("testcontainer/")
+      public AzureBlobStorageFixture() : base("testcontainerv11/")
       {
       }
 
@@ -27,6 +27,27 @@ namespace Storage.Net.Tests.Integration.Blobs
       {
       }
    }
+
+   public class AzureBlobStorageV12Fixture : BlobFixture
+   {
+      public AzureBlobStorageV12Fixture() : base("testcontainerv12/")
+      {
+
+      }
+
+      protected override IBlobStorage CreateStorage(ITestSettings settings)
+      {
+         return StorageFactory.Blobs.AzureBlob12Storage(settings.AzureStorageName, settings.AzureStorageKey);
+      }
+   }
+
+   public class AzureBlobStorageV12Test : BlobTest, IClassFixture<AzureBlobStorageV12Fixture>
+   {
+      public AzureBlobStorageV12Test(AzureBlobStorageV12Fixture fixture) : base(fixture)
+      {
+      }
+   }
+
 
    public class AzureFilesFixture : BlobFixture
    {
