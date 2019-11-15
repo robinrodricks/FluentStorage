@@ -23,7 +23,7 @@ namespace Storage.Net.Tests.Integration.Azure
          _native = (IAzureBlobStorage)storage;
       }
 
-      [Fact]
+      /*[Fact]
       public async Task GetAccountSas()
       {
          var policy = new AccountSasPolicy(DateTime.UtcNow, TimeSpan.FromHours(1));
@@ -91,7 +91,7 @@ namespace Storage.Net.Tests.Integration.Azure
 
          string text = await new HttpClient().GetStringAsync(publicUrl);
          Assert.Equal("read me!", text);
-      }
+      }*/
 
       [Fact]
       public async Task Lease_CanAcquireAndRelease()
@@ -106,7 +106,7 @@ namespace Storage.Net.Tests.Integration.Azure
          }
       }
 
-      [Fact]
+      /*[Fact]
       public async Task Lease_Break()
       {
          string id = $"test/{nameof(Lease_Break)}.lck";
@@ -196,6 +196,6 @@ namespace Storage.Net.Tests.Integration.Azure
          Blob snapshot = await _native.CreateSnapshotAsync(path);
 
          Assert.NotNull(snapshot);
-      }
+      }*/
    }
 }

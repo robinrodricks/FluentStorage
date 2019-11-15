@@ -16,7 +16,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
    //auth scenarios: https://github.com/Azure/azure-sdk-for-net/blob/master/sdk/storage/Azure.Storage.Blobs/samples/Sample02_Auth.cs
 
 
-   class AzureBlobStorage : IAzureBlobStorage12
+   class AzureBlobStorage : IAzureBlobStorage
    {
       private const int BrowserParallelism = 10;
       private readonly BlobServiceClient _client;
@@ -140,6 +140,83 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          GenericValidation.CheckBlobFullPaths(blobs);
 
          await Task.WhenAll(blobs.Select(b => SetBlobAsync(b, cancellationToken))).ConfigureAwait(false);
+      }
+
+      #endregion
+
+      #region [ IAzureBlobStorage Specific ]
+
+      public async Task<AzureStorageLease> AcquireLeaseAsync(
+         string fullPath,
+         TimeSpan? maxLeaseTime = null,
+         string proposedLeaseId = null,
+         bool waitForRelease = false,
+         CancellationToken cancellationToken = default)
+      {
+         GenericValidation.CheckBlobFullPath(fullPath);
+
+         if(maxLeaseTime != null)
+         {
+            if(maxLeaseTime.Value < TimeSpan.FromSeconds(15) || maxLeaseTime.Value >= TimeSpan.FromMinutes(1))
+            {
+               throw new ArgumentException(nameof(maxLeaseTime), $"When specifying lease time, make sure it's between 15 seconds and 1 minute, was: {maxLeaseTime.Value}");
+            }
+         }
+
+         (BlobContainerClient container, string path) = await GetPartsAsync(fullPath, true).ConfigureAwait(false);
+
+         //get lease client for container or blob
+         BlobLeaseClient leaseClient;
+         if(string.IsNullOrEmpty(path))
+         {
+            leaseClient = container.GetBlobLeaseClient();
+         }
+         else
+         {
+            //create a new blob if it doesn't exist
+            if(!(await ExistsAsync(fullPath).ConfigureAwait(false)))
+            {
+               await WriteAsync(fullPath, new MemoryStream(), false, cancellationToken).ConfigureAwait(false);
+            }
+
+            BlockBlobClient client = container.GetBlockBlobClient(path);
+            leaseClient = client.GetBlobLeaseClient();
+         }
+
+         await leaseClient.AcquireAsync(
+            maxLeaseTime == null ? TimeSpan.MinValue : maxLeaseTime.Value,
+            cancellationToken: cancellationToken).ConfigureAwait(false);
+
+         return new AzureStorageLease(leaseClient);
+      }
+
+      public async Task BreakLeaseAsync(string fullPath, bool ignoreErrors = false, CancellationToken cancellationToken = default)
+      {
+         GenericValidation.CheckBlobFullPath(fullPath);
+
+         (BlobContainerClient container, string path) = await GetPartsAsync(fullPath, true).ConfigureAwait(false);
+
+         //get lease client for container or blob
+         BlobLeaseClient leaseClient;
+         if(string.IsNullOrEmpty(path))
+         {
+            leaseClient = container.GetBlobLeaseClient();
+         }
+         else
+         {
+            BlockBlobClient client = container.GetBlockBlobClient(path);
+            leaseClient = client.GetBlobLeaseClient();
+         }
+
+         try
+         {
+            await leaseClient.BreakAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+         }
+         catch(RequestFailedException ex) when(ex.ErrorCode == "LeaseNotPresentWithLeaseOperation")
+         {
+            if(!ignoreErrors)
+               throw;
+         }
       }
 
       #endregion

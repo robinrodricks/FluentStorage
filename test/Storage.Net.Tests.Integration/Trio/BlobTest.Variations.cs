@@ -37,7 +37,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 
       protected override IBlobStorage CreateStorage(ITestSettings settings)
       {
-         return StorageFactory.Blobs.AzureBlob12Storage(settings.AzureStorageName, settings.AzureStorageKey);
+         return StorageFactory.Blobs.AzureBlobStorage(settings.AzureStorageName, settings.AzureStorageKey);
       }
    }
 
