@@ -238,6 +238,25 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          }
       }
 
+      public async Task<ContainerPublicAccessType> GetContainerPublicAccessAsync(string containerName, CancellationToken cancellationToken = default)
+      {
+         (BlobContainerClient container, _) = await GetPartsAsync(containerName, true).ConfigureAwait(false);
+
+         Response<BlobContainerAccessPolicy> policy =
+            await container.GetAccessPolicyAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+
+         return (ContainerPublicAccessType)(int)policy.Value.BlobPublicAccess;
+      }
+
+      public async Task SetContainerPublicAccessAsync(string containerName, ContainerPublicAccessType containerPublicAccessType, CancellationToken cancellationToken = default)
+      {
+         (BlobContainerClient container, _) = await GetPartsAsync(containerName, true).ConfigureAwait(false);
+
+         await container.SetAccessPolicyAsync(
+            (PublicAccessType)(int)containerPublicAccessType,
+            cancellationToken: cancellationToken).ConfigureAwait(false);
+      }
+
       #endregion
 
       private async Task SetBlobAsync(Blob blob, CancellationToken cancellationToken)

@@ -55,7 +55,7 @@ namespace Storage.Net.Tests.Integration.Azure
          IReadOnlyCollection<Blob> blobs = await sasInstance.ListAsync(StoragePath.RootFolderPath);
          Blob testBlob = blobs.FirstOrDefault(b => b.FullPath == fileName);
          Assert.NotNull(testBlob);
-      }
+      }*/
 
       [Fact]
       public async Task ContainerPublicAccess()
@@ -73,7 +73,7 @@ namespace Storage.Net.Tests.Integration.Azure
          Assert.Equal(ContainerPublicAccessType.Container, pa);
       }
 
-      [Fact]
+      /*[Fact]
       public async Task BlobPublicAccess()
       {
          string path = StoragePath.Combine("test", Guid.NewGuid().ToString() + ".txt");

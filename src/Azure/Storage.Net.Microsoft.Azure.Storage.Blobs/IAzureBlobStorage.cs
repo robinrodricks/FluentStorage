@@ -34,5 +34,23 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          string fullPath,
          bool ignoreErrors = false,
          CancellationToken cancellationToken = default);
+
+      /// <summary>
+      /// Gets public access type for a specific blob container
+      /// </summary>
+      /// <param name="containerName"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      Task<ContainerPublicAccessType> GetContainerPublicAccessAsync(string containerName, CancellationToken cancellationToken = default);
+
+      /// <summary>
+      /// Sets public access type for a specific blob container
+      /// </summary>
+      /// <param name="containerName"></param>
+      /// <param name="containerPublicAccessType"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      Task SetContainerPublicAccessAsync(string containerName, ContainerPublicAccessType containerPublicAccessType, CancellationToken cancellationToken = default);
+
    }
 }
