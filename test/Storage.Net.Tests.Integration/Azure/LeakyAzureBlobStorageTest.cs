@@ -106,10 +106,12 @@ namespace Storage.Net.Tests.Integration.Azure
          }
       }
 
-      /*[Fact]
+      [Fact]
       public async Task Lease_Break()
       {
          string id = $"test/{nameof(Lease_Break)}.lck";
+
+         await _native.BreakLeaseAsync(id, true);
 
          await _native.AcquireLeaseAsync(id, TimeSpan.FromSeconds(20));
 
@@ -120,6 +122,8 @@ namespace Storage.Net.Tests.Integration.Azure
       public async Task Lease_FailsOnAcquiredLeasedBlob()
       {
          string id = $"test/{nameof(Lease_FailsOnAcquiredLeasedBlob)}.lck";
+
+         await _native.BreakLeaseAsync(id, true);
 
          using(AzureStorageLease lease1 = await _native.AcquireLeaseAsync(id, TimeSpan.FromSeconds(20)))
          {
@@ -132,6 +136,8 @@ namespace Storage.Net.Tests.Integration.Azure
       {
          string id = $"test/{nameof(Lease_WaitsToReleaseAcquiredLease)}.lck";
 
+         await _native.BreakLeaseAsync(id, true);
+
          using(AzureStorageLease lease1 = await _native.AcquireLeaseAsync(id, TimeSpan.FromSeconds(20)))
          {
             await _native.AcquireLeaseAsync(id, TimeSpan.FromSeconds(20), null, true);
@@ -142,6 +148,8 @@ namespace Storage.Net.Tests.Integration.Azure
       public async Task Lease_Container_CanAcquireAndRelease()
       {
          string id = "test";
+
+         await _native.BreakLeaseAsync(id, true);
 
          using(AzureStorageLease lease = await _native.AcquireLeaseAsync(id, TimeSpan.FromSeconds(15)))
          {
@@ -154,12 +162,14 @@ namespace Storage.Net.Tests.Integration.Azure
       {
          string id = "test";
 
+         await _native.BreakLeaseAsync(id, true);
+
          await _native.AcquireLeaseAsync(id, TimeSpan.FromSeconds(15));
 
          await _native.BreakLeaseAsync(id);
       }
 
-      [Fact]
+      /*[Fact]
       public async Task Top_level_folders_are_containers()
       {
          IReadOnlyCollection<Blob> containers = await _native.ListAsync();

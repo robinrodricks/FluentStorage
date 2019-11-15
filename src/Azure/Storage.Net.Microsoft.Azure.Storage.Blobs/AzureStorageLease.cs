@@ -31,7 +31,14 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       /// </summary>
       public void Dispose()
       {
-         LeaseClient.ReleaseAsync();
+         try
+         {
+            LeaseClient.Release();
+         }
+         catch(RequestFailedException ex) when (ex.ErrorCode == "LeaseIdMismatchWithLeaseOperation")
+         {
+            //happens when a lease expires
+         }
       }
    }
 }

@@ -169,7 +169,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          BlobLeaseClient leaseClient;
          if(string.IsNullOrEmpty(path))
          {
-            leaseClient = container.GetBlobLeaseClient();
+            leaseClient = container.GetBlobLeaseClient(proposedLeaseId);
          }
          else
          {
@@ -180,12 +180,31 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             }
 
             BlockBlobClient client = container.GetBlockBlobClient(path);
-            leaseClient = client.GetBlobLeaseClient();
+            leaseClient = client.GetBlobLeaseClient(proposedLeaseId);
          }
 
-         await leaseClient.AcquireAsync(
-            maxLeaseTime == null ? TimeSpan.MinValue : maxLeaseTime.Value,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
+         while(!cancellationToken.IsCancellationRequested)
+         {
+            try
+            {
+               await leaseClient.AcquireAsync(
+                  maxLeaseTime == null ? TimeSpan.MinValue : maxLeaseTime.Value,
+                  cancellationToken: cancellationToken).ConfigureAwait(false);
+
+               break;
+            }
+            catch(RequestFailedException ex) when(ex.ErrorCode == "LeaseAlreadyPresent")
+            {
+               if(!waitForRelease)
+               {
+                  throw new StorageException(ErrorCode.Conflict, ex);
+               }
+               else
+               {
+                  await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+               }
+            }
+         }
 
          return new AzureStorageLease(leaseClient);
       }
