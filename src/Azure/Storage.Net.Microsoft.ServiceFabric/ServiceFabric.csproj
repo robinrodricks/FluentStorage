@@ -16,6 +16,7 @@
       <LangVersion>latest</LangVersion>
       <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
       <WarningsAsErrors />
+      <PackageId>Storage.Net.Microsoft.Azure.ServiceFabric</PackageId>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
