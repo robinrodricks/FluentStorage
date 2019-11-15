@@ -23,19 +23,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AWS", "AWS", "{75082AEF-72A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{76FFA3B1-8786-495D-B7B1-8F38A267D183}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Microsoft.Azure.DataLake.Store", "Azure\Storage.Net.Microsoft.Azure.DataLake.Store\Storage.Net.Microsoft.Azure.DataLake.Store.csproj", "{7A83138D-9EB1-4979-8349-FCBFB11385B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLakeGen1", "Azure\Storage.Net.Microsoft.Azure.DataLake.Store\DataLakeGen1.csproj", "{7A83138D-9EB1-4979-8349-FCBFB11385B5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Amazon.Aws", "AWS\Storage.Net.Amazon.Aws\Storage.Net.Amazon.Aws.csproj", "{D0E01366-A330-416F-A363-2F29598DBC63}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Microsoft.Azure.ServiceBus", "Azure\Storage.Net.Microsoft.Azure.ServiceBus\Storage.Net.Microsoft.Azure.ServiceBus.csproj", "{A1F41190-C131-441A-8B75-613369126F23}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceBus", "Azure\Storage.Net.Microsoft.Azure.ServiceBus\ServiceBus.csproj", "{A1F41190-C131-441A-8B75-613369126F23}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Microsoft.ServiceFabric", "Azure\Storage.Net.Microsoft.ServiceFabric\Storage.Net.Microsoft.ServiceFabric.csproj", "{2E01D09D-8EC2-4C2D-A4D0-60751ABC0EFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabric", "Azure\Storage.Net.Microsoft.ServiceFabric\ServiceFabric.csproj", "{2E01D09D-8EC2-4C2D-A4D0-60751ABC0EFF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Microsoft.Azure.KeyVault", "Azure\Storage.Net.Microsoft.Azure.KeyVault\Storage.Net.Microsoft.Azure.KeyVault.csproj", "{6DD1E3D5-2367-40E4-B70C-67B45BF81A2F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyVault", "Azure\Storage.Net.Microsoft.Azure.KeyVault\KeyVault.csproj", "{6DD1E3D5-2367-40E4-B70C-67B45BF81A2F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Microsoft.Azure.EventHub", "Azure\Storage.Net.Microsoft.Azure.EventHub\Storage.Net.Microsoft.Azure.EventHub.csproj", "{76050C11-E042-4806-8123-CB933B3B07F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventHub", "Azure\Storage.Net.Microsoft.Azure.EventHub\EventHub.csproj", "{76050C11-E042-4806-8123-CB933B3B07F3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Microsoft.Azure.Storage", "Azure\Storage.Net.Microsoft.Azure.Storage\Storage.Net.Microsoft.Azure.Storage.csproj", "{98315953-1DA6-46A2-A009-888467B4F902}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegacyStorage", "Azure\Storage.Net.Microsoft.Azure.Storage\LegacyStorage.csproj", "{98315953-1DA6-46A2-A009-888467B4F902}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Tests", "..\test\Storage.Net.Tests\Storage.Net.Tests.csproj", "{E37128DB-6CD7-4E06-8130-9BCEAD41DF5D}"
 EndProject
@@ -51,9 +51,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GCP", "GCP", "{7060A53B-F04
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Gcp.CloudStorage", "GCP\Storage.Net.Gcp.CloudStorage\Storage.Net.Gcp.CloudStorage.csproj", "{A79A5CE0-83F3-44E2-A88D-D51D7A3EE8F5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Net.Microsoft.Azure.Databricks.Dbfs", "Azure\Storage.Net.Microsoft.Azure.Databricks.Dbfs\Storage.Net.Microsoft.Azure.Databricks.Dbfs.csproj", "{8EED860F-4D6C-4EAE-97D3-62925E7336E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Databricks.Dbfs", "Azure\Storage.Net.Microsoft.Azure.Databricks.Dbfs\Databricks.Dbfs.csproj", "{8EED860F-4D6C-4EAE-97D3-62925E7336E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Net.Microsoft.Azure.Storage.Blobs", "Azure\Storage.Net.Microsoft.Azure.Storage.Blobs\Storage.Net.Microsoft.Azure.Storage.Blobs.csproj", "{6F4E9CCC-DEB7-4D40-B2BA-4914171D26B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blobs", "Azure\Storage.Net.Microsoft.Azure.Storage.Blobs\Blobs.csproj", "{6F4E9CCC-DEB7-4D40-B2BA-4914171D26B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

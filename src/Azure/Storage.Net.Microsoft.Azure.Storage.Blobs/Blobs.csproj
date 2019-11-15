@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
      <LangVersion>latest</LangVersion>
+     <PackageId>Storage.Net.Microsoft.Azure.Storage.Blobs</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
