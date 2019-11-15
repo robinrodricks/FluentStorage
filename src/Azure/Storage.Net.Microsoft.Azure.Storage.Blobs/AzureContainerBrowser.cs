@@ -25,14 +25,60 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
       public async Task<IReadOnlyCollection<Blob>> ListFolderAsync(ListOptions options, CancellationToken cancellationToken)
       {
-         await foreach(BlobHierarchyItem item in _client.GetBlobsByHierarchyAsync(prefix: options.FolderPath).ConfigureAwait(false))
+         var result = new List<Blob>();
+
+         await foreach(BlobHierarchyItem item in
+            _client.GetBlobsByHierarchyAsync(
+               delimiter: options.Recurse ? null : "/",
+               prefix: FormatFolderPrefix(options.FolderPath),
+               traits: options.IncludeAttributes ? BlobTraits.Metadata : BlobTraits.None).ConfigureAwait(false))
          {
-            string name = item.Prefix;
+
+            Blob blob = AzConvert.ToBlob(_prependContainerName ? _client.Name : null, item);
+
+            if(options.IsMatch(blob) && (options.BrowseFilter == null || options.BrowseFilter(blob)))
+            {
+               result.Add(blob);
+            }
          }
 
-         //_client.GetBlobsByHierarchyAsync()
+         if(options.Recurse)
+         {
+            AssumeImplicitPrefixes(
+               _prependContainerName ? StoragePath.Combine(_client.Name, options.FolderPath) : options.FolderPath,
+               result);
+         }
 
-         return Enumerable.Empty<Blob>().ToList();
+         return result;
+      }
+
+      private static void AssumeImplicitPrefixes(string absoluteRoot, List<Blob> blobs)
+      {
+         absoluteRoot = StoragePath.Normalize(absoluteRoot);
+
+         List<Blob> implicitFolders = blobs
+            .Select(b => b.FullPath)
+            .Select(p => p.Substring(absoluteRoot.Length))
+            .Select(p => StoragePath.GetParent(p))
+            .Where(p => !StoragePath.IsRootPath(p))
+            .Distinct()
+            .Select(p => new Blob(p, BlobItemKind.Folder))
+            .ToList();
+
+         blobs.AddRange(implicitFolders);
+      }
+
+      private static string FormatFolderPrefix(string folderPath)
+      {
+         folderPath = StoragePath.Normalize(folderPath);
+
+         if(StoragePath.IsRootPath(folderPath))
+            return null;
+
+         if(!folderPath.EndsWith("/"))
+            folderPath += "/";
+
+         return folderPath;
       }
 
       public void Dispose()

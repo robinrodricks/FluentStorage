@@ -69,6 +69,9 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       }
 
 
+
+
+
       public async Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
          GenericValidation.CheckBlobFullPaths(fullPaths);
@@ -83,18 +86,27 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return await Task.WhenAll(fullPaths.Select(p => ExistsAsync(p, cancellationToken))).ConfigureAwait(false);
       }
 
-      public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
+      {
+         return await Task.WhenAll(fullPaths.Select(p => GetBlobAsync(p, cancellationToken))).ConfigureAwait(false);
+      }
+
 
       public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
 
-         (BlobContainerClient container, string path) = await GetPartsAsync(fullPath, true).ConfigureAwait(false);
+         (BlobContainerClient container, string path) = await GetPartsAsync(fullPath, false).ConfigureAwait(false);
 
          BlockBlobClient client = container.GetBlockBlobClient(path);
 
          try
          {
+            //current SDK fails to download 0-sized files
+            Response<BlobProperties> p = await client.GetPropertiesAsync().ConfigureAwait(false);
+            if(p.Value.ContentLength == 0)
+               return new MemoryStream();
+
             Response<BlobDownloadInfo> response = await client.DownloadAsync(cancellationToken).ConfigureAwait(false);
 
             return response.Value.Content;
@@ -123,9 +135,66 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             dataStream,
             cancellationToken: cancellationToken).ConfigureAwait(false);
       }
-      public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public async Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
+      {
+         GenericValidation.CheckBlobFullPaths(blobs);
+
+         await Task.WhenAll(blobs.Select(b => SetBlobAsync(b, cancellationToken))).ConfigureAwait(false);
+      }
 
       #endregion
+
+      private async Task SetBlobAsync(Blob blob, CancellationToken cancellationToken)
+      {
+         if(!(await ExistsAsync(blob, cancellationToken).ConfigureAwait(false)))
+            return;
+
+         (BlobContainerClient container, string path) = await GetPartsAsync(blob, false).ConfigureAwait(false);
+
+         if(string.IsNullOrEmpty(path))
+         {
+            //it's a container!
+
+            await container.SetMetadataAsync(blob.Metadata, cancellationToken: cancellationToken).ConfigureAwait(false);
+         }
+         else
+         {
+            BlockBlobClient client = container.GetBlockBlobClient(path);
+
+            await client.SetMetadataAsync(blob.Metadata, cancellationToken: cancellationToken).ConfigureAwait(false);
+         }
+      }
+
+      private async Task<Blob> GetBlobAsync(string fullPath, CancellationToken cancellationToken)
+      {
+         (BlobContainerClient container, string path) = await GetPartsAsync(fullPath, false).ConfigureAwait(false);
+
+         if(container == null)
+            return null;
+
+         if(string.IsNullOrEmpty(path))
+         {
+            //it's a container
+
+            Response<BlobContainerProperties> attributes = await container.GetPropertiesAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            return AzConvert.ToBlob(container.Name, attributes);
+         }
+
+         BlobClient client = container.GetBlobClient(path);
+
+         try
+         {
+            Response<BlobProperties> properties = await client.GetPropertiesAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            return AzConvert.ToBlob(_containerName, path, properties);
+         }
+         catch(RequestFailedException ex) when(ex.ErrorCode == "BlobNotFound")
+         {
+            return null;
+         }
+      }
+
 
       private async Task<IReadOnlyCollection<BlobContainerClient>> ListContainersAsync(CancellationToken cancellationToken)
       {

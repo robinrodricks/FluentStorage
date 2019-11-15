@@ -61,7 +61,7 @@ namespace Storage.Net.Blobs
       /// <summary>
       /// Custom provider-specific properties. Key names are case-insensitive.
       /// </summary>
-      public Dictionary<string, string> Properties { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+      public Dictionary<string, object> Properties { get; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
       /// <summary>
       /// User defined metadata. Key names are case-insensitive.
@@ -72,14 +72,14 @@ namespace Storage.Net.Blobs
       /// Tries to add properties in pairs when value is not null
       /// </summary>
       /// <param name="keyValues"></param>
-      public void TryAddProperties(params string[] keyValues)
+      public void TryAddProperties(params object[] keyValues)
       {
          for(int i = 0; i < keyValues.Length; i += 2)
          {
-            string key = keyValues[i];
-            string value = keyValues[i + 1];
+            string key = (string)keyValues[i];
+            object value = keyValues[i + 1];
 
-            if(value != null)
+            if(key != null && value != null)
             {
                Properties[key] = value;
             }
