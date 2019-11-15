@@ -65,7 +65,10 @@ namespace Storage.Net.Blobs
          GenericValidation.CheckBlobFullPath(fullPath);
          fullPath = StoragePath.Normalize(fullPath);
 
-         if (append)
+         if(sourceStream is null)
+            throw new ArgumentNullException(nameof(sourceStream));
+
+         if(append)
          {
             if (!Exists(fullPath))
             {

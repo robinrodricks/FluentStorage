@@ -166,6 +166,9 @@ namespace Storage.Net.Blobs.Files
 
       public async Task WriteAsync(string fullPath, Stream dataStream, bool append, CancellationToken cancellationToken = default)
       {
+         if(dataStream is null)
+            throw new ArgumentNullException(nameof(dataStream));
+
          fullPath = StoragePath.Normalize(fullPath, false);
          ZipArchive archive = GetArchive(true);
 

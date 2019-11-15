@@ -146,6 +146,8 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2
       public async Task WriteAsync(string fullPath, Stream dataStream,
          bool append = false, CancellationToken cancellationToken = default)
       {
+         if(dataStream is null)
+            throw new ArgumentNullException(nameof(dataStream));
          DecomposePath(fullPath, out string filesystemName, out string relativePath);
 
          //create path and filesystem if required

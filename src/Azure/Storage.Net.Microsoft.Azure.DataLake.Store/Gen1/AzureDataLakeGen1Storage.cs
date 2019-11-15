@@ -77,6 +77,9 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen1
       {
          GenericValidation.CheckBlobFullPath(fullPath);
 
+         if(dataStream is null)
+            throw new ArgumentNullException(nameof(dataStream));
+
          AdlsClient client = await GetAdlsClientAsync().ConfigureAwait(false);
 
          AdlsOutputStream stream;

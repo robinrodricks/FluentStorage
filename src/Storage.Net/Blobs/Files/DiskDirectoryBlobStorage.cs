@@ -216,6 +216,8 @@ namespace Storage.Net.Blobs.Files
 
       public async Task WriteAsync(string fullPath, Stream dataStream, bool append, CancellationToken cancellationToken)
       {
+         if(dataStream is null)
+            throw new ArgumentNullException(nameof(dataStream));
          GenericValidation.CheckBlobFullPath(fullPath);
 
          fullPath = StoragePath.Normalize(fullPath, false);
