@@ -107,21 +107,15 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
          return blob;
       }
 
-      public Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
+      public async Task WriteAsync(string fullPath, Stream dataStream, bool append, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
          ValidateSecretName(fullPath);
          if (append) throw new ArgumentException("appending to secrets is not supported", nameof(append));
 
-         var callbackStream = new FixedStream(new MemoryStream(), null, async fx =>
-         {
-            string value = Encoding.UTF8.GetString(((MemoryStream)fx.Parent).ToArray());
-
-            await _vaultClient.SetSecretAsync(_vaultUri, fullPath, value).ConfigureAwait(false);
-         });
-
-         return Task.FromResult<Stream>(callbackStream);
-         
+         byte[] data = dataStream.ToByteArray();
+         string value = Encoding.UTF8.GetString(data);
+         await _vaultClient.SetSecretAsync(_vaultUri, fullPath, value).ConfigureAwait(false);
       }
 
       public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken)

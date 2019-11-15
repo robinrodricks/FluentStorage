@@ -86,7 +86,7 @@ namespace Storage.Net.Blobs
          return Task.FromResult(true);
       }
 
-      public Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
+      public Task<Stream> WriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
          fullPath = StoragePath.Normalize(fullPath);

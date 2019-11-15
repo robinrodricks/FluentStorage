@@ -197,10 +197,7 @@ namespace Storage.Net.Blobs
 
          using (var source = new MemoryStream(data))
          {
-            using(Stream dest = await provider.OpenWriteAsync(fullPath, false, cancellationToken).ConfigureAwait(false))
-            {
-               await source.CopyToAsync(dest).ConfigureAwait(false);
-            }
+            await provider.WriteAsync(fullPath, source, append, cancellationToken).ConfigureAwait(false);
          }
       }
 
@@ -224,31 +221,6 @@ namespace Storage.Net.Blobs
       #endregion
 
       #region [ Streaming ]
-
-      /// <summary>
-      /// Copy data from <paramref name="sourceStream"/> and write to the destination storage
-      /// </summary>
-      /// <param name="storage"></param>
-      /// <param name="fullPath">Full blob path, required.</param>
-      /// <param name="sourceStream">Source stream to copy from, required</param>
-      /// <param name="append">When true, the blob gets overwritten, otherwise the data is appended.</param>
-      /// <param name="cancellationToken"></param>
-      /// <returns></returns>
-      public static async Task WriteAsync(
-         this IBlobStorage storage,
-         string fullPath,
-         Stream sourceStream,
-         bool append = false,
-         CancellationToken cancellationToken = default)
-      {
-         if(sourceStream == null)
-            throw new ArgumentNullException(nameof(sourceStream));
-
-         using(Stream dest = await storage.OpenWriteAsync(fullPath, append, cancellationToken).ConfigureAwait(false))
-         {
-            await sourceStream.CopyToAsync(dest).ConfigureAwait(false);
-         }
-      }
 
       /// <summary>
       /// Downloads blob to a stream
@@ -337,12 +309,12 @@ namespace Storage.Net.Blobs
          this IBlobStorage provider,
          string blobId, IBlobStorage targetStorage, string newId, CancellationToken cancellationToken = default)
       {
-         Stream src = await provider.OpenReadAsync(blobId, cancellationToken);
-         if (src == null) return;
-
-         using (src)
+         using(Stream src = await provider.OpenReadAsync(blobId, cancellationToken).ConfigureAwait(false))
          {
-            await targetStorage.WriteAsync(newId ?? blobId, src, false, cancellationToken);
+            if(src == null)
+               return;
+
+            await targetStorage.WriteAsync(newId ?? blobId, src, false, cancellationToken).ConfigureAwait(false);
          }
       }
 

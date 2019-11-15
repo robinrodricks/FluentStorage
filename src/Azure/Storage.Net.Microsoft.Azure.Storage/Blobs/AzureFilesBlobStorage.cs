@@ -83,17 +83,12 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          }
       }
 
-      public override async Task<Stream> OpenWriteAsync(string fullPath, bool append = false, CancellationToken cancellationToken = default)
+      public override async Task WriteAsync(string fullPath, Stream dataStream,
+         bool append = false, CancellationToken cancellationToken = default)
       {
          CloudFile file = await GetFileReferenceAsync(fullPath, true, cancellationToken).ConfigureAwait(false);
 
-         return new FixedStream(new MemoryStream(), null, async (fx) =>
-         {
-            var ms = (MemoryStream)fx.Parent;
-            ms.Position = 0;
-
-            await file.UploadFromStreamAsync(ms).ConfigureAwait(false);
-         });
+         await file.UploadFromStreamAsync(dataStream, cancellationToken).ConfigureAwait(false);
       }
 
       public override async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)

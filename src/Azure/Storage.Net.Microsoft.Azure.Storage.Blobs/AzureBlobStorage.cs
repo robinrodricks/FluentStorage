@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using Storage.Net.Blobs;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blobs
@@ -64,17 +65,64 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             result = result.Take(options.MaxResults.Value).ToList();
          }
 
-         return null;
+         return result;
       }
 
 
-      public Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public async Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
+      {
+         GenericValidation.CheckBlobFullPaths(fullPaths);
+
+         await Task.WhenAll(fullPaths.Select(fullPath => DeleteAsync(fullPath, cancellationToken))).ConfigureAwait(false);
+      }
+
       public void Dispose() { }
-      public Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+      public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
+      {
+         return await Task.WhenAll(fullPaths.Select(p => ExistsAsync(p, cancellationToken))).ConfigureAwait(false);
+      }
+
       public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-      public Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+      public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
+      {
+         GenericValidation.CheckBlobFullPath(fullPath);
+
+         (BlobContainerClient container, string path) = await GetPartsAsync(fullPath, true).ConfigureAwait(false);
+
+         BlockBlobClient client = container.GetBlockBlobClient(path);
+
+         try
+         {
+            Response<BlobDownloadInfo> response = await client.DownloadAsync(cancellationToken).ConfigureAwait(false);
+
+            return response.Value.Content;
+         }
+         catch(RequestFailedException ex) when (ex.ErrorCode == "BlobNotFound")
+         {
+            return null;
+         }
+      }
+
       public Task<ITransaction> OpenTransactionAsync() => throw new NotImplementedException();
-      public Task<Stream> OpenWriteAsync(string fullPath, bool append = false, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+      public async Task WriteAsync(string fullPath, Stream dataStream,
+         bool append = false, CancellationToken cancellationToken = default)
+      {
+         GenericValidation.CheckBlobFullPath(fullPath);
+
+         if(dataStream is null)
+            throw new ArgumentNullException(nameof(dataStream));
+
+         (BlobContainerClient container, string path) = await GetPartsAsync(fullPath, true).ConfigureAwait(false);
+
+         BlockBlobClient client = container.GetBlockBlobClient(path);
+
+         await client.UploadAsync(
+            dataStream,
+            cancellationToken: cancellationToken).ConfigureAwait(false);
+      }
       public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
       #endregion
@@ -112,6 +160,63 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          }
       }
 
+      private async Task DeleteAsync(string fullPath, CancellationToken cancellationToken)
+      {
+         (BlobContainerClient container, string path) = await GetPartsAsync(fullPath, false);
+
+         if(StoragePath.IsRootPath(path))
+         {
+            //deleting the entire container
+            await container.DeleteIfExistsAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+         }
+         else
+         {
+
+            BlockBlobClient blob = string.IsNullOrEmpty(path)
+               ? null
+               : container.GetBlockBlobClient(StoragePath.Normalize(path, false));
+            if(blob != null)
+            {
+               try
+               {
+                  await blob.DeleteAsync(
+                     DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken).ConfigureAwait(false);
+               }
+               catch(RequestFailedException ex) when(ex.ErrorCode == "BlobNotFound")
+               {
+                  //this might be a folder reference, just try it
+
+                  await foreach(BlobItem recursedFile in
+                     container.GetBlobsAsync(prefix: path, cancellationToken: cancellationToken).ConfigureAwait(false))
+                  {
+                     BlobClient client = container.GetBlobClient(recursedFile.Name);
+                     await client.DeleteIfExistsAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+                  }
+               }
+            }
+         }
+      }
+
+      private async Task<bool> ExistsAsync(string fullPath, CancellationToken cancellationToken = default)
+      {
+         (BlobContainerClient container, string path) = await GetPartsAsync(fullPath, true).ConfigureAwait(false);
+
+         if(container == null)
+            return false;
+
+         BlobBaseClient client = container.GetBlobBaseClient(path);
+
+         try
+         {
+            await client.GetPropertiesAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+         }
+         catch(RequestFailedException ex) when(ex.ErrorCode == "BlobNotFound")
+         {
+            return false;
+         }
+
+         return true;
+      }
 
       private async Task<(BlobContainerClient, string)> GetPartsAsync(string fullPath, bool createContainer = true)
       {

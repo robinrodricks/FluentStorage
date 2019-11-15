@@ -143,12 +143,33 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen2
          return new BufferedStream(new ReadStream(_restApi, (long)pp.Length, fs, rp));
       }
 
-      public Task<Stream> OpenWriteAsync(string fullPath, bool append = false, CancellationToken cancellationToken = default)
+      public async Task WriteAsync(string fullPath, Stream dataStream,
+         bool append = false, CancellationToken cancellationToken = default)
       {
          DecomposePath(fullPath, out string filesystemName, out string relativePath);
 
-         //FlushingStream already handles missing filesystem and attempts to create it on error
-         return Task.FromResult<Stream>(new BufferedStream(new WriteStream(_restApi, filesystemName, relativePath)));
+         //create path and filesystem if required
+         try
+         {
+            await _restApi.CreatePathAsync(filesystemName, relativePath, "file").ConfigureAwait(false);
+         }
+         catch(ApiException ex) when(ex.StatusCode == HttpStatusCode.NotFound)
+         {
+            //filesystem doesn't exist, create it
+            await _restApi.CreateFilesystemAsync(filesystemName).ConfigureAwait(false);
+
+            //now create path again
+            await _restApi.CreatePathAsync(filesystemName, relativePath, "file").ConfigureAwait(false);
+         }
+
+         //upload data
+         await _restApi.UpdatePathAsync(filesystemName, relativePath, "append",
+            0,
+            body: dataStream).ConfigureAwait(false);
+
+         //flush and close
+         await _restApi.UpdatePathAsync(filesystemName, relativePath, "flush",
+            dataStream.Length, body: EmptyStream).ConfigureAwait(false);
       }
 
       private void DecomposePath(string path, out string filesystemName, out string relativePath, bool requireRelativePath = true)

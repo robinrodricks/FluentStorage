@@ -317,14 +317,17 @@ namespace Storage.Net.Tests.Integration.Blobs
          string id = RandomBlobPath();
          byte[] data = Encoding.UTF8.GetBytes("oh my");
 
-         using(Stream dest = await _storage.OpenWriteAsync(id))
-         {
-            await dest.WriteAsync(data, 0, data.Length);
-         }
+         await _storage.WriteAsync(id, new MemoryStream(data));
 
          //read and check
          string result = await _storage.ReadTextAsync(id);
          Assert.Equal("oh my", result);
+      }
+
+      [Fact]
+      public async Task Write_nullDataStream_argumentnullexception()
+      {
+         await Assert.ThrowsAsync<ArgumentNullException>(() => _storage.WriteAsync(RandomBlobPath(), null));
       }
 
       [Fact]
@@ -510,10 +513,8 @@ namespace Storage.Net.Tests.Integration.Blobs
          blob.Metadata["user"] = "ivan";
          blob.Metadata["fun"] = "no";
 
-         using(Stream s = await _storage.OpenWriteAsync(blob))
-         {
-            s.Write(RandomGenerator.GetRandomBytes(10, 15));
-         }
+         await _storage.WriteAsync(blob, new MemoryStream(RandomGenerator.GetRandomBytes(10, 15)));
+
          try
          {
             await _storage.SetBlobAsync(blob);
