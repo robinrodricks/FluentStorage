@@ -9,24 +9,29 @@ using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
+using Blobs;
 using Storage.Net.Blobs;
+using Storage.Net.Microsoft.Azure.Storage.Blobs.Gen2.Model;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 {
    //auth scenarios: https://github.com/Azure/azure-sdk-for-net/blob/master/sdk/storage/Azure.Storage.Blobs/samples/Sample02_Auth.cs
 
 
-   class AzureBlobStorage : IAzureBlobStorage
+   class AzureBlobStorage : IAzureDataLakeStorage
    {
       private const int BrowserParallelism = 10;
       private readonly BlobServiceClient _client;
       private readonly string _containerName;
       private readonly Dictionary<string, BlobContainerClient> _containerNameToContainerClient =
          new Dictionary<string, BlobContainerClient>();
+      private readonly ExtendedSdk _extended;
 
-      public AzureBlobStorage(BlobServiceClient blobServiceClient)
+      public AzureBlobStorage(BlobServiceClient blobServiceClient, string accountName, string containerName = null)
       {
-         _client = blobServiceClient;
+         _client = blobServiceClient ?? throw new ArgumentNullException(nameof(blobServiceClient));
+         _containerName = containerName;
+         _extended = new ExtendedSdk(blobServiceClient, accountName);
       }
 
       #region [ Interface Methods ]
@@ -259,6 +264,25 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
       #endregion
 
+      #region [ Data Lake Storage ]
+
+      public Task<IReadOnlyCollection<Filesystem>> ListFilesystemsAsync(CancellationToken cancellationToken = default)
+      {
+         return _extended.ListFilesystemsAsync(cancellationToken);
+      }
+
+      public Task CreateFilesystemAsync(string filesystemName, CancellationToken cancellationToken = default)
+      {
+         return _extended.CreateFilesystemAsync(filesystemName, cancellationToken);
+      }
+
+      public Task DeleteFilesystemAsync(string filesystemName, CancellationToken cancellationToken = default)
+      {
+         return _extended.DeleteFilesystemAsync(filesystemName, cancellationToken);
+      }
+
+      #endregion
+
       private async Task SetBlobAsync(Blob blob, CancellationToken cancellationToken)
       {
          if(!(await ExistsAsync(blob, cancellationToken).ConfigureAwait(false)))
@@ -461,6 +485,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
          return (container, relativePath);
       }
+
 
    }
 }

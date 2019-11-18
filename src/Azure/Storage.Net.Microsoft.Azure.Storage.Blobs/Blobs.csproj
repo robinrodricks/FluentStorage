@@ -4,10 +4,19 @@
     <TargetFramework>netstandard2.0</TargetFramework>
      <LangVersion>latest</LangVersion>
      <PackageId>Storage.Net.Microsoft.Azure.Storage.Blobs</PackageId>
+     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+     <WarningsAsErrors />
+     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <ItemGroup>
+   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+      <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+   </PropertyGroup>
+
+
+   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.0.0" />
+    <PackageReference Include="System.Text.Json" Version="4.6.0" />
   </ItemGroup>
 
   <ItemGroup>

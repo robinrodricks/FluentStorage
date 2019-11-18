@@ -11,7 +11,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 {
    public class AzureBlobStorageFixture : BlobFixture
    {
-      public AzureBlobStorageFixture() : base("testcontainerv11/")
+      public AzureBlobStorageFixture() : base("lakeyv12/")
       {
       }
 
@@ -78,7 +78,11 @@ namespace Storage.Net.Tests.Integration.Blobs
 
       protected override IBlobStorage CreateStorage(ITestSettings settings)
       {
-         return StorageFactory.Blobs.AzureDataLakeGen2StoreBySharedAccessKey(settings.AzureDataLakeGen2Name, settings.AzureDataLakeGen2Key);
+         return StorageFactory.Blobs.AzureDataLakeStorage(
+            settings.AzureDataLakeGen2Name,
+            settings.AzureDataLakeGen2Key);
+
+         //return StorageFactory.Blobs.AzureDataLakeGen2StoreBySharedAccessKey(settings.AzureDataLakeGen2Name, settings.AzureDataLakeGen2Key);
       }
    }
 

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Storage.Net.Blobs;
-using Storage.Net.Microsoft.Azure.DataLake.Store.Gen2;
-using Storage.Net.Microsoft.Azure.DataLake.Store.Gen2.Model;
+using Storage.Net.Microsoft.Azure.Storage.Blobs;
+using Storage.Net.Microsoft.Azure.Storage.Blobs.Gen2.Model;
 using Xunit;
 
 namespace Storage.Net.Tests.Integration.Azure
@@ -13,24 +13,26 @@ namespace Storage.Net.Tests.Integration.Azure
    public class LeakyAdlsGen2StorageTest : IAsyncLifetime
    {
       private readonly ITestSettings _settings;
-      private readonly IAzureDataLakeGen2BlobStorage _storage;
-      private const string Filesystem = "leaks";
+      private readonly IAzureDataLakeStorage _storage;
+      private static readonly string Filesystem = nameof(LeakyAdlsGen2StorageTest).ToLower();
 
       public LeakyAdlsGen2StorageTest()
       {
          _settings = Settings.Instance;
-         _storage = (IAzureDataLakeGen2BlobStorage)StorageFactory.Blobs.AzureDataLakeGen2StoreByClientSecret(
+         /*_storage = (IAzureDataLakeGen2BlobStorage)StorageFactory.Blobs.AzureDataLakeGen2StoreByClientSecret(
             _settings.AzureDataLakeGen2Name,
             _settings.AzureDataLakeGen2TenantId,
             _settings.AzureDataLakeGen2PrincipalId,
-            _settings.AzureDataLakeGen2PrincipalSecret);
+            _settings.AzureDataLakeGen2PrincipalSecret);*/
+         _storage = StorageFactory.Blobs.AzureDataLakeStorage(_settings.AzureDataLakeGen2Name,
+            _settings.AzureDataLakeGen2Key);
       }
 
       [Fact]
       public async Task Authenticate_with_shared_key()
       {
-         IBlobStorage authInstance =
-            StorageFactory.Blobs.AzureDataLakeGen2StoreBySharedAccessKey(_settings.AzureDataLakeGen2Name,
+         IAzureDataLakeStorage authInstance =
+            StorageFactory.Blobs.AzureDataLakeStorage(_settings.AzureDataLakeGen2Name,
                _settings.AzureDataLakeGen2Key);
 
          //trigger any operation
@@ -50,15 +52,30 @@ namespace Storage.Net.Tests.Integration.Azure
          await authInstance.ListAsync();
       }
 
-      /*[Fact]
-      public async Task Resolution_get_upn_from_objectId()
+      [Fact]
+      public async Task Filesystems_list_doesnt_crash()
       {
-         string upn = await _storage.AclObjectIdToUpnAsync(_settings.AzureDataLakeGen2TestObjectId);
+         IReadOnlyCollection<Filesystem> list = await _storage.ListFilesystemsAsync();
 
-         Assert.NotNull(upn);
-      }*/
+         Assert.True(list.Count > 0);
+      }
 
       [Fact]
+      public async Task Creates_deletes_and_lists_a_filesystem()
+      {
+         string filesystem = "createfs-" + Guid.NewGuid().ToString();
+
+         //await _storage.DeleteFilesystemAsync(filesystem);
+         Assert.DoesNotContain(await _storage.ListFilesystemsAsync(), x => x.Name == filesystem);
+
+         await _storage.CreateFilesystemAsync(filesystem);
+         Assert.Contains(await _storage.ListFilesystemsAsync(), x => x.Name == filesystem);
+
+         await _storage.DeleteFilesystemAsync(filesystem);
+         Assert.DoesNotContain(await _storage.ListFilesystemsAsync(), x => x.Name == filesystem);
+      }
+
+      /*[Fact]
       public async Task Acl_assign_permisssions_to_file_for_user()
       {
          string path = StoragePath.Combine(Filesystem, Guid.NewGuid().ToString());
@@ -158,20 +175,6 @@ namespace Storage.Net.Tests.Integration.Azure
       }
 
       [Fact]
-      public async Task Creates_deletes_and_lists_a_filesystem()
-      {
-         const string filesystem = "filesystemtest";
-
-         Assert.DoesNotContain(await _storage.ListFilesystemsAsync(), x => x == filesystem);
-
-         await _storage.CreateFilesystemAsync(filesystem);
-         Assert.Contains(await _storage.ListFilesystemsAsync(), x => x == filesystem);
-
-         await _storage.DeleteFilesystemAsync(filesystem);
-         Assert.DoesNotContain(await _storage.ListFilesystemsAsync(), x => x == filesystem);
-      }
-
-      [Fact]
       public async Task Acl_assign_non_default_permisssions_to_filesystem_for_user()
       {
          string filesystem = "aclnondefault";
@@ -227,7 +230,7 @@ namespace Storage.Net.Tests.Integration.Azure
          Assert.False(userAcl.CanRead);
          Assert.True(userAcl.CanWrite);
          Assert.False(userAcl.CanExecute);
-      }
+      }*/
 
       public async Task InitializeAsync()
       {

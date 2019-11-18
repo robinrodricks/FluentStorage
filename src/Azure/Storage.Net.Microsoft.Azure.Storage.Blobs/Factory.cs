@@ -5,8 +5,14 @@ using Storage.Net.Microsoft.Azure.Storage.Blobs;
 
 namespace Storage.Net
 {
+   /// <summary>
+   /// Blob storage factory
+   /// </summary>
    public static class Factory
    {
+      /// <summary>
+      /// 
+      /// </summary>
       public static IAzureBlobStorage AzureBlobStorage(this IBlobStorageFactory factory,
          string accountName,
          string key,
@@ -21,8 +27,20 @@ namespace Storage.Net
 
          var client = new BlobServiceClient(serviceUri ?? GetServiceUri(accountName), credential);
 
-         return new AzureBlobStorage(client);
+         return new AzureBlobStorage(client, accountName);
       }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      public static IAzureDataLakeStorage AzureDataLakeStorage(this IBlobStorageFactory factory,
+         string accountName,
+         string key,
+         Uri serviceUri = null)
+      {
+         return (IAzureDataLakeStorage)factory.AzureBlobStorage(accountName, key, serviceUri);
+      }
+
 
       /*
       /// <summary>

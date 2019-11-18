@@ -1,10 +1,44 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Storage.Net.Blobs;
+using Storage.Net.Microsoft.Azure.Storage.Blobs.Gen2.Model;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 {
+   /// <summary>
+   /// Additional Gen 2 storage operations
+   /// </summary>
+   public interface IAzureDataLakeStorage : IAzureBlobStorage
+   {
+      /// <summary>
+      /// Lists filesystems using Data Lake native REST API
+      /// </summary>
+      /// <returns></returns>
+      Task<IReadOnlyCollection<Filesystem>> ListFilesystemsAsync(CancellationToken cancellationToken = default);
+
+      /// <summary>
+      /// Creates a filesystem
+      /// </summary>
+      /// <param name="filesystemName"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      Task CreateFilesystemAsync(string filesystemName, CancellationToken cancellationToken = default);
+
+      /// <summary>
+      /// Deletes a filesystem
+      /// </summary>
+      /// <param name="filesystem"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      Task DeleteFilesystemAsync(string filesystem, CancellationToken cancellationToken = default);
+
+   }
+
+   /// <summary>
+   /// Azure blob storage specific operations
+   /// </summary>
    public interface IAzureBlobStorage : IBlobStorage
    {
       /// <summary>
