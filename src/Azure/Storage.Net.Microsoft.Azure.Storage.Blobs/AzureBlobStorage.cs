@@ -281,6 +281,16 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return _extended.DeleteFilesystemAsync(filesystemName, cancellationToken);
       }
 
+      public Task SetAccessControlAsync(string fullPath, AccessControl accessControl, CancellationToken cancellationToken = default)
+      {
+         return _extended.SetAccessControlAsync(fullPath, accessControl, cancellationToken);
+      }
+
+      public Task<AccessControl> GetAccessControlAsync(string fullPath, bool getUpn = false, CancellationToken cancellationToken = default)
+      {
+         return _extended.GetAccessControlAsync(fullPath, getUpn, cancellationToken);
+      }
+
       #endregion
 
       private async Task SetBlobAsync(Blob blob, CancellationToken cancellationToken)
@@ -485,7 +495,5 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
          return (container, relativePath);
       }
-
-
    }
 }

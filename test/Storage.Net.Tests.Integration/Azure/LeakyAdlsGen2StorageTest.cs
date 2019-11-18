@@ -19,7 +19,7 @@ namespace Storage.Net.Tests.Integration.Azure
       public LeakyAdlsGen2StorageTest()
       {
          _settings = Settings.Instance;
-         _storage = StorageFactory.Blobs.AzureDataLakeStorage(
+         _storage = StorageFactory.Blobs.AzureDataLakeStorageWithAzureAd(
             _settings.AzureDataLakeGen2Name,
             _settings.AzureDataLakeGen2TenantId,
             _settings.AzureDataLakeGen2PrincipalId,
@@ -30,7 +30,7 @@ namespace Storage.Net.Tests.Integration.Azure
       public async Task Authenticate_with_shared_key()
       {
          IAzureDataLakeStorage authInstance =
-            StorageFactory.Blobs.AzureDataLakeStorage(_settings.AzureDataLakeGen2Name,
+            StorageFactory.Blobs.AzureDataLakeStorageWithSharedKey(_settings.AzureDataLakeGen2Name,
                _settings.AzureDataLakeGen2Key);
 
          //trigger any operation
@@ -40,7 +40,7 @@ namespace Storage.Net.Tests.Integration.Azure
       [Fact]
       public async Task Authenticate_with_service_principal()
       {
-         IBlobStorage authInstance = StorageFactory.Blobs.AzureDataLakeStorage(
+         IBlobStorage authInstance = StorageFactory.Blobs.AzureDataLakeStorageWithAzureAd(
             _settings.AzureDataLakeGen2Name,
             _settings.AzureDataLakeGen2TenantId,
             _settings.AzureDataLakeGen2PrincipalId,
@@ -73,7 +73,7 @@ namespace Storage.Net.Tests.Integration.Azure
          Assert.DoesNotContain(await _storage.ListFilesystemsAsync(), x => x.Name == filesystem);
       }
 
-      /*[Fact]
+      [Fact]
       public async Task Acl_assign_permisssions_to_file_for_user()
       {
          string path = StoragePath.Combine(Filesystem, Guid.NewGuid().ToString());
@@ -228,7 +228,7 @@ namespace Storage.Net.Tests.Integration.Azure
          Assert.False(userAcl.CanRead);
          Assert.True(userAcl.CanWrite);
          Assert.False(userAcl.CanExecute);
-      }*/
+      }
 
       public async Task InitializeAsync()
       {

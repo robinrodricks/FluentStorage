@@ -19,7 +19,8 @@ namespace Storage.Net.Tests.Integration.Azure
       {
          ITestSettings settings = Settings.Instance;
 
-         IBlobStorage storage = StorageFactory.Blobs.AzureBlobStorage(settings.AzureStorageName, settings.AzureStorageKey);
+         IBlobStorage storage = StorageFactory.Blobs.AzureBlobStorageWithSharedKey(
+            settings.AzureStorageName, settings.AzureStorageKey);
          _native = (IAzureBlobStorage)storage;
       }
 

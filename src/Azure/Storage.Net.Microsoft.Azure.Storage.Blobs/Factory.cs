@@ -15,7 +15,7 @@ namespace Storage.Net
       /// <summary>
       /// 
       /// </summary>
-      public static IAzureBlobStorage AzureBlobStorage(this IBlobStorageFactory factory,
+      public static IAzureBlobStorage AzureBlobStorageWithSharedKey(this IBlobStorageFactory factory,
          string accountName,
          string key,
          Uri serviceUri = null)
@@ -42,7 +42,7 @@ namespace Storage.Net
       /// <param name="applicationSecret"></param>
       /// <param name="activeDirectoryAuthEndpoint"></param>
       /// <returns></returns>
-      public static IAzureBlobStorage AzureBlobStorage(this IBlobStorageFactory factory,
+      public static IAzureBlobStorage AzureBlobStorageWithAzureAd(this IBlobStorageFactory factory,
          string accountName,
          string tenantId,
          string applicationId,
@@ -76,14 +76,32 @@ namespace Storage.Net
       }
 
       /// <summary>
+      /// Creates Azure Blob Storage with Managed Identity
+      /// </summary>
+      /// <param name="factory"></param>
+      /// <param name="accountName"></param>
+      /// <param name="clientId"></param>
+      /// <returns></returns>
+      public static IAzureBlobStorage AzureBlobStorageWithMsi(this IBlobStorageFactory factory,
+         string accountName,
+         string clientId = null)
+      {
+         TokenCredential credential = new ManagedIdentityCredential(clientId, null);
+
+         var client = new BlobServiceClient(GetServiceUri(accountName), credential);
+
+         return new AzureBlobStorage(client, accountName);
+      }
+
+      /// <summary>
       /// 
       /// </summary>
-      public static IAzureDataLakeStorage AzureDataLakeStorage(this IBlobStorageFactory factory,
+      public static IAzureDataLakeStorage AzureDataLakeStorageWithSharedKey(this IBlobStorageFactory factory,
          string accountName,
          string key,
          Uri serviceUri = null)
       {
-         return (IAzureDataLakeStorage)factory.AzureBlobStorage(accountName, key, serviceUri);
+         return (IAzureDataLakeStorage)factory.AzureBlobStorageWithSharedKey(accountName, key, serviceUri);
       }
 
       /// <summary>
@@ -96,14 +114,14 @@ namespace Storage.Net
       /// <param name="applicationSecret"></param>
       /// <param name="activeDirectoryAuthEndpoint"></param>
       /// <returns></returns>
-      public static IAzureDataLakeStorage AzureDataLakeStorage(this IBlobStorageFactory factory,
+      public static IAzureDataLakeStorage AzureDataLakeStorageWithAzureAd(this IBlobStorageFactory factory,
          string accountName,
          string tenantId,
          string applicationId,
          string applicationSecret,
          string activeDirectoryAuthEndpoint = "https://login.microsoftonline.com/")
       {
-         return (IAzureDataLakeStorage)factory.AzureBlobStorage(
+         return (IAzureDataLakeStorage)factory.AzureBlobStorageWithAzureAd(
             accountName,
             tenantId,
             applicationId,
@@ -111,21 +129,23 @@ namespace Storage.Net
             activeDirectoryAuthEndpoint);
       }
 
+      /// <summary>
+      /// Creates Azure Data Lake Gen 2 Storage with Managed Identity
+      /// </summary>
+      /// <param name="factory"></param>
+      /// <param name="accountName"></param>
+      /// <param name="clientId"></param>
+      /// <returns></returns>
+      public static IAzureDataLakeStorage AzureDataLakeStorageWithMsi(this IBlobStorageFactory factory,
+         string accountName,
+         string clientId = null)
+      {
+         return (IAzureDataLakeStorage)factory.AzureBlobStorageWithMsi(accountName, clientId);
+      }
+
 
       /*
-      /// <summary>
-      /// Creates a blob storage implementation based on Microsoft Azure Blob Storage using account name and key.
-      /// </summary>
-      /// <param name="factory">Reference to factory</param>
-      /// <param name="accountName">Storage Account name</param>
-      /// <param name="key">Storage Account key</param>
-      /// <returns>Generic blob storage interface</returns>
-      public static IAzureBlobStorage AzureBlobStorage(this IBlobStorageFactory factory,
-         string accountName,
-         string key)
-      {
-         return AzureUniversalBlobStorageProvider.CreateFromAccountNameAndKey(accountName, key);
-      }
+
 
       /// <summary>
       /// Creates a blob storage implementation using Shared Access Signature.
@@ -139,21 +159,6 @@ namespace Storage.Net
          return AzureUniversalBlobStorageProvider.CreateFromSasUrl(sasUrl);
       }
 
-      /// <summary>
-      /// Creates a blob storage implementation using a bearer token
-      /// </summary>
-      /// <param name="factory"></param>
-      /// <param name="accountName"></param>
-      /// <param name="token"></param>
-      /// <returns></returns>
-      public static IAzureBlobStorage AzureBlobStorageFromAadToken(this IBlobStorageFactory factory,
-         string accountName,
-         string token)
-      {
-         return AzureUniversalBlobStorageProvider.CreateWithAadToken(accountName, token);
-      }
-
-
 
       /// <summary>
       /// Creates a blob storage implementation based on Microsoft Azure Blob Storage using development storage.
@@ -164,17 +169,6 @@ namespace Storage.Net
       {
          return AzureUniversalBlobStorageProvider.CreateForLocalEmulator();
       }
-
-      /// <summary>
-      /// Creates an instance of Microsoft Azure Blob Storage that wraps around native <see cref="CloudBlobClient"/>.
-      /// Avoid using if possible as it's a subject to change in future.
-      /// </summary>
-      public static IAzureBlobStorage AzureBlobStorage(this IBlobStorageFactory factory, CloudBlobClient cloudBlobClient)
-      {
-         if(cloudBlobClient == null)
-            throw new ArgumentNullException(nameof(cloudBlobClient));
-
-         return new AzureUniversalBlobStorageProvider(cloudBlobClient, null);
       }
       */
 
