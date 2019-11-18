@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Azure.Storage;
 using Azure.Storage.Sas;
 
@@ -43,21 +41,5 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          string query = sas.ToSasQueryParameters(sharedKeyCredential).ToString();
          return query;
       }
-
-      /*internal SharedAccessAccountPolicy ToSharedAccessAccountPolicy()
-      {
-         return new SharedAccessAccountPolicy
-         {
-            SharedAccessStartTime = StartTime,
-            SharedAccessExpiryTime = ExpiryTime,
-            Protocols = SharedAccessProtocol.HttpsOnly,
-            Services = SharedAccessAccountServices.Blob,
-            Permissions = (SharedAccessAccountPermissions)(int)Permissions,
-            ResourceTypes =
-               SharedAccessAccountResourceTypes.Container |
-               SharedAccessAccountResourceTypes.Object |
-               SharedAccessAccountResourceTypes.Service
-         };
-      }*/
    }
 }

@@ -98,7 +98,7 @@ namespace Storage.Net
 
          var client = new BlobServiceClient(new Uri(sas));
 
-         return new AzureBlobStorage(client, accountName);
+         return new AzureBlobStorage(client, accountName, containerName: containerName);
       }
 
       /// <summary>
@@ -171,19 +171,6 @@ namespace Storage.Net
 
 
       /*
-      /// <summary>
-      /// Creates a blob storage implementation using Shared Access Signature.
-      /// </summary>
-      /// <param name="factory">Reference to factory</param>
-      /// <param name="sasUrl"></param>
-      /// <returns></returns>
-      public static IAzureBlobStorage AzureBlobStorageFromSas(this IBlobStorageFactory factory,
-         string sasUrl)
-      {
-         return AzureUniversalBlobStorageProvider.CreateFromSasUrl(sasUrl);
-      }
-
-
       /// <summary>
       /// Creates a blob storage implementation based on Microsoft Azure Blob Storage using development storage.
       /// </summary>

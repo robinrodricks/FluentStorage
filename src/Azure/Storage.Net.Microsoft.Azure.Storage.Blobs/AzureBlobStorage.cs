@@ -12,6 +12,7 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using Azure.Storage.Sas;
 using Blobs;
+using Microsoft.Identity.Client;
 using Storage.Net.Blobs;
 using Storage.Net.Microsoft.Azure.Storage.Blobs.Gen2.Model;
 
@@ -275,7 +276,8 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             cancellationToken: cancellationToken).ConfigureAwait(false);
       }
 
-      public Task<string> GetStorageSasAsync(AccountSasPolicy accountPolicy, bool includeUrl = true)
+      public Task<string> GetStorageSasAsync(
+         AccountSasPolicy accountPolicy, bool includeUrl = true, CancellationToken cancellationToken = default)
       {
          if(accountPolicy is null)
             throw new ArgumentNullException(nameof(accountPolicy));
@@ -287,10 +289,58 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
          if(includeUrl)
          {
-            sas = _client.Uri + "?" + sas;
+            string url = _client.Uri.ToString();
+            url += "?";
+            url += sas;
+            return Task.FromResult(url);
          }
 
          return Task.FromResult(sas);
+      }
+
+      public Task<string> GetContainerSasAsync(
+         string containerName,
+         ContainerSasPolicy containerSasPolicy,
+         bool includeUrl = true,
+         CancellationToken cancellationToken = default)
+      {
+         string sas = containerSasPolicy.ToSasQuery(_sasSigningCredentials, containerName);
+
+         if(includeUrl)
+         {
+            string url = _client.Uri.ToString();
+            url += containerName;
+            url += "/?";
+            url += sas;
+            return Task.FromResult(url);
+         }
+
+         return Task.FromResult(sas);
+      }
+
+      public async Task<string> GetBlobSasAsync(
+         string fullPath,
+         BlobSasPolicy blobSasPolicy = null,
+         bool includeUrl = true,
+         CancellationToken cancellationToken = default)
+      {
+         if(blobSasPolicy == null)
+            blobSasPolicy = new BlobSasPolicy(DateTime.UtcNow, TimeSpan.FromHours(1)) { Permissions = BlobSasPermission.Read };
+
+         (BlobContainerClient container, string path) = await GetPartsAsync(fullPath, false).ConfigureAwait(false);
+
+         string sas = blobSasPolicy.ToSasQuery(_sasSigningCredentials, container.Name, path);
+
+         if(includeUrl)
+         {
+            string url = _client.Uri.ToString();
+            url += StoragePath.Normalize(fullPath);
+            url += "?";
+            url += sas;
+            return url;
+         }
+
+         return sas;
       }
 
       #endregion
@@ -526,6 +576,5 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
          return (container, relativePath);
       }
-
    }
 }

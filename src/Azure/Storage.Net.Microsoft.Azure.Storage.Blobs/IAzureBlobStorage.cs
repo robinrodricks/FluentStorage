@@ -54,14 +54,46 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       /// <param name="containerPublicAccessType"></param>
       /// <param name="cancellationToken"></param>
       /// <returns></returns>
-      Task SetContainerPublicAccessAsync(string containerName, ContainerPublicAccessType containerPublicAccessType, CancellationToken cancellationToken = default);
+      Task SetContainerPublicAccessAsync(
+         string containerName, ContainerPublicAccessType containerPublicAccessType, CancellationToken cancellationToken = default);
 
 
       /// <summary>
-      /// Gets Shared Access Signature for the entire storage account
+      /// Gets Shared Access Signature for the path.
+      /// </summary>
+      /// <param name="accountPolicy"></param>
+      /// <param name="includeUrl"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      Task<string> GetStorageSasAsync(
+         AccountSasPolicy accountPolicy,
+         bool includeUrl = true,
+         CancellationToken cancellationToken = default);
+
+      /// <summary>
+      /// Gets Shared Access Signature for a blob container
       /// </summary>
       /// <returns></returns>
-      Task<string> GetStorageSasAsync(AccountSasPolicy accountPolicy, bool includeUrl = true);
+      Task<string> GetContainerSasAsync(
+         string containerName,
+         ContainerSasPolicy containerSasPolicy,
+         bool includeUrl = true,
+         CancellationToken cancellationToken = default);
+
+      /// <summary>
+      /// Gets Shared Access Signature for a single blob
+      /// </summary>
+      /// <param name="fullPath"></param>
+      /// <param name="blobSasPolicy">Access policy, by default set to unlimited read for 1 hour.</param>
+      /// <param name="includeUrl"></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      Task<string> GetBlobSasAsync(
+         string fullPath,
+         BlobSasPolicy blobSasPolicy = null,
+         bool includeUrl = true,
+         CancellationToken cancellationToken = default);
+
 
    }
 }

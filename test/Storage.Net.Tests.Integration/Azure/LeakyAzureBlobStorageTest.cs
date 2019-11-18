@@ -25,7 +25,7 @@ namespace Storage.Net.Tests.Integration.Azure
       }
 
       [Fact]
-      public async Task GetAccountSas()
+      public async Task Sas_Account()
       {
 
          var policy = new AccountSasPolicy(DateTime.UtcNow, TimeSpan.FromHours(1));
@@ -42,8 +42,8 @@ namespace Storage.Net.Tests.Integration.Azure
          Assert.True(containers.Count > 0);
       }
 
-      /*[Fact]
-      public async Task GetContainerSas()
+      [Fact]
+      public async Task Sas_Container()
       {
          string fileName = Guid.NewGuid().ToString() + ".containersas.txt";
          string filePath = StoragePath.Combine("test", fileName);
@@ -53,11 +53,11 @@ namespace Storage.Net.Tests.Integration.Azure
          string sas = await _native.GetContainerSasAsync("test", policy, true);
 
          //check we can connect and list test file in the root
-         IBlobStorage sasInstance = StorageFactory.Blobs.AzureBlobStorageFromSas(sas);
+         IBlobStorage sasInstance = StorageFactory.Blobs.AzureBlobStorageWithSas(sas);
          IReadOnlyCollection<Blob> blobs = await sasInstance.ListAsync(StoragePath.RootFolderPath);
          Blob testBlob = blobs.FirstOrDefault(b => b.FullPath == fileName);
          Assert.NotNull(testBlob);
-      }*/
+      }
 
       [Fact]
       public async Task ContainerPublicAccess()
@@ -75,14 +75,14 @@ namespace Storage.Net.Tests.Integration.Azure
          Assert.Equal(ContainerPublicAccessType.Container, pa);
       }
 
-      /*[Fact]
-      public async Task BlobPublicAccess()
+      [Fact]
+      public async Task Sas_BlobPublicAccess()
       {
          string path = StoragePath.Combine("test", Guid.NewGuid().ToString() + ".txt");
 
          await _native.WriteTextAsync(path, "read me!");
 
-         var policy = new BlobSasPolicy(TimeSpan.FromHours(12))
+         var policy = new BlobSasPolicy(DateTime.UtcNow, TimeSpan.FromHours(12))
          {
             Permissions = BlobSasPermission.Read | BlobSasPermission.Write
          };
@@ -93,7 +93,7 @@ namespace Storage.Net.Tests.Integration.Azure
 
          string text = await new HttpClient().GetStringAsync(publicUrl);
          Assert.Equal("read me!", text);
-      }*/
+      }
 
       [Fact]
       public async Task Lease_CanAcquireAndRelease()
