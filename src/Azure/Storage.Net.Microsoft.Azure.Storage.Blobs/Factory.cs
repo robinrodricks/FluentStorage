@@ -3,6 +3,8 @@ using Azure.Core;
 using Azure.Identity;
 using Azure.Storage;
 using Azure.Storage.Blobs;
+using Azure.Storage.Sas;
+using Storage.Net.ConnectionString;
 using Storage.Net.Microsoft.Azure.Storage.Blobs;
 
 namespace Storage.Net
@@ -12,6 +14,14 @@ namespace Storage.Net
    /// </summary>
    public static class Factory
    {
+      /// <summary>
+      /// Register Azure module.
+      /// </summary>
+      public static IModulesFactory UseAzureBlobStorage(this IModulesFactory factory)
+      {
+         return factory.Use(new Module());
+      }
+
       /// <summary>
       /// 
       /// </summary>
@@ -29,7 +39,7 @@ namespace Storage.Net
 
          var client = new BlobServiceClient(serviceUri ?? GetServiceUri(accountName), credential);
 
-         return new AzureBlobStorage(client, accountName);
+         return new AzureBlobStorage(client, accountName, credential);
       }
 
       /// <summary>
@@ -71,6 +81,22 @@ namespace Storage.Net
 
          // Create a client that can authenticate using our token credential
          var client = new BlobServiceClient(GetServiceUri(accountName), credential);
+
+         return new AzureBlobStorage(client, accountName);
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="factory"></param>
+      /// <param name="sas"></param>
+      /// <returns></returns>
+      public static IAzureBlobStorage AzureBlobStorageWithSas(this IBlobStorageFactory factory,
+         string sas)
+      {
+         TryParseSasUrl(sas, out string accountName, out string containerName, out string sasQuery);
+
+         var client = new BlobServiceClient(new Uri(sas));
 
          return new AzureBlobStorage(client, accountName);
       }
@@ -145,8 +171,6 @@ namespace Storage.Net
 
 
       /*
-
-
       /// <summary>
       /// Creates a blob storage implementation using Shared Access Signature.
       /// </summary>
@@ -172,9 +196,44 @@ namespace Storage.Net
       }
       */
 
+      /// <summary>
+      /// Create connection string for azure blob storage
+      /// </summary>
+      public static StorageConnectionString ForAzureBlobStorageWithSharedKey(this IConnectionStringFactory factory,
+         string accountName,
+         string accountKey)
+      {
+         var cs = new StorageConnectionString(KnownPrefix.AzureBlobStorage + "://");
+         cs.Parameters[KnownParameter.AccountName] = accountName;
+         cs.Parameters[KnownParameter.KeyOrPassword] = accountKey;
+         return cs;
+      }
+
       private static Uri GetServiceUri(string accountName)
       {
          return new Uri($"https://{accountName}.blob.core.windows.net/");
+      }
+
+      private static bool TryParseSasUrl(string url, out string accountName, out string containerName, out string sas)
+      {
+         try
+         {
+            var u = new Uri(url);
+
+            accountName = u.Host.Substring(0, u.Host.IndexOf('.'));
+            containerName = u.Segments.Length == 2 ? u.Segments[1] : null;
+            sas = u.Query;
+
+            return true;
+         }
+         catch
+         {
+            accountName = null;
+            containerName = null;
+            sas = null;
+            return false;
+         }
+
       }
    }
 }

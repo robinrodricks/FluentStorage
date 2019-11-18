@@ -56,5 +56,12 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       /// <returns></returns>
       Task SetContainerPublicAccessAsync(string containerName, ContainerPublicAccessType containerPublicAccessType, CancellationToken cancellationToken = default);
 
+
+      /// <summary>
+      /// Gets Shared Access Signature for the entire storage account
+      /// </summary>
+      /// <returns></returns>
+      Task<string> GetStorageSasAsync(AccountSasPolicy accountPolicy, bool includeUrl = true);
+
    }
 }

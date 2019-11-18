@@ -7,6 +7,8 @@
      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
      <WarningsAsErrors />
      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+     <RootNamespace>Storage.Net.Microsoft.Azure.Storage.Blobs</RootNamespace>
+     <AssemblyName>Storage.Net.Microsoft.Azure.Storage.Blobs</AssemblyName>
   </PropertyGroup>
 
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">

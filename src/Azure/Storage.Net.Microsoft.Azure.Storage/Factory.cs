@@ -93,19 +93,6 @@ namespace Storage.Net
       #region [ Connection Strings ]
 
       /// <summary>
-      /// Create connection string for azure blob storage
-      /// </summary>
-      public static StorageConnectionString ForAzureBlobStorage(this IConnectionStringFactory factory,
-         string accountName,
-         string accountKey)
-      {
-         var cs = new StorageConnectionString(KnownPrefix.AzureBlobStorage + "://");
-         cs.Parameters[KnownParameter.AccountName] = accountName;
-         cs.Parameters[KnownParameter.KeyOrPassword] = accountKey;
-         return cs;
-      }
-
-      /// <summary>
       /// Create connection string for Azure File storage with account name and key
       /// </summary>
       public static StorageConnectionString ForAzureFileStorage(this IConnectionStringFactory factory,

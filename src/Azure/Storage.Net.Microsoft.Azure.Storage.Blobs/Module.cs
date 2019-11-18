@@ -1,4 +1,5 @@
-﻿using Storage.Net.Blobs;
+﻿using System.Text;
+using Storage.Net.Blobs;
 using Storage.Net.ConnectionString;
 using Storage.Net.KeyValue;
 using Storage.Net.Messaging;
@@ -11,6 +12,16 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
       public IBlobStorage CreateBlobStorage(StorageConnectionString connectionString)
       {
+         if(connectionString.Prefix == KnownPrefix.AzureBlobStorage)
+         {
+            connectionString.GetRequired(KnownParameter.AccountName, true, out string accountName);
+
+            string sharedKey = connectionString.Get(KnownParameter.KeyOrPassword);
+            if(!string.IsNullOrEmpty(sharedKey))
+            {
+               return StorageFactory.Blobs.AzureBlobStorageWithSharedKey(accountName, sharedKey);
+            }
+         }
 
          return null;
       }

@@ -6,9 +6,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure;
+using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
+using Azure.Storage.Sas;
 using Blobs;
 using Storage.Net.Blobs;
 using Storage.Net.Microsoft.Azure.Storage.Blobs.Gen2.Model;
@@ -22,14 +24,20 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
    {
       private const int BrowserParallelism = 10;
       private readonly BlobServiceClient _client;
+      private readonly StorageSharedKeyCredential _sasSigningCredentials;
       private readonly string _containerName;
       private readonly Dictionary<string, BlobContainerClient> _containerNameToContainerClient =
          new Dictionary<string, BlobContainerClient>();
       private readonly ExtendedSdk _extended;
 
-      public AzureBlobStorage(BlobServiceClient blobServiceClient, string accountName, string containerName = null)
+      public AzureBlobStorage(
+         BlobServiceClient blobServiceClient,
+         string accountName,
+         StorageSharedKeyCredential sasSigningCredentials = null,
+         string containerName = null)
       {
          _client = blobServiceClient ?? throw new ArgumentNullException(nameof(blobServiceClient));
+         _sasSigningCredentials = sasSigningCredentials;
          _containerName = containerName;
          _extended = new ExtendedSdk(blobServiceClient, accountName);
       }
@@ -241,6 +249,11 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             if(!ignoreErrors)
                throw;
          }
+         catch(RequestFailedException ex) when (ex.ErrorCode == "BlobNotFound")
+         {
+            if(!ignoreErrors)
+               throw;
+         }
       }
 
       public async Task<ContainerPublicAccessType> GetContainerPublicAccessAsync(string containerName, CancellationToken cancellationToken = default)
@@ -260,6 +273,24 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          await container.SetAccessPolicyAsync(
             (PublicAccessType)(int)containerPublicAccessType,
             cancellationToken: cancellationToken).ConfigureAwait(false);
+      }
+
+      public Task<string> GetStorageSasAsync(AccountSasPolicy accountPolicy, bool includeUrl = true)
+      {
+         if(accountPolicy is null)
+            throw new ArgumentNullException(nameof(accountPolicy));
+
+         if(_sasSigningCredentials == null)
+            throw new NotSupportedException($"cannot create Shared Access Signature, you have to authenticate using Shared Key in order to issue them.");
+
+         string sas = accountPolicy.ToSasQuery(_sasSigningCredentials);
+
+         if(includeUrl)
+         {
+            sas = _client.Uri + "?" + sas;
+         }
+
+         return Task.FromResult(sas);
       }
 
       #endregion
@@ -495,5 +526,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
          return (container, relativePath);
       }
+
    }
 }

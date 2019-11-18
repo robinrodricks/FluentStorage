@@ -24,9 +24,10 @@ namespace Storage.Net.Tests.Integration.Azure
          _native = (IAzureBlobStorage)storage;
       }
 
-      /*[Fact]
+      [Fact]
       public async Task GetAccountSas()
       {
+
          var policy = new AccountSasPolicy(DateTime.UtcNow, TimeSpan.FromHours(1));
          policy.Permissions =
             AccountSasPermission.List |
@@ -36,12 +37,12 @@ namespace Storage.Net.Tests.Integration.Azure
          Assert.NotNull(sas);
 
          //check we can connect and list containers
-         IBlobStorage sasInstance = StorageFactory.Blobs.AzureBlobStorageFromSas(sas);
+         IBlobStorage sasInstance = StorageFactory.Blobs.AzureBlobStorageWithSas(sas);
          IReadOnlyCollection<Blob> containers = await sasInstance.ListAsync(StoragePath.RootFolderPath);
          Assert.True(containers.Count > 0);
       }
 
-      [Fact]
+      /*[Fact]
       public async Task GetContainerSas()
       {
          string fileName = Guid.NewGuid().ToString() + ".containersas.txt";
