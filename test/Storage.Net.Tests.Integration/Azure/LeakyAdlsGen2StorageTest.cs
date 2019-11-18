@@ -19,13 +19,11 @@ namespace Storage.Net.Tests.Integration.Azure
       public LeakyAdlsGen2StorageTest()
       {
          _settings = Settings.Instance;
-         /*_storage = (IAzureDataLakeGen2BlobStorage)StorageFactory.Blobs.AzureDataLakeGen2StoreByClientSecret(
+         _storage = StorageFactory.Blobs.AzureDataLakeStorage(
             _settings.AzureDataLakeGen2Name,
             _settings.AzureDataLakeGen2TenantId,
             _settings.AzureDataLakeGen2PrincipalId,
-            _settings.AzureDataLakeGen2PrincipalSecret);*/
-         _storage = StorageFactory.Blobs.AzureDataLakeStorage(_settings.AzureDataLakeGen2Name,
-            _settings.AzureDataLakeGen2Key);
+            _settings.AzureDataLakeGen2PrincipalSecret);
       }
 
       [Fact]
@@ -42,7 +40,7 @@ namespace Storage.Net.Tests.Integration.Azure
       [Fact]
       public async Task Authenticate_with_service_principal()
       {
-         IBlobStorage authInstance = StorageFactory.Blobs.AzureDataLakeGen2StoreByClientSecret(
+         IBlobStorage authInstance = StorageFactory.Blobs.AzureDataLakeStorage(
             _settings.AzureDataLakeGen2Name,
             _settings.AzureDataLakeGen2TenantId,
             _settings.AzureDataLakeGen2PrincipalId,
