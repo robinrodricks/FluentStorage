@@ -18,6 +18,8 @@
       <LangVersion>latest</LangVersion>
       <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
       <WarningsAsErrors />
+      <AssemblyName>Storage.Net.Microsoft.Azure.EventHub</AssemblyName>
+      <RootNamespace>Storage.Net.Microsoft.Azure.EventHub</RootNamespace>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>

@@ -8,6 +8,8 @@
      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
      <WarningsAsErrors />
      <Description>Extension to Storage.Net that provides a read-only filesystem access to Azure Databricks.</Description>
+     <AssemblyName>Storage.Net.Microsoft.Azure.Databricks.Dbfs</AssemblyName>
+     <RootNamespace>Storage.Net.Microsoft.Azure.Databricks.Dbfs</RootNamespace>
   </PropertyGroup>
 
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">

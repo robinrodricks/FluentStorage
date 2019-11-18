@@ -16,6 +16,8 @@
       <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
       <WarningsAsErrors />
       <PackageId>Storage.Net.Microsoft.Azure.KeyVault</PackageId>
+      <AssemblyName>Storage.Net.Microsoft.Azure.KeyVault</AssemblyName>
+      <RootNamespace>Storage.Net.Microsoft.Azure.KeyVault</RootNamespace>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
