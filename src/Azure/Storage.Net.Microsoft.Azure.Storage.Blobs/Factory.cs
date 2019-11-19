@@ -242,6 +242,40 @@ namespace Storage.Net
          return cs;
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      public static StorageConnectionString ForAzureBlobStorageWithAzureAd(this IConnectionStringFactory factory,
+         string accountName,
+         string tenantId,
+         string applicationId,
+         string applicationSecret)
+      {
+         var cs = new StorageConnectionString(KnownPrefix.AzureBlobStorage);
+         cs.Parameters[KnownParameter.AccountName] = accountName;
+         cs.Parameters[KnownParameter.TenantId] = tenantId;
+         cs.Parameters[KnownParameter.ClientId] = applicationId;
+         cs.Parameters[KnownParameter.ClientSecret] = applicationSecret;
+         return cs;
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      public static StorageConnectionString ForAzureDataLakeStorageWithAzureAd(this IConnectionStringFactory factory,
+         string accountName,
+         string tenantId,
+         string applicationId,
+         string applicationSecret)
+      {
+         var cs = new StorageConnectionString(KnownPrefix.AzureDataLakeGen2);
+         cs.Parameters[KnownParameter.AccountName] = accountName;
+         cs.Parameters[KnownParameter.TenantId] = tenantId;
+         cs.Parameters[KnownParameter.ClientId] = applicationId;
+         cs.Parameters[KnownParameter.ClientSecret] = applicationSecret;
+         return cs;
+      }
+
       private static Uri GetServiceUri(string accountName)
       {
          return new Uri($"https://{accountName}.blob.core.windows.net/");
