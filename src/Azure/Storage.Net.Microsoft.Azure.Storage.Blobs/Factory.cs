@@ -151,6 +151,18 @@ namespace Storage.Net
       /// <summary>
       /// 
       /// </summary>
+      public static IAzureBlobStorage AzureBlobStorageWithTokenCredential(IBlobStorageFactory factory,
+         string accountName,
+         TokenCredential tokenCredential)
+      {
+         var client = new BlobServiceClient(GetServiceUri(accountName), tokenCredential);
+
+         return new AzureBlobStorage(client, accountName);
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
       /// <param name="factory"></param>
       /// <param name="sas"></param>
       /// <returns></returns>
