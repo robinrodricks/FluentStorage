@@ -100,7 +100,7 @@ stages:
         projects: test/Storage.Net.Tests.Integration/Storage.Net.Tests.Integration.csproj
         arguments: '-c release --filter Category=Blobs'
 
-- stage: KeyVaulueTest
+- stage: KeyValueTest
   dependsOn: []
   jobs:
   - job: Platform
@@ -134,7 +134,7 @@ stages:
 
 
 - stage: Deploy
-  dependsOn: ['Build', 'BlobsTest', 'KeyVaulueTest', 'MessagingTest'] 
+  dependsOn: ['Build', 'BlobsTest', 'KeyValueTest', 'MessagingTest'] 
   condition: "eq(variables['Build.SourceBranch'], 'refs/heads/master')"
   #condition: "or( eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/queuesvnext') )"
   jobs:
