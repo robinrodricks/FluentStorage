@@ -42,7 +42,7 @@ namespace Storage.Net.Tests.Integration.Azure
          Assert.True(containers.Count > 0);
       }
 
-      //[Fact]
+      /*[Fact]
       public async Task Sas_Container()
       {
          string fileName = Guid.NewGuid().ToString() + ".containersas.txt";
@@ -57,7 +57,7 @@ namespace Storage.Net.Tests.Integration.Azure
          IReadOnlyCollection<Blob> blobs = await sasInstance.ListAsync(StoragePath.RootFolderPath);
          Blob testBlob = blobs.FirstOrDefault(b => b.FullPath == fileName);
          Assert.NotNull(testBlob);
-      }
+      }*/
 
       [Fact]
       public async Task ContainerPublicAccess()
