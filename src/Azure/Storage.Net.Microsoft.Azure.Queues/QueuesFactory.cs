@@ -25,7 +25,7 @@ namespace Storage.Net
          string accountName,
          string storageKey)
       {
-         return new AzureStorageQueueMessenger(accountName, storageKey);
+         return new AzureStorageQueueMessenger(accountName, storageKey);   //
       }
    }
 }
