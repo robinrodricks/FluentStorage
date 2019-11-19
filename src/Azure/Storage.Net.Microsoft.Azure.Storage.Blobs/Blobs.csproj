@@ -9,6 +9,7 @@
      <GenerateDocumentationFile>true</GenerateDocumentationFile>
      <RootNamespace>Storage.Net.Microsoft.Azure.Storage.Blobs</RootNamespace>
      <AssemblyName>Storage.Net.Microsoft.Azure.Storage.Blobs</AssemblyName>
+     <Description>Support for Azure blob storage.</Description>
   </PropertyGroup>
 
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
