@@ -170,12 +170,13 @@ namespace Storage.Net.Blobs.Files
             throw new ArgumentNullException(nameof(dataStream));
 
          fullPath = StoragePath.Normalize(fullPath, false);
-         ZipArchive archive = GetArchive(true);
 
          using(var ms = new MemoryStream())
          {
             await dataStream.CopyToAsync(ms).ConfigureAwait(false);
             ms.Position = 0;
+
+            ZipArchive archive = GetArchive(true);
 
             ZipArchiveEntry entry = archive.CreateEntry(fullPath, CompressionLevel.Optimal);
             using(Stream dest = entry.Open())

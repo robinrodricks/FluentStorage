@@ -395,7 +395,7 @@ namespace Storage.Net.Tests.Integration.Blobs
             await _storage.RenameAsync(file, StoragePath.Combine(prefix, "2"));
             IReadOnlyCollection<Blob> list = await _storage.ListAsync(prefix);
 
-            Assert.True(list.Count == 1);
+            Assert.Single(list);
             Assert.True(list.First().Name == "2");
          }
          catch(NotSupportedException)
