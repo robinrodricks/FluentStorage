@@ -46,5 +46,10 @@ namespace Storage.Net
       /// Region
       /// </summary>
       public static readonly string Region = "region";
+
+      /// <summary>
+      /// 
+      /// </summary>
+      public static readonly string UseDevelopmentStorage = "development";
    }
 }

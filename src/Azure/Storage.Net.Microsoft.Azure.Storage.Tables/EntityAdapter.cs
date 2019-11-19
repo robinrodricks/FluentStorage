@@ -5,7 +5,7 @@ using Storage.Net.KeyValue;
 using NetBox.Extensions;
 using Microsoft.Azure.Cosmos.Table;
 
-namespace Storage.Net.Microsoft.Azure.Storage.KeyValue
+namespace Storage.Net.Microsoft.Azure.Storage.Tables
 {
    class EntityAdapter : IAzTableEntity
    {

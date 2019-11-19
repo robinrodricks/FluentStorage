@@ -45,5 +45,10 @@
       /// </summary>
       public const string AzureFilesStorage = "azure.file";
 
+      /// <summary>
+      /// Microsoft Azure Table Storage
+      /// </summary>
+      public const string AzureTableStorage = "azure.tables";
+
    }
 }

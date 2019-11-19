@@ -53,10 +53,6 @@ namespace Storage.Net.Tests.Integration.KeyValue
                _settings.AzureStorageName,
                _settings.AzureStorageKey);
          }
-         else if(_name == "azure-emulator")
-         {
-            _tables = StorageFactory.KeyValue.AzureTableDevelopmentStorage();
-         }
 
          _tableName = TestTablePrefix + Guid.NewGuid().ToString().Replace("-", "");
       }

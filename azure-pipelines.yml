@@ -100,6 +100,22 @@ stages:
         projects: test/Storage.Net.Tests.Integration/Storage.Net.Tests.Integration.csproj
         arguments: '-c release --filter Category=Blobs'
 
+- stage: KeyVaulueTest
+  dependsOn: []
+  jobs:
+  - job: Platform
+    displayName: 'Tests'
+    pool:
+      vmImage: $(vmImage)
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: 'run tests'
+      continueOnError: false
+      inputs:
+        command: test
+        projects: test/Storage.Net.Tests.Integration/Storage.Net.Tests.Integration.csproj
+        arguments: '-c release --filter Category=KeyValue'
+
 - stage: MessagingTest
   dependsOn: []
   jobs:
@@ -118,7 +134,7 @@ stages:
 
 
 - stage: Deploy
-  dependsOn: ['Build', 'BlobsTest', 'MessagingTest'] 
+  dependsOn: ['Build', 'BlobsTest', 'KeyVaulueTest', 'MessagingTest'] 
   condition: "eq(variables['Build.SourceBranch'], 'refs/heads/master')"
   #condition: "or( eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/queuesvnext') )"
   jobs:
