@@ -38,7 +38,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       public static Blob ToBlob(BlobContainerClient client)
       {
          var blob = new Blob(client.Name, BlobItemKind.Folder);
-
+         blob.Properties["IsContainer"] = true;
          return blob;
       }
 
