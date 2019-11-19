@@ -42,7 +42,7 @@ namespace Storage.Net.Tests.Integration.Azure
          Assert.True(containers.Count > 0);
       }
 
-      [Fact]
+      //[Fact]
       public async Task Sas_Container()
       {
          string fileName = Guid.NewGuid().ToString() + ".containersas.txt";

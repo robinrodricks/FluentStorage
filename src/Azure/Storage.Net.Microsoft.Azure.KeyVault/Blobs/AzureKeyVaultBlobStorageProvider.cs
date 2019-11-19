@@ -144,7 +144,19 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
       {
          GenericValidation.CheckBlobFullPaths(fullPaths);
 
-         await Task.WhenAll(fullPaths.Select(fullPath => _vaultClient.DeleteSecretAsync(_vaultUri, fullPath))).ConfigureAwait(false);
+         await Task.WhenAll(fullPaths.Select(fullPath => DeleteAsync(fullPath, cancellationToken))).ConfigureAwait(false);
+      }
+
+      private async Task DeleteAsync(string fullPath, CancellationToken cancellationToken)
+      {
+         try
+         {
+            await _vaultClient.DeleteSecretAsync(_vaultUri, fullPath, cancellationToken).ConfigureAwait(false);
+         }
+         catch(KeyVaultErrorException ex) when(ex.Response.StatusCode == HttpStatusCode.NotFound)
+         {
+            //ignore, secret doesn't exist
+         }
       }
 
       public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
