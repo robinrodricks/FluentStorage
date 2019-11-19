@@ -3,6 +3,7 @@ trigger:
   branches:
     include:
       - master
+      - stor12
   paths:
     exclude:
       - README.md
