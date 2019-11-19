@@ -359,6 +359,11 @@ namespace Storage.Net.Blobs
       public static async Task RenameAsync(this IBlobStorage blobStorage,
          string oldPath, string newPath, CancellationToken cancellationToken = default)
       {
+         if(oldPath is null)
+            throw new ArgumentNullException(nameof(oldPath));
+         if(newPath is null)
+            throw new ArgumentNullException(nameof(newPath));
+
          //try to use extended client here
          if(blobStorage is IExtendedBlobStorage extendedBlobStorage)
          {
@@ -382,6 +387,8 @@ namespace Storage.Net.Blobs
             await blobStorage.CopyToAsync(oldPath, blobStorage, newPath, cancellationToken).ConfigureAwait(false);
             await blobStorage.DeleteAsync(oldPath, cancellationToken).ConfigureAwait(false);
          }
+
+
       }
 
       #endregion

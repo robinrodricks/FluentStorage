@@ -405,6 +405,19 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
+      public async Task Rename_OldPathNull_ThowsArgumentNull()
+      {
+         await Assert.ThrowsAsync<ArgumentNullException>(() => _storage.RenameAsync(null, "test/1"));
+      }
+
+      [Fact]
+      public async Task Rename_NewPathNull_ThowsArgumentNull()
+      {
+         await Assert.ThrowsAsync<ArgumentNullException>(() => _storage.RenameAsync("test/1", null));
+      }
+
+
+      [Fact]
       public async Task Rename_Folder_Renames()
       {
          string prefix = RandomBlobPath();

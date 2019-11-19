@@ -21,7 +21,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
    //auth scenarios: https://github.com/Azure/azure-sdk-for-net/blob/master/sdk/storage/Azure.Storage.Blobs/samples/Sample02_Auth.cs
 
 
-   class AzureBlobStorage : IAzureDataLakeStorage
+   class AzureBlobStorage : IAzureBlobStorage
    {
       private const int BrowserParallelism = 10;
       private readonly BlobServiceClient _client;
@@ -29,7 +29,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       private readonly string _containerName;
       private readonly Dictionary<string, BlobContainerClient> _containerNameToContainerClient =
          new Dictionary<string, BlobContainerClient>();
-      private readonly ExtendedSdk _extended;
 
       public AzureBlobStorage(
          BlobServiceClient blobServiceClient,
@@ -40,7 +39,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          _client = blobServiceClient ?? throw new ArgumentNullException(nameof(blobServiceClient));
          _sasSigningCredentials = sasSigningCredentials;
          _containerName = containerName;
-         _extended = new ExtendedSdk(blobServiceClient, accountName);
+         
       }
 
       #region [ Interface Methods ]
@@ -345,34 +344,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
       #endregion
 
-      #region [ Data Lake Storage ]
-
-      public Task<IReadOnlyCollection<Filesystem>> ListFilesystemsAsync(CancellationToken cancellationToken = default)
-      {
-         return _extended.ListFilesystemsAsync(cancellationToken);
-      }
-
-      public Task CreateFilesystemAsync(string filesystemName, CancellationToken cancellationToken = default)
-      {
-         return _extended.CreateFilesystemAsync(filesystemName, cancellationToken);
-      }
-
-      public Task DeleteFilesystemAsync(string filesystemName, CancellationToken cancellationToken = default)
-      {
-         return _extended.DeleteFilesystemAsync(filesystemName, cancellationToken);
-      }
-
-      public Task SetAccessControlAsync(string fullPath, AccessControl accessControl, CancellationToken cancellationToken = default)
-      {
-         return _extended.SetAccessControlAsync(fullPath, accessControl, cancellationToken);
-      }
-
-      public Task<AccessControl> GetAccessControlAsync(string fullPath, bool getUpn = false, CancellationToken cancellationToken = default)
-      {
-         return _extended.GetAccessControlAsync(fullPath, getUpn, cancellationToken);
-      }
-
-      #endregion
 
       private async Task SetBlobAsync(Blob blob, CancellationToken cancellationToken)
       {
@@ -459,13 +430,13 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          }
       }
 
-      private async Task DeleteAsync(string fullPath, CancellationToken cancellationToken)
+      protected virtual async Task DeleteAsync(string fullPath, CancellationToken cancellationToken)
       {
          (BlobContainerClient container, string path) = await GetPartsAsync(fullPath, false);
 
          if(StoragePath.IsRootPath(path))
          {
-            //deleting the entire container
+            //deleting the entire container / filesystem
             await container.DeleteIfExistsAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
          }
          else

@@ -131,6 +131,33 @@ namespace Blobs
          return new AccessControl(owner, group, permissions, acl);
       }
 
+      public async Task DeleteAsync(string fullPath, CancellationToken cancellationToken)
+      {
+         DecomposePath(fullPath, out string fs, out string rp, false);
+
+         if(StoragePath.IsRootPath(rp))
+         {
+            await DeleteFilesystemAsync(fs, cancellationToken).ConfigureAwait(false);
+         }
+         else
+         {
+            try
+            {
+               await InvokeAsync<string>(
+                  $"{fs}/{rp}?recursive=true",
+                  RequestMethod.Delete,
+                  null,
+                  cancellationToken);
+            }
+            catch(RequestFailedException)
+            {
+               throw;
+               // file not found, ignore
+            }
+         }
+
+      }
+
 
       public async Task<TResult> InvokeAsync<TResult>(
          string relativeUrl,
