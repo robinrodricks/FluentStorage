@@ -51,7 +51,7 @@ namespace Storage.Net.Tests.Integration.Azure
       }
 
       [Fact]
-      public async Task Filesystems_list_doesnt_crash()
+      public async Task FS_list_doesnt_crash()
       {
          IReadOnlyCollection<Filesystem> list = await _storage.ListFilesystemsAsync();
 
@@ -59,18 +59,35 @@ namespace Storage.Net.Tests.Integration.Azure
       }
 
       [Fact]
-      public async Task Creates_deletes_and_lists_a_filesystem()
+      public async Task FS_Creates_deletes_and_lists()
       {
          string filesystem = "createfs-" + Guid.NewGuid().ToString();
 
-         //await _storage.DeleteFilesystemAsync(filesystem);
-         Assert.DoesNotContain(await _storage.ListFilesystemsAsync(), x => x.Name == filesystem);
+         try
+         {
+            //await _storage.DeleteFilesystemAsync(filesystem);
+            Assert.DoesNotContain(await _storage.ListFilesystemsAsync(), x => x.Name == filesystem);
 
-         await _storage.CreateFilesystemAsync(filesystem);
-         Assert.Contains(await _storage.ListFilesystemsAsync(), x => x.Name == filesystem);
-
-         await _storage.DeleteFilesystemAsync(filesystem);
+            await _storage.CreateFilesystemAsync(filesystem);
+            Assert.Contains(await _storage.ListFilesystemsAsync(), x => x.Name == filesystem);
+         }
+         finally
+         {
+            await _storage.DeleteFilesystemAsync(filesystem);
+         }
          Assert.DoesNotContain(await _storage.ListFilesystemsAsync(), x => x.Name == filesystem);
+      }
+
+      [Fact]
+      public async Task FS_GetProperties()
+      {
+         string fsName = "propfs";
+
+         await _storage.WriteTextAsync(fsName + "/fff", "test");
+
+         Blob fsBlob = await _storage.GetBlobAsync(fsName);
+
+
       }
 
       [Fact]

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Blobs;
+using Storage.Net.Blobs;
 using Storage.Net.Microsoft.Azure.Storage.Blobs.Gen2.Model;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blobs
@@ -51,6 +52,17 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       protected override Task DeleteAsync(string fullPath, CancellationToken cancellationToken)
       {
          return _extended.DeleteAsync(fullPath, cancellationToken);
+      }
+
+      public override Task<IReadOnlyCollection<Blob>> ListAsync(
+         ListOptions options, CancellationToken cancellationToken)
+      {
+         return _extended.ListAsync(options, cancellationToken);
+      }
+
+      protected override Task<Blob> GetBlobAsync(string fullPath, CancellationToken cancellationToken)
+      {
+         return _extended.GetBlobAsync(fullPath, cancellationToken);
       }
 
    }

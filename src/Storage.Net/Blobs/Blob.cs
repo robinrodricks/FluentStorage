@@ -87,6 +87,25 @@ namespace Storage.Net.Blobs
       }
 
       /// <summary>
+      /// Tries to add properties from dictionary by key names
+      /// </summary>
+      /// <param name="source"></param>
+      /// <param name="keyNames"></param>
+      public void TryAddPropertiesFromDictionary(IDictionary<string, string> source, params string[] keyNames)
+      {
+         if(source == null || keyNames == null)
+            return;
+
+         foreach(string key in keyNames)
+         {
+            if(source.TryGetValue(key, out string value))
+            {
+               Properties[key] = value;
+            }
+         }
+      }
+
+      /// <summary>
       /// Create a new instance
       /// </summary>
       /// <param name="fullPath"></param>

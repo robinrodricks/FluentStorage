@@ -1,16 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using NetBox.Extensions;
 using Storage.Net.Blobs;
+using Storage.Net.Microsoft.Azure.Storage.Blobs.Gen2.Model;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 {
    static class AzConvert
    {
+      private static readonly char[] MetadataPairsSeparator = new[] { ',' };
+      private static readonly char[] MetadataPairSeparator = new[] { '=' };
+
+      public static Blob ToBlob(Filesystem fs)
+      {
+         var blob = new Blob(fs.Name, BlobItemKind.Folder);
+         blob.LastModificationTime = fs.LastModified;
+         blob.TryAddProperties(
+            "ETag", fs.Etag,
+            "IsFilesystem", true);
+         return blob;
+      }
+
       public static Blob ToBlob(BlobContainerItem item)
       {
          var blob = new Blob(item.Name, BlobItemKind.Folder);
@@ -175,6 +190,70 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             "LeaseDuration", properties.LeaseDuration,
             "LeaseState", properties.LeaseState,
             "LeaseStatus", properties.LeaseStatus);
+      }
+
+      public static Blob ToBlob(string filesystemName, Gen2Path path)
+      {
+         var blob = new Blob(StoragePath.Combine(filesystemName, path.Name), path.IsDirectory ? BlobItemKind.Folder : BlobItemKind.File)
+         {
+            Size = path.ContentLength,
+            LastModificationTime = path.LastModified
+         };
+
+         blob.TryAddProperties(
+            "ETag", path.ETag,
+            "Owner", path.Owner,
+            "Group", path.Group,
+            "Permissions", path.Permissions);
+
+         return blob;
+      }
+
+      public static Blob ToBlob(string fullPath, IDictionary<string, string> pathHeaders, bool isFilesystem)
+      {
+         var blob = new Blob(fullPath);
+
+         if(pathHeaders.TryGetValue("Content-MD5", out string md5))
+         {
+            blob.MD5 = md5.Base64DecodeAsBytes().ToHexString();
+         }
+
+         if(pathHeaders.TryGetValue("Content-Length", out string contentLength))
+         {
+            blob.Size = long.Parse(contentLength);
+         }
+
+         blob.LastModificationTime = DateTimeOffset.Parse(pathHeaders["Last-Modified"]);
+
+         blob.TryAddPropertiesFromDictionary(pathHeaders,
+            "Content-Type",
+            "ETag",
+            "x-ms-owner",
+            "x-ms-group",
+            "x-ms-permissions",
+            "x-ms-resource-type",
+            "x-ms-lease-state",
+            "x-ms-lease-status",
+            "x-ms-server-encrypted",
+            "x-ms-request-id",
+            "x-ms-client-request-id");
+
+         if(isFilesystem)
+         {
+            blob.Properties["IsFilesystem"] = isFilesystem;
+         }
+
+         if(pathHeaders.TryGetValue("x-ms-properties", out string um))
+         {
+            Dictionary<string, string> umd = um
+               .Split(MetadataPairsSeparator, StringSplitOptions.RemoveEmptyEntries)
+               .Select(pair => pair.Split(MetadataPairSeparator, 2))
+               .ToDictionary(a => a[0], a => a[1].Base64Decode());
+
+            blob.Metadata.MergeRange(umd);
+         }
+
+         return blob;
       }
    }
 }

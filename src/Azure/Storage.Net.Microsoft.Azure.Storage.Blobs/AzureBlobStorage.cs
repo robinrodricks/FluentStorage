@@ -44,7 +44,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
       #region [ Interface Methods ]
 
-      public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default)
+      public virtual async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default)
       {
          if(options == null)
             options = new ListOptions();
@@ -80,9 +80,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
          return result;
       }
-
-
-
 
 
       public async Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
@@ -144,9 +141,16 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
          BlockBlobClient client = container.GetBlockBlobClient(path);
 
-         await client.UploadAsync(
-            dataStream,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
+         try
+         {
+            await client.UploadAsync(
+               dataStream,
+               cancellationToken: cancellationToken).ConfigureAwait(false);
+         }
+         catch(RequestFailedException ex) when (ex.ErrorCode == "OperationNotAllowedInCurrentState")
+         {
+            //happens when trying to write to a non-file object i.e. folder
+         }
       }
       public async Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
       {
@@ -366,7 +370,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          }
       }
 
-      private async Task<Blob> GetBlobAsync(string fullPath, CancellationToken cancellationToken)
+      protected virtual async Task<Blob> GetBlobAsync(string fullPath, CancellationToken cancellationToken)
       {
          (BlobContainerClient container, string path) = await GetPartsAsync(fullPath, false).ConfigureAwait(false);
 

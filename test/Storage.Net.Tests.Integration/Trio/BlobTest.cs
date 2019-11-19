@@ -312,7 +312,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
-      public async Task Write_with_openwrite_succeeds()
+      public async Task Write_with_writeasync_succeeds()
       {
          string id = RandomBlobPath();
          byte[] data = Encoding.UTF8.GetBytes("oh my");
@@ -353,6 +353,13 @@ namespace Storage.Net.Tests.Integration.Blobs
          await _storage.DeleteAsync(path);
 
          Assert.False(await _storage.ExistsAsync(path));
+      }
+
+      [Fact]
+      public async Task Delete_non_existing_file_ignores()
+      {
+         string path = RandomBlobPath();
+         await _storage.DeleteAsync(path);
       }
 
       [Fact]
