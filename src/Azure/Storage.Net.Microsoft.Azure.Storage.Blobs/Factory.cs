@@ -223,7 +223,20 @@ namespace Storage.Net
          string accountName,
          string accountKey)
       {
-         var cs = new StorageConnectionString(KnownPrefix.AzureBlobStorage + "://");
+         var cs = new StorageConnectionString(KnownPrefix.AzureBlobStorage);
+         cs.Parameters[KnownParameter.AccountName] = accountName;
+         cs.Parameters[KnownParameter.KeyOrPassword] = accountKey;
+         return cs;
+      }
+
+      /// <summary>
+      /// Create connection string for azure blob storage
+      /// </summary>
+      public static StorageConnectionString ForAzureDataLakeStorageWithSharedKey(this IConnectionStringFactory factory,
+         string accountName,
+         string accountKey)
+      {
+         var cs = new StorageConnectionString(KnownPrefix.AzureDataLakeGen2);
          cs.Parameters[KnownParameter.AccountName] = accountName;
          cs.Parameters[KnownParameter.KeyOrPassword] = accountKey;
          return cs;

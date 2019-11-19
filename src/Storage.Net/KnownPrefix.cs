@@ -26,6 +26,11 @@
       public static string AzureDataLakeGen2 = "azure.datalake.gen2";
 
       /// <summary>
+      /// Azure Data Lake latest generation, currently Gen 2
+      /// </summary>
+      public static string AzureDataLake = "azure.datalake";
+
+      /// <summary>
       /// Azure Key Vault
       /// </summary>
       public static string AzureKeyVault = "azure.keyvault";

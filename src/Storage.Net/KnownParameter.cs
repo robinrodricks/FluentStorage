@@ -51,5 +51,20 @@ namespace Storage.Net
       /// 
       /// </summary>
       public static readonly string UseDevelopmentStorage = "development";
+
+      /// <summary>
+      /// 
+      /// </summary>
+      public static readonly string TenantId = "tenantId";
+
+      /// <summary>
+      /// 
+      /// </summary>
+      public static readonly string ClientId = "principalId";
+
+      /// <summary>
+      /// 
+      /// </summary>
+      public static readonly string ClientSecret = "principalSecret";
    }
 }
