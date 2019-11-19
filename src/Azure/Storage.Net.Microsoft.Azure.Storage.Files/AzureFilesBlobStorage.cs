@@ -12,7 +12,7 @@ using Storage.Net.Blobs;
 using Storage.Net.Streaming;
 using AzStorageException = Microsoft.Azure.Storage.StorageException;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Blobs
+namespace Storage.Net.Microsoft.Azure.Storage.Files
 {
    class AzureFilesBlobStorage : GenericBlobStorage
    {
@@ -83,8 +83,11 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          }
       }
 
-      public override async Task WriteAsync(string fullPath, Stream dataStream,
-         bool append = false, CancellationToken cancellationToken = default)
+      public override async Task WriteAsync(
+         string fullPath,
+         Stream dataStream,
+         bool append = false,
+         CancellationToken cancellationToken = default)
       {
          CloudFile file = await GetFileReferenceAsync(fullPath, true, cancellationToken).ConfigureAwait(false);
 
