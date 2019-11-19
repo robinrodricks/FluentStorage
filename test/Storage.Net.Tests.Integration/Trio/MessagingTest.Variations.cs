@@ -100,14 +100,14 @@ namespace Storage.Net.Tests.Integration.Messaging
 
    public class AzureServiceBusTopicTest : MessagingTest, IClassFixture<AzureServiceBusFixture>
    {
-      public AzureServiceBusTopicTest(AzureServiceBusFixture fixture) : base(fixture, "t/", "fxtopic", receiveChannelSuffix: "/default")
+      public AzureServiceBusTopicTest(AzureServiceBusFixture fixture) : base(fixture, "t/", "t/fxtopic", receiveChannelSuffix: "/default")
       {
       }
    }
 
    public class AzureServiceBusQueueTest : MessagingTest, IClassFixture<AzureServiceBusFixture>
    {
-      public AzureServiceBusQueueTest(AzureServiceBusFixture fixture) : base(fixture, "q/", "fxqueue")
+      public AzureServiceBusQueueTest(AzureServiceBusFixture fixture) : base(fixture, "q/", "q/fxqueue")
       {
       }
    }
