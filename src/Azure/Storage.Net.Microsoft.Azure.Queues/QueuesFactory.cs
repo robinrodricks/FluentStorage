@@ -1,19 +1,15 @@
-﻿using Storage.Net.Messaging;
-using Storage.Net.Microsoft.Azure.Storage.Messaging;
-using Storage.Net.Microsoft.Azure.Storage;
+﻿using System;
+using Storage.Net.Messaging;
+using Storage.Net.Microsoft.Azure.Queues;
 
 namespace Storage.Net
 {
-   /// <summary>
-   /// Factory class that implement factory methods for Microsoft Azure implememtations
-   /// </summary>
-   public static class LegacyFactory
+   public static class QueuesFactory
    {
-
       /// <summary>
       /// Register Azure module.
       /// </summary>
-      public static IModulesFactory UseAzureStorage(this IModulesFactory factory)
+      public static IModulesFactory UseAzureQueues(this IModulesFactory factory)
       {
          return factory.Use(new Module());
       }

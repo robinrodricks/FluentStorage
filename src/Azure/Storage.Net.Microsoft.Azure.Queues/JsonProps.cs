@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Messaging
+namespace Storage.Net.Microsoft.Azure.Queues
 {
    class JsonProps
    {

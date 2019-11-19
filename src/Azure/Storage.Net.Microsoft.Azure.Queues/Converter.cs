@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Messaging
+namespace Storage.Net.Microsoft.Azure.Queues
 {
    internal static class Converter
    {

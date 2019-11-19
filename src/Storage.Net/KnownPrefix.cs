@@ -50,5 +50,10 @@
       /// </summary>
       public const string AzureTableStorage = "azure.tables";
 
+      /// <summary>
+      /// Azure Storage Queues
+      /// </summary>
+      public const string AzureQueueStorage = "azure.queue";
+
    }
 }

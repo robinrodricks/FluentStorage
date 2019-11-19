@@ -11,7 +11,7 @@ using Microsoft.Azure.Storage.Queue;
 using Storage.Net.Messaging;
 using WSE = Microsoft.Azure.Storage.StorageException;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Messaging
+namespace Storage.Net.Microsoft.Azure.Queues
 {
    class AzureStorageQueueMessenger : IMessenger
    {
