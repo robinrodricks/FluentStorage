@@ -405,12 +405,27 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       {
          var r = new List<BlobContainerClient>();
 
+         //check that the special "$logs" container exists
+         BlobContainerClient logsContainerClient = _client.GetBlobContainerClient("$logs");
+         Task<Response<BlobContainerProperties>> logsProps = logsContainerClient.GetPropertiesAsync();
+
+         //in the meanwhile, enumerate
          await foreach(BlobContainerItem container in _client.GetBlobContainersAsync(BlobContainerTraits.Metadata).ConfigureAwait(false))
          {
             (BlobContainerClient client, _) = await GetPartsAsync(container.Name, false).ConfigureAwait(false);
 
             if(client != null)
                r.Add(client);
+         }
+
+         try
+         {
+            await logsProps;
+            r.Add(logsContainerClient);
+         }
+         catch(RequestFailedException ex) when(ex.ErrorCode == "todo")
+         {
+
          }
 
          return r;

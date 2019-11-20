@@ -39,6 +39,10 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       {
          var blob = new Blob(client.Name, BlobItemKind.Folder);
          blob.Properties["IsContainer"] = true;
+         if(client.Name == "$logs")
+         {
+            blob.Properties["IsLogsContainer"] = true;
+         }
          return blob;
       }
 

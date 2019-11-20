@@ -171,7 +171,7 @@ namespace Storage.Net.Tests.Integration.Azure
          await _native.BreakLeaseAsync(id);
       }
 
-      /*[Fact]
+      [Fact]
       public async Task Top_level_folders_are_containers()
       {
          IReadOnlyCollection<Blob> containers = await _native.ListAsync();
@@ -180,7 +180,7 @@ namespace Storage.Net.Tests.Integration.Azure
          {
             Assert.Equal(BlobItemKind.Folder, container.Kind);
             Assert.True(container.Properties?.ContainsKey("IsContainer"), "isContainer property not present at all");
-            Assert.Equal("True", container.Properties["IsContainer"]);
+            Assert.Equal(true, container.Properties["IsContainer"]);
          }
       }
 
@@ -199,6 +199,13 @@ namespace Storage.Net.Tests.Integration.Azure
       }
 
       [Fact]
+      public async Task Analytics_has_logs_container()
+      {
+         IReadOnlyCollection<Blob> containers = await _native.ListAsync();
+         Assert.Contains(containers, c => c.Name == "$logs");
+      }
+
+      /*[Fact]
       public async Task Snapshots_create()
       {
          string path = "test/test.txt";
