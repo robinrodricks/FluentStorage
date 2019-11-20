@@ -64,6 +64,27 @@ namespace Storage.Net.Blobs
       public Dictionary<string, object> Properties { get; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
       /// <summary>
+      /// Try to get property and cast it to a specified type
+      /// </summary>
+      public bool TryGetProperty<TValue>(string name, out TValue value, TValue defaultValue = default)
+      {
+         if(name == null || !Properties.TryGetValue(name, out object objValue))
+         {
+            value = defaultValue;
+            return false;
+         }
+
+         if(objValue is TValue)
+         {
+            value = (TValue)objValue;
+            return true;
+         }
+
+         value = defaultValue;
+         return false;
+      }
+
+      /// <summary>
       /// User defined metadata. Key names are case-insensitive.
       /// </summary>
       public Dictionary<string, string> Metadata { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
