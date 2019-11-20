@@ -423,7 +423,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             await logsProps;
             r.Add(logsContainerClient);
          }
-         catch(RequestFailedException ex) when(ex.ErrorCode == "todo")
+         catch(RequestFailedException ex) when(ex.ErrorCode == "ContainerNotFound")
          {
 
          }
