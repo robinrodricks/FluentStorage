@@ -141,7 +141,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
             "CacheControl", properties.CacheControl,
             "ContentDisposition", properties.ContentDisposition,
             "ContentEncoding", properties.ContentEncoding,
-            "ContentHash", properties.ContentHash,
+            "ContentHash", properties.ContentHash.ToHexString(),
             "ContentLanguage", properties.ContentLanguage,
             "ContentLength", properties.ContentLength,
             "ContentType", properties.ContentType,

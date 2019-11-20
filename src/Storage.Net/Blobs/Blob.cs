@@ -102,6 +102,9 @@ namespace Storage.Net.Blobs
 
             if(key != null && value != null)
             {
+               if(value is string s && string.IsNullOrEmpty(s))
+                  continue;
+
                Properties[key] = value;
             }
          }
