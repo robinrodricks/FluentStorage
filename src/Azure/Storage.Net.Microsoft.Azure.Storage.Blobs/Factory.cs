@@ -151,7 +151,7 @@ namespace Storage.Net
       /// <summary>
       /// 
       /// </summary>
-      public static IAzureBlobStorage AzureBlobStorageWithTokenCredential(IBlobStorageFactory factory,
+      public static IAzureBlobStorage AzureBlobStorageWithTokenCredential(this IBlobStorageFactory factory,
          string accountName,
          TokenCredential tokenCredential)
       {
