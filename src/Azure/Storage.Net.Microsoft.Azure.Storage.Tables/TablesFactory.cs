@@ -38,7 +38,7 @@ namespace Storage.Net
          string accountName,
          string accountKey)
       {
-         var cs = new StorageConnectionString(KnownPrefix.AzureDataLakeGen2);
+         var cs = new StorageConnectionString(KnownPrefix.AzureTableStorage);
          cs.Parameters[KnownParameter.AccountName] = accountName;
          cs.Parameters[KnownParameter.KeyOrPassword] = accountKey;
          return cs;
