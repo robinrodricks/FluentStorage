@@ -1,4 +1,5 @@
-﻿using Storage.Net.KeyValue;
+﻿using Storage.Net.ConnectionString;
+using Storage.Net.KeyValue;
 using Storage.Net.Microsoft.Azure.Storage.Tables;
 
 namespace Storage.Net
@@ -28,6 +29,19 @@ namespace Storage.Net
          string storageKey)
       {
          return new AzureTableStorageKeyValueStorage(accountName, storageKey);
+      }
+
+      /// <summary>
+      /// Create connection string for azure table storage
+      /// </summary>
+      public static StorageConnectionString ForAzureTableStorageWithSharedKey(this IConnectionStringFactory factory,
+         string accountName,
+         string accountKey)
+      {
+         var cs = new StorageConnectionString(KnownPrefix.AzureDataLakeGen2);
+         cs.Parameters[KnownParameter.AccountName] = accountName;
+         cs.Parameters[KnownParameter.KeyOrPassword] = accountKey;
+         return cs;
       }
    }
 }
