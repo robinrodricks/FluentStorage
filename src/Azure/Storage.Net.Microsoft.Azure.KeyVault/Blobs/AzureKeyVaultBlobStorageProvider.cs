@@ -63,6 +63,7 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
       private static Blob ToBlob(SecretProperties secretProperties)
       {
          var blob = new Blob(secretProperties.Name, BlobItemKind.File);
+         blob.LastModificationTime = secretProperties.UpdatedOn;
 
          blob.TryAddProperties(
             "ContentType", secretProperties.ContentType,
@@ -77,7 +78,8 @@ namespace Storage.Net.Microsoft.Azure.KeyVault.Blobs
             "Tags", secretProperties.Tags,
             "UpdatedOn", secretProperties.UpdatedOn,
             "VaultUri", secretProperties.VaultUri,
-            "Version", secretProperties.Version);
+            "Version", secretProperties.Version,
+            "IsSecret", true);
 
          return blob;
       }
