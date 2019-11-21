@@ -17,7 +17,9 @@ namespace Storage.Net.Tests.Integration.Blobs
 
       protected override IBlobStorage CreateStorage(ITestSettings settings)
       {
-         return StorageFactory.Blobs.AzureBlobStorageWithSharedKey(settings.AzureStorageName, settings.AzureStorageKey);
+         return StorageFactory.Blobs
+            .AzureBlobStorageWithSharedKey(settings.AzureStorageName, settings.AzureStorageKey)
+            .Gzip();
       }
    }
 
@@ -164,7 +166,9 @@ namespace Storage.Net.Tests.Integration.Blobs
       {
          return StorageFactory.Blobs.AzureKeyVault(
                   settings.KeyVaultUri,
-                  settings.KeyVaultCreds);
+                  settings.KeyVaultTenantId,
+                  settings.KeyVaultClientId,
+                  settings.KeyVaultSecret);
       }
    }
 

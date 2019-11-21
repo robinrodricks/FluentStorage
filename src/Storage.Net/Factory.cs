@@ -8,6 +8,9 @@ using Storage.Net.KeyValue;
 using Storage.Net.KeyValue.Files;
 using Storage.Net.Messaging.Large;
 using Storage.Net.Messaging.Files;
+using System.IO.Compression;
+using Storage.Net.Blobs.Sinks.Impl;
+using Storage.Net.Blobs.Sinks;
 
 namespace Storage.Net
 {
@@ -139,6 +142,17 @@ namespace Storage.Net
       }
 
       #region [ Data Decorators ]
+
+      /// <summary>
+      /// Wraps blob storage into zip compression
+      /// </summary>
+      /// <param name="blobStorage"></param>
+      /// <param name="compressionLevel"></param>
+      /// <returns></returns>
+      public static IBlobStorage Gzip(this IBlobStorage blobStorage, CompressionLevel compressionLevel = CompressionLevel.Optimal)
+      {
+         return new SinkedBlobStorage(blobStorage, new GZipSink(compressionLevel));
+      }
 
       #endregion
    }
