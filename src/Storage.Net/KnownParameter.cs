@@ -55,6 +55,11 @@ namespace Storage.Net
       /// <summary>
       /// 
       /// </summary>
+      public static readonly string VaultUri = "vaultUri";
+
+      /// <summary>
+      /// 
+      /// </summary>
       public static readonly string TenantId = "tenantId";
 
       /// <summary>
@@ -66,5 +71,10 @@ namespace Storage.Net
       /// 
       /// </summary>
       public static readonly string ClientSecret = "principalSecret";
+
+      /// <summary>
+      /// 
+      /// </summary>
+      public static readonly string MsiEnabled = "msi";
    }
 }
