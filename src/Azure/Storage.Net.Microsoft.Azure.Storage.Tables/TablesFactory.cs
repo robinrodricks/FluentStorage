@@ -24,7 +24,7 @@ namespace Storage.Net
       /// <param name="accountName">Account name</param>
       /// <param name="storageKey">Account key</param>
       /// <returns></returns>
-      public static IKeyValueStorage AzureTableStorage(this IKeyValueStorageFactory factory,
+      public static IAzureStorageTablesKeyValueStorage AzureTableStorage(this IKeyValueStorageFactory factory,
          string accountName,
          string storageKey)
       {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Tables
    /// <summary>
    /// Microsoft Azure Table storage
    /// </summary>
-   class AzureTableStorageKeyValueStorage : IKeyValueStorage
+   class AzureTableStorageKeyValueStorage : IAzureStorageTablesKeyValueStorage
    {
       private const int MaxInsertLimit = 100;
       public const string UseDevelopmentStorageConnectionString = @"UseDevelopmentStorage=true";
@@ -336,8 +337,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Tables
       {
          if(name == null)
             throw new ArgumentNullException(nameof(name));
-         if(!TableNameRgx.IsMatch(name))
-            throw new ArgumentException(@"invalid table name: " + name, nameof(name));
+         ValidateTableName(name);
 
          bool cached = TableNameToTableTag.TryGetValue(name, out TableTag tag);
 
@@ -360,6 +360,15 @@ namespace Storage.Net.Microsoft.Azure.Storage.Tables
          if(!tag.Exists)
             return null;
          return tag.Table;
+      }
+
+      private static void ValidateTableName(string name)
+      {
+         if(name.StartsWith("$Metrics"))
+            return;
+
+         if(!TableNameRgx.IsMatch(name))
+            throw new ArgumentException($"'{name}' is an invalid table name - it should start with a letter, can container letters (uppercase and lowercase) and numbers, and be between 2 and 62 characters long.", nameof(name));
       }
 
       private async Task<List<TableResult>> ExecOrThrowAsync(CloudTable table, TableBatchOperation op)
@@ -455,6 +464,28 @@ namespace Storage.Net.Microsoft.Azure.Storage.Tables
       /// </summary>
       public void Dispose()
       {
+      }
+
+      public async Task<IReadOnlyCollection<BlobMetrics>> GetBasicBlobMetricsAsync()
+      {
+         IReadOnlyCollection<Value> allBlobMetrics = await GetAsync("$MetricsCapacityBlob", new Key(null, null));
+         var metrics = new List<BlobMetrics>();
+
+         if(allBlobMetrics != null)
+         {
+            foreach(Value value in allBlobMetrics)
+            {
+               metrics.Add(new BlobMetrics(
+                  DateTime.ParseExact(value.PartitionKey, "yyyyMMddT0000", CultureInfo.InvariantCulture),
+                  value.RowKey == "analytics",
+                  (long)value["Capacity"],
+                  (int)(long)value["ContainerCount"],
+                  (long)value["ObjectCount"]
+                  ));
+            }
+         }
+
+         return metrics;
       }
    }
 }
