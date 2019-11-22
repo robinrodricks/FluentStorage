@@ -1,7 +1,5 @@
-﻿using System.Text;
-using Storage.Net.Blobs;
+﻿using Storage.Net.Blobs;
 using Storage.Net.ConnectionString;
-using Storage.Net.KeyValue;
 using Storage.Net.Messaging;
 
 namespace Storage.Net.Microsoft.Azure.Storage.Blobs
@@ -45,7 +43,6 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          return null;
       }
 
-      public IKeyValueStorage CreateKeyValueStorage(StorageConnectionString connectionString) => null;
       public IMessenger CreateMessenger(StorageConnectionString connectionString) => null;
    }
 }

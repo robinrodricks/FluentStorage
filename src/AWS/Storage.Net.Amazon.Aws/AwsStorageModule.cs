@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Amazon;
 using Storage.Net.Amazon.Aws.Blobs;
 using Storage.Net.Blobs;
 using Storage.Net.ConnectionString;
-using Storage.Net.KeyValue;
 using Storage.Net.Messaging;
 
 namespace Storage.Net.Amazon.Aws
@@ -52,8 +48,6 @@ namespace Storage.Net.Amazon.Aws
 
          return null;
       }
-
-      public IKeyValueStorage CreateKeyValueStorage(StorageConnectionString connectionString) => null;
 
       public IMessenger CreateMessenger(StorageConnectionString connectionString) => null;
    }

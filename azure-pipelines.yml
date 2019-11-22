@@ -101,22 +101,6 @@ stages:
         projects: test/Storage.Net.Tests.Integration/Storage.Net.Tests.Integration.csproj
         arguments: '-c release --filter Category=Blobs'
 
-- stage: KeyValueTest
-  dependsOn: []
-  jobs:
-  - job: Platform
-    displayName: 'Tests'
-    pool:
-      vmImage: $(vmImage)
-    steps:
-    - task: DotNetCoreCLI@2
-      displayName: 'run tests'
-      continueOnError: false
-      inputs:
-        command: test
-        projects: test/Storage.Net.Tests.Integration/Storage.Net.Tests.Integration.csproj
-        arguments: '-c release --filter Category=KeyValue'
-
 - stage: MessagingTest
   dependsOn: []
   jobs:

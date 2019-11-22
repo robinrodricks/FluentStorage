@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Storage.Net.Blobs;
 using System.Linq;
-using Storage.Net.KeyValue;
 using Storage.Net.Messaging;
 
 namespace Storage.Net.ConnectionString
@@ -27,11 +26,6 @@ namespace Storage.Net.ConnectionString
       public static IBlobStorage CreateBlobStorage(string connectionString)
       {
          return Create(connectionString, (factory, cs) => factory.CreateBlobStorage(cs));
-      }
-
-      public static IKeyValueStorage CreateKeyValueStorage(string connectionString)
-      {
-         return Create(connectionString, (factory, cs) => factory.CreateKeyValueStorage(cs));
       }
 
       public static IMessenger CreateMessager(string connectionString)

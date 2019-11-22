@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Storage.Net.Blobs;
 using Storage.Net.ConnectionString;
-using Storage.Net.KeyValue;
 using Storage.Net.Messaging;
-using Storage.Net.Microsoft.Azure.KeyVault.Blobs;
 
 namespace Storage.Net.Microsoft.Azure.KeyVault
 {
@@ -35,7 +31,6 @@ namespace Storage.Net.Microsoft.Azure.KeyVault
 
          return null;
       }
-      public IKeyValueStorage CreateKeyValueStorage(StorageConnectionString connectionString) => null;
 
       public IMessenger CreateMessenger(StorageConnectionString connectionString) => null;
    }

@@ -1,6 +1,5 @@
 ﻿using Storage.Net.Blobs;
 using Storage.Net.ConnectionString;
-using Storage.Net.KeyValue;
 using Storage.Net.Messaging;
 using Storage.Net.Microsoft.Azure.DataLake.Store.Gen1;
 
@@ -34,8 +33,6 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store
 
          return null;
       }
-
-      public IKeyValueStorage CreateKeyValueStorage(StorageConnectionString connectionString) => null;
 
       public IMessenger CreateMessenger(StorageConnectionString connectionString) => null;
    }

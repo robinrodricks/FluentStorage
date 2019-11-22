@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using Storage.Net.Blobs;
+﻿using Storage.Net.Blobs;
 using Storage.Net.Blobs.Files;
-using Storage.Net.KeyValue;
-using Storage.Net.KeyValue.Files;
 using Storage.Net.Messaging;
 using Storage.Net.Messaging.Files;
 
@@ -31,18 +26,6 @@ namespace Storage.Net.ConnectionString
             connectionString.GetRequired("path", true, out string path);
 
             return new ZipFileBlobStorage(path);
-         }
-
-         return null;
-      }
-
-      public IKeyValueStorage CreateKeyValueStorage(StorageConnectionString connectionString)
-      {
-         if(connectionString.Prefix == "disk")
-         {
-            connectionString.GetRequired("path", true, out string path);
-
-            return new CsvFileKeyValueStorage(new DirectoryInfo(path));
          }
 
          return null;
