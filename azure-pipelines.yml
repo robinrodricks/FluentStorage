@@ -119,7 +119,7 @@ stages:
 
 
 - stage: Deploy
-  dependsOn: ['Build', 'BlobsTest', 'KeyValueTest', 'MessagingTest'] 
+  dependsOn: ['Build', 'BlobsTest', 'MessagingTest'] 
   condition: "eq(variables['Build.SourceBranch'], 'refs/heads/master')"
   #condition: "or( eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/queuesvnext') )"
   jobs:
