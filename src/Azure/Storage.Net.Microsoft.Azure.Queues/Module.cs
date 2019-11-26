@@ -9,6 +9,7 @@ namespace Storage.Net.Microsoft.Azure.Queues
       public IConnectionFactory ConnectionFactory => this;
 
       public IBlobStorage CreateBlobStorage(StorageConnectionString connectionString) => null;
+
       public IMessenger CreateMessenger(StorageConnectionString connectionString)
       {
          if(connectionString.Prefix == KnownPrefix.AzureQueueStorage)
@@ -21,5 +22,6 @@ namespace Storage.Net.Microsoft.Azure.Queues
 
          return null;
       }
+
    }
 }

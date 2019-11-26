@@ -1,4 +1,5 @@
 ﻿using System;
+using Storage.Net.ConnectionString;
 using Storage.Net.Messaging;
 using Storage.Net.Microsoft.Azure.Queues;
 
@@ -26,6 +27,24 @@ namespace Storage.Net
          string storageKey)
       {
          return new AzureStorageQueueMessenger(accountName, storageKey);   //
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="factory"></param>
+      /// <param name="accountName"></param>
+      /// <param name="accountKey"></param>
+      /// <returns></returns>
+      public static StorageConnectionString ForAzureStorageQueuesWithSharedKey(
+         this IConnectionStringFactory factory,
+         string accountName,
+         string accountKey)
+      {
+         var cs = new StorageConnectionString(KnownPrefix.AzureQueueStorage);
+         cs.Parameters[KnownParameter.AccountName] = accountName;
+         cs.Parameters[KnownParameter.KeyOrPassword] = accountKey;
+         return cs;
       }
    }
 }
