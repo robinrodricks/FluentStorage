@@ -198,6 +198,16 @@ namespace Storage.Net.Tests.Integration.Messaging
       }
 
       [Fact]
+      public async Task Peek_SendMessage_HasAtLeaseOne()
+      {
+         await SendAsync();
+
+         IReadOnlyCollection<QueueMessage> messages = await _msg.PeekAsync(_qn);
+
+         Assert.NotEmpty(messages);
+      }
+
+      [Fact]
       public async Task Receive_NullChannel_ArgumentNullException()
       {
          await Assert.ThrowsAsync<ArgumentNullException>(() => _msg.ReceiveAsync(null));

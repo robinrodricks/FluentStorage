@@ -126,6 +126,10 @@ namespace Storage.Net.Microsoft.Azure.Queues
          if(channelName is null)
             throw new ArgumentNullException(nameof(channelName));
 
+         //you can only peek a max of 32 messages
+         if(count > 32)
+            count = 32;
+
          CloudQueue queue = await GetQueueAsync(channelName).ConfigureAwait(false);
 
          IEnumerable<CloudQueueMessage> batch = await queue.PeekMessagesAsync(count).ConfigureAwait(false);
