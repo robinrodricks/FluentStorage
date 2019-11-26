@@ -198,6 +198,12 @@ namespace Storage.Net.Tests.Integration.Messaging
       }
 
       [Fact]
+      public async Task Peek_NullChannel_ThrowsArgumentNull()
+      {
+         await Assert.ThrowsAsync<ArgumentNullException>(() => _msg.PeekAsync(null));
+      }
+
+      [Fact]
       public async Task Peek_SendMessage_HasAtLeaseOne()
       {
          await SendAsync();
