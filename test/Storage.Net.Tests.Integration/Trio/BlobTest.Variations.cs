@@ -53,6 +53,8 @@ namespace Storage.Net.Tests.Integration.Blobs
 
    public class AdlsGen1Fixture : BlobFixture
    {
+      public AdlsGen1Fixture() : base("gen1fixture") { }
+
       protected override IBlobStorage CreateStorage(ITestSettings settings)
       {
          return StorageFactory.Blobs.AzureDataLakeGen1StoreByClientSecret(
