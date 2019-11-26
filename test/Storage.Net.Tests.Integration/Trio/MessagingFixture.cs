@@ -30,7 +30,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
       public void Dispose()
       {
-         if(Messenger != null)
+         if(Messenger != null) 
             Messenger.Dispose();
 
          Directory.Delete(_testDir, true);
