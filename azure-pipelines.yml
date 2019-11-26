@@ -85,11 +85,11 @@ stages:
       inputs:
         ArtifactName: nuget
 
-- stage: BlobsTest
+- stage: Integration
   dependsOn: []
   jobs:
-  - job: Platform
-    displayName: 'Tests'
+  - job: Blobs
+    displayName: 'Blobs'
     pool:
       vmImage: $(vmImage)
     steps:
@@ -100,12 +100,8 @@ stages:
         command: test
         projects: test/Storage.Net.Tests.Integration/Storage.Net.Tests.Integration.csproj
         arguments: '-c release --filter Category=Blobs'
-
-- stage: MessagingTest
-  dependsOn: []
-  jobs:
-  - job: Platform
-    displayName: 'Tests'
+  - job: Messaging
+    displayName: 'Messaging'
     pool:
       vmImage: $(vmImage)
     steps:
@@ -119,7 +115,7 @@ stages:
 
 
 - stage: Deploy
-  dependsOn: ['Build', 'BlobsTest', 'MessagingTest'] 
+  dependsOn: ['Build', 'Integration'] 
   condition: "eq(variables['Build.SourceBranch'], 'refs/heads/master')"
   #condition: "or( eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/queuesvnext') )"
   jobs:
