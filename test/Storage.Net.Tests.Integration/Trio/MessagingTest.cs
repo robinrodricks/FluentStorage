@@ -50,8 +50,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          try
          {
-            IReadOnlyCollection<string> channels = await _msg.ListChannelsAsync();
-            await _msg.DeleteChannelsAsync(channels);
+            await _msg.DeleteChannelAsync(_qn);
          }
          catch { }
       }
