@@ -283,7 +283,7 @@ namespace Blobs
                responseHeaders.TryGetValue("x-ms-continuation", out continuation);
             } while(continuation != null);
          }
-         catch(RequestFailedException ex) when (ex.ErrorCode == "PathNotFound")
+         catch(RequestFailedException ex) when (ex.ErrorCode == "PathNotFound" || ex.ErrorCode == "FilesystemNotFound")
          {
             // trying to list a path which doesn't exist, just return an empty result
             return new List<Blob>();
