@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,8 +28,8 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       private readonly BlobServiceClient _client;
       private readonly StorageSharedKeyCredential _sasSigningCredentials;
       private readonly string _containerName;
-      private readonly Dictionary<string, BlobContainerClient> _containerNameToContainerClient =
-         new Dictionary<string, BlobContainerClient>();
+      private readonly ConcurrentDictionary<string, BlobContainerClient> _containerNameToContainerClient =
+         new ConcurrentDictionary<string, BlobContainerClient>();
 
       public AzureBlobStorage(
          BlobServiceClient blobServiceClient,

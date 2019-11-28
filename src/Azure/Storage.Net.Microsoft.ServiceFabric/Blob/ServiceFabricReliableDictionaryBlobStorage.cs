@@ -34,10 +34,10 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
          {
             IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync();
 
-            IAsyncEnumerable<KeyValuePair<string, byte[]>> enumerable =
+            global::Microsoft.ServiceFabric.Data.IAsyncEnumerable<KeyValuePair<string, byte[]>> enumerable =
                await coll.CreateEnumerableAsync(tx.Tx);
 
-            using (IAsyncEnumerator<KeyValuePair<string, byte[]>> enumerator = enumerable.GetAsyncEnumerator())
+            using (global::Microsoft.ServiceFabric.Data.IAsyncEnumerator<KeyValuePair<string, byte[]>> enumerator = enumerable.GetAsyncEnumerator())
             {
                while (await enumerator.MoveNextAsync(cancellationToken))
                {
