@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+#if JSON
+using System.Text.Json;
+#endif
 using System.Threading;
 using System.Threading.Tasks;
 using NetBox;
@@ -295,7 +298,59 @@ namespace Storage.Net.Blobs
 
       #endregion
 
-      #region [ Uniqueue ]
+#region [ Objects ]
+
+#if JSON
+
+      /// <summary>
+      /// Writes an object to blob storage using <see cref="JsonSerializer"/>
+      /// </summary>
+      /// <typeparam name="T">Objec type</typeparam>
+      /// <param name="storage"></param>
+      /// <param name="fullPath">Full path to blob</param>
+      /// <param name="instance">Object instance to write</param>
+      /// <param name="options">Optional serialiser options</param>
+      /// <param name="encoding">Text encoding used to write to the blob storage, defaults to <see cref="UTF8Encoding"/></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      public static async Task WriteObjectAsync<T>(
+         this IBlobStorage storage,
+         string fullPath, T instance,
+         JsonSerializerOptions options = null,
+         Encoding encoding = null,
+         CancellationToken cancellationToken = default)
+      {
+         string jsonText = JsonSerializer.Serialize(instance, options);
+         await WriteTextAsync(storage, fullPath, jsonText, encoding, cancellationToken).ConfigureAwait(false);
+      }
+
+      /// <summary>
+      /// Reads an object from blob storage using <see cref="JsonSerializer"/>
+      /// </summary>
+      /// <typeparam name="T"></typeparam>
+      /// <param name="storage"></param>
+      /// <param name="fullPath">Full path to blob</param>
+      /// <param name="options">Optional serialiser options</param>
+      /// <param name="encoding">Text encoding used to write to the blob storage, defaults to <see cref="UTF8Encoding"/></param>
+      /// <param name="cancellationToken"></param>
+      /// <returns></returns>
+      public static async Task<T> ReadObjectAsync<T>(this IBlobStorage storage,
+         string fullPath,
+         JsonSerializerOptions options = null,
+         Encoding encoding = null,
+         CancellationToken cancellationToken = default)
+      {
+         string jsonText = await storage.ReadTextAsync(fullPath, encoding, cancellationToken);
+         if(string.IsNullOrEmpty(jsonText))
+            return default;
+
+         return JsonSerializer.Deserialize<T>(jsonText, options);
+      }
+#endif
+
+#endregion
+
+#region [ Uniqueue ]
 
       /// <summary>
       /// Copies blob to another storage
@@ -391,9 +446,9 @@ namespace Storage.Net.Blobs
 
       }
 
-      #endregion
+#endregion
 
-      #region [ Folders ]
+#region [ Folders ]
 
       /// <summary>
       /// Creates a new folder in this storage. If storage supports hierarchy, the folder is created as is, otherwise a folder is created by putting a dummy zero size file in that folder.
@@ -422,6 +477,6 @@ namespace Storage.Net.Blobs
          }
       }
 
-      #endregion
+#endregion
    }
 }
