@@ -313,7 +313,7 @@ namespace Storage.Net.Blobs
       /// <param name="encoding">Text encoding used to write to the blob storage, defaults to <see cref="UTF8Encoding"/></param>
       /// <param name="cancellationToken"></param>
       /// <returns></returns>
-      public static async Task WriteObjectAsync<T>(
+      public static async Task WriteJsonAsync<T>(
          this IBlobStorage storage,
          string fullPath, T instance,
          JsonSerializerOptions options = null,
@@ -330,12 +330,14 @@ namespace Storage.Net.Blobs
       /// <typeparam name="T"></typeparam>
       /// <param name="storage"></param>
       /// <param name="fullPath">Full path to blob</param>
+      /// <param name="ignoreInvalidJson">When true, json that cannot be deserialised is ignored and method simply returns default value</param>
       /// <param name="options">Optional serialiser options</param>
       /// <param name="encoding">Text encoding used to write to the blob storage, defaults to <see cref="UTF8Encoding"/></param>
       /// <param name="cancellationToken"></param>
       /// <returns></returns>
-      public static async Task<T> ReadObjectAsync<T>(this IBlobStorage storage,
+      public static async Task<T> ReadJsonAsync<T>(this IBlobStorage storage,
          string fullPath,
+         bool ignoreInvalidJson = false,
          JsonSerializerOptions options = null,
          Encoding encoding = null,
          CancellationToken cancellationToken = default)
@@ -344,7 +346,17 @@ namespace Storage.Net.Blobs
          if(string.IsNullOrEmpty(jsonText))
             return default;
 
-         return JsonSerializer.Deserialize<T>(jsonText, options);
+         try
+         {
+            return JsonSerializer.Deserialize<T>(jsonText, options);
+         }
+         catch(JsonException)
+         {
+            if(ignoreInvalidJson)
+               return default;
+
+            throw;
+         }
       }
 #endif
 
