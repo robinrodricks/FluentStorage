@@ -3,7 +3,7 @@
       <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
       <AssemblyTitle>Storage.Net</AssemblyTitle>
       <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
-      <TargetFrameworks>netstandard1.6;netstandard2.0</TargetFrameworks>
+      <TargetFrameworks>netstandard1.6;netstandard2.0;netstandard2.1</TargetFrameworks>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <AssemblyName>Storage.Net</AssemblyName>
       <PackageId>Storage.Net</PackageId>
@@ -22,6 +22,9 @@
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.6'">
+      <DefineConstants>NET16</DefineConstants>
    </PropertyGroup>
    <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
      <DefineConstants>JSON</DefineConstants>

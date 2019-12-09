@@ -21,6 +21,6 @@ namespace Storage.Net.Blobs.Sinks
       /// <param name="fullPath">Full path to file</param>
       /// <param name="parentStream">Source stream to write</param>
       /// <returns></returns>
-      Stream OpenWriteStream(string fullPath, Stream parentStream);
+      Stream OpenWriteStream(ref string fullPath, Stream parentStream);
    }
 }
