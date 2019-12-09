@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Storage.Net.Blobs;
+using Storage.Net.Blobs.Sinks.Impl;
 using Xunit;
 
 namespace Storage.Net.Tests.Blobs.Sink
@@ -16,6 +17,19 @@ namespace Storage.Net.Tests.Blobs.Sink
    {
       public SymmetricEncryptionTest() : base(
          StorageFactory.Blobs.InMemory().WithSymmetricEncryption("6qg/7EgPmrK9ZY70pnECtZ40g3dDe74czSvWJ+3dj0A="))
+      {
+
+      }
+   }
+
+   public class CompressedAndEncryptedTest : SinksTest
+   {
+      public CompressedAndEncryptedTest() : base(
+         StorageFactory.Blobs
+            .InMemory()
+            .WithSinks(
+               new GZipSink(),
+               new SymmetricEncryptionSink("To6X5XVaNNMKFfxssJS6biREGpOVZjEIC6T7cc1rJF0=")))
       {
 
       }

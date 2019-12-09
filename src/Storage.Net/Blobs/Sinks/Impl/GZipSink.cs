@@ -3,15 +3,25 @@ using System.IO.Compression;
 
 namespace Storage.Net.Blobs.Sinks.Impl
 {
-   class GZipSink : ITransformSink
+   /// <summary>
+   /// GZip transformation sink
+   /// </summary>
+   public class GZipSink : ITransformSink
    {
       private readonly CompressionLevel _compressionLevel;
 
-      public GZipSink(CompressionLevel compressionLevel)
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="compressionLevel"></param>
+      public GZipSink(CompressionLevel compressionLevel = CompressionLevel.Optimal)
       {
          _compressionLevel = compressionLevel;
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
       public Stream OpenReadStream(string fullPath, Stream parentStream)
       {
          if(parentStream == null)
@@ -20,6 +30,9 @@ namespace Storage.Net.Blobs.Sinks.Impl
          return new GZipStream(parentStream, CompressionMode.Decompress, false);
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
       public Stream OpenWriteStream(ref string fullPath, Stream parentStream)
       {
          return new GZipStream(parentStream, _compressionLevel, false);

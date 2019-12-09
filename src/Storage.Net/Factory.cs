@@ -123,6 +123,18 @@ namespace Storage.Net
       #region [ Data Decorators ]
 
       /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="blobStorage"></param>
+      /// <param name="sinks"></param>
+      /// <returns></returns>
+      public static IBlobStorage WithSinks(this IBlobStorage blobStorage,
+         params ITransformSink[] sinks)
+      {
+         return new SinkedBlobStorage(blobStorage, sinks);
+      }
+
+      /// <summary>
       /// Wraps blob storage into zip compression
       /// </summary>
       /// <param name="blobStorage"></param>
