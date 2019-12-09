@@ -2,30 +2,44 @@
 using Storage.Net.Blobs;
 using Xunit;
 
-namespace Storage.Net.Tests.Blobs
+namespace Storage.Net.Tests.Blobs.Sink
 {
-   public class SinksTest
+   public class GzipSinkTest : SinksTest
    {
-      private readonly IBlobStorage storage = StorageFactory.Blobs.InMemory();
-
-      [Fact]
-      public async Task Gzip()
+      public GzipSinkTest() : base(StorageFactory.Blobs.InMemory().WithGzipCompression())
       {
-         IBlobStorage zipStorage = storage.WithGzipCompression();
 
-         await zipStorage.WriteTextAsync("1.gzip", "it's a gzipped text");
+      }
+   }
 
-         Assert.Equal("it's a gzipped text", await zipStorage.ReadTextAsync("1.gzip"));
+   public class SymmetricEncryptionTest : SinksTest
+   {
+      public SymmetricEncryptionTest() : base(
+         StorageFactory.Blobs.InMemory().WithSymmetricEncryption("6qg/7EgPmrK9ZY70pnECtZ40g3dDe74czSvWJ+3dj0A="))
+      {
+
+      }
+   }
+
+   public abstract class SinksTest
+   {
+      private readonly IBlobStorage storage;
+
+      protected SinksTest(IBlobStorage storage)
+      {
+         this.storage = storage;
       }
 
-      [Fact]
-      public async Task SymmetricEncryption()
+      [Theory]
+      [InlineData(null)]
+      [InlineData("sample")]
+      [InlineData("123")]
+      [InlineData("123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123")]
+      public async Task Roundtrip(string sample)
       {
-         IBlobStorage enc = storage.WithSymmetricEncryption("6qg/7EgPmrK9ZY70pnECtZ40g3dDe74czSvWJ+3dj0A=");
+         await storage.WriteTextAsync("target.txt", sample);
 
-         await enc.WriteTextAsync("1.senc", "encrypted?");
-
-         Assert.Equal("encrypted?", await enc.ReadTextAsync("1.senc"));
+         Assert.Equal(sample, await storage.ReadTextAsync("target.txt"));
       }
    }
 }

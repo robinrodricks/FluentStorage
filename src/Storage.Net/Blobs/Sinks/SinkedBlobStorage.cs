@@ -52,6 +52,9 @@ namespace Storage.Net.Blobs.Sinks
          //chain streams
          Stream readStream = await _parent.OpenReadAsync(fullPath, cancellationToken);
 
+         if(readStream == null)
+            return null;
+
          foreach(ITransformSink sink in _sinks)
          {
             readStream = sink.OpenReadStream(fullPath, readStream);
@@ -60,8 +63,14 @@ namespace Storage.Net.Blobs.Sinks
          return readStream;
       }
 
-      public async Task WriteAsync(string fullPath, Stream dataSourceStream, bool append = false, CancellationToken cancellationToken = default)
+      public async Task WriteAsync(
+         string fullPath, Stream dataSourceStream,
+         bool append = false,
+         CancellationToken cancellationToken = default)
       {
+         if(dataSourceStream == null)
+            return;
+
          //chain streams
          var bottom = new MemoryStream();
          Stream top = bottom;

@@ -1,10 +1,7 @@
 ﻿#if !NET16
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
-using System.Text;
-using NetBox.Extensions;
 
 namespace Storage.Net.Blobs.Sinks.Impl
 {
