@@ -8,13 +8,13 @@
 
 Storage.NET is a field-tested .NET library that helps to achieve [polycloud techniques](https://www.thoughtworks.com/radar/techniques/polycloud). 
 
-It provides generic interface for popular cloud storage providers like Amazon S3, Azure Service Bus, Azure Event Hub, Azure Storage, Azure Data Lake Store thus abstracting Messaging, Blob (object store for unsturctured data) and Table (NoSQL key-value store) services.
+It provides generic interface for popular cloud storage providers like Amazon S3, Azure Service Bus, Azure Event Hub, Azure Storage, Azure Data Lake Store thus abstracting Blob and Messaging services.
 
 It also implements in-memory and on-disk versions of all the abstractions for faster local machine development. Connection strings are supported too!
 
 ![Comic Why](doc/comic-why.png)
 
-Like desktop like we do? You can download a preview version of a **native Windows 10 client** here:
+Storage.Net is used by some big **Fotrune 500** companies, large, medium and small businesses, open-source projects and even desktop applications like this one:
 
 <a href='//www.microsoft.com/store/apps/9NKV1D43NLL3?cid=storebadge&ocid=badge'>
    <img src='https://assets.windowsphone.com/85864462-9c82-451e-9355-a3d5f874397a/English_get-it-from-MS_InvariantCulture_Default.png' alt='English badge' style='width: 284px; height: 104px;' width='284' height='104'/>
@@ -27,7 +27,6 @@ Like desktop like we do? You can download a preview version of a **native Window
 - [Implementations](#implementations)
 - [Getting Started](#getting-started)
   - [Blob Storage](#blob-storage)
-  - [Key-Value Storage](#key-value-storage)
   - [Messaging](#messaging)
 - [Contributing](#contributing)
 - [Sponsorship](#sponsorship)
@@ -44,23 +43,21 @@ Storage.Net supports **Azure Service Bus**, **Azure Event Hub**, **Azure Storage
 
 Storage.Net also implements inmemory and on disk versions of all the abstractions, therefore you can develop fast on local machine or use vendor free serverless implementations for parts of your applciation which don't require a separate third party backend at a particular point in development.
 
-This framework supports `.NET 4.5.2` and `.NET Standard 1.6`, and all of the plugins exist for all frameworks.
+This framework supports `.NET Standard 2.0` and higher.
 
 ## Implementations
 
 ![Storagetypes](doc/storagetypes.svg)
 
-Storage.Net defines three different storage types:
+Storage.Net defines two different storage types:
 
 - **Blob Storage** is used to store arbitrary files of any size, that do not have any structure. The data is essentially a binary file. Examples of a blog storage is Azure Blob Storage, Amazon S3, local folder etc.
-- **Key-Value Storage** is essentialy a large dictionary where key points to some value. Examples are Azure Table Storage, etcd etc.
 - **Messaging** is an asynchronous mechanism to send and receive messages between disconnected systems. For instance MSMQ, Azure Service Bus, Amazon Simple Queue etc.
 
 Some effort has been made to document the supported storage options, you are welcome to contribute to documentation, or browse the following sections:
 
 - [Blob Storage Implementations](doc/blobs.md)
 - [Messaging Implementations](doc/messaging.md)
-- [Key-Value Implementations](doc/keyvalue.md)
 
 ## Geting Started
 
@@ -144,16 +141,6 @@ public async Task BlobStorage_sample2()
 ```
 
 You can find the list of supported blob storage implementations [here](doc/blobs.md).
-
-### Key-Value Storage
-
-The intention of creating a simplistic key-value storage is to abstract away different implementations of storing key-value data. An entry point to key-value storage is [IKeyValueStorage](src/Storage.Net/KeyValue/IKeyValueStorage.cs) interface. As with blobs, you can create this interface by calling to one of the factory methods:
-
-![](doc/storagefactory-intellisense-kv.gif)
-
-Once created, you can start working with key-value storage using one of the methods available in `IKeyValueStorage`.
-
-You can find the list of supported key-value implementations [here](doc/keyvalue.md).
 
 ### Messaging
 
