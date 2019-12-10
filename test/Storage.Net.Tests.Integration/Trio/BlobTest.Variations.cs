@@ -29,6 +29,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
    }
 
+#if DEBUG
    public class AzureEmulatedBlobStorageFixture : BlobFixture
    {
       public AzureEmulatedBlobStorageFixture() : base("itest")
@@ -49,6 +50,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 
       }
    }
+#endif
 
    public class AzureFilesFixture : BlobFixture
    {
