@@ -8,6 +8,7 @@ trigger:
     exclude:
       - README.md
       - doc/*
+      - .github/*
 
 pr:
   branches:

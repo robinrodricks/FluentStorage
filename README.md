@@ -254,6 +254,14 @@ Does your company use Storage.Net?  Ask your manager or marketing team if your c
 
 All contributions of any size and areas are welcome, being it coding, testing, documentation or consulting. The framework is heavily tested under stress with integration tests, in fact most of the code is tests, not implementation, and this approach is more preferred to adding unstable features.
 
+PRs are raised against [develop](https://github.com/aloneguid/storage/tree/develop) branch, **master** is for releases only.
+
+All the builds (from PR or branches) are automatically generating *NuGet packages* which are placed into the following intermediate feed:
+
+`https://pkgs.dev.azure.com/aloneguid/AllPublic/_packaging/storagenet/nuget/v3/index.json`
+
+Builds from *master* branch publishes NuGet to `nuget.org`.
+
 ### Code
 
 Storage.Net tries to enforce idential behavior on all implementaions of storage interfaces to the smallest details possible and you will find a lot of test specifications which will help you to add another provider.
