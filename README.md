@@ -27,6 +27,7 @@ Storage.Net is used by some big **Fotrune 500** companies, large, medium and sma
 - [Implementations](#implementations)
 - [Getting Started](#getting-started)
   - [Blob Storage](#blob-storage)
+    - [High-level architecture](#high-level-architecture)
   - [Messaging](#messaging)
 - [Contributing](#contributing)
 - [Sponsorship](#sponsorship)
@@ -81,7 +82,7 @@ You can also use connection strings to create blob storage instances. Connection
 IBlobStorage storage = StorageFactory.Blobs.FromConnectionString("azure.blobs://...parameters...");
 ```
 
-In this example we create a blob storage implementation which happens to be Microsoft Azure blob storage. The project is referencing an appropriate [nuget package](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.Storage). As blob storage methods promote streaming we create a `MemoryStream` over a string for simplicity sake. In your case the actual stream can come from a variety of sources.
+In this example we create a blob storage implementation which happens to be Microsoft Azure blob storage. The project is referencing an appropriate [nuget package](https://www.nuget.org/packages/Storage.Net.Microsoft.Azure.Storage.Blobs/). As blob storage methods promote streaming we create a `MemoryStream` over a string for simplicity sake. In your case the actual stream can come from a variety of sources.
 
 ```csharp
 using Storage.Net;
@@ -141,6 +142,18 @@ public async Task BlobStorage_sample2()
 ```
 
 You can find the list of supported blob storage implementations [here](doc/blobs.md).
+
+#### High-level architecture
+
+The basic architecture of blobs is depicted in the following diagram:
+
+![](doc/blobs-interfaces.svg)
+
+All of the core methods are defined in the `IBlobStorage` interface. This is the interface that's enough for a new storage provider to implement in order to add a new storage provider.
+
+However, some providers support more than just basic operations, for instance Azure Blob Storage supports blob leasing, shared access signatures etc., therefore it actually implements `IAzureBlobStorage` interface that in turn implements `IBlobStorage` interface, and extends the functionality further. Same goes for AWS S3 and others.
+
+However, when you are browsing `IBlobStorage` interface, intellisesnse will shows you a plethora of methods that are not there. This is because there are plenty of **extension methods** defined for it. Extension methods add extra useful stuff, such as ability to write/read strings, JSON objects and so on, but they in turn use only methods from `IBlobStorage`. The decision to split those methods into extension methods was because that is logical functionality not dependent on any underlying implementation. Also implementing new storage providers is much easier, as you only have to implement a subset of methods.
 
 ### Messaging
 
