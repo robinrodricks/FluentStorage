@@ -50,8 +50,7 @@ namespace Storage.Net.Tests.Integration.Messaging
 
          try
          {
-            IReadOnlyCollection<string> channels = await _msg.ListChannelsAsync();
-            await _msg.DeleteChannelsAsync(channels);
+            await _msg.DeleteChannelAsync(_qn);
          }
          catch { }
       }
@@ -191,6 +190,29 @@ namespace Storage.Net.Tests.Integration.Messaging
             IReadOnlyCollection<QueueMessage> messages = await _msg.ReceiveAsync(_qn);
 
             Assert.Contains(messages, m => m.Properties.TryGetValue("tag", out string itag) && itag == tag);
+         }
+         catch(NotSupportedException)
+         {
+
+         }
+      }
+
+      [Fact]
+      public async Task Peek_NullChannel_ThrowsArgumentNull()
+      {
+         await Assert.ThrowsAsync<ArgumentNullException>(() => _msg.PeekAsync(null));
+      }
+
+      [Fact]
+      public async Task Peek_SendMessage_HasAtLeaseOne()
+      {
+         try
+         {
+            await SendAsync();
+
+            IReadOnlyCollection<QueueMessage> messages = await _msg.PeekAsync(_qn);
+
+            Assert.NotEmpty(messages);
          }
          catch(NotSupportedException)
          {

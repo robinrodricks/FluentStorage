@@ -11,13 +11,14 @@ namespace Storage.Net.Tests.Integration.Blobs
 {
    public class AzureBlobStorageFixture : BlobFixture
    {
-      public AzureBlobStorageFixture() : base("testcontainer/")
+      public AzureBlobStorageFixture() : base("lakeyv12/")
       {
       }
 
       protected override IBlobStorage CreateStorage(ITestSettings settings)
       {
-         return StorageFactory.Blobs.AzureBlobStorage(settings.AzureStorageName, settings.AzureStorageKey);
+         return StorageFactory.Blobs
+            .AzureBlobStorageWithSharedKey(settings.AzureStorageName, settings.AzureStorageKey);
       }
    }
 
@@ -27,6 +28,29 @@ namespace Storage.Net.Tests.Integration.Blobs
       {
       }
    }
+
+#if DEBUG
+   public class AzureEmulatedBlobStorageFixture : BlobFixture
+   {
+      public AzureEmulatedBlobStorageFixture() : base("itest")
+      {
+
+      }
+
+      protected override IBlobStorage CreateStorage(ITestSettings settings)
+      {
+         return StorageFactory.Blobs.AzureBlobStorageWithLocalEmulator();
+      }
+   }
+
+   public class AzureEmulatedBlobStorageTest : BlobTest, IClassFixture<AzureEmulatedBlobStorageFixture>
+   {
+      public AzureEmulatedBlobStorageTest(AzureEmulatedBlobStorageFixture fixture) : base(fixture)
+      {
+
+      }
+   }
+#endif
 
    public class AzureFilesFixture : BlobFixture
    {
@@ -51,6 +75,8 @@ namespace Storage.Net.Tests.Integration.Blobs
 
    public class AdlsGen1Fixture : BlobFixture
    {
+      public AdlsGen1Fixture() : base("gen1fixture") { }
+
       protected override IBlobStorage CreateStorage(ITestSettings settings)
       {
          return StorageFactory.Blobs.AzureDataLakeGen1StoreByClientSecret(
@@ -77,7 +103,11 @@ namespace Storage.Net.Tests.Integration.Blobs
 
       protected override IBlobStorage CreateStorage(ITestSettings settings)
       {
-         return StorageFactory.Blobs.AzureDataLakeGen2StoreBySharedAccessKey(settings.AzureDataLakeGen2Name, settings.AzureDataLakeGen2Key);
+         return StorageFactory.Blobs.AzureDataLakeStorageWithSharedKey(
+            settings.AzureDataLakeGen2Name,
+            settings.AzureDataLakeGen2Key);
+
+         //return StorageFactory.Blobs.AzureDataLakeGen2StoreBySharedAccessKey(settings.AzureDataLakeGen2Name, settings.AzureDataLakeGen2Key);
       }
    }
 
@@ -159,7 +189,9 @@ namespace Storage.Net.Tests.Integration.Blobs
       {
          return StorageFactory.Blobs.AzureKeyVault(
                   settings.KeyVaultUri,
-                  settings.KeyVaultCreds);
+                  settings.KeyVaultTenantId,
+                  settings.KeyVaultClientId,
+                  settings.KeyVaultSecret);
       }
    }
 

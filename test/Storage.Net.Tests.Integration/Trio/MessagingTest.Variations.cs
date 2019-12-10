@@ -87,7 +87,7 @@ namespace Storage.Net.Tests.Integration.Messaging
    }
    #endregion
 
-   #region [ Azure Service Bus Topics ]
+   #region [ Azure Service Bus ]
 
    public class AzureServiceBusFixture : MessagingFixture
    {
@@ -100,14 +100,14 @@ namespace Storage.Net.Tests.Integration.Messaging
 
    public class AzureServiceBusTopicTest : MessagingTest, IClassFixture<AzureServiceBusFixture>
    {
-      public AzureServiceBusTopicTest(AzureServiceBusFixture fixture) : base(fixture, "t/", receiveChannelSuffix: "/default")
+      public AzureServiceBusTopicTest(AzureServiceBusFixture fixture) : base(fixture, "t/", "t/fxtopic", receiveChannelSuffix: "/default")
       {
       }
    }
 
    public class AzureServiceBusQueueTest : MessagingTest, IClassFixture<AzureServiceBusFixture>
    {
-      public AzureServiceBusQueueTest(AzureServiceBusFixture fixture) : base(fixture, "q/")
+      public AzureServiceBusQueueTest(AzureServiceBusFixture fixture) : base(fixture, "q/", "q/fxqueue")
       {
       }
    }

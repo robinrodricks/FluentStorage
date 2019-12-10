@@ -249,7 +249,8 @@ namespace Storage.Net.Tests.Integration.Blobs
          long size = Encoding.UTF8.GetBytes(content).Length;
          string md5 = content.GetHash(HashType.Md5);
 
-         Assert.Equal(size, meta.Size);
+         if(meta.Size != null)
+            Assert.Equal(size, meta.Size);
          if(meta.MD5 != null)
             Assert.Equal(md5, meta.MD5);
          if(meta.LastModificationTime != null)
@@ -312,19 +313,22 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
 
       [Fact]
-      public async Task Write_with_openwrite_succeeds()
+      public async Task Write_with_writeasync_succeeds()
       {
          string id = RandomBlobPath();
          byte[] data = Encoding.UTF8.GetBytes("oh my");
 
-         using(Stream dest = await _storage.OpenWriteAsync(id))
-         {
-            await dest.WriteAsync(data, 0, data.Length);
-         }
+         await _storage.WriteAsync(id, new MemoryStream(data));
 
          //read and check
          string result = await _storage.ReadTextAsync(id);
          Assert.Equal("oh my", result);
+      }
+
+      [Fact]
+      public async Task Write_nullDataStream_argumentnullexception()
+      {
+         await Assert.ThrowsAsync<ArgumentNullException>(() => _storage.WriteAsync(RandomBlobPath(), null));
       }
 
       [Fact]
@@ -350,6 +354,13 @@ namespace Storage.Net.Tests.Integration.Blobs
          await _storage.DeleteAsync(path);
 
          Assert.False(await _storage.ExistsAsync(path));
+      }
+
+      [Fact]
+      public async Task Delete_non_existing_file_ignores()
+      {
+         string path = RandomBlobPath();
+         await _storage.DeleteAsync(path);
       }
 
       [Fact]
@@ -392,7 +403,7 @@ namespace Storage.Net.Tests.Integration.Blobs
             await _storage.RenameAsync(file, StoragePath.Combine(prefix, "2"));
             IReadOnlyCollection<Blob> list = await _storage.ListAsync(prefix);
 
-            Assert.True(list.Count == 1);
+            Assert.Single(list);
             Assert.True(list.First().Name == "2");
          }
          catch(NotSupportedException)
@@ -400,6 +411,19 @@ namespace Storage.Net.Tests.Integration.Blobs
 
          }
       }
+
+      [Fact]
+      public async Task Rename_OldPathNull_ThowsArgumentNull()
+      {
+         await Assert.ThrowsAsync<ArgumentNullException>(() => _storage.RenameAsync(null, "test/1"));
+      }
+
+      [Fact]
+      public async Task Rename_NewPathNull_ThowsArgumentNull()
+      {
+         await Assert.ThrowsAsync<ArgumentNullException>(() => _storage.RenameAsync("test/1", null));
+      }
+
 
       [Fact]
       public async Task Rename_Folder_Renames()
@@ -454,7 +478,6 @@ namespace Storage.Net.Tests.Integration.Blobs
 
          await _storage.WriteTextAsync(blob, "test");
          Blob blob2 = await _storage.GetBlobAsync(blob);
-         Assert.True(blob2.Size > 0);
 
          try
          {
@@ -510,10 +533,8 @@ namespace Storage.Net.Tests.Integration.Blobs
          blob.Metadata["user"] = "ivan";
          blob.Metadata["fun"] = "no";
 
-         using(Stream s = await _storage.OpenWriteAsync(blob))
-         {
-            s.Write(RandomGenerator.GetRandomBytes(10, 15));
-         }
+         await _storage.WriteAsync(blob, new MemoryStream(RandomGenerator.GetRandomBytes(10, 15)));
+
          try
          {
             await _storage.SetBlobAsync(blob);

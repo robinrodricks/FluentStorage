@@ -73,9 +73,12 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen1
          return await browser.BrowseAsync(options, cancellationToken).ConfigureAwait(false);
       }
 
-      public async Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
+      public async Task WriteAsync(string fullPath, Stream dataStream, bool append, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
+
+         if(dataStream is null)
+            throw new ArgumentNullException(nameof(dataStream));
 
          AdlsClient client = await GetAdlsClientAsync().ConfigureAwait(false);
 
@@ -92,7 +95,10 @@ namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen1
                cancelToken: cancellationToken).ConfigureAwait(false);
          }
 
-         return new AdlsWriteableStream(stream);
+         using(stream)
+         {
+            await dataStream.CopyToAsync(stream).ConfigureAwait(false);
+         }
       }
 
       public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken)

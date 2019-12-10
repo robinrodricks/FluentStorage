@@ -54,23 +54,31 @@ namespace Storage.Net.Messaging
          return Task.CompletedTask;
       }
 
-      public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default)
+      {
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
+
+         return Task.FromResult<IReadOnlyCollection<QueueMessage>>(GetMessages(channelName, count, true, null));
+      }
+
       public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(
          string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default)
       {
          if(channelName is null)
             throw new ArgumentNullException(nameof(channelName));
 
-         return Task.FromResult<IReadOnlyCollection<QueueMessage>>(GetMessages(channelName, count, visibility));
+         return Task.FromResult<IReadOnlyCollection<QueueMessage>>(GetMessages(channelName, count, false, visibility));
       }
 
-      private List<QueueMessage> GetMessages(string channelName, int count, TimeSpan? visibility)
+      private List<QueueMessage> GetMessages(string channelName, int count, bool peekOnly, TimeSpan? visibility)
       {
          var result = new List<QueueMessage>();
          ConcurrentQueue<QueueMessage> queue = GetQueue(channelName);
 
          DateTime now = DateTime.UtcNow;
          DateTimeOffset nextVisible = now + (visibility ?? TimeSpan.FromMinutes(1));
+
          while(result.Count < count)
          {
             if(!queue.TryDequeue(out QueueMessage msg))
@@ -83,7 +91,11 @@ namespace Storage.Net.Messaging
                result.Add(msg);
 
                msg.NextVisibleTime = nextVisible;
-               queue.Enqueue(msg);
+
+               if(peekOnly)
+               {
+                  queue.Enqueue(msg);
+               }
             }
             else
             {

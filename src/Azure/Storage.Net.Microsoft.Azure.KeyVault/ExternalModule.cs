@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Storage.Net.Blobs;
 using Storage.Net.ConnectionString;
-using Storage.Net.KeyValue;
 using Storage.Net.Messaging;
-using Storage.Net.Microsoft.Azure.KeyVault.Blobs;
 
 namespace Storage.Net.Microsoft.Azure.KeyVault
 {
@@ -17,24 +13,24 @@ namespace Storage.Net.Microsoft.Azure.KeyVault
       {
          if(connectionString.Prefix == KnownPrefix.AzureKeyVault)
          {
-            connectionString.GetRequired("vaultUri", true, out string uri);
+            connectionString.GetRequired(KnownParameter.VaultUri, true, out string uri);
 
-            if(connectionString.Parameters.ContainsKey("msi"))
+            if(connectionString.Parameters.ContainsKey(KnownParameter.MsiEnabled))
             {
-               return new AzureKeyVaultBlobStorageProvider(new Uri(uri));
+               return StorageFactory.Blobs.AzureKeyVaultWithMsi(new Uri(uri));
             }
             else
             {
-               connectionString.GetRequired("clientId", true, out string clientId);
-               connectionString.GetRequired("clientSecret", true, out string clientSecret);
+               connectionString.GetRequired(KnownParameter.TenantId, true, out string tenantId);
+               connectionString.GetRequired(KnownParameter.ClientId, true, out string clientId);
+               connectionString.GetRequired(KnownParameter.ClientSecret, true, out string clientSecret);
 
-               return new AzureKeyVaultBlobStorageProvider(new Uri(uri), clientId, clientSecret);
+               return StorageFactory.Blobs.AzureKeyVault(new Uri(uri), tenantId, clientId, clientSecret);
             }
          }
 
          return null;
       }
-      public IKeyValueStorage CreateKeyValueStorage(StorageConnectionString connectionString) => null;
 
       public IMessenger CreateMessenger(StorageConnectionString connectionString) => null;
    }

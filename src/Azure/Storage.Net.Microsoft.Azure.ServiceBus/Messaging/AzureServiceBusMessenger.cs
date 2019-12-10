@@ -206,7 +206,16 @@ namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
          return channels;
       }
 
-      public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+      public async Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default)
+      {
+         if(channelName is null)
+            throw new ArgumentNullException(nameof(channelName));
+
+         MessageReceiver receiver = CreateMessageReceiver(channelName);
+         IList<Message> messages = await receiver.PeekAsync(count);
+
+         return messages.Select(Converter.ToQueueMessage).ToList();
+      }
 
       public async Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(
          string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default)

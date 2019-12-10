@@ -65,7 +65,10 @@ namespace Storage.Net.Blobs
          GenericValidation.CheckBlobFullPath(fullPath);
          fullPath = StoragePath.Normalize(fullPath);
 
-         if (append)
+         if(sourceStream is null)
+            throw new ArgumentNullException(nameof(sourceStream));
+
+         if(append)
          {
             if (!Exists(fullPath))
             {
@@ -86,7 +89,7 @@ namespace Storage.Net.Blobs
          return Task.FromResult(true);
       }
 
-      public Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
+      public Task<Stream> WriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
          fullPath = StoragePath.Normalize(fullPath);

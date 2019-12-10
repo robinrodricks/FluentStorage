@@ -71,8 +71,14 @@ namespace Storage.Net.Tests
       [Option(Alias = "Azure.KeyVault.Uri")]
       Uri KeyVaultUri { get; }
 
-      [Option(Alias = "Azure.KeyVault.Creds")]
-      NetworkCredential KeyVaultCreds { get; }
+      [Option(Alias = "Azure.KeyVault.TenantId")]
+      string KeyVaultTenantId { get; }
+
+      [Option(Alias = "Azure.KeyVault.ClientId")]
+      string KeyVaultClientId { get; }
+
+      [Option(Alias = "Azure.KeyVault.ClientSecret")]
+      string KeyVaultSecret { get; }
 
       [Option(Alias = "Azure.Databricks.BaseUri")]
       string DatabricksBaseUri { get; }

@@ -4,10 +4,11 @@ using Storage.Net.Blobs;
 using Storage.Net.Blobs.Files;
 using Storage.Net.Messaging;
 using Storage.Net.ConnectionString;
-using Storage.Net.KeyValue;
-using Storage.Net.KeyValue.Files;
 using Storage.Net.Messaging.Large;
 using Storage.Net.Messaging.Files;
+using System.IO.Compression;
+using Storage.Net.Blobs.Sinks.Impl;
+using Storage.Net.Blobs.Sinks;
 
 namespace Storage.Net
 {
@@ -44,30 +45,11 @@ namespace Storage.Net
       }
 
       /// <summary>
-      /// Creates a key-value storage instance from a connections tring
-      /// </summary>
-      public static IKeyValueStorage FromConnectionString(this IKeyValueStorageFactory factory, string connectionString)
-      {
-         return ConnectionStringFactory.CreateKeyValueStorage(connectionString);
-      }
-
-      /// <summary>
       /// Creates message publisher
       /// </summary>
       public static IMessenger MessengerFromConnectionString(this IMessagingFactory factory, string connectionString)
       {
          return ConnectionStringFactory.CreateMessager(connectionString);
-      }
-
-      /// <summary>
-      /// Creates a new instance of CSV file storage
-      /// </summary>
-      /// <param name="factory"></param>
-      /// <param name="rootDir"></param>
-      public static IKeyValueStorage CsvFiles(this IKeyValueStorageFactory factory,
-         DirectoryInfo rootDir)
-      {
-         return new CsvFileKeyValueStorage(rootDir);
       }
 
       /// <summary>
@@ -139,6 +121,47 @@ namespace Storage.Net
       }
 
       #region [ Data Decorators ]
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="blobStorage"></param>
+      /// <param name="sinks"></param>
+      /// <returns></returns>
+      public static IBlobStorage WithSinks(this IBlobStorage blobStorage,
+         params ITransformSink[] sinks)
+      {
+         return new SinkedBlobStorage(blobStorage, sinks);
+      }
+
+      /// <summary>
+      /// Wraps blob storage into zip compression
+      /// </summary>
+      /// <param name="blobStorage"></param>
+      /// <param name="compressionLevel"></param>
+      /// <returns></returns>
+      public static IBlobStorage WithGzipCompression(
+         this IBlobStorage blobStorage, CompressionLevel compressionLevel = CompressionLevel.Optimal)
+      {
+         return new SinkedBlobStorage(blobStorage, new GZipSink(compressionLevel));
+      }
+
+#if !NET16
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="blobStorage"></param>
+      /// <param name="encryptionKey"></param>
+      /// <returns></returns>
+      public static IBlobStorage WithSymmetricEncryption(
+         this IBlobStorage blobStorage,
+         string encryptionKey)
+      {
+         return new SinkedBlobStorage(blobStorage, new SymmetricEncryptionSink(encryptionKey));
+      }
+
+#endif
 
       #endregion
    }

@@ -118,7 +118,18 @@ namespace Storage.Net.Amazon.Aws.Messaging
          }
       }
 
-      public async Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default)
+      public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default)
+      {
+         return ReceiveInternalAsync(channelName, count, visibility ?? TimeSpan.FromMinutes(1), cancellationToken);
+      }
+
+      public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default)
+      {
+         return ReceiveInternalAsync(channelName, count, TimeSpan.FromSeconds(1), cancellationToken);
+      }
+
+      private async Task<IReadOnlyCollection<QueueMessage>> ReceiveInternalAsync(
+         string channelName, int count, TimeSpan visibility, CancellationToken cancellationToken)
       {
          if(channelName is null)
             throw new ArgumentNullException(nameof(channelName));
@@ -126,15 +137,14 @@ namespace Storage.Net.Amazon.Aws.Messaging
          var request = new ReceiveMessageRequest(GetQueueUri(channelName))
          {
             MessageAttributeNames = new List<string> { ".*" },
-            MaxNumberOfMessages = Math.Min(10, count)
+            MaxNumberOfMessages = Math.Min(10, count),
+            VisibilityTimeout = (int)visibility.TotalSeconds
          };
 
          ReceiveMessageResponse messages = await _client.ReceiveMessageAsync(request, cancellationToken).ConfigureAwait(false);
 
          return messages.Messages.Select(Converter.ToQueueMessage).ToList();
       }
-
-      public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
       public void Dispose()
       {

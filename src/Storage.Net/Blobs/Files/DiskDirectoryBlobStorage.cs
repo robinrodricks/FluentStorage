@@ -214,18 +214,18 @@ namespace Storage.Net.Blobs.Files
       {
       }
 
-      /// <summary>
-      /// 
-      /// </summary>
-      public Task<Stream> OpenWriteAsync(string fullPath, bool append, CancellationToken cancellationToken)
+      public async Task WriteAsync(string fullPath, Stream dataStream, bool append, CancellationToken cancellationToken)
       {
+         if(dataStream is null)
+            throw new ArgumentNullException(nameof(dataStream));
          GenericValidation.CheckBlobFullPath(fullPath);
 
          fullPath = StoragePath.Normalize(fullPath, false);
 
-         Stream stream = CreateStream(fullPath, !append);
-
-         return Task.FromResult(stream);
+         using(Stream stream = CreateStream(fullPath, !append))
+         {
+            await dataStream.CopyToAsync(stream).ConfigureAwait(false);
+         }
       }
 
       /// <summary>

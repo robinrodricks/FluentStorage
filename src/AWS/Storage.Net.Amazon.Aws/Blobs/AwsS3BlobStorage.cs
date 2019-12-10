@@ -153,7 +153,8 @@ namespace Storage.Net.Amazon.Aws.Blobs
       /// <summary>
       /// S3 doesnt support this natively and will cache everything in MemoryStream until disposed.
       /// </summary>
-      public Task<Stream> OpenWriteAsync(string fullPath, bool append = false, CancellationToken cancellationToken = default)
+      public async Task WriteAsync(string fullPath, Stream dataStream, bool append = false,
+         CancellationToken cancellationToken = default)
       {
          if(append)
             throw new NotSupportedException();
@@ -162,15 +163,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
 
-         var callbackStream = new FixedStream(new MemoryStream(), null, async (fx) =>
-         {
-            var ms = (MemoryStream)fx.Parent;
-            ms.Position = 0;
-
-            await _fileTransferUtility.UploadAsync(ms, _bucketName, fullPath, cancellationToken).ConfigureAwait(false);
-         });
-
-         return Task.FromResult<Stream>(callbackStream);
+         await _fileTransferUtility.UploadAsync(dataStream, _bucketName, fullPath, cancellationToken).ConfigureAwait(false);
       }
 
       public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
