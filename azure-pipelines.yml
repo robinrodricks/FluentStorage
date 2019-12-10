@@ -3,7 +3,7 @@ trigger:
   branches:
     include:
       - master
-      - stor12
+      - develop
   paths:
     exclude:
       - README.md
@@ -12,7 +12,7 @@ trigger:
 pr:
   branches:
     include:
-      - v6
+      - develop
       - master
   paths:
     exclude:
@@ -77,11 +77,12 @@ stages:
         command: 'push'
         packagesToPush: '$(build.artifactstagingdirectory)/**/*.nupkg'
         nuGetFeedType: 'internal'
-        publishVstsFeed: '4bab84c0-90f7-4425-afc6-ba077aa9757e/d26176f7-ae69-43db-8342-99ce408538ec'
+        publishVstsFeed: '4bab84c0-90f7-4425-afc6-ba077aa9757e/0efacfd4-9b7e-4cfb-90c0-07824d6fbbf3'
+        allowPackageConflicts: true
 
 
     - task: PublishBuildArtifacts@1
-      displayName: 'publish nugets'
+      displayName: 'publish nugets as artifacts'
       inputs:
         ArtifactName: nuget
 
