@@ -76,5 +76,10 @@ namespace Storage.Net
       /// 
       /// </summary>
       public static readonly string MsiEnabled = "msi";
+
+      /// <summary>
+      /// 
+      /// </summary>
+      public static readonly string IsLocalEmulator = "emu";
    }
 }

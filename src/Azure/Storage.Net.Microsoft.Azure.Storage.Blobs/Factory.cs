@@ -23,6 +23,22 @@ namespace Storage.Net
       }
 
       /// <summary>
+      /// Connect to local emulator
+      /// </summary>
+      public static IAzureBlobStorage AzureBlobStorageWithLocalEmulator(this IBlobStorageFactory factory)
+      {
+         var credential = new StorageSharedKeyCredential(
+            "devstoreaccount1",
+            "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==");
+
+         var client = new BlobServiceClient(
+            new Uri("http://127.0.0.1:10000/devstoreaccount1"),
+            credential);
+
+         return new AzureBlobStorage(client, "devstoreaccount1", credential);
+      }
+
+      /// <summary>
       /// 
       /// </summary>
       public static IAzureBlobStorage AzureBlobStorageWithSharedKey(this IBlobStorageFactory factory,

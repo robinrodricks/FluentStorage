@@ -29,6 +29,26 @@ namespace Storage.Net.Tests.Integration.Blobs
       }
    }
 
+   public class AzureEmulatedBlobStorageFixture : BlobFixture
+   {
+      public AzureEmulatedBlobStorageFixture() : base("itest")
+      {
+
+      }
+
+      protected override IBlobStorage CreateStorage(ITestSettings settings)
+      {
+         return StorageFactory.Blobs.AzureBlobStorageWithLocalEmulator();
+      }
+   }
+
+   public class AzureEmulatedBlobStorageTest : BlobTest, IClassFixture<AzureEmulatedBlobStorageFixture>
+   {
+      public AzureEmulatedBlobStorageTest(AzureEmulatedBlobStorageFixture fixture) : base(fixture)
+      {
+
+      }
+   }
 
    public class AzureFilesFixture : BlobFixture
    {
