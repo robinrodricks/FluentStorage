@@ -28,6 +28,7 @@ Storage.Net is used by some big **Fotrune 500** companies, large, medium and sma
 - [Getting Started](#getting-started)
   - [Blob Storage](#blob-storage)
     - [High-level architecture](#high-level-architecture)
+    - [Transform Sinks](#transform-sinks)
   - [Messaging](#messaging)
 - [Contributing](#contributing)
 - [Sponsorship](#sponsorship)
