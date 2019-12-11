@@ -91,7 +91,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Files
       {
          CloudFile file = await GetFileReferenceAsync(fullPath, true, cancellationToken).ConfigureAwait(false);
 
-         await file.UploadFromStreamAsync(dataStream, cancellationToken).ConfigureAwait(false);
+         await file.UploadFromStreamAsync(new StorageSourceStream(dataStream), cancellationToken).ConfigureAwait(false);
       }
 
       public override async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
