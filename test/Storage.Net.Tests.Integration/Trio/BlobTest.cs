@@ -8,6 +8,7 @@ using NetBox;
 using NetBox.Extensions;
 using NetBox.Generator;
 using Storage.Net.Blobs;
+using Storage.Net.Tests.Integration.Util;
 using Xunit;
 
 namespace Storage.Net.Tests.Integration.Blobs
@@ -329,6 +330,19 @@ namespace Storage.Net.Tests.Integration.Blobs
       public async Task Write_nullDataStream_argumentnullexception()
       {
          await Assert.ThrowsAsync<ArgumentNullException>(() => _storage.WriteAsync(RandomBlobPath(), (Stream)null, false));
+      }
+
+      [Fact]
+      public async Task Write_non_seekable_stream_succeeds()
+      {
+         string s = "test content";
+         string id = RandomBlobPath();
+
+         var nonSeekable = new NonSeekableStream(new MemoryStream(Encoding.UTF8.GetBytes(s)));
+
+         await _storage.WriteAsync(id, nonSeekable);
+
+         Assert.Equal(s, await _storage.ReadTextAsync(id));
       }
 
       [Fact]
