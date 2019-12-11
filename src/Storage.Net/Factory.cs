@@ -143,7 +143,7 @@ namespace Storage.Net
       public static IBlobStorage WithGzipCompression(
          this IBlobStorage blobStorage, CompressionLevel compressionLevel = CompressionLevel.Optimal)
       {
-         return new SinkedBlobStorage(blobStorage, new GZipSink(compressionLevel));
+         return blobStorage.WithSinks(new GZipSink(compressionLevel));
       }
 
 #if !NET16
@@ -158,7 +158,7 @@ namespace Storage.Net
          this IBlobStorage blobStorage,
          string encryptionKey)
       {
-         return new SinkedBlobStorage(blobStorage, new SymmetricEncryptionSink(encryptionKey));
+         return blobStorage.WithSinks(new SymmetricEncryptionSink(encryptionKey));
       }
 
 #endif
