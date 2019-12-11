@@ -135,7 +135,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
       {
          GenericValidation.CheckBlobFullPath(fullPath);
 
-         if(dataStream is null)
+         if(dataStream == null)
             throw new ArgumentNullException(nameof(dataStream));
 
          (BlobContainerClient container, string path) = await GetPartsAsync(fullPath, true).ConfigureAwait(false);
@@ -145,7 +145,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          try
          {
             await client.UploadAsync(
-               dataStream,
+               new StorageSourceStream(dataStream),
                cancellationToken: cancellationToken).ConfigureAwait(false);
          }
          catch(RequestFailedException ex) when (ex.ErrorCode == "OperationNotAllowedInCurrentState")

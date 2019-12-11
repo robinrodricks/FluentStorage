@@ -10,7 +10,7 @@ namespace Storage.Net.Blobs.Sinks
    class SinkedBlobStorage : IBlobStorage
    {
       private readonly IBlobStorage _parent;
-      private readonly List<ITransformSink> _sinks;
+      private readonly ITransformSink[] _sinks;
 
       public SinkedBlobStorage(IBlobStorage blobStorage, params ITransformSink[] sinks)
       {
@@ -18,7 +18,7 @@ namespace Storage.Net.Blobs.Sinks
             throw new ArgumentNullException(nameof(sinks));
 
          _parent = blobStorage ?? throw new ArgumentNullException(nameof(blobStorage));
-         _sinks = sinks.ToList();
+         _sinks = sinks;
       }
 
       public Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
@@ -71,18 +71,9 @@ namespace Storage.Net.Blobs.Sinks
          if(dataSourceStream == null)
             return;
 
-         //chain streams
-         var bottom = new MemoryStream();
-         Stream top = bottom;
-         foreach(ITransformSink sink in _sinks)
+         using(var source = new SinkedStream(dataSourceStream, fullPath, _sinks))
          {
-            top = sink.OpenWriteStream(ref fullPath, top);
-         }
-
-         //write using reverse chain
-         using(var rev = new ReverseStream(dataSourceStream, bottom, top))
-         {
-            await _parent.WriteAsync(fullPath, rev, append, cancellationToken).ConfigureAwait(false);
+            await _parent.WriteAsync(fullPath, source, append, cancellationToken);
          }
       }
    }

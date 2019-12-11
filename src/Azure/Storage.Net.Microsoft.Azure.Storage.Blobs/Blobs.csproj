@@ -18,9 +18,9 @@
 
 
    <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.0.0" />
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.0.0" />
-    <PackageReference Include="System.Text.Json" Version="4.6.0" />
+    <PackageReference Include="Azure.Identity" Version="1.1.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.1.0" />
+    <PackageReference Include="System.Text.Json" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>

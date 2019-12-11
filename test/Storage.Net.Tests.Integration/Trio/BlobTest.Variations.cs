@@ -19,6 +19,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       {
          return StorageFactory.Blobs
             .AzureBlobStorageWithSharedKey(settings.AzureStorageName, settings.AzureStorageKey);
+            //.WithGzipCompression();
       }
    }
 

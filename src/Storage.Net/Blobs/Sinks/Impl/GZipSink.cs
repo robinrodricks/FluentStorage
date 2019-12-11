@@ -33,7 +33,7 @@ namespace Storage.Net.Blobs.Sinks.Impl
       /// <summary>
       /// 
       /// </summary>
-      public Stream OpenWriteStream(ref string fullPath, Stream parentStream)
+      public Stream OpenWriteStream(string fullPath, Stream parentStream)
       {
          return new GZipStream(parentStream, _compressionLevel, false);
       }

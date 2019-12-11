@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-#if JSON
 using System.Text.Json;
-#endif
 using System.Threading;
 using System.Threading.Tasks;
 using NetBox;
@@ -300,8 +298,6 @@ namespace Storage.Net.Blobs
 
 #region [ Objects ]
 
-#if JSON
-
       /// <summary>
       /// Writes an object to blob storage using <see cref="JsonSerializer"/>
       /// </summary>
@@ -358,7 +354,6 @@ namespace Storage.Net.Blobs
             throw;
          }
       }
-#endif
 
 #endregion
 

@@ -155,6 +155,19 @@ However, some providers support more than just basic operations, for instance Az
 
 However, when you are browsing `IBlobStorage` interface, intellisesnse will shows you a plethora of methods that are not there. This is because there are plenty of **extension methods** defined for it. Extension methods add extra useful stuff, such as ability to write/read strings, JSON objects and so on, but they in turn use only methods from `IBlobStorage`. The decision to split those methods into extension methods was because that is logical functionality not dependent on any underlying implementation. Also implementing new storage providers is much easier, as you only have to implement a subset of methods.
 
+#### Transform Sinks
+
+Transform sinks is another awesome feature of Storage.Net that works across all the storage providers. Transform sinks allow you to transform data stream for both upload and download to somehow transform the underlying stream of data. Examples of transform sinks would be *gzipping data* transparently, *encrypting it*, and so on.
+
+##### Details
+
+Due to the nature of the transforms, they can change both the underlying data, and stream size, therefore there is an issue with storage providers, as they need to know beforehand the size of the blob you are uploading. The matter becomes more complicated when some implementations need to calculate other statistics of the data before uploading i.e. hash, CRC and so on. Therefore the only *reliable* way to stream transformed data is to actually perform all of the transofrms, and then upload it. In this implementation, Storage.Net uses in-memory transforms to achieve this, however does it extremely efficiently by using [Microsoft.IO.RecyclableMemoryStream](https://github.com/Microsoft/Microsoft.IO.RecyclableMemoryStream) package that performs memory pooling and reclaiming for you so that you don't need to worry about software slowdows. You can read more about this technique [here](http://www.philosophicalgeek.com/2015/02/06/announcing-microsoft-io-recycablememorystream/).
+
+This also means that today a transform sink can upload a stream only as large as the amount of RAM available on your machine. I am, however, thinking of ways to go further than that, and there are some beta implementations available that might see the light soon.
+
+
+
+
 ### Messaging
 
 Messaging is inteded for message passing between one or more systems in disconnected fashion. You can send a message somewhere and current or remote system picks it up for processing later when required. This paradigm somehow fits into [CQRS](https://martinfowler.com/bliki/CQRS.html) and [Message Passing](https://www.defit.org/message-passing/) architectural ideas.

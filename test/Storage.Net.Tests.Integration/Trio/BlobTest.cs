@@ -328,7 +328,7 @@ namespace Storage.Net.Tests.Integration.Blobs
       [Fact]
       public async Task Write_nullDataStream_argumentnullexception()
       {
-         await Assert.ThrowsAsync<ArgumentNullException>(() => _storage.WriteAsync(RandomBlobPath(), null));
+         await Assert.ThrowsAsync<ArgumentNullException>(() => _storage.WriteAsync(RandomBlobPath(), (Stream)null, false));
       }
 
       [Fact]
