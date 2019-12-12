@@ -179,7 +179,7 @@ Due to the nature of the transforms, they can change both the underlying data, a
 
 This also means that today a transform sink can upload a stream only as large as the amount of RAM available on your machine. I am, however, thinking of ways to go further than that, and there are some beta implementations available that might see the light soon.
 
-
+![](doc/sinks-memory.svg)
 
 
 ### Messaging
