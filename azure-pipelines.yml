@@ -144,3 +144,13 @@ stages:
               packagesToPush: '$(System.ArtifactsDirectory)/nuget/*.nupkg'
               nuGetFeedType: external
               publishFeedCredentials: 'nuget.org (aloneguid)'
+          - task: GitHubRelease@1
+            inputs:
+               gitHubConnection: 'aloneguid'
+               repositoryName: 'aloneguid/storage'
+               action: 'create'
+               target: '$(Build.SourceVersion)'
+               tagSource: 'userSpecifiedTag'
+               tag: '$(Build.BuildNumber)'
+               changeLogCompareToRelease: 'lastFullRelease'
+               changeLogType: 'commitBased'
