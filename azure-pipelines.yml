@@ -4,7 +4,6 @@ trigger:
     include:
       - master
       - develop
-      - azure-arm
   paths:
     exclude:
       - README.md
@@ -76,6 +75,7 @@ stages:
 
     # we don't care if tests in other stages are not successful, we want to public this to internal testing
     - task: NuGetCommand@2
+      condition: "eq(variables['Build.SourceBranch'], 'refs/heads/develop')"
       displayName: 'push to internal feed'
       continueOnError: true
       inputs:
@@ -92,6 +92,7 @@ stages:
         ArtifactName: nuget
       
 - stage: Integration
+  condition: "eq(variables['Build.SourceBranch'], 'refs/heads/develop')"
   dependsOn: []
   jobs:
   - job: Infra
