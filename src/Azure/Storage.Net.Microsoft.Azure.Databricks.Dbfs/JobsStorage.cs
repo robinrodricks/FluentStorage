@@ -44,6 +44,7 @@ namespace Storage.Net.Databricks
          }
          while(runsList.HasMore);
 
+         rr.Reverse();  // jobs are better to see in reverse order - newest first
          return rr;
       }
 
