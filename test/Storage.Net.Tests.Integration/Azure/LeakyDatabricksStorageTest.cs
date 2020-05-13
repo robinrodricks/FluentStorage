@@ -10,6 +10,7 @@ using Xunit;
 
 namespace Storage.Net.Tests.Integration.Azure
 {
+#if DEBUG
    [Trait("Category", "Blobs")]
    public class LeakyDatabricksStorageTest
    {
@@ -117,4 +118,5 @@ namespace Storage.Net.Tests.Integration.Azure
          Assert.True(runs.Count > 0);
       }
    }
+#endif
 }
