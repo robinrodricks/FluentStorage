@@ -4,7 +4,6 @@ trigger:
     include:
       - master
       - develop
-      - databricks
   paths:
     exclude:
       - README.md
