@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -46,6 +47,27 @@ namespace Storage.Net.Databricks
 
          rr.Reverse();  // jobs are better to see in reverse order - newest first
          return rr;
+      }
+
+      public override async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
+      {
+         // download run: path is [job name]/[run id]
+
+         string[] parts = StoragePath.Split(fullPath);
+
+         if(parts.Length == 2)
+         {
+            if(long.TryParse(parts[1], out long runId))
+            {
+               (string notebookOutput, string error, Run run) = await _jobs.RunsGetOutput(runId);
+
+               return notebookOutput == null
+                  ? null
+                  : new MemoryStream(Encoding.UTF8.GetBytes(notebookOutput));
+            }
+         }
+
+         return null;
       }
 
       private async Task<long?> GetJobIdFromJobNameAsync(string jobName)

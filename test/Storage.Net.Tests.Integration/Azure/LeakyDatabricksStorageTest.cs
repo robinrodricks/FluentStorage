@@ -117,6 +117,15 @@ namespace Storage.Net.Tests.Integration.Azure
 
          Assert.True(runs.Count > 0);
       }
+
+      [Fact]
+      public async Task Download_job_run_output()
+      {
+         Blob job = (await _storage.ListAsync("/jobs")).First();
+         Blob run = (await _storage.ListAsync(job)).Last();
+
+         string output = await _storage.ReadTextAsync($"/jobs/{job.Name}/{run.Name}");
+      }
    }
 #endif
 }
