@@ -309,7 +309,7 @@ namespace Storage.Net.Blobs
          if(fullPath == null)
             return false;
 
-         fullPath = StoragePath.Normalize(fullPath);
+         fullPath = StoragePath.Normalize(fullPath, true);
 
          Blob mountPoint = _mountPoints.FirstOrDefault(mp => fullPath.StartsWith(mp.FullPath));
          if(mountPoint == null)
