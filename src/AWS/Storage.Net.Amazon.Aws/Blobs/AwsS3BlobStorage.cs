@@ -168,7 +168,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
          if(append)
             throw new NotSupportedException();
          GenericValidation.CheckBlobFullPath(fullPath);
-         fullPath = StoragePath.Normalize(fullPath);
+         fullPath = Normalise(fullPath);
 
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
 
@@ -179,7 +179,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
       {
          GenericValidation.CheckBlobFullPath(fullPath);
 
-         fullPath = StoragePath.Normalize(fullPath);
+         fullPath = Normalise(fullPath);
          GetObjectResponse response = await GetObjectAsync(fullPath).ConfigureAwait(false);
          if(response == null)
             return null;
@@ -198,7 +198,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
       {
          GenericValidation.CheckBlobFullPath(fullPath);
 
-         fullPath = StoragePath.Normalize(fullPath);
+         fullPath = Normalise(fullPath);
 
          await client.DeleteObjectAsync(_bucketName, fullPath, cancellationToken).ConfigureAwait(false);
          using(var browser = new AwsS3DirectoryBrowser(client, _bucketName))
@@ -220,7 +220,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
          try
          {
-            fullPath = StoragePath.Normalize(fullPath);
+            fullPath = Normalise(fullPath);
             await client.GetObjectMetadataAsync(_bucketName, fullPath, cancellationToken).ConfigureAwait(false);
             return true;
          }
@@ -240,7 +240,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
       private async Task<Blob> GetBlobAsync(string fullPath)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
-         fullPath = StoragePath.Normalize(fullPath);
+         fullPath = Normalise(fullPath);
 
          AmazonS3Client client = await GetClientAsync().ConfigureAwait(false);
 
@@ -272,7 +272,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
                   client,
                   blob,
                   _bucketName,
-                  blob).ConfigureAwait(false);
+                  Normalise(blob.FullPath)).ConfigureAwait(false);
             }
          }
       }
@@ -350,9 +350,14 @@ namespace Storage.Net.Amazon.Aws.Blobs
             BucketName = _bucketName,
             ContentType = mimeType,
             Expires = DateTime.UtcNow.AddSeconds(expiresInSeconds),
-            Key = StoragePath.Normalize(fullPath),
+            Key = Normalise(fullPath),
             Verb = verb,
          });
+      }
+
+      private static string Normalise(string path)
+      {
+         return StoragePath.Normalize(path).Substring(1);
       }
    }
 }
