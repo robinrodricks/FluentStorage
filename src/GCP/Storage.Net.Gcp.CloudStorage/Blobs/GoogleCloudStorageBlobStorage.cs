@@ -179,7 +179,7 @@ namespace Storage.Net.Gcp.CloudStorage.Blobs
          if(append)
             throw new NotSupportedException();
          GenericValidation.CheckBlobFullPath(fullPath);
-         fullPath = StoragePath.Normalize(fullPath, false);
+         fullPath = StoragePath.Normalize(fullPath);
 
          await _client.UploadObjectAsync(_bucketName, fullPath, null, dataStream, cancellationToken: cancellationToken).ConfigureAwait(false);
       }
@@ -187,7 +187,7 @@ namespace Storage.Net.Gcp.CloudStorage.Blobs
       public override async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
-         fullPath = StoragePath.Normalize(fullPath, false);
+         fullPath = StoragePath.Normalize(fullPath);
 
          // no read streaming support in this crappy SDK
 

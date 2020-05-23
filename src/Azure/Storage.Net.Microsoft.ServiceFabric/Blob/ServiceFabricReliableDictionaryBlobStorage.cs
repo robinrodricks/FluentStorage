@@ -254,7 +254,7 @@ namespace Storage.Net.Microsoft.ServiceFabric.Blobs
 
       private string ToFullPath(string fullPath)
       {
-         return StoragePath.Normalize(fullPath, false);
+         return StoragePath.Normalize(fullPath);
       }
    }
 }

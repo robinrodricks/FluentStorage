@@ -96,13 +96,56 @@ namespace Storage.Net.Blobs
          public T result;
       }
 
+      class XTag<TInput, TReducedInput, TOutput>
+      {
+         public string fullPath;
+         public string relPath;
+         public TInput fullInput;
+         public TReducedInput reducedInput;
+         public TOutput result;
+      }
+
+      private Dictionary<IBlobStorage, List<XTag<TInput, TReducedInput, TOutput>>> Explode<TInput, TReducedInput, TOutput>(
+         IEnumerable<TInput> inputs,
+         Func<TInput, string> inputToFullPathReducer,
+         Func<TInput, string, string, TReducedInput> inputReducer)
+      {
+         var result = new Dictionary<IBlobStorage, List<XTag<TInput, TReducedInput, TOutput>>>();
+
+         foreach(TInput input in inputs)
+         {
+            string fullPath = inputToFullPathReducer(input);
+
+            if(TryExplodeToMountPoint(fullPath, out IBlobStorage storage, out string relPath))
+            {
+               if(!result.TryGetValue(storage, out List<XTag<TInput, TReducedInput, TOutput>> acc))
+               {
+                  acc = new List<XTag<TInput, TReducedInput, TOutput>>();
+                  result[storage] = acc;
+               }
+
+               var tag = new XTag<TInput, TReducedInput, TOutput>
+               {
+                  fullPath = fullPath,
+                  relPath = relPath,
+                  fullInput = input,
+                  reducedInput = inputReducer(input, fullPath, relPath),
+                  result = default
+               };
+
+               acc.Add(tag);
+            }
+         }
+
+         return result;
+      }
+
       private Dictionary<IBlobStorage, List<MpTag<T>>> Explode<T>(
          IEnumerable<string> fullPaths,
          out Dictionary<string, MpTag<T>> fullPathToTag)
       {
-         var dic1 = new Dictionary<IBlobStorage, List<MpTag<T>>>();
+         var rmap = new Dictionary<IBlobStorage, List<MpTag<T>>>();
          fullPathToTag = new Dictionary<string, MpTag<T>>();
-         //var fullToRel = new Dictionary<string, string>();
 
          foreach(string fp in fullPaths)
          {
@@ -112,10 +155,10 @@ namespace Storage.Net.Blobs
             }
             else
             {
-               if(!dic1.TryGetValue(storage, out List<MpTag<T>> tags))
+               if(!rmap.TryGetValue(storage, out List<MpTag<T>> tags))
                {
                   tags = new List<MpTag<T>>();
-                  dic1[storage] = tags;
+                  rmap[storage] = tags;
                }
 
                var tag = new MpTag<T> { fullPath = fp, relPath = relPath };
@@ -124,9 +167,12 @@ namespace Storage.Net.Blobs
                fullPathToTag[fp] = tag;
             }
          }
-         return dic1;
+         return rmap;
       }
 
+      /// <summary>
+      /// Simpler version of Explode that does not need to match to the result
+      /// </summary>
       private Dictionary<IBlobStorage, List<string>> Explode(IEnumerable<string> fullPaths)
       {
          var map = new Dictionary<IBlobStorage, List<string>>();
@@ -158,11 +204,33 @@ namespace Storage.Net.Blobs
          await Task.WhenAll(tasks).ConfigureAwait(false);
       }
 
+      private async Task ExecuteAsync(
+         IEnumerable<Blob> blobs,
+         Func<IBlobStorage, IEnumerable<Blob>, Task> action)
+      {
+         Dictionary<IBlobStorage, List<XTag<Blob, Blob, bool>>> map = Explode<Blob, Blob, bool>(blobs,
+            b => b.FullPath,
+            (b, f, r) =>
+            {
+               Blob reduced = (Blob)b.Clone();
+               reduced.SetFullPath(r);
+               return reduced;
+            });
+
+         foreach(KeyValuePair<IBlobStorage, List<XTag<Blob, Blob, bool>>> pair in map)
+         {
+            IEnumerable<Blob> relBlobs = pair.Value.Select(x => x.reducedInput);
+
+            await action(pair.Key, relBlobs).ConfigureAwait(false);
+         }
+      }
+
+
       private async Task<IReadOnlyCollection<TResult>> ExecuteAsync<TResult>(
          IEnumerable<string> fullPaths,
          Func<IBlobStorage, IEnumerable<string>, Task<IReadOnlyCollection<TResult>>> action)
       {
-         Dictionary<IBlobStorage, List<MpTag<TResult>>> dic = Explode<TResult>(
+         Dictionary<IBlobStorage, List<MpTag<TResult>>> dic = Explode(
             fullPaths,
             out Dictionary<string, MpTag<TResult>> fullPathToTag);
 
@@ -285,6 +353,17 @@ namespace Storage.Net.Blobs
                blob.PrependPath(mountPoint.FullPath);
             }
             result.AddRange(mountResults);
+
+            // check that we reached the limit in options, and if so - trim result we have and break
+            if(options.MaxResults != null)
+            {
+               int max = options.MaxResults.Value;
+               if(result.Count >= max)
+               {
+                  result = result.Take(max).ToList();
+                  break;
+               }
+            }
          }
 
          return result;
@@ -301,6 +380,15 @@ namespace Storage.Net.Blobs
          return await storage.OpenReadAsync(relPath, cancellationToken).ConfigureAwait(false);
       }
 
+
+      /// <summary>
+      /// 
+      /// </summary>
+      public virtual Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
+      {
+         return ExecuteAsync(blobs, (s, rb) => s.SetBlobsAsync(rb, cancellationToken));
+      }
+
       private bool TryExplodeToMountPoint(string fullPath, out IBlobStorage storage, out string relPath)
       {
          storage = null;
@@ -309,7 +397,7 @@ namespace Storage.Net.Blobs
          if(fullPath == null)
             return false;
 
-         fullPath = StoragePath.Normalize(fullPath, true);
+         fullPath = StoragePath.Normalize(fullPath);
 
          Blob mountPoint = _mountPoints.FirstOrDefault(mp => fullPath.StartsWith(mp.FullPath));
          if(mountPoint == null)
@@ -321,19 +409,11 @@ namespace Storage.Net.Blobs
       }
 
 
-
       /// <summary>
       /// 
       /// </summary>
       public virtual Task<ITransaction> OpenTransactionAsync() => null;
 
-      /// <summary>
-      /// 
-      /// </summary>
-      public virtual Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
-      {
-         throw new NotImplementedException();
-      }
 
       /// <summary>
       /// 

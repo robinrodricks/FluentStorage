@@ -23,7 +23,7 @@ namespace Storage.Net.Databricks
 
       protected override async Task<IReadOnlyCollection<Blob>> ListAtAsync(string path, ListOptions options, CancellationToken cancellationToken)
       {
-         IEnumerable<ObjectInfo> objects = await _api.List(StoragePath.Normalize(path, true)).ConfigureAwait(false);
+         IEnumerable<ObjectInfo> objects = await _api.List(StoragePath.Normalize(path)).ConfigureAwait(false);
 
          return objects.Select(ToBlob).Where(b => b != null).ToList();
       }
@@ -59,20 +59,20 @@ namespace Storage.Net.Databricks
          //notebooks are passed with extensions at the end (.py, .scala etc.) so you need to remove them first
          string path = Path.ChangeExtension(fullPath, null);   // removes extension
 
-         byte[] notebookBytes = await _api.Export(StoragePath.Normalize(path, true), exportFormat);
+         byte[] notebookBytes = await _api.Export(StoragePath.Normalize(path), exportFormat);
          return new MemoryStream(notebookBytes);
       }
 
       public override async Task WriteAsync(
          string fullPath, Stream dataStream, bool append = false, CancellationToken cancellationToken = default)
       {
-         string path = StoragePath.Normalize(fullPath, true);
+         string path = StoragePath.Normalize(fullPath);
 
          //import will fail unless all the parent folders exist, so make sure they do
          string parent = StoragePath.GetParent(path);
          if(!StoragePath.IsRootPath(parent))
          {
-            await _api.Mkdirs(StoragePath.Normalize(parent, true));
+            await _api.Mkdirs(StoragePath.Normalize(parent));
          }
 
          GetImportParameters(path, out ExportFormat exportFormat, out Language? language);

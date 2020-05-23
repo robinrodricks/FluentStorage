@@ -27,7 +27,7 @@ namespace Storage.Net.Databricks
 
       private async Task DeleteAsync(string fullPath)
       {
-         fullPath = StoragePath.Normalize(fullPath, true);
+         fullPath = StoragePath.Normalize(fullPath);
 
          await _dbfs.Delete(fullPath, true);
       }
@@ -39,7 +39,7 @@ namespace Storage.Net.Databricks
 
       private async Task<bool> ExistsAsync(string fullPath)
       {
-         fullPath = StoragePath.Normalize(fullPath, true);
+         fullPath = StoragePath.Normalize(fullPath);
 
          try
          {
@@ -60,7 +60,7 @@ namespace Storage.Net.Databricks
 
       private async Task<Blob> GetBlobAsync(string fullPath)
       {
-         fullPath = StoragePath.Normalize(fullPath, true);
+         fullPath = StoragePath.Normalize(fullPath);
          FileInfo status;
          try
          {
@@ -100,7 +100,7 @@ namespace Storage.Net.Databricks
 
          try
          {
-            objects = await _dbfs.List(StoragePath.Normalize(path, true));
+            objects = await _dbfs.List(StoragePath.Normalize(path));
          }
          catch(ClientApiException ex) when(ex.StatusCode == HttpStatusCode.NotFound)
          {
@@ -124,7 +124,7 @@ namespace Storage.Net.Databricks
 
       public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
       {
-         fullPath = StoragePath.Normalize(fullPath, true);
+         fullPath = StoragePath.Normalize(fullPath);
 
          var ms = new MemoryStream(0);
          try
@@ -147,7 +147,7 @@ namespace Storage.Net.Databricks
          if(dataStream is null)
             throw new ArgumentNullException(nameof(dataStream));
 
-         fullPath = StoragePath.Normalize(fullPath, true);
+         fullPath = StoragePath.Normalize(fullPath);
 
          if(append)
             throw new ArgumentOutOfRangeException(nameof(append), "append mode is not supported");

@@ -7,7 +7,7 @@ namespace Storage.Net.Tests.Integration.Blobs
 {
    public class AzureBlobStorageFixture : BlobFixture
    {
-      public AzureBlobStorageFixture() : base("lakeyv12/")
+      public AzureBlobStorageFixture() : base("lakeyv12")
       {
       }
 

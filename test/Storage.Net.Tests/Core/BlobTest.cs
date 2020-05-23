@@ -22,7 +22,7 @@ namespace Storage.Net.Tests.Core
 
       [Theory]
       [InlineData("/", null, "/")]
-      [InlineData("/f0/f1", "f2", "f2/f0")]
+      [InlineData("/f0/f1", "f2", "/f2/f0")]
       public void Prepend_path(string path, string prefix, string expected)
       {
          var blob = new Blob(path, BlobItemKind.Folder);
