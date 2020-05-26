@@ -122,6 +122,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
          //prefix is absolute too
          result.AddRange(
             response.CommonPrefixes
+               .Where(p => !StoragePath.IsRootPath(p))
                .Select(p => new Blob(p, BlobItemKind.Folder)));
 
          return result;

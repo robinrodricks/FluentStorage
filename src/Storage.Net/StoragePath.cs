@@ -75,7 +75,8 @@ namespace Storage.Net
       /// - path separators are trimmed from both ends
       /// </summary>
       /// <param name="path"></param>
-      public static string Normalize(string path)
+      /// <param name="removeTrailingSlash"></param>
+      public static string Normalize(string path, bool removeTrailingSlash = false)
       {
          if (StoragePath.IsRootPath(path)) return RootFolderPath;
 
@@ -99,7 +100,9 @@ namespace Storage.Net
          }
          path = string.Join(PathSeparatorString, r);
 
-         return PathSeparatorString + path;
+         return removeTrailingSlash
+            ? path
+            : PathSeparatorString + path;
       }
 
       /// <summary>
@@ -117,7 +120,7 @@ namespace Storage.Net
       /// <summary>
       /// Splits path in parts. Leading and trailing path separators are totally ignored. Note that it returns
       /// null if input path is null. Parent folder signatures are returned as a part of split, they are not removed.
-      /// If you want to get an absolute normalized path use <see cref="Normalize(string)"/>
+      /// If you want to get an absolute normalized path use <see cref="Normalize(string, bool)"/>
       /// </summary>
       public static string[] Split(string path)
       {
