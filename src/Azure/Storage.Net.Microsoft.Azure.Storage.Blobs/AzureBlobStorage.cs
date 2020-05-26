@@ -337,8 +337,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
          if(includeUrl)
          {
-            string url = _client.Uri.ToString();
-            url += StoragePath.Normalize(fullPath);
+            string url = new Uri(_client.Uri, StoragePath.Normalize(fullPath)).ToString();
             url += "?";
             url += sas;
             return url;
