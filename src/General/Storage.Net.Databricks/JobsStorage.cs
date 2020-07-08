@@ -26,27 +26,40 @@ namespace Storage.Net.Databricks
          if(StoragePath.IsRootPath(path))
          {
             IEnumerable<Job> jobs = await _jobs.List();
-            return jobs.Select(ToBlob).ToList();
+
+            var jobsBlobs = new List<Blob>();
+            foreach(Job job in jobs)
+            {
+               jobsBlobs.Add(await ToBlobAsync(job));
+            }
+
+            return jobsBlobs;
          }
 
          // need job ID here - find by job name (crap!)
-         var rr = new List<Blob>();
          string jobName = StoragePath.Split(path)[0];
          long? jobId = await GetJobIdFromJobNameAsync(jobName);
+         IReadOnlyCollection<Run> allRuns = await GetAllJobRunsAsync(jobId.Value);
+         List<Blob> rr = allRuns.Select(r => ToBlob(jobName, r)).ToList();
+         rr.Reverse();  // jobs are better to see in reverse order - newest first
+         return rr;
+      }
+
+      private async Task<IReadOnlyCollection<Run>> GetAllJobRunsAsync(long jobId)
+      {
+         var result = new List<Run>();
          RunList runsList;
          int offset = 0;
          do
          {
-            runsList = await _jobs.RunsList(jobId, offset, 500, false, false);
+            runsList = await _jobs.RunsList(jobId, offset, 500, false, false).ConfigureAwait(false);
             List<Run> runs = runsList.Runs.ToList();
             offset += runs.Count;
-
-            rr.AddRange(runs.Select(r => ToBlob(jobName, r)));
+            result.AddRange(runs);
          }
          while(runsList.HasMore);
 
-         rr.Reverse();  // jobs are better to see in reverse order - newest first
-         return rr;
+         return result;
       }
 
       public override async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
@@ -85,7 +98,7 @@ namespace Storage.Net.Databricks
          return null;
       }
 
-      private static Blob ToBlob(Job dbJob)
+      private async Task<Blob> ToBlobAsync(Job dbJob)
       {
          var blob = new Blob(dbJob.Settings.Name, BlobItemKind.Folder);
          blob.LastModificationTime = dbJob.CreatedTime;
@@ -94,6 +107,18 @@ namespace Storage.Net.Databricks
             "Id", dbJob.JobId,
             "CreatorUserName", dbJob.CreatorUserName,
             "Settings", Module.AsDbJson(dbJob.Settings));
+
+         // get last run
+         IReadOnlyCollection<Run> allRuns = await GetAllJobRunsAsync(dbJob.JobId);
+         Run lastRun = allRuns.LastOrDefault();
+         if(lastRun != null)
+         {
+            blob.TryAddProperties(
+               "LastRunLifeCycleState", lastRun.State.LifeCycleState,
+               "LastRunResultState", lastRun.State.ResultState,
+               "LastRunEndTime", lastRun.EndTime,
+               "LastRunExecutionDuration", lastRun.ExecutionDuration);
+         }
 
          return blob;
       }

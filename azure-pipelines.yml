@@ -31,7 +31,7 @@ variables:
   - name: av
     value: '9.0.0'
   - name: pv
-    value: '9.3.0-preview-01'
+    value: '9.3.0-preview-02'
 
 stages:
 - stage: Build
