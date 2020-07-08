@@ -41,7 +41,6 @@ namespace Storage.Net.Databricks
          long? jobId = await GetJobIdFromJobNameAsync(jobName);
          IReadOnlyCollection<Run> allRuns = await GetAllJobRunsAsync(jobId.Value);
          List<Blob> rr = allRuns.Select(r => ToBlob(jobName, r)).ToList();
-         rr.Reverse();  // jobs are better to see in reverse order - newest first
          return rr;
       }
 
@@ -109,8 +108,7 @@ namespace Storage.Net.Databricks
             "Settings", Module.AsDbJson(dbJob.Settings));
 
          // get last run
-         IReadOnlyCollection<Run> allRuns = await GetAllJobRunsAsync(dbJob.JobId);
-         Run lastRun = allRuns.LastOrDefault();
+         Run lastRun = (await _jobs.RunsList(dbJob.JobId, 0, 1)).Runs.FirstOrDefault();
          if(lastRun != null)
          {
             blob.TryAddProperties(
