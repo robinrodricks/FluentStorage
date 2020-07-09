@@ -31,11 +31,13 @@ namespace Storage.Net.Databricks
             return await Task.WhenAll(jobs.Select(j => ToBlobAsync(j))).ConfigureAwait(false);
          }
 
+         // list runs
          // need job ID here - find by job name (crap!)
          string jobName = StoragePath.Split(path)[0];
          long? jobId = await GetJobIdFromJobNameAsync(jobName);
          IReadOnlyCollection<Run> allRuns = await GetAllJobRunsAsync(jobId.Value);
          List<Blob> rr = allRuns.Select(r => ToBlob(jobName, r)).ToList();
+         rr.Reverse();
          return rr;
       }
 
@@ -66,11 +68,15 @@ namespace Storage.Net.Databricks
          {
             if(long.TryParse(parts[1], out long runId))
             {
-               (string notebookOutput, string error, Run run) = await _jobs.RunsGetOutput(runId);
+               IEnumerable<ViewItem> exportedViews = await _jobs.RunsExport(runId, ViewsToExport.ALL);
+               if(exportedViews == null)
+                  return null;
 
-               return notebookOutput == null
+               ViewItem exportedView = exportedViews.FirstOrDefault();
+
+               return exportedView?.Content == null
                   ? null
-                  : new MemoryStream(Encoding.UTF8.GetBytes(notebookOutput));
+                  : new MemoryStream(Encoding.UTF8.GetBytes(exportedView.Content));
             }
          }
 
@@ -95,50 +101,68 @@ namespace Storage.Net.Databricks
       private async Task<Blob> ToBlobAsync(Job dbJob)
       {
          var blob = new Blob(dbJob.Settings.Name, BlobItemKind.Folder);
-         blob.LastModificationTime = dbJob.CreatedTime;
+         blob.CreatedTime = blob.LastModificationTime = dbJob.CreatedTime;
          blob.TryAddProperties(
             "ObjectType", "job",
             "Id", dbJob.JobId,
             "CreatorUserName", dbJob.CreatorUserName,
-            "Settings", Module.AsDbJson(dbJob.Settings),
             "QuartzCronExpression", dbJob.Settings?.Schedule?.QuartzCronExpression,
-            "SettingsObject", dbJob.Settings);
+            "MaxRetries", dbJob.Settings.MaxRetries,
+            "MinRetryInterval", TimeSpan.FromMilliseconds(dbJob.Settings.MinRetryIntervalMilliSeconds),
+            "RetryOnTimeout", dbJob.Settings.RetryOnTimeout,
+            "MaxConcurrentRuns", dbJob.Settings.MaxConcurrentRuns,
+            "Timeout", TimeSpan.FromSeconds(dbJob.Settings.TimeoutSeconds),
+            "Settings", dbJob.Settings,
+            "SettingJson", Module.AsDbJson(dbJob.Settings),
+            "EmailNotifications", dbJob.Settings?.EmailNotifications,
+            "EmailNotificationsJson", Module.AsDbJson(dbJob.Settings?.EmailNotifications));
 
          // get last run
          Run lastRun = (await _jobs.RunsList(dbJob.JobId, 0, 1)).Runs.FirstOrDefault();
          if(lastRun != null)
          {
-            blob.TryAddProperties(
-               "LastRunLifeCycleState", lastRun.State.LifeCycleState,
-               "LastRunResultState", lastRun.State.ResultState,
-               "LastRunEndTime", lastRun.EndTime,
-               "LastRunExecutionDuration", lastRun.ExecutionDuration);
+            AddProperties(blob, lastRun, "LastRun");
          }
 
          return blob;
       }
 
       private static Blob ToBlob(string jobName, Run dbRun)
-        {
+       {
          var blob = new Blob(jobName, dbRun.RunId.ToString(), BlobItemKind.File);
          blob.LastModificationTime = dbRun.EndTime ?? dbRun.StartTime;
-         blob.TryAddProperties(
-            "StartTime", dbRun.StartTime,
-            "EndTime", dbRun.EndTime,
-            "ExecutionDuration", dbRun.ExecutionDuration,
-            "IsCompleted", dbRun.IsCompleted,
+         AddProperties(blob, dbRun);
+         return blob;
+      }
+
+      private static void AddProperties(Blob blob, Run dbRun, string prefix = null)
+      {
+         blob.TryAddPropertiesWithPrefix(prefix,
+            "Creator", dbRun.CreatorUserName,
             "JobId", dbRun.JobId,
-            "NumberInJob", dbRun.NumberInJob,
-            "RunId", dbRun.RunId,
-            "RunPageUrl", dbRun.RunPageUrl,
-            "Schedule", Module.AsDbJson(dbRun.Schedule),
-            "SetupDuration", dbRun.SetupDuration,
+            "OriginalAttemptRunId", dbRun.OriginalAttemptRunId,
             "LifeCycleState", dbRun.State.LifeCycleState,
             "ResultState", dbRun.State.ResultState,
             "StateMessage", dbRun.State.StateMessage,
-            "Task", Module.AsDbJson(dbRun.Task),
-            "Trigger", dbRun.Trigger);
-         return blob;
+            "QuartzCronExpression", dbRun.Schedule?.QuartzCronExpression,
+            "StartTime", dbRun.StartTime,
+            "EndTime", dbRun.EndTime,
+            "SetupDuration", TimeSpan.FromMilliseconds(dbRun.SetupDuration),
+            "ExecutionDuration", TimeSpan.FromMilliseconds(dbRun.ExecutionDuration),
+            "CleanupDuration", TimeSpan.FromMilliseconds(dbRun.CleanupDuration),
+            "Trigger", dbRun.Trigger,
+            "RunPageUrl", dbRun.RunPageUrl,
+            "IsCompleted", dbRun.IsCompleted,
+            "RunId", dbRun.RunId,
+            "NumberInJob", dbRun.NumberInJob,
+            "Task", dbRun.Task,
+            "TaskJson", Module.AsDbJson(dbRun.Task),
+            "ClusterSpec", dbRun.ClusterSpec,
+            "ClusterSpecJson", Module.AsDbJson(dbRun.ClusterSpec),
+            "ClusterInstance", dbRun.ClusterInstance,
+            "ClusterInstanceJson", Module.AsDbJson(dbRun.ClusterInstance),
+            "OverridingParameters", dbRun.OverridingParameters,
+            "OverridingParametersJson", Module.AsDbJson(dbRun.OverridingParameters));
       }
    }
 }
