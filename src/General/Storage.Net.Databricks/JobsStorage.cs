@@ -100,7 +100,9 @@ namespace Storage.Net.Databricks
             "ObjectType", "job",
             "Id", dbJob.JobId,
             "CreatorUserName", dbJob.CreatorUserName,
-            "Settings", Module.AsDbJson(dbJob.Settings));
+            "Settings", Module.AsDbJson(dbJob.Settings),
+            "QuartzCronExpression", dbJob.Settings?.Schedule?.QuartzCronExpression,
+            "SettingsObject", dbJob.Settings);
 
          // get last run
          Run lastRun = (await _jobs.RunsList(dbJob.JobId, 0, 1)).Runs.FirstOrDefault();
