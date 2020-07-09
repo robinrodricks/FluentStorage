@@ -27,13 +27,8 @@ namespace Storage.Net.Databricks
          {
             IEnumerable<Job> jobs = await _jobs.List();
 
-            var jobsBlobs = new List<Blob>();
-            foreach(Job job in jobs)
-            {
-               jobsBlobs.Add(await ToBlobAsync(job));
-            }
-
-            return jobsBlobs;
+            // convert in parallel as they need to fetch extra info per item
+            return await Task.WhenAll(jobs.Select(j => ToBlobAsync(j))).ConfigureAwait(false);
          }
 
          // need job ID here - find by job name (crap!)
