@@ -34,7 +34,7 @@ namespace Storage.Net.Gcp.CloudStorage.Blobs
       protected override async Task<IReadOnlyCollection<Blob>> ListAtAsync(string path, ListOptions options, CancellationToken cancellationToken)
       {
          ObjectsResource.ListRequest request = _client.Service.Objects.List(_bucketName);
-         request.Prefix = StoragePath.IsRootPath(path) ? null : (path + "/");
+         request.Prefix = StoragePath.IsRootPath(path) ? null : (NormalisePath(path) + "/");
          request.Delimiter = "/";
 
          var page = new List<Blob>();
@@ -72,7 +72,7 @@ namespace Storage.Net.Gcp.CloudStorage.Blobs
                Delimiter = options.Recurse ? null : "/"
             });
 
-         return await GConvert.ToBlobsAsync(objects, options);
+         return await GConvert.ToBlobsAsync(objects, options).ConfigureAwait(false);
       }
 
       public override async Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
@@ -84,8 +84,8 @@ namespace Storage.Net.Gcp.CloudStorage.Blobs
 
       private async Task SetBlobAsync(Blob blob, CancellationToken cancellationToken = default)
       {
-         Object item = await _client.GetObjectAsync(_bucketName, StoragePath.Normalize(blob.FullPath), cancellationToken: cancellationToken);
-         
+         Object item = await _client.GetObjectAsync(_bucketName, NormalisePath(blob.FullPath), cancellationToken: cancellationToken).ConfigureAwait(false);
+
          if(item.Metadata == null)
          {
             item.Metadata = new Dictionary<string, string>();
@@ -103,19 +103,19 @@ namespace Storage.Net.Gcp.CloudStorage.Blobs
             }
          }
 
-         await _client.UpdateObjectAsync(item, cancellationToken: cancellationToken);
+         await _client.UpdateObjectAsync(item, cancellationToken: cancellationToken).ConfigureAwait(false);
       }
 
       protected override async Task<Blob> GetBlobAsync(string fullPath, CancellationToken cancellationToken)
       {
-         fullPath = StoragePath.Normalize(fullPath);
+         fullPath = NormalisePath(fullPath);
 
          try
          {
             Object obj = await _client.GetObjectAsync(_bucketName, fullPath,
                new GetObjectOptions
                {
-                  //todo  
+                  //todo
                },
                cancellationToken).ConfigureAwait(false);
 
@@ -131,7 +131,7 @@ namespace Storage.Net.Gcp.CloudStorage.Blobs
       {
          try
          {
-            await _client.DeleteObjectAsync(_bucketName, StoragePath.Normalize(fullPath), cancellationToken: cancellationToken).ConfigureAwait(false);
+            await _client.DeleteObjectAsync(_bucketName, NormalisePath(fullPath), cancellationToken: cancellationToken).ConfigureAwait(false);
          }
          catch(GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.NotFound)
          {
@@ -143,7 +143,7 @@ namespace Storage.Net.Gcp.CloudStorage.Blobs
             {
                try
                {
-                  await _client.DeleteObjectAsync(_bucketName, blob, cancellationToken: cancellationToken).ConfigureAwait(false);
+                  await _client.DeleteObjectAsync(_bucketName, NormalisePath(blob.FullPath), cancellationToken: cancellationToken).ConfigureAwait(false);
                }
                catch(GoogleApiException exc) when(exc.HttpStatusCode == HttpStatusCode.NotFound)
                {
@@ -160,7 +160,7 @@ namespace Storage.Net.Gcp.CloudStorage.Blobs
          try
          {
             await _client.GetObjectAsync(
-               _bucketName, StoragePath.Normalize(fullPath),
+               _bucketName, NormalisePath(fullPath),
                null,
                cancellationToken).ConfigureAwait(false);
 
@@ -179,7 +179,7 @@ namespace Storage.Net.Gcp.CloudStorage.Blobs
          if(append)
             throw new NotSupportedException();
          GenericValidation.CheckBlobFullPath(fullPath);
-         fullPath = StoragePath.Normalize(fullPath, false);
+         fullPath = NormalisePath(fullPath);
 
          await _client.UploadObjectAsync(_bucketName, fullPath, null, dataStream, cancellationToken: cancellationToken).ConfigureAwait(false);
       }
@@ -187,7 +187,7 @@ namespace Storage.Net.Gcp.CloudStorage.Blobs
       public override async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
-         fullPath = StoragePath.Normalize(fullPath, false);
+         fullPath = NormalisePath(fullPath);
 
          // no read streaming support in this crappy SDK
 
@@ -202,6 +202,15 @@ namespace Storage.Net.Gcp.CloudStorage.Blobs
          }
          ms.Position = 0;
          return ms;
+      }
+
+      /// <summary>
+      /// GCP requires no trailing root
+      /// </summary>
+      private static string NormalisePath(string path)
+      {
+         path = StoragePath.Normalize(path);
+         return path.Substring(1);
       }
    }
 }

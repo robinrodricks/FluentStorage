@@ -3,59 +3,49 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Databricks.Client;
 using Storage.Net.Blobs;
 using FileInfo = Microsoft.Azure.Databricks.Client.FileInfo;
 
-namespace Storage.Net.Microsoft.Azure.Databricks.Dbfs
+namespace Storage.Net.Databricks
 {
-   class AzureDatabricksDbfsBlobStorage : IBlobStorage
+   class DbfsStorage : IBlobStorage
    {
-      private readonly DatabricksClient _client;
       private readonly IDbfsApi _dbfs;
-      private readonly bool _isReadOnly;
 
-      public AzureDatabricksDbfsBlobStorage(string baseUri, string token, bool isReadOnly)
+      public DbfsStorage(IDbfsApi dbfsApi)
       {
-         if(baseUri is null)
-            throw new ArgumentNullException(nameof(baseUri));
-         if(token is null)
-            throw new ArgumentNullException(nameof(token));
-
-         _client = DatabricksClient.CreateClient(baseUri, token);
-         _dbfs = _client.Dbfs;
-         _isReadOnly = isReadOnly;
+         _dbfs = dbfsApi;
       }
 
       public async Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         await Task.WhenAll(fullPaths.Select(fp => DeleteAsync(fp)));
+         await Task.WhenAll(fullPaths.Select(fp => DeleteAsync(fp))).ConfigureAwait(false);
       }
 
       private async Task DeleteAsync(string fullPath)
       {
-         fullPath = StoragePath.Normalize(fullPath, true);
+         fullPath = StoragePath.Normalize(fullPath);
 
-         await _dbfs.Delete(fullPath, true);
+         await _dbfs.Delete(fullPath, true).ConfigureAwait(false);
       }
 
       public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         return await Task.WhenAll(fullPaths.Select(fp => ExistsAsync(fp)));
+         return await Task.WhenAll(fullPaths.Select(fp => ExistsAsync(fp))).ConfigureAwait(false);
       }
 
       private async Task<bool> ExistsAsync(string fullPath)
       {
-         fullPath = StoragePath.Normalize(fullPath, true);
+         fullPath = StoragePath.Normalize(fullPath);
 
          try
          {
-            await _dbfs.GetStatus(fullPath);
+            await _dbfs.GetStatus(fullPath).ConfigureAwait(false);
          }
-         catch(ClientApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+         catch(ClientApiException ex) when(ex.StatusCode == HttpStatusCode.NotFound)
          {
             return false;
          }
@@ -65,16 +55,16 @@ namespace Storage.Net.Microsoft.Azure.Databricks.Dbfs
 
       public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         return await Task.WhenAll(fullPaths.Select(fp => GetBlobAsync(fp)));
+         return await Task.WhenAll(fullPaths.Select(fp => GetBlobAsync(fp))).ConfigureAwait(false);
       }
 
       private async Task<Blob> GetBlobAsync(string fullPath)
       {
-         fullPath = StoragePath.Normalize(fullPath, true);
+         fullPath = StoragePath.Normalize(fullPath);
          FileInfo status;
          try
          {
-            status = await _dbfs.GetStatus(fullPath);
+            status = await _dbfs.GetStatus(fullPath).ConfigureAwait(false);
          }
          catch(ClientApiException ex) when(ex.StatusCode == HttpStatusCode.NotFound)
          {
@@ -94,7 +84,7 @@ namespace Storage.Net.Microsoft.Azure.Databricks.Dbfs
 
          var result = new List<Blob>();
 
-         await ListFolderAsync(options.FolderPath, result, options);
+         await ListFolderAsync(options.FolderPath, result, options).ConfigureAwait(false);
 
          if(options.MaxResults != null)
          {
@@ -110,9 +100,9 @@ namespace Storage.Net.Microsoft.Azure.Databricks.Dbfs
 
          try
          {
-            objects = await _dbfs.List(StoragePath.Normalize(path, true));
+            objects = await _dbfs.List(StoragePath.Normalize(path)).ConfigureAwait(false);
          }
-         catch(ClientApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+         catch(ClientApiException ex) when(ex.StatusCode == HttpStatusCode.NotFound)
          {
             objects = new List<FileInfo>();
          }
@@ -128,20 +118,20 @@ namespace Storage.Net.Microsoft.Azure.Databricks.Dbfs
 
          if(options.Recurse)
          {
-            await Task.WhenAll(batch.Where(b => b.IsFolder).Select(f => ListFolderAsync(f.FullPath, container, options)));
+            await Task.WhenAll(batch.Where(b => b.IsFolder).Select(f => ListFolderAsync(f.FullPath, container, options))).ConfigureAwait(false);
          }
       }
 
       public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
       {
-         fullPath = StoragePath.Normalize(fullPath, true);
+         fullPath = StoragePath.Normalize(fullPath);
 
          var ms = new MemoryStream(0);
          try
          {
-            await _dbfs.Download(fullPath, ms);
+            await _dbfs.Download(fullPath, ms).ConfigureAwait(false);
          }
-         catch(ClientApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound || ex.StatusCode == HttpStatusCode.BadRequest)
+         catch(ClientApiException ex) when(ex.StatusCode == HttpStatusCode.NotFound || ex.StatusCode == HttpStatusCode.BadRequest)
          {
             return null;
          }
@@ -157,12 +147,12 @@ namespace Storage.Net.Microsoft.Azure.Databricks.Dbfs
          if(dataStream is null)
             throw new ArgumentNullException(nameof(dataStream));
 
-         fullPath = StoragePath.Normalize(fullPath, true);
+         fullPath = StoragePath.Normalize(fullPath);
 
          if(append)
             throw new ArgumentOutOfRangeException(nameof(append), "append mode is not supported");
 
-         await _dbfs.Upload(fullPath, true, dataStream);
+         await _dbfs.Upload(fullPath, true, dataStream).ConfigureAwait(false);
       }
 
       public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) => throw new NotSupportedException();
@@ -170,14 +160,6 @@ namespace Storage.Net.Microsoft.Azure.Databricks.Dbfs
       public void Dispose()
       {
 
-      }
-
-      private void CheckReadOnly()
-      {
-         if(_isReadOnly)
-         {
-            throw new InvalidOperationException("file system is read-only");
-         }
       }
    }
 }

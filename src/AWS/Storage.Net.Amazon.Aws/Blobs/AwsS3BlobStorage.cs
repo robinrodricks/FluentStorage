@@ -51,7 +51,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
       }
 
       /// <summary>
-      /// Creates a new instance of <see cref="AwsS3BlobStorage"/> for a given region endpoint, and will assume the running AWS ECS Task role credentials or Lambda role credentials 
+      /// Creates a new instance of <see cref="AwsS3BlobStorage"/> for a given region endpoint, and will assume the running AWS ECS Task role credentials or Lambda role credentials
       /// </summary>
       public AwsS3BlobStorage(string bucketName, string region)
       {
@@ -83,6 +83,15 @@ namespace Storage.Net.Amazon.Aws.Blobs
       /// </summary>
       public AwsS3BlobStorage(string accessKeyId, string secretAccessKey, string sessionToken,
          string bucketName, AmazonS3Config clientConfig)
+         : this(accessKeyId, secretAccessKey, sessionToken, bucketName, clientConfig, new TransferUtilityConfig())
+      {
+      }
+
+      /// <summary>
+      /// Creates a new instance of <see cref="AwsS3BlobStorage"/> for a given S3 client configuration
+      /// </summary>
+      public AwsS3BlobStorage(string accessKeyId, string secretAccessKey, string sessionToken,
+         string bucketName, AmazonS3Config clientConfig, TransferUtilityConfig transferUtilityConfig)
       {
          if(accessKeyId == null)
             throw new ArgumentNullException(nameof(accessKeyId));
@@ -96,7 +105,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
          _client = new AmazonS3Client(awsCreds, clientConfig);
 
-         _fileTransferUtility = new TransferUtility(_client);
+         _fileTransferUtility = new TransferUtility(_client, transferUtilityConfig ?? new TransferUtilityConfig());
       }
 
       private async Task<AmazonS3Client> GetClientAsync()
@@ -107,7 +116,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
             {
                var request = new PutBucketRequest { BucketName = _bucketName };
 
-               await _client.PutBucketAsync(request);
+               await _client.PutBucketAsync(request).ConfigureAwait(false);
 
                _initialised = true;
             }
@@ -159,7 +168,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
          if(append)
             throw new NotSupportedException();
          GenericValidation.CheckBlobFullPath(fullPath);
-         fullPath = StoragePath.Normalize(fullPath, false);
+         fullPath = StoragePath.Normalize(fullPath, true);
 
          //http://docs.aws.amazon.com/AmazonS3/latest/dev/HLuploadFileDotNet.html
 
@@ -170,7 +179,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
       {
          GenericValidation.CheckBlobFullPath(fullPath);
 
-         fullPath = StoragePath.Normalize(fullPath, false);
+         fullPath = StoragePath.Normalize(fullPath, true);
          GetObjectResponse response = await GetObjectAsync(fullPath).ConfigureAwait(false);
          if(response == null)
             return null;
@@ -189,7 +198,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
       {
          GenericValidation.CheckBlobFullPath(fullPath);
 
-         fullPath = StoragePath.Normalize(fullPath, false);
+         fullPath = StoragePath.Normalize(fullPath, true);
 
          await client.DeleteObjectAsync(_bucketName, fullPath, cancellationToken).ConfigureAwait(false);
          using(var browser = new AwsS3DirectoryBrowser(client, _bucketName))
@@ -211,7 +220,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
 
          try
          {
-            fullPath = StoragePath.Normalize(fullPath, false);
+            fullPath = StoragePath.Normalize(fullPath, true);
             await client.GetObjectMetadataAsync(_bucketName, fullPath, cancellationToken).ConfigureAwait(false);
             return true;
          }
@@ -231,7 +240,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
       private async Task<Blob> GetBlobAsync(string fullPath)
       {
          GenericValidation.CheckBlobFullPath(fullPath);
-         fullPath = StoragePath.Normalize(fullPath, false);
+         fullPath = StoragePath.Normalize(fullPath, true);
 
          AmazonS3Client client = await GetClientAsync().ConfigureAwait(false);
 
@@ -263,7 +272,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
                   client,
                   blob,
                   _bucketName,
-                  blob).ConfigureAwait(false);
+                  StoragePath.Normalize(blob.FullPath, true)).ConfigureAwait(false);
             }
          }
       }
@@ -318,7 +327,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
       /// </summary>
       public async Task<string> GetUploadUrlAsync(string fullPath, string mimeType, int expiresInSeconds = 86000)
       {
-         return await GetPresignedUrlAsync(fullPath, mimeType, expiresInSeconds, HttpVerb.PUT);
+         return await GetPresignedUrlAsync(fullPath, mimeType, expiresInSeconds, HttpVerb.PUT).ConfigureAwait(false);
       }
 
       /// <summary>
@@ -326,7 +335,7 @@ namespace Storage.Net.Amazon.Aws.Blobs
       /// </summary>
       public async Task<string> GetDownloadUrlAsync(string fullPath, string mimeType, int expiresInSeconds = 86000)
       {
-         return await GetPresignedUrlAsync(fullPath, mimeType, expiresInSeconds, HttpVerb.GET);
+         return await GetPresignedUrlAsync(fullPath, mimeType, expiresInSeconds, HttpVerb.GET).ConfigureAwait(false);
       }
 
       /// <summary>
@@ -334,14 +343,14 @@ namespace Storage.Net.Amazon.Aws.Blobs
       /// </summary>
       public async Task<string> GetPresignedUrlAsync(string fullPath, string mimeType, int expiresInSeconds, HttpVerb verb)
       {
-         IAmazonS3 client = await GetClientAsync();
+         IAmazonS3 client = await GetClientAsync().ConfigureAwait(false);
 
          return client.GetPreSignedURL(new GetPreSignedUrlRequest()
          {
             BucketName = _bucketName,
             ContentType = mimeType,
             Expires = DateTime.UtcNow.AddSeconds(expiresInSeconds),
-            Key = StoragePath.Normalize(fullPath, false),
+            Key = StoragePath.Normalize(fullPath, true),
             Verb = verb,
          });
       }

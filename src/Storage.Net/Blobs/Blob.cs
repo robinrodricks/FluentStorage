@@ -9,7 +9,7 @@ namespace Storage.Net.Blobs
    /// <summary>
    /// Blob item description
    /// </summary>
-   public sealed class Blob : IEquatable<Blob>
+   public sealed class Blob : IEquatable<Blob>, ICloneable
    {
       /// <summary>
       /// Gets the kind of item
@@ -49,6 +49,11 @@ namespace Storage.Net.Blobs
       public string MD5 { get; set; }
 
       /// <summary>
+      /// Creation time when known
+      /// </summary>
+      public DateTimeOffset? CreatedTime { get; set; }
+
+      /// <summary>
       /// Last modification time when known
       /// </summary>
       public DateTimeOffset? LastModificationTime { get; set; }
@@ -61,7 +66,7 @@ namespace Storage.Net.Blobs
       /// <summary>
       /// Custom provider-specific properties. Key names are case-insensitive.
       /// </summary>
-      public Dictionary<string, object> Properties { get; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+      public Dictionary<string, object> Properties { get; private set; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
       /// <summary>
       /// Try to get property and cast it to a specified type
@@ -87,7 +92,9 @@ namespace Storage.Net.Blobs
       /// <summary>
       /// User defined metadata. Key names are case-insensitive.
       /// </summary>
-      public Dictionary<string, string> Metadata { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+      public Dictionary<string, string> Metadata { get; private set;  } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+      internal object Tag { get; set; }
 
       /// <summary>
       /// Tries to add properties in pairs when value is not null
@@ -108,6 +115,21 @@ namespace Storage.Net.Blobs
                Properties[key] = value;
             }
          }
+      }
+
+      /// <summary>
+      /// Works just like <see cref="TryAddProperties(object[])"/> but prefixes all the keys
+      /// </summary>
+      /// <param name="prefix"></param>
+      /// <param name="keyValues"></param>
+      public void TryAddPropertiesWithPrefix(string prefix, params object[] keyValues)
+      {
+         if(string.IsNullOrEmpty(prefix))
+            TryAddProperties(keyValues);
+
+         object[] keyValuesWithPrefix = keyValues.Select((e, i) => i % 2 == 0 ? (prefix + (string)e) : e).ToArray();
+
+         TryAddProperties(keyValuesWithPrefix);
       }
 
       /// <summary>
@@ -136,11 +158,7 @@ namespace Storage.Net.Blobs
       /// <param name="kind"></param>
       public Blob(string fullPath, BlobItemKind kind = BlobItemKind.File)
       {
-         string path = StoragePath.Normalize(fullPath);
-         string[] parts = StoragePath.Split(path);
-
-         Name = parts.Last();
-         FolderPath = StoragePath.GetParent(path);
+         SetFullPath(fullPath);
 
          Kind = kind;
       }
@@ -162,7 +180,7 @@ namespace Storage.Net.Blobs
       /// <summary>
       /// Returns true if this item is a folder and it's a root folder
       /// </summary>
-      public bool IsRootFolder => Kind == BlobItemKind.Folder && StoragePath.IsRootPath(FolderPath);
+      public bool IsRootFolder => Kind == BlobItemKind.Folder && StoragePath.IsRootPath(FullPath);
 
       /// <summary>
       /// Full blob info, i.e type, id and path
@@ -286,6 +304,51 @@ namespace Storage.Net.Blobs
                }
             }
          }
+      }
+
+      /// <summary>
+      /// Prepends path to this blob's path without modifying blob's properties
+      /// </summary>
+      /// <param name="path"></param>
+      public void PrependPath(string path)
+      {
+         if(path == null || StoragePath.IsRootPath(path))
+            return;
+
+         FolderPath = StoragePath.Combine(path, FolderPath);
+      }
+
+      /// <summary>
+      /// Changes full path of this blob without modifying any other property
+      /// </summary>
+      public void SetFullPath(string fullPath)
+      {
+         string path = StoragePath.Normalize(fullPath);
+
+         if(StoragePath.IsRootPath(path))
+         {
+            Name = StoragePath.RootFolderPath;
+            FolderPath = StoragePath.RootFolderPath;
+         }
+         else
+         {
+            string[] parts = StoragePath.Split(path);
+
+            Name = parts.Last();
+            FolderPath = StoragePath.GetParent(path);
+         }
+      }
+
+      /// <summary>
+      /// Clones blob to best efforts
+      /// </summary>
+      /// <returns></returns>
+      public object Clone()
+      {
+         var clone = (Blob)MemberwiseClone();
+         clone.Metadata = new Dictionary<string, string>(Metadata, StringComparer.OrdinalIgnoreCase);
+         clone.Properties = new Dictionary<string, object>(Properties, StringComparer.OrdinalIgnoreCase);
+         return clone;
       }
    }
 }

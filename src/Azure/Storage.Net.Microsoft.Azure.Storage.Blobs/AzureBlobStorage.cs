@@ -40,7 +40,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
          _client = blobServiceClient ?? throw new ArgumentNullException(nameof(blobServiceClient));
          _sasSigningCredentials = sasSigningCredentials;
          _containerName = containerName;
-         
+
       }
 
       #region [ Interface Methods ]
@@ -337,8 +337,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
          if(includeUrl)
          {
-            string url = _client.Uri.ToString();
-            url += StoragePath.Normalize(fullPath);
+            string url = new Uri(_client.Uri, StoragePath.Normalize(fullPath)).ToString();
             url += "?";
             url += sas;
             return url;
@@ -421,7 +420,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
          try
          {
-            await logsProps;
+            await logsProps.ConfigureAwait(false);
             r.Add(logsContainerClient);
          }
          catch(RequestFailedException ex) when(ex.ErrorCode == "ContainerNotFound")
@@ -452,7 +451,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
       protected virtual async Task DeleteAsync(string fullPath, CancellationToken cancellationToken)
       {
-         (BlobContainerClient container, string path) = await GetPartsAsync(fullPath, false);
+         (BlobContainerClient container, string path) = await GetPartsAsync(fullPath, false).ConfigureAwait(false);
 
          if(StoragePath.IsRootPath(path))
          {
@@ -464,7 +463,7 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
             BlockBlobClient blob = string.IsNullOrEmpty(path)
                ? null
-               : container.GetBlockBlobClient(StoragePath.Normalize(path, false));
+               : container.GetBlockBlobClient(StoragePath.Normalize(path));
             if(blob != null)
             {
                try
@@ -520,16 +519,17 @@ namespace Storage.Net.Microsoft.Azure.Storage.Blobs
 
          if(_containerName == null)
          {
-            int idx = fullPath.IndexOf(StoragePath.PathSeparator);
-            if(idx == -1)
+            string[] parts = StoragePath.Split(fullPath);
+
+            if(parts.Length == 1)
             {
-               containerName = fullPath;
+               containerName = parts[0];
                relativePath = string.Empty;
             }
             else
             {
-               containerName = fullPath.Substring(0, idx);
-               relativePath = fullPath.Substring(idx + 1);
+               containerName = parts[0];
+               relativePath = StoragePath.Combine(parts.Skip(1)).Substring(1);
             }
          }
          else

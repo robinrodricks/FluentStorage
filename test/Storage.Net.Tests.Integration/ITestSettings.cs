@@ -93,6 +93,10 @@ namespace Storage.Net.Tests
       string FtpPassword { get; }
 
       #endregion
+
+      string DatabricksBaseUri { get; set; }
+
+      string DatabricksToken { get; set; }
    }
 
    public static class Settings
@@ -112,7 +116,7 @@ namespace Storage.Net.Tests
 
                _instance = new ConfigurationBuilder<ITestSettings>()
                   .UseIniFile("c:\\tmp\\integration-tests.ini")
-                  .UseAzureDevOpsVariableSet(_instance.DevOpsOrgName, _instance.DevOpsProject, _instance.DevOpsPat, _instance.DevOpsVariableSetId)
+                  //.UseAzureDevOpsVariableSet(_instance.DevOpsOrgName, _instance.DevOpsProject, _instance.DevOpsPat, _instance.DevOpsVariableSetId)
                   .UseEnvironmentVariables()
                   .Build();
 
