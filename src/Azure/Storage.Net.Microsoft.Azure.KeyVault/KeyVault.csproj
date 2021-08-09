@@ -31,6 +31,6 @@
       <ProjectReference Include="..\..\Storage.Net\Storage.Net.csproj" />
    </ItemGroup>
    <ItemGroup>
-      <None Include="..\..\storage.png" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+      <None Include="..\..\storage.png" CopyToOutputDirectory="Always" Pack="true" PackagePath="\" />
    </ItemGroup>
 </Project>

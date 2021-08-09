@@ -35,7 +35,7 @@
   </ItemGroup>
 
    <ItemGroup>
-      <None Include="..\..\src\storage.png" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+      <None Include="..\..\src\storage.png" CopyToOutputDirectory="Always" Pack="true" PackagePath="\"  />
    </ItemGroup>
 
 </Project>

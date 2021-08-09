@@ -18,7 +18,7 @@
      <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.1.1" />
   </ItemGroup>
    <ItemGroup>
-      <None Include="..\..\storage.png" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+      <None Include="..\..\storage.png" CopyToOutputDirectory="Always" Pack="true" PackagePath="\" />
    </ItemGroup>
 
 </Project>
