@@ -27,11 +27,11 @@ variables:
   - name: rgName
     value: 'storagenet-deleteme'
   - name: v
-    value: '9.2.0'
+    value: '9.3.0'
   - name: av
     value: '9.0.0'
   - name: pv
-    value: '9.2.7'
+    value: '9.3.0'
 
 stages:
 - stage: Build
