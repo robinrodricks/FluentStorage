@@ -1,4 +1,5 @@
 ﻿using Amazon;
+using Amazon.Runtime;
 using Amazon.S3;
 using Storage.Net.Amazon.Aws.Messaging;
 using Storage.Net.Amazon.Aws.Blobs;
