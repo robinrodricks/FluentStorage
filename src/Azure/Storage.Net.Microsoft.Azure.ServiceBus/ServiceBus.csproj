@@ -6,7 +6,7 @@
       <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageId>Storage.Net.Microsoft.Azure.ServiceBus</PackageId>
-      <PackageIcon>http://i.isolineltd.com/nuget/storage.png</PackageIcon>
+      <PackageIcon>storage.png</PackageIcon>
       <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
       <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
       <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -33,5 +33,8 @@
    </ItemGroup>
    <ItemGroup>
       <ProjectReference Include="..\..\Storage.Net\Storage.Net.csproj" />
+   </ItemGroup>
+   <ItemGroup>
+      <None Include="..\..\storage.png" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
    </ItemGroup>
 </Project>

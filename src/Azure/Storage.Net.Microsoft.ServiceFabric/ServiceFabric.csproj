@@ -5,7 +5,7 @@
       <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
       <PackageLicense>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicense>
       <Copyright>Copyright (c) 2015-2017 by Ivan Gavryliuk</Copyright>
-      <PackageIcon>http://i.isolineltd.com/nuget/storage.png</PackageIcon>
+      <PackageIcon>storage.png</PackageIcon>
       <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
       <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
       <Version>2.6.204.0</Version>
@@ -28,5 +28,8 @@
    </ItemGroup>
    <ItemGroup>
       <ProjectReference Include="..\..\Storage.Net\Storage.Net.csproj" />
+   </ItemGroup>
+   <ItemGroup>
+      <None Include="..\..\storage.png" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
    </ItemGroup>
 </Project>

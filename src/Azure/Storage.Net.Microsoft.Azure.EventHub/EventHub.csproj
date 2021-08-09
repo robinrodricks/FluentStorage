@@ -6,7 +6,7 @@
       <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageId>Storage.Net.Microsoft.Azure.EventHub</PackageId>
-      <PackageIcon>http://i.isolineltd.com/nuget/storage.png</PackageIcon>
+      <PackageIcon>storage.png</PackageIcon>
       <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
       <Version>1.0.0</Version>
       <FileVersion>1.0.0.0</FileVersion>
@@ -34,5 +34,8 @@
    </ItemGroup>
    <ItemGroup>
       <ProjectReference Include="..\..\Storage.Net\Storage.Net.csproj" />
+   </ItemGroup>
+   <ItemGroup>
+      <None Include="..\..\storage.png" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
    </ItemGroup>
 </Project>

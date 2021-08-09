@@ -7,7 +7,7 @@
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <AssemblyName>Storage.Net</AssemblyName>
       <PackageId>Storage.Net</PackageId>
-      <PackageIcon>http://i.isolineltd.com/nuget/storage.png</PackageIcon>
+      <PackageIcon>storage.png</PackageIcon>
       <PackageProjectUrl>https://github.com/aloneguid/storage</PackageProjectUrl>
       <RepositoryUrl>https://github.com/aloneguid/storage</RepositoryUrl>
       <RepositoryType>GitHub</RepositoryType>
@@ -34,5 +34,8 @@
       <PackageReference Include="NetBox" Version="2.3.5" />
       <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
       <PackageReference Include="System.Text.Json" Version="4.7.0" />
+   </ItemGroup>
+   <ItemGroup>
+      <None Include="..\..\storage.png" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
    </ItemGroup>
 </Project>
