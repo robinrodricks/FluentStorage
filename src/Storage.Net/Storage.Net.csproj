@@ -36,6 +36,6 @@
       <PackageReference Include="System.Text.Json" Version="4.7.0" />
    </ItemGroup>
    <ItemGroup>
-      <None Include="..\..\storage.png" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+      <None Include="..\storage.png" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
    </ItemGroup>
 </Project>

@@ -34,4 +34,8 @@
     <ProjectReference Include="..\..\src\AWS\Storage.Net.Amazon.Aws\Storage.Net.Amazon.Aws.csproj" />
   </ItemGroup>
 
+   <ItemGroup>
+      <None Include="..\..\src\storage.png" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+   </ItemGroup>
+
 </Project>

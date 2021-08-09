@@ -10,5 +10,8 @@
     <ProjectReference Include="..\..\src\Azure\Storage.Net.Microsoft.Azure.EventHub\EventHub.csproj" />
     <ProjectReference Include="..\Storage.Net.Tests.Integration\Storage.Net.Tests.Integration.csproj" />
   </ItemGroup>
+   <ItemGroup>
+      <None Include="..\..\src\storage.png" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+   </ItemGroup>
 
 </Project>
