@@ -2,6 +2,8 @@
 ### One Interface To Rule Them All
 [![NuGet](https://img.shields.io/nuget/v/Storage.Net.svg)](https://www.nuget.org/packages/Storage.Net/) [![](https://img.shields.io/azure-devops/build/aloneguid/4bab84c0-90f7-4425-afc6-ba077aa9757e/49/master.svg)](https://aloneguid.visualstudio.com/AllPublic/_build?definitionId=49) [![open collective backers and sponsors](https://img.shields.io/opencollective/all/storagedotnet.svg)](https://opencollective.com/storagedotnet)
 
+> This repository is archived in November 2022 because of resourcing issues. I'd like to thank everyone for contributions made and great feedback received. It has definitely been a great journey. Unfortunately, OSS is not always possible without support and since the product inception in 2015, I have received $25 of donation in 7 years so you get the idea. If you would like to take the ownership of this project please email me aloneguid@outlook.com.
+
 ![Slide](doc/slide.svg)
 
 ## About
