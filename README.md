@@ -4,6 +4,8 @@
 
 > This repository is archived in November 2022 because of resourcing issues. I'd like to thank everyone for contributions made and great feedback received. It has definitely been a great journey. Unfortunately, OSS is not always possible without support and since the product inception in 2015, I have received $25 of donation in 7 years so you get the idea. If you would like to take the ownership of this project please email me aloneguid@outlook.com.
 
+> Also, feel free to check out [Stowage](https://github.com/aloneguid/stowage) project where ideas from this project went into.
+
 ![Slide](doc/slide.svg)
 
 ## About
