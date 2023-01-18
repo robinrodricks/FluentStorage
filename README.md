@@ -20,17 +20,19 @@ FluentStorage is released under the permissive MIT License, so it can be used in
 
 ## Features
 
-* Abstracts storage implementation like `blobs`, `tables` and `messages` from the .NET Application Developer.
+* Unified API to interface with all major cloud providers for [Blobs](https://github.com/robinrodricks/FluentStorage/wiki/Blob-Storage) and [Messaging](https://github.com/robinrodricks/FluentStorage/wiki/Message-Storage).
 
 * Provides a generic interface regardless on which storage provider you are using.
 
 * Provides both synchronous and asynchronous alternatives of all methods and implements it to the best effort possible. 
 
-* Supports **Amazon S3**, **Azure Storage**, **Azure Service Bus**, **Azure Event Hub**, **Azure Data Lake Store**, **Azure Key Vault** and many more, out of the box, with hassle-free configuration and zero learning path.
+* Supports providers: AWS S3, AWS SQS, GCP Storage, FTP, FTPS, SFTP, Azure Blob & File Storage, Azure Queue Storage, Azure Service Bus, Azure Event Hub, Azure Data Lake Store, Azure Key Vault.
 
-* Implements inmemory and on disk versions of all the abstractions, therefore you can develop fast on a local machine or use vendor free serverless implementations for parts of your applciation which don't require a separate third party backend at a particular point in development.
+* Supports providers using out-of-the-box Nuget packages, with hassle-free configuration and zero learning path.
 
-* Attempts to enforce idential behavior on all implementaions of storage interfaces to the smallest details possible and you will find a lot of test specifications which will help you to add another provider.
+* Implements [in-memory and on-disk versions](https://github.com/robinrodricks/FluentStorage/wiki/Standard-Storage) of all the abstractions, therefore you can develop fast on a local machine or use vendor-free serverless implementations for parts of your application.
+
+* Attempts to enforce idential behavior on all implementations of storage interfaces to the smallest details possible, and contains many test specifications which will help you to add another provider.
 
 
 
