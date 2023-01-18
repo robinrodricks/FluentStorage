@@ -38,7 +38,7 @@ FluentStorage is released under the permissive MIT License, so it can be used in
 
 ## Packages
 
-Stable binaries are released on NuGet, and contain everything you need to use Cloud Storage in your .NET/.NET Standard application.
+Stable binaries are released on NuGet, and contain everything you need to use Cloud Storage in your .NET app.
 
 
 |       		| Package      		| Latest Version	|  Downloads	|  Documentation	| 
