@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+      <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
+      <AssemblyTitle>Storage.Net.Microsoft.Azure.EventHub</AssemblyTitle>
+      <PackageId>Storage.Net.Microsoft.Azure.EventHub</PackageId>
+      <PackageLicense>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicense>
+      <Description>Extension to Storage.Net providing integration with Microsoft Azure Storage for blobs, tables and queues.</Description>
+      <AssemblyName>Storage.Net.Microsoft.Azure.EventHub</AssemblyName>
+      <RootNamespace>Storage.Net.Microsoft.Azure.EventHub</RootNamespace>
+      <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+      <PackageIcon>logo-nuget.png</PackageIcon>
+      <Authors>Robin Rodricks, Ivan Gavryliuk, FluentStorage Contributors</Authors>
+      <Version>5.0.0</Version>
+      <PackageProjectUrl>https://github.com/robinrodricks/FluentStorage</PackageProjectUrl>
+      <RepositoryUrl>https://github.com/robinrodricks/FluentStorage</RepositoryUrl>
+      <RepositoryType>GitHub</RepositoryType>
+      <PackageLicenseExpression>MIT</PackageLicenseExpression>
+      <LangVersion>latest</LangVersion>
+      <SignAssembly>True</SignAssembly>
+      <AssemblyOriginatorKeyFile>..\FluentStorage\sn.snk</AssemblyOriginatorKeyFile>
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>$
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+      <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+   </PropertyGroup>
+   <ItemGroup>
+      <Compile Include="..\..\JsonExtensions.cs" Link="JsonExtensions.cs" />
+   </ItemGroup>
+   <ItemGroup>
+      <PackageReference Include="Microsoft.Azure.EventHubs" Version="4.1.0" />
+      <PackageReference Include="Microsoft.Azure.EventHubs.Processor" Version="4.1.0" />
+      <PackageReference Include="NetBox" Version="2.3.5" />
+   </ItemGroup>
+   <ItemGroup>
+      <ProjectReference Include="..\FluentStorage\FluentStorage.csproj" />
+   </ItemGroup>
+
+   <ItemGroup>
+      <None Include="..\.github\logo-nuget.png">
+         <Pack>True</Pack>
+         <PackagePath></PackagePath>
+      </None>
+   </ItemGroup>
+
+</Project>

@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net60</TargetFramework>
+  </PropertyGroup>
+
+   <ItemGroup>
+     <ProjectReference Include="..\FluentStorage.AWS\FluentStorage.AWS.csproj" />
+     <ProjectReference Include="..\FluentStorage.Azure.EventHub\FluentStorage.Azure.EventHub.csproj" />
+     <ProjectReference Include="..\FluentStorage.Tests.Integration\FluentStorage.Tests.Integration.csproj" />
+   </ItemGroup>
+
+</Project>

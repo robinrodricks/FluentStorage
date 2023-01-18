@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+      <AssemblyTitle>Storage.Net</AssemblyTitle>
+      <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
+      <AssemblyName>Storage.Net</AssemblyName>
+      <PackageId>Storage.Net</PackageId>
+      <Description>Storage.Net abstracts storage implementation like blobs, tables and messages from the .NET Application Developer. It's aimed to provide a generic interface regardless on which storage provider you are using. It also provides both synchronous and asynchronous alternatives of all methods and implements it to the best effort possible. Supports .NET 4.5.1 and .NET Standard 1.6.</Description>
+      <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+      <PackageIcon>logo-nuget.png</PackageIcon>
+      <Authors>Robin Rodricks, Ivan Gavryliuk, FluentStorage Contributors</Authors>
+      <Version>5.0.0</Version>
+      <PackageProjectUrl>https://github.com/robinrodricks/FluentStorage</PackageProjectUrl>
+      <RepositoryUrl>https://github.com/robinrodricks/FluentStorage</RepositoryUrl>
+      <RepositoryType>GitHub</RepositoryType>
+      <PackageLicenseExpression>MIT</PackageLicenseExpression>
+      <LangVersion>latest</LangVersion>
+      <SignAssembly>True</SignAssembly>
+      <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+      <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+      <DefineConstants>JSON</DefineConstants>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+      <DefineConstants>JSON</DefineConstants>
+   </PropertyGroup>
+   <ItemGroup>
+      <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="1.3.2" />
+      <PackageReference Include="NetBox" Version="2.3.5" />
+      <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+      <PackageReference Include="System.Text.Json" Version="4.7.0" />
+   </ItemGroup>
+
+   <ItemGroup>
+      <None Include="..\.github\logo-nuget.png">
+         <Pack>True</Pack>
+         <PackagePath></PackagePath>
+      </None>
+   </ItemGroup>
+
+</Project>

@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+      <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
+      <Description>Extension to Storage.Net providing integration with Microsoft Azure Key vault as a blob storage.</Description>
+      <FileVersion>1.0.0.0</FileVersion>
+      <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      <PackageLicense>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicense>
+      <PackageId>Storage.Net.Microsoft.Azure.KeyVault</PackageId>
+      <AssemblyName>Storage.Net.Microsoft.Azure.KeyVault</AssemblyName>
+      <RootNamespace>Storage.Net.Microsoft.Azure.KeyVault</RootNamespace>
+      <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+      <PackageIcon>logo-nuget.png</PackageIcon>
+      <Authors>Robin Rodricks, Ivan Gavryliuk, FluentStorage Contributors</Authors>
+      <Version>5.0.0</Version>
+      <PackageProjectUrl>https://github.com/robinrodricks/FluentStorage</PackageProjectUrl>
+      <RepositoryUrl>https://github.com/robinrodricks/FluentStorage</RepositoryUrl>
+      <RepositoryType>GitHub</RepositoryType>
+      <PackageLicenseExpression>MIT</PackageLicenseExpression>
+      <LangVersion>latest</LangVersion>
+      <SignAssembly>True</SignAssembly>
+      <AssemblyOriginatorKeyFile>..\FluentStorage\sn.snk</AssemblyOriginatorKeyFile>
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>$
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+      <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+   </PropertyGroup>
+   <ItemGroup>
+      <PackageReference Include="Azure.Identity" Version="1.1.0" />
+      <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.0.0" />
+   </ItemGroup>
+   <ItemGroup>
+      <ProjectReference Include="..\FluentStorage\FluentStorage.csproj" />
+   </ItemGroup>
+
+   <ItemGroup>
+      <None Include="..\.github\logo-nuget.png">
+         <Pack>True</Pack>
+         <PackagePath></PackagePath>
+      </None>
+   </ItemGroup>
+
+</Project>

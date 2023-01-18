@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+      <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
+      <PackageLicense>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicense>
+      <Description>Provides Azure Data Lake Store integration for Storage.Net library. Supports only ADLS Gen 1. To use Gen 2, use Storage.Net.Microsoft.Azure.Storage.Blobs package.</Description>
+      <PackageId>Storage.Net.Microsoft.Azure.DataLake.Storage.Gen1</PackageId>
+      <AssemblyName>Storage.Net.Microsoft.Azure.DataLake.Storage.Gen1</AssemblyName>
+      <RootNamespace>Storage.Net.Microsoft.Azure.DataLake.Storage.Gen1</RootNamespace>
+      <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+      <PackageIcon>logo-nuget.png</PackageIcon>
+      <Authors>Robin Rodricks, Ivan Gavryliuk, FluentStorage Contributors</Authors>
+      <Version>5.0.0</Version>
+      <PackageProjectUrl>https://github.com/robinrodricks/FluentStorage</PackageProjectUrl>
+      <RepositoryUrl>https://github.com/robinrodricks/FluentStorage</RepositoryUrl>
+      <RepositoryType>GitHub</RepositoryType>
+      <PackageLicenseExpression>MIT</PackageLicenseExpression>
+      <LangVersion>latest</LangVersion>
+      <SignAssembly>True</SignAssembly>
+      <AssemblyOriginatorKeyFile>..\FluentStorage\sn.snk</AssemblyOriginatorKeyFile>
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>$
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+      <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+   </PropertyGroup>
+   <ItemGroup>
+      <PackageReference Include="Microsoft.Azure.DataLake.Store" Version="1.1.19" />
+      <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.3.1" />
+      <PackageReference Include="Microsoft.Rest.ClientRuntime.Azure.Authentication" Version="2.4.0" />
+      <PackageReference Include="NetBox" Version="2.3.5" />
+      <PackageReference Include="System.Net.Http" Version="4.3.4" />
+   </ItemGroup>
+   <ItemGroup>
+      <ProjectReference Include="..\FluentStorage\FluentStorage.csproj" />
+   </ItemGroup>
+
+   <ItemGroup>
+      <None Include="..\.github\logo-nuget.png">
+         <Pack>True</Pack>
+         <PackagePath></PackagePath>
+      </None>
+   </ItemGroup>
+
+</Project>

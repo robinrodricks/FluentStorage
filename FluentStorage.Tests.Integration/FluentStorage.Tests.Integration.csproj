@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+      <TargetFramework>net60</TargetFramework>
+      <LangVersion>latest</LangVersion>
+   </PropertyGroup>
+
+   <ItemGroup>
+      <PackageReference Include="xunit" Version="2.4.1" />
+      <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+         <PrivateAssets>all</PrivateAssets>
+         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+      <PackageReference Include="LogMagic" Version="2.17.5" />
+      <PackageReference Include="Config.Net" Version="4.14.20" />
+      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FluentStorage.AWS\FluentStorage.AWS.csproj" />
+    <ProjectReference Include="..\FluentStorage.Azure.DataLake.Store\FluentStorage.Azure.DataLake.Store.csproj" />
+    <ProjectReference Include="..\FluentStorage.Azure.EventHub\FluentStorage.Azure.EventHub.csproj" />
+    <ProjectReference Include="..\FluentStorage.Azure.KeyVault\FluentStorage.Azure.KeyVault.csproj" />
+    <ProjectReference Include="..\FluentStorage.Azure.Queues\FluentStorage.Azure.Queues.csproj" />
+    <ProjectReference Include="..\FluentStorage.Azure.ServiceBus\FluentStorage.Azure.ServiceBus.csproj" />
+    <ProjectReference Include="..\FluentStorage.Azure.ServiceFabric\FluentStorage.Azure.ServiceFabric.csproj" />
+    <ProjectReference Include="..\FluentStorage.Azure.Storage.Blobs\FluentStorage.Azure.Storage.Blobs.csproj" />
+    <ProjectReference Include="..\FluentStorage.Azure.Storage.Files\FluentStorage.Azure.Storage.Files.csproj" />
+    <ProjectReference Include="..\FluentStorage.Databricks\FluentStorage.Databricks.csproj" />
+    <ProjectReference Include="..\FluentStorage.FTP\FluentStorage.FTP.csproj" />
+    <ProjectReference Include="..\FluentStorage.GCP\FluentStorage.GCP.csproj" />
+    <ProjectReference Include="..\FluentStorage\FluentStorage.csproj" />
+  </ItemGroup>
+
+</Project>

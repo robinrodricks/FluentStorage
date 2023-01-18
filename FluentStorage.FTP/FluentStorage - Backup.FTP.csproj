@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+      <TargetFramework>netstandard2.0</TargetFramework>
+      <LangVersion>latest</LangVersion>
+      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+      <WarningsAsErrors />
+      <Description>FTP bindings for Storage.Net</Description>
+   </PropertyGroup>
+
+   <ItemGroup>
+      <PackageReference Include="FluentFTP" Version="28.0.5" />
+      <PackageReference Include="Polly" Version="7.2.0" />
+   </ItemGroup>
+
+   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+      <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+   </PropertyGroup>
+
+   <ItemGroup>
+      <ProjectReference Include="..\FluentStorage\FluentStorage.csproj" />
+      <ProjectReference Include="..\FluentStorage\FluentStorage.csproj" />
+   </ItemGroup>
+
+   <ItemGroup>
+      <None Include="..\..\storage.png" CopyToOutputDirectory="Always" Pack="true" PackagePath="\" />
+   </ItemGroup>
+
+</Project>
