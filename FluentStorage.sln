@@ -19,9 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentStorage.Azure.Service
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentStorage.Azure.ServiceFabric", "FluentStorage.Azure.ServiceFabric\FluentStorage.Azure.ServiceFabric.csproj", "{3E01AD0A-FCCB-4795-84F3-41FF04ED5C1C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentStorage.Azure.Blobs", "FluentStorage.Azure.Storage.Blobs\FluentStorage.Azure.Blobs.csproj", "{40FE085F-7581-4660-AFAD-C7CA1C003703}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentStorage.Azure.Blobs", "FluentStorage.Azure.Blobs\FluentStorage.Azure.Blobs.csproj", "{40FE085F-7581-4660-AFAD-C7CA1C003703}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentStorage.Azure.Files", "FluentStorage.Azure.Storage.Files\FluentStorage.Azure.Files.csproj", "{857DE0F5-9AC4-46AC-917C-7EAD1C6E3CCF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentStorage.Azure.Files", "FluentStorage.Azure.Files\FluentStorage.Azure.Files.csproj", "{857DE0F5-9AC4-46AC-917C-7EAD1C6E3CCF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentStorage.Databricks", "FluentStorage.Databricks\FluentStorage.Databricks.csproj", "{7B80BB9E-8D27-411D-8929-350EBC50A6AC}"
 EndProject
