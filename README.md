@@ -1,10 +1,10 @@
-![FluentStorage](https://github.com/robinrodricks/FluentStorage/raw/master/.github/logo.png)
+![FluentStorage](https://github.com/robinrodricks/FluentStorage/raw/develop/.github/logo.png)
 
 [![Version](https://img.shields.io/nuget/vpre/FluentStorage.svg)](https://www.nuget.org/packages/FluentStorage)
 [![Downloads](https://img.shields.io/nuget/dt/FluentStorage.svg)](https://www.nuget.org/packages/FluentStorage)
 [![GitHub contributors](https://img.shields.io/github/contributors/robinrodricks/FluentStorage.svg)](https://github.com/robinrodricks/FluentStorage/graphs/contributors)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/8bc33aa55cb8494da3a7a07dba5316f7)](https://www.codacy.com/gh/robinrodricks/FluentStorage/dashboard)
-[![License](https://img.shields.io/github/license/robinrodricks/FluentStorage.svg)](https://github.com/robinrodricks/FluentStorage/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/robinrodricks/FluentStorage.svg)](https://github.com/robinrodricks/FluentStorage/blob/develop/LICENSE)
 
 
 ### One Interface To Rule Them All
@@ -44,7 +44,7 @@ Features:
 Special thanks to these awesome people who helped create FluentStorage! Shoutout to [Ivan Gavryliuk](https://github.com/aloneguid) for the original project [Storage.Net](https://github.com/aloneguid/storage).
 
 <!---
-<img src="https://github.com/robinrodricks/FluentStorage/raw/master/.github/contributors.png" />
+<img src="https://github.com/robinrodricks/FluentStorage/raw/develop/.github/contributors.png" />
 -->
 
 <a href="https://github.com/robinrodricks/FluentStorage/graphs/contributors">
