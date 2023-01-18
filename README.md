@@ -36,6 +36,13 @@ FluentStorage is released under the permissive MIT License, so it can be used in
 
 
 
+
+## Supported Cloud Services
+
+![Slide](https://raw.githubusercontent.com/robinrodricks/FluentStorage/develop/.github/providers.svg)
+
+
+
 ## What's New
 
 In 2023 we added:
@@ -43,12 +50,6 @@ In 2023 we added:
 * **SFTP** provider [SSH.NET](https://github.com/sshnet/SSH.NET) added 
 * **FTP** provider [FluentFTP](https://github.com/robinrodricks/FluentFTP) updated to v44
 * **AWS** Nuget bumped to latest versions
-
-
-
-## Supported Cloud Services
-
-![Slide](https://raw.githubusercontent.com/robinrodricks/FluentStorage/develop/.github/providers.svg)
 
 
 
