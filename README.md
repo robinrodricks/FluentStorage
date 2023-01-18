@@ -1,10 +1,9 @@
-﻿# Storage.Net
+# FluentStorage
+
+Originally known as Storage.Net.
+
 ### One Interface To Rule Them All
-[![NuGet](https://img.shields.io/nuget/v/Storage.Net.svg)](https://www.nuget.org/packages/Storage.Net/) [![](https://img.shields.io/azure-devops/build/aloneguid/4bab84c0-90f7-4425-afc6-ba077aa9757e/49/master.svg)](https://aloneguid.visualstudio.com/AllPublic/_build?definitionId=49) [![open collective backers and sponsors](https://img.shields.io/opencollective/all/storagedotnet.svg)](https://opencollective.com/storagedotnet)
-
-> This repository is archived in November 2022 because of resourcing issues. I'd like to thank everyone for contributions made and great feedback received. It has definitely been a great journey. Unfortunately, OSS is not always possible without support and since the product inception in 2015, I have received $25 of donation in 7 years so you get the idea. If you would like to take the ownership of this project please email me aloneguid@outlook.com.
-
-> Also, feel free to check out [Stowage](https://github.com/aloneguid/stowage) project where ideas from this project went into.
+[![NuGet](https://img.shields.io/nuget/v/Storage.Net.svg)](https://www.nuget.org/packages/Storage.Net/) [![](https://img.shields.io/azure-devops/build/aloneguid/4bab84c0-90f7-4425-afc6-ba077aa9757e/49/master.svg)](https://aloneguid.visualstudio.com/AllPublic/_build?definitionId=49) 
 
 ![Slide](doc/slide.svg)
 
@@ -20,9 +19,6 @@ It also implements in-memory and on-disk versions of all the abstractions for fa
 
 Storage.Net is used by some big **Fortune 500** companies, large, medium and small businesses, open-source projects and even desktop applications like this one:
 
-<a href='//www.microsoft.com/store/apps/9NKV1D43NLL3?cid=storebadge&ocid=badge'>
-   <img src='https://assets.windowsphone.com/85864462-9c82-451e-9355-a3d5f874397a/English_get-it-from-MS_InvariantCulture_Default.png' alt='English badge' style='width: 284px; height: 104px;' width='284' height='104'/>
-</a>
 
 ## Index
 
@@ -267,59 +263,18 @@ These methods make sure that *all* of the message data is preserved, and also ar
 
 ## Sponsorship
 
-This framework is free and can be used for free, open source and commercial applications. Storage.Net (all code, NuGets and binaries) are under the [MIT License (MIT)](https://github.com/aloneguid/storage/blob/master/LICENSE). It's battle-tested and used by many awesome people and organisations. So hit the magic ⭐️ button, we appreciate it!!! 🙏 Thx!
+This framework is free and can be used for free, open source and commercial applications. Storage.Net (all code, NuGets and binaries) are under the [MIT License (MIT)](https://github.com/aloneguid/storage/blob/master/LICENSE). It's battle-tested and used by many awesome people and organisations. 
 
 The core team members, Storage.Net contributors and contributors in the ecosystem do this open source work in their free time. If you use Storage.Net, and you'd like us to invest more time on it, please donate. This project increases your income/productivity/usabilty too.
-
-### Why charge/sponsor for open source?
-
- * [Open-Source Maintainers are Jerks! | Nick Randolph & Geoffrey Huntley](https://vimeo.com/296579853)
- * [FOSS is free as in toilet | Geoffroy Couprie](http://unhandledexpression.com/general/2018/11/27/foss-is-free-as-in-toilet.html)
- * [How to Charge for your Open Source | Mike Perham](https://www.mikeperham.com/2015/11/23/how-to-charge-for-your-open-source/)
- * [Sustain OSS: The Report](https://sustainoss.org/assets/pdf/SustainOSS-west-2017-report.pdf)
- * [Open Source Maintainers Owe You Nothing | Mike McQuaid](https://mikemcquaid.com/2018/03/19/open-source-maintainers-owe-you-nothing/)
- * [Who should fund open source projects? | Jane Elizabeth](https://jaxenter.com/who-funds-open-source-projects-133222.html)
- * [Apply at OSS Inc today| Ryan Chenkie](https://twitter.com/ryanchenkie/status/1067801413974032385)
- * [The Ethics of Unpaid Labor and the OSS Community | Ashe Dryden](https://www.ashedryden.com/blog/the-ethics-of-unpaid-labor-and-the-oss-community)
-
-### Backers
-
-Become a backer and show your support to our open source project.
-
-[![](https://opencollective.com/storagedotnet/backers.svg)](https://opencollective.com/storagedotnet#support)
-
-### Sponsors
-
-Does your company use Storage.Net?  Ask your manager or marketing team if your company would be interested in supporting our project.  Support will allow the maintainers to dedicate more time for maintenance and new features for everyone.  Also, your company's logo will show here - who doesn't want a little extra exposure?
-
-[![](https://opencollective.com/storagedotnet/sponsors.svg)](https://opencollective.com/storagedotnet#sponsor)
 
 ## Contributing
 
 All contributions of any size and areas are welcome, being it coding, testing, documentation or consulting. The framework is heavily tested under stress with integration tests, in fact most of the code is tests, not implementation, and this approach is more preferred to adding unstable features.
 
-PRs are raised against [develop](https://github.com/aloneguid/storage/tree/develop) branch, **master** is for releases only.
-
-All the builds (from PR or branches) are automatically generating *NuGet packages* which are placed into the following intermediate feed:
-
-`https://pkgs.dev.azure.com/aloneguid/AllPublic/_packaging/storagenet/nuget/v3/index.json`
-
-Builds from *master* branch publishes NuGet to `nuget.org`.
+PRs are raised against [develop](https://github.com/aloneguid/storage/tree/develop) branch.
 
 ### Code
 
 Storage.Net tries to enforce idential behavior on all implementaions of storage interfaces to the smallest details possible and you will find a lot of test specifications which will help you to add another provider.
 
 The solution is created in Visual Studio 2017 (Community Edition).
-
-### Documentation
-
-When I think of the best way to document a framework I tend to think that working examples are the best. Adding various real world scenarios with working code is more preferrable than just documenting an untested API.
-
-### Reporting bugs or requesting features
-
-Please use the GitHub issue tracker to do this.
-
-### Support
-
-You can get support by raising an issue here, or contacting me directly for consulting services.
