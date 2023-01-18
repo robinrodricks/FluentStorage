@@ -1,17 +1,21 @@
-# FluentStorage
+![FluentStorage](https://github.com/robinrodricks/FluentStorage/raw/master/.github/logo.png)
+
+[![Version](https://img.shields.io/nuget/vpre/FluentStorage.svg)](https://www.nuget.org/packages/FluentStorage)
+[![Downloads](https://img.shields.io/nuget/dt/FluentStorage.svg)](https://www.nuget.org/packages/FluentStorage)
+[![GitHub contributors](https://img.shields.io/github/contributors/robinrodricks/FluentStorage.svg)](https://github.com/robinrodricks/FluentStorage/graphs/contributors)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/8bc33aa55cb8494da3a7a07dba5316f7)](https://www.codacy.com/gh/robinrodricks/FluentStorage/dashboard)
+[![License](https://img.shields.io/github/license/robinrodricks/FluentStorage.svg)](https://github.com/robinrodricks/FluentStorage/blob/master/LICENSE)
 
 
 ### One Interface To Rule Them All
 
-FluentStorage, originally known as Storage.NET, is a field-tested .NET library that helps to achieve [polycloud techniques](https://www.thoughtworks.com/radar/techniques/polycloud).
+FluentStorage, originally known as Storage.NET, is a field-tested polycloud .NET cloud storage library that helps you interface with multiple cloud providers from a single unified interface.
 
 It provides a generic interface for popular cloud storage providers like Amazon S3, Azure Service Bus, Azure Event Hub, Azure Storage, Azure Data Lake Store thus abstracting Blob and Messaging services.
 
 It is written entirely in C#, with no external dependency.
 
 FluentStorage is released under the permissive MIT License, so it can be used in both proprietary and free/open source applications.
-
-I'm not really sure why there are so many similar storage providers performing almost identical function but no standard. Why do we need to learn a new SDK to achieve something trivial we've done so many times before? I have no idea. If you don't either, use this library.
 
 Features:
 
