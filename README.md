@@ -40,7 +40,6 @@ FluentStorage is released under the permissive MIT License, so it can be used in
 ![Slide](https://raw.githubusercontent.com/robinrodricks/FluentStorage/develop/.github/providers.svg)
 
 
-
 ## What's New
 
 In 2023 we added:
