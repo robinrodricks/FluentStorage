@@ -8,27 +8,23 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Azure.ServiceBus.Core;
 
-namespace FluentStorage.Azure.ServiceBus.Messaging
-{
-   /// <summary>
-   /// Implements message receiver on Azure Service Bus Queues
-   /// </summary>
-   class AzureServiceBusQueueReceiver : AzureServiceBusReceiver
-   {
-      //https://github.com/Azure/azure-service-bus/blob/master/samples/DotNet/Microsoft.Azure.ServiceBus/ReceiveSample/readme.md
-      public AzureServiceBusQueueReceiver(string connectionString, string queueName, bool peekLock = true, MessageHandlerOptions handlerOptions = null)
-         : base(
-              CreateClient(connectionString, queueName, peekLock),
-              CreateMessageReceiver(connectionString, queueName, peekLock),
-              handlerOptions)
-      {
-      }
+namespace FluentStorage.Azure.ServiceBus.Messaging {
+	/// <summary>
+	/// Implements message receiver on Azure Service Bus Queues
+	/// </summary>
+	class AzureServiceBusQueueReceiver : AzureServiceBusReceiver {
+		//https://github.com/Azure/azure-service-bus/blob/master/samples/DotNet/Microsoft.Azure.ServiceBus/ReceiveSample/readme.md
+		public AzureServiceBusQueueReceiver(string connectionString, string queueName, bool peekLock = true, MessageHandlerOptions handlerOptions = null)
+		   : base(
+				CreateClient(connectionString, queueName, peekLock),
+				CreateMessageReceiver(connectionString, queueName, peekLock),
+				handlerOptions) {
+		}
 
-      private static QueueClient CreateClient(string connectionString, string queueName, bool peekLock)
-      {
-         ReceiveMode mode = peekLock ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete;
+		private static QueueClient CreateClient(string connectionString, string queueName, bool peekLock) {
+			ReceiveMode mode = peekLock ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete;
 
-         return new QueueClient(connectionString, queueName, mode);
-      }
-   }
+			return new QueueClient(connectionString, queueName, mode);
+		}
+	}
 }

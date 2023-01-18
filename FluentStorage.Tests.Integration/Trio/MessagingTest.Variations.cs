@@ -4,133 +4,107 @@ using FluentStorage.Blobs;
 using FluentStorage.Messaging;
 using Xunit;
 
-namespace FluentStorage.Tests.Integration.Messaging
-{
+namespace FluentStorage.Tests.Integration.Messaging {
 
-   #region [ Azure Storage Queue ]
+	#region [ Azure Storage Queue ]
 
-   public class AzureStorageQueueFixture : MessagingFixture
-   {
-      protected override IMessenger CreateMessenger(ITestSettings settings) =>
-         StorageFactory.Messages.AzureStorageQueue(
-            settings.AzureStorageName,
-            settings.AzureStorageKey);
-   }
+	public class AzureStorageQueueFixture : MessagingFixture {
+		protected override IMessenger CreateMessenger(ITestSettings settings) =>
+		   StorageFactory.Messages.AzureStorageQueue(
+			  settings.AzureStorageName,
+			  settings.AzureStorageKey);
+	}
 
-   public class AzureStorageQueueTest : MessagingTest, IClassFixture<AzureStorageQueueFixture>
-   {
-      public AzureStorageQueueTest(AzureStorageQueueFixture fixture) : base(fixture)
-      {
-      }
-   }
+	public class AzureStorageQueueTest : MessagingTest, IClassFixture<AzureStorageQueueFixture> {
+		public AzureStorageQueueTest(AzureStorageQueueFixture fixture) : base(fixture) {
+		}
+	}
 
-   #endregion
+	#endregion
 
-   #region [ In-Memory ]
+	#region [ In-Memory ]
 
-   public class InMemoryFixture : MessagingFixture
-   {
-      protected override IMessenger CreateMessenger(ITestSettings settings)
-      {
-         return StorageFactory.Messages.InMemory("test");
-      }
-   }
+	public class InMemoryFixture : MessagingFixture {
+		protected override IMessenger CreateMessenger(ITestSettings settings) {
+			return StorageFactory.Messages.InMemory("test");
+		}
+	}
 
-   public class InMemoryTest : MessagingTest, IClassFixture<InMemoryFixture>
-   {
-      public InMemoryTest(InMemoryFixture fixture) : base(fixture)
-      {
-      }
-   }
+	public class InMemoryTest : MessagingTest, IClassFixture<InMemoryFixture> {
+		public InMemoryTest(InMemoryFixture fixture) : base(fixture) {
+		}
+	}
 
-   #endregion
+	#endregion
 
-   #region [ Disk ]
+	#region [ Disk ]
 
-   public class DiskFixture : MessagingFixture
-   {
-      protected override IMessenger CreateMessenger(ITestSettings settings)
-      {
-         return StorageFactory.Messages.Disk(_testDir);
-      }
-   }
+	public class DiskFixture : MessagingFixture {
+		protected override IMessenger CreateMessenger(ITestSettings settings) {
+			return StorageFactory.Messages.Disk(_testDir);
+		}
+	}
 
-   public class DiskTest : MessagingTest, IClassFixture<DiskFixture>
-   {
-      public DiskTest(DiskFixture fixture) : base(fixture)
-      {
-      }
-   }
+	public class DiskTest : MessagingTest, IClassFixture<DiskFixture> {
+		public DiskTest(DiskFixture fixture) : base(fixture) {
+		}
+	}
 
-   #endregion
+	#endregion
 
-   #region [ AWS SQS ]
+	#region [ AWS SQS ]
 
-   public class AwsSQSFixture : MessagingFixture
-   {
-      protected override IMessenger CreateMessenger(ITestSettings settings)
-      {
-         return StorageFactory.Messages.AwsSQS(
-            settings.AwsAccessKeyId,
-            settings.AwsSecretAccessKey,
-            "https://sqs.us-east-1.amazonaws.com",
-            RegionEndpoint.USEast1);
-      }
-   }
+	public class AwsSQSFixture : MessagingFixture {
+		protected override IMessenger CreateMessenger(ITestSettings settings) {
+			return StorageFactory.Messages.AwsSQS(
+			   settings.AwsAccessKeyId,
+			   settings.AwsSecretAccessKey,
+			   "https://sqs.us-east-1.amazonaws.com",
+			   RegionEndpoint.USEast1);
+		}
+	}
 
 
-   public class AwsSQSTest : MessagingTest, IClassFixture<AwsSQSFixture>
-   {
-      public AwsSQSTest(AwsSQSFixture fixture) : base(fixture)
-      {
-      }
-   }
-   #endregion
+	public class AwsSQSTest : MessagingTest, IClassFixture<AwsSQSFixture> {
+		public AwsSQSTest(AwsSQSFixture fixture) : base(fixture) {
+		}
+	}
+	#endregion
 
-   #region [ Azure Service Bus ]
+	#region [ Azure Service Bus ]
 
-   public class AzureServiceBusFixture : MessagingFixture
-   {
-      protected override IMessenger CreateMessenger(ITestSettings settings)
-      {
-         return StorageFactory.Messages.AzureServiceBus(settings.AzureServiceBusConnectionString);
+	public class AzureServiceBusFixture : MessagingFixture {
+		protected override IMessenger CreateMessenger(ITestSettings settings) {
+			return StorageFactory.Messages.AzureServiceBus(settings.AzureServiceBusConnectionString);
 
-      }
-   }
+		}
+	}
 
-   public class AzureServiceBusTopicTest : MessagingTest, IClassFixture<AzureServiceBusFixture>
-   {
-      public AzureServiceBusTopicTest(AzureServiceBusFixture fixture) : base(fixture, "t/", "t/fxtopic", receiveChannelSuffix: "/default")
-      {
-      }
-   }
+	public class AzureServiceBusTopicTest : MessagingTest, IClassFixture<AzureServiceBusFixture> {
+		public AzureServiceBusTopicTest(AzureServiceBusFixture fixture) : base(fixture, "t/", "t/fxtopic", receiveChannelSuffix: "/default") {
+		}
+	}
 
-   public class AzureServiceBusQueueTest : MessagingTest, IClassFixture<AzureServiceBusFixture>
-   {
-      public AzureServiceBusQueueTest(AzureServiceBusFixture fixture) : base(fixture, "q/", "q/fxqueue")
-      {
-      }
-   }
+	public class AzureServiceBusQueueTest : MessagingTest, IClassFixture<AzureServiceBusFixture> {
+		public AzureServiceBusQueueTest(AzureServiceBusFixture fixture) : base(fixture, "q/", "q/fxqueue") {
+		}
+	}
 
-   #endregion
+	#endregion
 
-   #region [ Azure Event Hubs ]
+	#region [ Azure Event Hubs ]
 
-   public class AzureEventHubFixture : MessagingFixture
-   {
-      protected override IMessenger CreateMessenger(ITestSettings settings)
-      {
-         return StorageFactory.Messages.AzureEventHub(settings.AzureEventHubConnectionString + ";EntityPath=integration");
-      }
-   }
+	public class AzureEventHubFixture : MessagingFixture {
+		protected override IMessenger CreateMessenger(ITestSettings settings) {
+			return StorageFactory.Messages.AzureEventHub(settings.AzureEventHubConnectionString + ";EntityPath=integration");
+		}
+	}
 
-   public class AzureEventHubTest : MessagingTest, IClassFixture<AzureEventHubFixture>
-   {
-      public AzureEventHubTest(AzureEventHubFixture fixture) : base(fixture, channelFixedName: "integration")
-      {
-      }
-   }
+	public class AzureEventHubTest : MessagingTest, IClassFixture<AzureEventHubFixture> {
+		public AzureEventHubTest(AzureEventHubFixture fixture) : base(fixture, channelFixedName: "integration") {
+		}
+	}
 
-   #endregion
+	#endregion
 
 }

@@ -7,50 +7,42 @@ using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.EventHubs.Processor;
 using FluentStorage.Messaging;
 
-namespace FluentStorage.Azure.EventHub
-{
-   class MessageProcessorEventProcessor : IEventProcessor
-   {
-      private readonly IMessageProcessor _messageProcessor;
-      private DateTimeOffset _lastCheckpointTime;
-      private static readonly TimeSpan CheckpointInterval = TimeSpan.FromMinutes(1);
+namespace FluentStorage.Azure.EventHub {
+	class MessageProcessorEventProcessor : IEventProcessor {
+		private readonly IMessageProcessor _messageProcessor;
+		private DateTimeOffset _lastCheckpointTime;
+		private static readonly TimeSpan CheckpointInterval = TimeSpan.FromMinutes(1);
 
-      public MessageProcessorEventProcessor(IMessageProcessor messageProcessor, PartitionContext partitionContext)
-      {
-         _messageProcessor = messageProcessor ?? throw new ArgumentNullException(nameof(messageProcessor));
-      }
+		public MessageProcessorEventProcessor(IMessageProcessor messageProcessor, PartitionContext partitionContext) {
+			_messageProcessor = messageProcessor ?? throw new ArgumentNullException(nameof(messageProcessor));
+		}
 
-      public Task CloseAsync(PartitionContext context, CloseReason reason)
-      {
-         return Task.CompletedTask;
-      }
+		public Task CloseAsync(PartitionContext context, CloseReason reason) {
+			return Task.CompletedTask;
+		}
 
-      public Task OpenAsync(PartitionContext context)
-      {
-         return Task.CompletedTask;
-      }
+		public Task OpenAsync(PartitionContext context) {
+			return Task.CompletedTask;
+		}
 
-      public Task ProcessErrorAsync(PartitionContext context, Exception error)
-      {
-         return Task.CompletedTask;
-      }
+		public Task ProcessErrorAsync(PartitionContext context, Exception error) {
+			return Task.CompletedTask;
+		}
 
-      public async Task ProcessEventsAsync(PartitionContext context, IEnumerable<EventData> messages)
-      {
-         //forward to message processor
-         List<QueueMessage> qms = messages.Select(ed => Converter.ToQueueMessage(ed, context.PartitionId)).ToList();
+		public async Task ProcessEventsAsync(PartitionContext context, IEnumerable<EventData> messages) {
+			//forward to message processor
+			List<QueueMessage> qms = messages.Select(ed => Converter.ToQueueMessage(ed, context.PartitionId)).ToList();
 
-         await _messageProcessor.ProcessMessagesAsync(qms).ConfigureAwait(false);
+			await _messageProcessor.ProcessMessagesAsync(qms).ConfigureAwait(false);
 
-         //checkpoint
-         DateTimeOffset now = DateTimeOffset.Now;
-         if(now - _lastCheckpointTime >= CheckpointInterval)
-         {
-            await context.CheckpointAsync().ConfigureAwait(false);
+			//checkpoint
+			DateTimeOffset now = DateTimeOffset.Now;
+			if (now - _lastCheckpointTime >= CheckpointInterval) {
+				await context.CheckpointAsync().ConfigureAwait(false);
 
-            _lastCheckpointTime = now;
-         }
+				_lastCheckpointTime = now;
+			}
 
-      }
-   }
+		}
+	}
 }

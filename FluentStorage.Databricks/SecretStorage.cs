@@ -10,96 +10,83 @@ using Microsoft.Azure.Databricks.Client;
 using NetBox.Extensions;
 using FluentStorage.Blobs;
 
-namespace FluentStorage.Databricks
-{
-   class SecretStorage : GenericBlobStorage
-   {
-      private readonly ISecretsApi _api;
+namespace FluentStorage.Databricks {
+	class SecretStorage : GenericBlobStorage {
+		private readonly ISecretsApi _api;
 
-      public SecretStorage(ISecretsApi api)
-      {
-         _api = api;
-      }
+		public SecretStorage(ISecretsApi api) {
+			_api = api;
+		}
 
-      public async Task CreateSecretsScope(string name, string initialManagePrincipal = null)
-      {
-         try
-         {
-            await _api.CreateScope(name, initialManagePrincipal).ConfigureAwait(false);
-         }
-         catch(ClientApiException ex) when(ex.StatusCode == HttpStatusCode.BadRequest)
-         {
-            //no other reliable way to detect ERROR_RESOURCE_ALREADY_EXISTS
-         }
-      }
+		public async Task CreateSecretsScope(string name, string initialManagePrincipal = null) {
+			try {
+				await _api.CreateScope(name, initialManagePrincipal).ConfigureAwait(false);
+			}
+			catch (ClientApiException ex) when (ex.StatusCode == HttpStatusCode.BadRequest) {
+				//no other reliable way to detect ERROR_RESOURCE_ALREADY_EXISTS
+			}
+		}
 
 
-      protected override bool CanListHierarchy => false;
+		protected override bool CanListHierarchy => false;
 
-      protected override async Task<IReadOnlyCollection<Blob>> ListAtAsync(
-         string path, ListOptions options, CancellationToken cancellationToken)
-      {
-         var r = new List<Blob>();
+		protected override async Task<IReadOnlyCollection<Blob>> ListAtAsync(
+		   string path, ListOptions options, CancellationToken cancellationToken) {
+			var r = new List<Blob>();
 
-         // listing from "/secrets"
-         if(StoragePath.IsRootPath(path))
-         {
-            IEnumerable<SecretScope> scopes = await _api.ListScopes().ConfigureAwait(false);
-            foreach(SecretScope scope in scopes)
-            {
-               var scopeBlob = new Blob(scope.Name, BlobItemKind.Folder);
-               scopeBlob.TryAddProperties(
-                  "Backend", scope.BackendType,
-                  "ObjectType", "secretScope");
+			// listing from "/secrets"
+			if (StoragePath.IsRootPath(path)) {
+				IEnumerable<SecretScope> scopes = await _api.ListScopes().ConfigureAwait(false);
+				foreach (SecretScope scope in scopes) {
+					var scopeBlob = new Blob(scope.Name, BlobItemKind.Folder);
+					scopeBlob.TryAddProperties(
+					   "Backend", scope.BackendType,
+					   "ObjectType", "secretScope");
 
-               IEnumerable<AclItem> acl = await _api.ListSecretAcl(scope.Name).ConfigureAwait(false);
-               scopeBlob.Properties.Add("ACL", string.Join(";", acl.Select(a => $"{a.Principal}:{a.Permission}")));
-               r.Add(scopeBlob);
-            }
-            return r;
-         }
+					IEnumerable<AclItem> acl = await _api.ListSecretAcl(scope.Name).ConfigureAwait(false);
+					scopeBlob.Properties.Add("ACL", string.Join(";", acl.Select(a => $"{a.Principal}:{a.Permission}")));
+					r.Add(scopeBlob);
+				}
+				return r;
+			}
 
-         // listing from "/secrets/[scope name]
+			// listing from "/secrets/[scope name]
 
-         string scopeName = StoragePath.Split(path)[0];
-         List<SecretMetadata> secretNames = (await _api.ListSecrets(scopeName).ConfigureAwait(false)).ToList();
-         foreach(SecretMetadata sm in secretNames)
-         {
-            var sb = new Blob(scopeName, sm.Key, BlobItemKind.File);
-            sb.LastModificationTime = sm.LastUpdatedTimestamp;
-            sb.TryAddProperties(
-               "ObjectType", "secret");
-            r.Add(sb);
-         }
-         return r;
-      }
+			string scopeName = StoragePath.Split(path)[0];
+			List<SecretMetadata> secretNames = (await _api.ListSecrets(scopeName).ConfigureAwait(false)).ToList();
+			foreach (SecretMetadata sm in secretNames) {
+				var sb = new Blob(scopeName, sm.Key, BlobItemKind.File);
+				sb.LastModificationTime = sm.LastUpdatedTimestamp;
+				sb.TryAddProperties(
+				   "ObjectType", "secret");
+				r.Add(sb);
+			}
+			return r;
+		}
 
-      public override async Task WriteAsync(
-         string fullPath, Stream dataStream, bool append = false, CancellationToken cancellationToken = default)
-      {
-         GetScopeAndKey(fullPath, out string scope, out string key);
-         byte[] data = dataStream.ToByteArray();
+		public override async Task WriteAsync(
+		   string fullPath, Stream dataStream, bool append = false, CancellationToken cancellationToken = default) {
+			GetScopeAndKey(fullPath, out string scope, out string key);
+			byte[] data = dataStream.ToByteArray();
 
-         await _api.PutSecret(data, scope, key).ConfigureAwait(false);
-      }
+			await _api.PutSecret(data, scope, key).ConfigureAwait(false);
+		}
 
-      public override Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
-      {
-         //just a sanity check
-         GetScopeAndKey(fullPath, out _, out _);
+		public override Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default) {
+			//just a sanity check
+			GetScopeAndKey(fullPath, out _, out _);
 
-         // return phrase "[REDACTED]" as there is no technical capability to read secret values in Databricks
-         return Task.FromResult<Stream>(new MemoryStream(Encoding.UTF8.GetBytes("[REDACTED]")));
-      }
+			// return phrase "[REDACTED]" as there is no technical capability to read secret values in Databricks
+			return Task.FromResult<Stream>(new MemoryStream(Encoding.UTF8.GetBytes("[REDACTED]")));
+		}
 
-      private static void GetScopeAndKey(string path, out string scope, out string key)
-      {
-         string[] parts = StoragePath.Split(path);
-         if(parts.Length != 2)
-            throw new ArgumentException($"path should contain exactly scope and secret name", nameof(path));
+		private static void GetScopeAndKey(string path, out string scope, out string key) {
+			string[] parts = StoragePath.Split(path);
+			if (parts.Length != 2)
+				throw new ArgumentException($"path should contain exactly scope and secret name", nameof(path));
 
-         scope = parts[0];
-         key = parts[1];
-      }
-   }
+			scope = parts[0];
+			key = parts[1];
+		}
+	}
 }

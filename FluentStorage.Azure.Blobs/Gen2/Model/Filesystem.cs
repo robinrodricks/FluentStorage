@@ -1,26 +1,24 @@
 ﻿using System;
 
-namespace FluentStorage.Azure.Blobs.Gen2.Model
-{
+namespace FluentStorage.Azure.Blobs.Gen2.Model {
 
-   /// <summary>
-   /// Gen 2 filesystem
-   /// </summary>
-   public class Filesystem
-   {
-      /// <summary>
-      /// ETag
-      /// </summary>
-      public string Etag { get; set; }
+	/// <summary>
+	/// Gen 2 filesystem
+	/// </summary>
+	public class Filesystem {
+		/// <summary>
+		/// ETag
+		/// </summary>
+		public string Etag { get; set; }
 
-      /// <summary>
-      /// Last modification date
-      /// </summary>
-      public DateTime LastModified { get; set; }
+		/// <summary>
+		/// Last modification date
+		/// </summary>
+		public DateTime LastModified { get; set; }
 
-      /// <summary>
-      /// Name of the filesystem
-      /// </summary>
-      public string Name { get; set; }
-   }
+		/// <summary>
+		/// Name of the filesystem
+		/// </summary>
+		public string Name { get; set; }
+	}
 }

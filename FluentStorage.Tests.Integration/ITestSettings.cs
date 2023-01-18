@@ -2,128 +2,122 @@
 using System.Net;
 using Config.Net;
 
-namespace FluentStorage.Tests
-{
-   public interface ITestSettings
-   {
-      [Option(DefaultValue = "aloneguid")]
-      string DevOpsOrgName { get; }
+namespace FluentStorage.Tests {
+	public interface ITestSettings {
+		[Option(DefaultValue = "aloneguid")]
+		string DevOpsOrgName { get; }
 
-      [Option(DefaultValue = "AllPublic")]
-      string DevOpsProject { get; }
+		[Option(DefaultValue = "AllPublic")]
+		string DevOpsProject { get; }
 
-      [Option(DefaultValue = "8")]
-      string DevOpsVariableSetId { get; }
+		[Option(DefaultValue = "8")]
+		string DevOpsVariableSetId { get; }
 
-      string DevOpsPat { get; }
+		string DevOpsPat { get; }
 
-      string ClientId { get; }
+		string ClientId { get; }
 
-      string ClientSecret { get; }
+		string ClientSecret { get; }
 
-      string TenantId { get; }
+		string TenantId { get; }
 
-      #region [ Azure ]
+		#region [ Azure ]
 
-      string AzureStorageName { get; }
+		string AzureStorageName { get; }
 
-      string AzureStorageKey { get; }
+		string AzureStorageKey { get; }
 
-      string AzureGen2StorageName { get; }
+		string AzureGen2StorageName { get; }
 
-      string AzureGen2StorageKey { get; }
+		string AzureGen2StorageKey { get; }
 
-      string OperatorObjectId { get; }
+		string OperatorObjectId { get; }
 
-      string AzureServiceBusConnectionString { get; }
+		string AzureServiceBusConnectionString { get; }
 
-      string AzureEventHubConnectionString { get; }
+		string AzureEventHubConnectionString { get; }
 
-      string AzureStorageNativeConnectionString { get; }
+		string AzureStorageNativeConnectionString { get; }
 
-      string AzureGen1StorageName { get; }
+		string AzureGen1StorageName { get; }
 
-      Uri AzureKeyVaultUri { get; }
+		Uri AzureKeyVaultUri { get; }
 
-      #endregion
+		#endregion
 
-      #region [ Amazon Web Services ]
+		#region [ Amazon Web Services ]
 
-      [Option(Alias = "Aws.AccessKeyId")]
-      string AwsAccessKeyId { get; }
+		[Option(Alias = "Aws.AccessKeyId")]
+		string AwsAccessKeyId { get; }
 
-      [Option(Alias = "Aws.SecretAccessKey")]
-      string AwsSecretAccessKey { get; }
+		[Option(Alias = "Aws.SecretAccessKey")]
+		string AwsSecretAccessKey { get; }
 
-      [Option(Alias = "Aws.TestBucketName")]
-      string AwsTestBucketName { get; }
+		[Option(Alias = "Aws.TestBucketName")]
+		string AwsTestBucketName { get; }
 
-      [Option(Alias = "Aws.TestBucketRegion", DefaultValue = "eu-west-1")]
-      string AwsTestBucketRegion { get; }
+		[Option(Alias = "Aws.TestBucketRegion", DefaultValue = "eu-west-1")]
+		string AwsTestBucketRegion { get; }
 
-      #endregion
+		#endregion
 
-      #region [ Google Cloud Platform ]
+		#region [ Google Cloud Platform ]
 
-      [Option(Alias = "Gcp.Storage.BucketName")]
-      string GcpStorageBucketName { get; }
+		[Option(Alias = "Gcp.Storage.BucketName")]
+		string GcpStorageBucketName { get; }
 
-      [Option(Alias = "Gcp.Storage.JsonKey")]
-      string GcpStorageJsonCreds { get; }
+		[Option(Alias = "Gcp.Storage.JsonKey")]
+		string GcpStorageJsonCreds { get; }
 
-      #endregion
+		#endregion
 
 
-      #region [ MSSQL ]
+		#region [ MSSQL ]
 
-      [Option(Alias = "Mssql.ConnectionString")]
-      string MssqlConnectionString { get; }
+		[Option(Alias = "Mssql.ConnectionString")]
+		string MssqlConnectionString { get; }
 
-      #endregion
+		#endregion
 
-      #region [ General ]
+		#region [ General ]
 
-      [Option(Alias = "Ftp.Hostname")]
-      string FtpHostName { get; }
+		[Option(Alias = "Ftp.Hostname")]
+		string FtpHostName { get; }
 
-      [Option(Alias = "Ftp.Username")]
-      string FtpUsername { get; }
+		[Option(Alias = "Ftp.Username")]
+		string FtpUsername { get; }
 
-      [Option(Alias = "Ftp.Password")]
-      string FtpPassword { get; }
+		[Option(Alias = "Ftp.Password")]
+		string FtpPassword { get; }
 
-      #endregion
+		#endregion
 
-      string DatabricksBaseUri { get; set; }
+		string DatabricksBaseUri { get; set; }
 
-      string DatabricksToken { get; set; }
-   }
+		string DatabricksToken { get; set; }
+	}
 
-   public static class Settings
-   {
-      private static ITestSettings _instance;
+	public static class Settings {
+		private static ITestSettings _instance;
 
-      public static ITestSettings Instance
-      {
-         get
-         {
-            if(_instance == null)
-            {
-               _instance = new ConfigurationBuilder<ITestSettings>()
-                  .UseIniFile("c:\\tmp\\integration-tests.ini")
-                  .UseEnvironmentVariables()
-                  .Build();
+		public static ITestSettings Instance {
+			get {
+				if (_instance == null) {
+					_instance = new ConfigurationBuilder<ITestSettings>()
+					   .UseIniFile("c:\\tmp\\integration-tests.ini")
+					   .UseEnvironmentVariables()
+					   .Build();
 
-               _instance = new ConfigurationBuilder<ITestSettings>()
-                  .UseIniFile("c:\\tmp\\integration-tests.ini")
-                  //.UseAzureDevOpsVariableSet(_instance.DevOpsOrgName, _instance.DevOpsProject, _instance.DevOpsPat, _instance.DevOpsVariableSetId)
-                  .UseEnvironmentVariables()
-                  .Build();
+					_instance = new ConfigurationBuilder<ITestSettings>()
+					   .UseIniFile("c:\\tmp\\integration-tests.ini")
+					   //.UseAzureDevOpsVariableSet(_instance.DevOpsOrgName, _instance.DevOpsProject, _instance.DevOpsPat, _instance.DevOpsVariableSetId)
+					   .UseEnvironmentVariables()
+					   .Build();
 
-            }
+				}
 
-            return _instance;
-         }
-      }
-   }
+				return _instance;
+			}
+		}
+	}
 }

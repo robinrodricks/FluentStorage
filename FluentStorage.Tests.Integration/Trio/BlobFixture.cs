@@ -7,81 +7,67 @@ using System.Threading.Tasks;
 using Config.Net;
 using FluentStorage.Blobs;
 
-namespace FluentStorage.Tests.Integration.Blobs
-{
-   public abstract class BlobFixture : IDisposable
-   {
-      private static readonly ITestSettings _settings = Settings.Instance;
+namespace FluentStorage.Tests.Integration.Blobs {
+	public abstract class BlobFixture : IDisposable {
+		private static readonly ITestSettings _settings = Settings.Instance;
 
-      private string _testDir;
-      private bool _initialised;
+		private string _testDir;
+		private bool _initialised;
 
-      protected BlobFixture(string blobPrefix = null)
-      {
-         Storage = CreateStorage(_settings);
-         BlobPrefix = blobPrefix;
-      }
+		protected BlobFixture(string blobPrefix = null) {
+			Storage = CreateStorage(_settings);
+			BlobPrefix = blobPrefix;
+		}
 
-      protected abstract IBlobStorage CreateStorage(ITestSettings settings);
+		protected abstract IBlobStorage CreateStorage(ITestSettings settings);
 
-      public IBlobStorage Storage { get; private set; }
-      public string BlobPrefix { get; }
+		public IBlobStorage Storage { get; private set; }
+		public string BlobPrefix { get; }
 
-      public string TestDir
-      {
-         get
-         {
-            if(_testDir == null)
-            {
-               string buildDir = new FileInfo(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath).Directory.FullName;
-               _testDir = Path.Combine(buildDir, "TEST-" + Guid.NewGuid());
-            }
+		public string TestDir {
+			get {
+				if (_testDir == null) {
+					string buildDir = new FileInfo(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath).Directory.FullName;
+					_testDir = Path.Combine(buildDir, "TEST-" + Guid.NewGuid());
+				}
 
-            return _testDir;
-         }
-      }
+				return _testDir;
+			}
+		}
 
-      public async Task InitAsync()
-      {
-         if(_initialised)
-            return;
+		public async Task InitAsync() {
+			if (_initialised)
+				return;
 
-         //drop all blobs in test storage
+			//drop all blobs in test storage
 
-         IReadOnlyCollection<Blob> topLevel = (await Storage.ListAsync(folderPath: BlobPrefix, recurse: false)).ToList();
+			IReadOnlyCollection<Blob> topLevel = (await Storage.ListAsync(folderPath: BlobPrefix, recurse: false)).ToList();
 
-         try
-         {
-            await Storage.DeleteAsync(topLevel.Select(f => f.FullPath));
-         }
-         catch
-         {
-            //absolutely doesn't matter if it fails, this is only a perf improvement on tests
-         }
+			try {
+				await Storage.DeleteAsync(topLevel.Select(f => f.FullPath));
+			}
+			catch {
+				//absolutely doesn't matter if it fails, this is only a perf improvement on tests
+			}
 
-         _initialised = true;
-      }
+			_initialised = true;
+		}
 
-      public Task DisposeAsync()
-      {
-         return Task.CompletedTask;
-      }
+		public Task DisposeAsync() {
+			return Task.CompletedTask;
+		}
 
-      public void Dispose()
-      {
-         Storage.Dispose();
+		public void Dispose() {
+			Storage.Dispose();
 
-         if(_testDir != null)
-         {
-            try
-            {
-               Directory.Delete(_testDir, true);
-            }
-            catch(DirectoryNotFoundException)
-            {
-            }
-            _testDir = null;
-         }
-      }
-   }
+			if (_testDir != null) {
+				try {
+					Directory.Delete(_testDir, true);
+				}
+				catch (DirectoryNotFoundException) {
+				}
+				_testDir = null;
+			}
+		}
+	}
 }

@@ -2,37 +2,31 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FluentStorage.Messaging.Polling
-{
-   class ExponentialBackoffPollingPolicy : IPollingPolicy
-   {
-      private readonly TimeSpan _initialDelay;
-      private readonly TimeSpan _maxDelay;
-      private TimeSpan _currentDelay;
+namespace FluentStorage.Messaging.Polling {
+	class ExponentialBackoffPollingPolicy : IPollingPolicy {
+		private readonly TimeSpan _initialDelay;
+		private readonly TimeSpan _maxDelay;
+		private TimeSpan _currentDelay;
 
-      public ExponentialBackoffPollingPolicy(TimeSpan initialDelay, TimeSpan maxDelay)
-      {
-         _initialDelay = initialDelay;
-         _maxDelay = maxDelay;
-         _currentDelay = _initialDelay;
-      }
+		public ExponentialBackoffPollingPolicy(TimeSpan initialDelay, TimeSpan maxDelay) {
+			_initialDelay = initialDelay;
+			_maxDelay = maxDelay;
+			_currentDelay = _initialDelay;
+		}
 
-      public TimeSpan GetNextDelay()
-      {
-         TimeSpan result = _currentDelay;
+		public TimeSpan GetNextDelay() {
+			TimeSpan result = _currentDelay;
 
-         _currentDelay = TimeSpan.FromMilliseconds(_currentDelay.TotalMilliseconds * 2);
-         if(_currentDelay > _maxDelay)
-         {
-            _currentDelay = _initialDelay;
-         }
+			_currentDelay = TimeSpan.FromMilliseconds(_currentDelay.TotalMilliseconds * 2);
+			if (_currentDelay > _maxDelay) {
+				_currentDelay = _initialDelay;
+			}
 
-         return result;
-      }
+			return result;
+		}
 
-      public void Reset()
-      {
-         _currentDelay = _initialDelay;
-      }
-   }
+		public void Reset() {
+			_currentDelay = _initialDelay;
+		}
+	}
 }

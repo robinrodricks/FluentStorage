@@ -3,37 +3,32 @@ using FluentStorage.ConnectionString;
 using FluentStorage.Messaging;
 using FluentStorage.Azure.DataLake;
 
-namespace FluentStorage.Azure.DataLake.Store
-{
-   class Module : IExternalModule, IConnectionFactory
-   {
-      public IConnectionFactory ConnectionFactory => this;
+namespace FluentStorage.Azure.DataLake.Store {
+	class Module : IExternalModule, IConnectionFactory {
+		public IConnectionFactory ConnectionFactory => this;
 
-      public IBlobStorage CreateBlobStorage(StorageConnectionString connectionString)
-      {
-         if(connectionString.Prefix == KnownPrefix.AzureDataLakeGen1)
-         {
-            connectionString.GetRequired("account", true, out string accountName);
-            connectionString.GetRequired("tenantId", true, out string tenantId);
-            connectionString.GetRequired("principalId", true, out string principalId);
-            connectionString.GetRequired("principalSecret", true, out string principalSecret);
+		public IBlobStorage CreateBlobStorage(StorageConnectionString connectionString) {
+			if (connectionString.Prefix == KnownPrefix.AzureDataLakeGen1) {
+				connectionString.GetRequired("account", true, out string accountName);
+				connectionString.GetRequired("tenantId", true, out string tenantId);
+				connectionString.GetRequired("principalId", true, out string principalId);
+				connectionString.GetRequired("principalSecret", true, out string principalSecret);
 
-            int.TryParse(connectionString.Get("listBatchSize"), out int listBatchSize);
+				int.TryParse(connectionString.Get("listBatchSize"), out int listBatchSize);
 
-            AzureDataLakeGen1Storage client = AzureDataLakeGen1Storage.CreateByClientSecret(
-               accountName, tenantId, principalId, principalSecret);
+				AzureDataLakeGen1Storage client = AzureDataLakeGen1Storage.CreateByClientSecret(
+				   accountName, tenantId, principalId, principalSecret);
 
-            if(listBatchSize != 0)
-            {
-               client.ListBatchSize = listBatchSize;
-            }
+				if (listBatchSize != 0) {
+					client.ListBatchSize = listBatchSize;
+				}
 
-            return client;
-         }
+				return client;
+			}
 
-         return null;
-      }
+			return null;
+		}
 
-      public IMessenger CreateMessenger(StorageConnectionString connectionString) => null;
-   }
+		public IMessenger CreateMessenger(StorageConnectionString connectionString) => null;
+	}
 }

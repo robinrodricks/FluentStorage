@@ -8,124 +8,110 @@ using FluentStorage.Blobs;
 using FluentStorage.Databricks;
 using Xunit;
 
-namespace FluentStorage.Tests.Integration.Azure
-{
+namespace FluentStorage.Tests.Integration.Azure {
 #if DEBUG
-   [Trait("Category", "Blobs")]
-   public class LeakyDatabricksStorageTest
-   {
-      private readonly IDatabricksStorage _storage;
+	[Trait("Category", "Blobs")]
+	public class LeakyDatabricksStorageTest {
+		private readonly IDatabricksStorage _storage;
 
-      public LeakyDatabricksStorageTest()
-      {
-         ITestSettings settings = Settings.Instance;
-         _storage = (IDatabricksStorage)StorageFactory.Blobs.Databricks(settings.DatabricksBaseUri, settings.DatabricksToken);
-      }
+		public LeakyDatabricksStorageTest() {
+			ITestSettings settings = Settings.Instance;
+			_storage = (IDatabricksStorage)StorageFactory.Blobs.Databricks(settings.DatabricksBaseUri, settings.DatabricksToken);
+		}
 
-      [Fact]
-      public async Task List_root()
-      {
-         IReadOnlyCollection<Blob> roots = await _storage.ListAsync();
+		[Fact]
+		public async Task List_root() {
+			IReadOnlyCollection<Blob> roots = await _storage.ListAsync();
 
-         Assert.Equal(2, roots.Count); // dbfs + notebooks
-      }
+			Assert.Equal(2, roots.Count); // dbfs + notebooks
+		}
 
-      [Fact]
-      public async Task List_dbfs_root()
-      {
-         IReadOnlyCollection<Blob> roots = await _storage.ListAsync("/dbfs");
+		[Fact]
+		public async Task List_dbfs_root() {
+			IReadOnlyCollection<Blob> roots = await _storage.ListAsync("/dbfs");
 
-         Assert.True(roots.Count > 0);
-      }
+			Assert.True(roots.Count > 0);
+		}
 
-      [Fact]
-      public async Task List_notebooks_root()
-      {
-         IReadOnlyCollection<Blob> roots = await _storage.ListAsync("/workspace");
+		[Fact]
+		public async Task List_notebooks_root() {
+			IReadOnlyCollection<Blob> roots = await _storage.ListAsync("/workspace");
 
-         Assert.True(roots.Count > 0);
-      }
+			Assert.True(roots.Count > 0);
+		}
 
-      [Fact]
-      public async Task Export_notebook()
-      {
-         IReadOnlyCollection<Blob> roots = await _storage.ListAsync("/workspace", recurse: true);
-         Blob notebook = roots.FirstOrDefault(b => b.TryGetProperty("ObjectType", out ObjectType? ot) && ot == ObjectType.NOTEBOOK);
-         Assert.NotNull(notebook);
+		[Fact]
+		public async Task Export_notebook() {
+			IReadOnlyCollection<Blob> roots = await _storage.ListAsync("/workspace", recurse: true);
+			Blob notebook = roots.FirstOrDefault(b => b.TryGetProperty("ObjectType", out ObjectType? ot) && ot == ObjectType.NOTEBOOK);
+			Assert.NotNull(notebook);
 
-         string defaultSource = await _storage.ReadTextAsync(notebook);
-         string sourceSource = await _storage.ReadTextAsync(notebook + "#source");
-         string jupyterSource = await _storage.ReadTextAsync(notebook + "#jupyter");
-         string htmlSource = await _storage.ReadTextAsync(notebook + "#html");
-         string dbcSource = await _storage.ReadTextAsync(notebook + "#dbc");
+			string defaultSource = await _storage.ReadTextAsync(notebook);
+			string sourceSource = await _storage.ReadTextAsync(notebook + "#source");
+			string jupyterSource = await _storage.ReadTextAsync(notebook + "#jupyter");
+			string htmlSource = await _storage.ReadTextAsync(notebook + "#html");
+			string dbcSource = await _storage.ReadTextAsync(notebook + "#dbc");
 
-      }
+		}
 
-      [Fact]
-      public async Task Import_notebook()
-      {
-         await _storage.WriteTextAsync("/workspace/integration/one/mine.scala", $"import sys # generated {DateTime.Now}");
-      }
+		[Fact]
+		public async Task Import_notebook() {
+			await _storage.WriteTextAsync("/workspace/integration/one/mine.scala", $"import sys # generated {DateTime.Now}");
+		}
 
-      [Fact]
-      public async Task List_secret_scopes()
-      {
-         await _storage.CreateSecretsScope("ivan");
+		[Fact]
+		public async Task List_secret_scopes() {
+			await _storage.CreateSecretsScope("ivan");
 
-         IReadOnlyCollection<Blob> scopes = await _storage.ListAsync("/secrets");
+			IReadOnlyCollection<Blob> scopes = await _storage.ListAsync("/secrets");
 
-         Assert.True(scopes.Count > 0);
-         Assert.Contains("ivan", scopes.Select(s => s.Name));
-      }
+			Assert.True(scopes.Count > 0);
+			Assert.Contains("ivan", scopes.Select(s => s.Name));
+		}
 
-      [Fact]
-      public async Task List_secrets()
-      {
-         await _storage.CreateSecretsScope("ivan");
-         await _storage.WriteTextAsync("/secrets/ivan/one", "dfadfd");
+		[Fact]
+		public async Task List_secrets() {
+			await _storage.CreateSecretsScope("ivan");
+			await _storage.WriteTextAsync("/secrets/ivan/one", "dfadfd");
 
-         IReadOnlyCollection<Blob> secrets = await _storage.ListAsync("/secrets/ivan");
-         Assert.True(secrets.Count > 0);
-      }
+			IReadOnlyCollection<Blob> secrets = await _storage.ListAsync("/secrets/ivan");
+			Assert.True(secrets.Count > 0);
+		}
 
-      [Fact]
-      public async Task Put_secret()
-      {
-         string value = Guid.NewGuid().ToString();
+		[Fact]
+		public async Task Put_secret() {
+			string value = Guid.NewGuid().ToString();
 
-         await _storage.WriteTextAsync("secrets/ivan/tag", value);
+			await _storage.WriteTextAsync("secrets/ivan/tag", value);
 
-         string value1 = await _storage.ReadTextAsync("secrets/ivan/tag");
+			string value1 = await _storage.ReadTextAsync("secrets/ivan/tag");
 
-         Assert.Equal("[REDACTED]", value1);
-      }
+			Assert.Equal("[REDACTED]", value1);
+		}
 
-      [Fact]
-      public async Task List_jobs()
-      {
-         IReadOnlyCollection<Blob> jobs = await _storage.ListAsync("/jobs");
+		[Fact]
+		public async Task List_jobs() {
+			IReadOnlyCollection<Blob> jobs = await _storage.ListAsync("/jobs");
 
-         Assert.True(jobs.Count > 0);
-      }
+			Assert.True(jobs.Count > 0);
+		}
 
-      [Fact]
-      public async Task List_job_runs()
-      {
-         Blob job = (await _storage.ListAsync("/jobs")).First();
+		[Fact]
+		public async Task List_job_runs() {
+			Blob job = (await _storage.ListAsync("/jobs")).First();
 
-         IReadOnlyCollection<Blob> runs = await _storage.ListAsync(job);
+			IReadOnlyCollection<Blob> runs = await _storage.ListAsync(job);
 
-         Assert.True(runs.Count > 0);
-      }
+			Assert.True(runs.Count > 0);
+		}
 
-      [Fact]
-      public async Task Download_job_run_output()
-      {
-         Blob job = (await _storage.ListAsync("/jobs")).First();
-         Blob run = (await _storage.ListAsync(job)).Last();
+		[Fact]
+		public async Task Download_job_run_output() {
+			Blob job = (await _storage.ListAsync("/jobs")).First();
+			Blob run = (await _storage.ListAsync(job)).Last();
 
-         string output = await _storage.ReadTextAsync($"/jobs/{job.Name}/{run.Name}");
-      }
-   }
+			string output = await _storage.ReadTextAsync($"/jobs/{job.Name}/{run.Name}");
+		}
+	}
 #endif
 }

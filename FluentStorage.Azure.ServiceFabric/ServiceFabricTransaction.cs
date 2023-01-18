@@ -3,55 +3,46 @@ using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data;
 using SFTransaction = Microsoft.ServiceFabric.Data.ITransaction;
 
-namespace FluentStorage.Microsoft.ServiceFabric
-{
-   class ServiceFabricTransaction : ITransaction
-   {
-      private readonly SFTransaction _transaction;
-      private bool _commited;
-      private readonly Action<bool> _transactionClosed;
-      private readonly bool _ignoreCommits;
+namespace FluentStorage.Microsoft.ServiceFabric {
+	class ServiceFabricTransaction : ITransaction {
+		private readonly SFTransaction _transaction;
+		private bool _commited;
+		private readonly Action<bool> _transactionClosed;
+		private readonly bool _ignoreCommits;
 
-      public ServiceFabricTransaction(IReliableStateManager stateManager, Action<bool> transactionClosed)
-      {
-         _transaction = stateManager.CreateTransaction();
-         _transactionClosed = transactionClosed;
-         _ignoreCommits = false;
-      }
+		public ServiceFabricTransaction(IReliableStateManager stateManager, Action<bool> transactionClosed) {
+			_transaction = stateManager.CreateTransaction();
+			_transactionClosed = transactionClosed;
+			_ignoreCommits = false;
+		}
 
-      public ServiceFabricTransaction(ServiceFabricTransaction transaction)
-      {
-         _transaction = transaction.Tx;
-         _transactionClosed = null;
-         _ignoreCommits = true;
-      }
+		public ServiceFabricTransaction(ServiceFabricTransaction transaction) {
+			_transaction = transaction.Tx;
+			_transactionClosed = null;
+			_ignoreCommits = true;
+		}
 
-      public SFTransaction Tx => _transaction;
+		public SFTransaction Tx => _transaction;
 
-      public Task CommitAsync()
-      {
-         _commited = true;
+		public Task CommitAsync() {
+			_commited = true;
 
-         if (_ignoreCommits) return Task.FromResult(true);
+			if (_ignoreCommits) return Task.FromResult(true);
 
-         return _transaction.CommitAsync();
-      }
+			return _transaction.CommitAsync();
+		}
 
-      public void Dispose()
-      {
-         try
-         {
-            if (!_ignoreCommits)
-            {
-               if (!_commited) _transaction.Abort();
+		public void Dispose() {
+			try {
+				if (!_ignoreCommits) {
+					if (!_commited) _transaction.Abort();
 
-               _transaction.Dispose();
-            }
-         }
-         finally
-         {
-            _transactionClosed?.Invoke(true);
-         }
-      }
-   }
+					_transaction.Dispose();
+				}
+			}
+			finally {
+				_transactionClosed?.Invoke(true);
+			}
+		}
+	}
 }

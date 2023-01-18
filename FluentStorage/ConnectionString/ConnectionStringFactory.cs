@@ -4,59 +4,50 @@ using FluentStorage.Blobs;
 using System.Linq;
 using FluentStorage.Messaging;
 
-namespace FluentStorage.ConnectionString
-{
-   static class ConnectionStringFactory
-   {
-      private const string TypeSeparator = "://";
-      private static readonly List<IConnectionFactory> Factories = new List<IConnectionFactory>();
+namespace FluentStorage.ConnectionString {
+	static class ConnectionStringFactory {
+		private const string TypeSeparator = "://";
+		private static readonly List<IConnectionFactory> Factories = new List<IConnectionFactory>();
 
-      static ConnectionStringFactory()
-      {
-         Register(new BuiltInConnectionFactory());
-      }
+		static ConnectionStringFactory() {
+			Register(new BuiltInConnectionFactory());
+		}
 
-      public static void Register(IConnectionFactory factory)
-      {
-         if (factory == null) throw new ArgumentNullException(nameof(factory));
+		public static void Register(IConnectionFactory factory) {
+			if (factory == null) throw new ArgumentNullException(nameof(factory));
 
-         Factories.Add(factory);
-      }
+			Factories.Add(factory);
+		}
 
-      public static IBlobStorage CreateBlobStorage(string connectionString)
-      {
-         return Create(connectionString, (factory, cs) => factory.CreateBlobStorage(cs));
-      }
+		public static IBlobStorage CreateBlobStorage(string connectionString) {
+			return Create(connectionString, (factory, cs) => factory.CreateBlobStorage(cs));
+		}
 
-      public static IMessenger CreateMessager(string connectionString)
-      {
-         return Create(connectionString, (factory, cs) => factory.CreateMessenger(cs));
-      }
+		public static IMessenger CreateMessager(string connectionString) {
+			return Create(connectionString, (factory, cs) => factory.CreateMessenger(cs));
+		}
 
 
-      private static TInstance Create<TInstance>(string connectionString, Func<IConnectionFactory, StorageConnectionString, TInstance> createAction)
-         where TInstance: class
-      {
-         if (connectionString == null)
-         {
-            throw new ArgumentNullException(nameof(connectionString));
-         }
+		private static TInstance Create<TInstance>(string connectionString, Func<IConnectionFactory, StorageConnectionString, TInstance> createAction)
+		   where TInstance : class {
+			if (connectionString == null) {
+				throw new ArgumentNullException(nameof(connectionString));
+			}
 
-         var pcs = new StorageConnectionString(connectionString);
+			var pcs = new StorageConnectionString(connectionString);
 
-         TInstance instance = Factories
-            .Select(f => createAction(f, pcs))
-            .FirstOrDefault(b => b != null);
+			TInstance instance = Factories
+			   .Select(f => createAction(f, pcs))
+			   .FirstOrDefault(b => b != null);
 
-         if (instance == null)
-         {
-            throw new ArgumentException(
-               $"could not create any implementation based on the passed connection string (prefix: {pcs.Prefix}), did you register required external module?",
-               nameof(connectionString));
-         }
+			if (instance == null) {
+				throw new ArgumentException(
+				   $"could not create any implementation based on the passed connection string (prefix: {pcs.Prefix}), did you register required external module?",
+				   nameof(connectionString));
+			}
 
-         return instance;
-      }
+			return instance;
+		}
 
-   }
+	}
 }
