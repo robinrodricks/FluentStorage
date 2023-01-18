@@ -1,51 +1,39 @@
 # FluentStorage
 
-Originally known as Storage.Net.
 
 ### One Interface To Rule Them All
-[![NuGet](https://img.shields.io/nuget/v/Storage.Net.svg)](https://www.nuget.org/packages/Storage.Net/) [![](https://img.shields.io/azure-devops/build/aloneguid/4bab84c0-90f7-4425-afc6-ba077aa9757e/49/master.svg)](https://aloneguid.visualstudio.com/AllPublic/_build?definitionId=49) 
 
-![Slide](doc/slide.svg)
+FluentStorage, originally known as Storage.NET, is a field-tested .NET library that helps to achieve [polycloud techniques](https://www.thoughtworks.com/radar/techniques/polycloud).
 
-## About
+It provides a generic interface for popular cloud storage providers like Amazon S3, Azure Service Bus, Azure Event Hub, Azure Storage, Azure Data Lake Store thus abstracting Blob and Messaging services.
 
-Storage.NET is a field-tested .NET library that helps to achieve [polycloud techniques](https://www.thoughtworks.com/radar/techniques/polycloud). 
+It is written entirely in C#, with no external dependency. It has an extensive automated test suite which tests all its functionality against local FTP server docker containers.
 
-It provides generic interface for popular cloud storage providers like Amazon S3, Azure Service Bus, Azure Event Hub, Azure Storage, Azure Data Lake Store thus abstracting Blob and Messaging services.
-
-It also implements in-memory and on-disk versions of all the abstractions for faster local machine development. Connection strings are supported too!
-
-![Comic Why](doc/comic-why.png)
-
-Storage.Net is used by some big **Fortune 500** companies, large, medium and small businesses, open-source projects and even desktop applications like this one:
-
-
-## Index
-
-- [Intentions](#intentions)
-  - [Local Development](#local-development)
-- [Implementations](#implementations)
-- [Getting Started](#getting-started)
-  - [Blob Storage](#blob-storage)
-    - [High-level architecture](#high-level-architecture)
-    - [Transform Sinks](#transform-sinks)
-  - [Messaging](#messaging)
-- [Contributing](#contributing)
-- [Sponsorship](#sponsorship)
-
-## Intentions
+FluentStorage is released under the permissive MIT License, so it can be used in both proprietary and free/open source applications.
 
 I'm not really sure why there are so many similar storage providers performing almost identical function but no standard. Why do we need to learn a new SDK to achieve something trivial we've done so many times before? I have no idea. If you don't either, use this library.
 
-`Storage.Net` abstracts storage implementation like `blobs`, `tables` and `messages` from the .NET Applicatiion Developer. It's aimed to provide a generic interface regardless on which storage provider you are using. It also provides both synchronous and asynchronous alternatives of all methods and implements it to the best effort possible. 
+Features:
 
-Storage.Net supports **Azure Service Bus**, **Azure Event Hub**, **Azure Storage**, **Azure Data Lake Store**, **Amazon S3**, **Azure Key Vault** and many more, out of the box, with hassle-free configuration and zero learning path.
+* Abstracts storage implementation like `blobs`, `tables` and `messages` from the .NET Application Developer.
 
-### Local Development
+* Provides a generic interface regardless on which storage provider you are using.
 
-Storage.Net also implements inmemory and on disk versions of all the abstractions, therefore you can develop fast on local machine or use vendor free serverless implementations for parts of your applciation which don't require a separate third party backend at a particular point in development.
+* Provides both synchronous and asynchronous alternatives of all methods and implements it to the best effort possible. 
 
-This framework supports `.NET Standard 2.0` and higher.
+* Supports **Amazon S3**, **Azure Storage**, **Azure Service Bus**, **Azure Event Hub**, **Azure Data Lake Store**, **Azure Key Vault** and many more, out of the box, with hassle-free configuration and zero learning path.
+
+* Implements inmemory and on disk versions of all the abstractions, therefore you can develop fast on a local machine or use vendor free serverless implementations for parts of your applciation which don't require a separate third party backend at a particular point in development.
+
+* Supports `.NET Standard 2.0` and higher.
+
+* Attempts to enforce idential behavior on all implementaions of storage interfaces to the smallest details possible and you will find a lot of test specifications which will help you to add another provider.
+
+
+## Supported Cloud Services
+
+![Slide](doc/slide.svg)
+
 
 ## Implementations
 
@@ -61,9 +49,7 @@ Some effort has been made to document the supported storage options, you are wel
 - [Blob Storage Implementations](doc/blobs.md)
 - [Messaging Implementations](doc/messaging.md)
 
-## Geting Started
-
-### Blob Storage
+## Blob Storage
 
 Blob Storage stores files. A file has only two properties - `ID` and raw data. If you build an analogy with disk filesystem, file ID is a file name.
 
@@ -182,7 +168,7 @@ This also means that today a transform sink can upload a stream only as large as
 ![](doc/sinks-memory.svg)
 
 
-### Messaging
+## Messaging
 
 Messaging is inteded for message passing between one or more systems in disconnected fashion. You can send a message somewhere and current or remote system picks it up for processing later when required. This paradigm somehow fits into [CQRS](https://martinfowler.com/bliki/CQRS.html) and [Message Passing](https://www.defit.org/message-passing/) architectural ideas.
 
@@ -260,21 +246,3 @@ QueueMessage receivedMessage = QueueMessage.FromByteArray(wireData);
 ```
 
 These methods make sure that *all* of the message data is preserved, and also are backward compatible between any changes to this class.
-
-## Sponsorship
-
-This framework is free and can be used for free, open source and commercial applications. Storage.Net (all code, NuGets and binaries) are under the [MIT License (MIT)](https://github.com/aloneguid/storage/blob/master/LICENSE). It's battle-tested and used by many awesome people and organisations. 
-
-The core team members, Storage.Net contributors and contributors in the ecosystem do this open source work in their free time. If you use Storage.Net, and you'd like us to invest more time on it, please donate. This project increases your income/productivity/usabilty too.
-
-## Contributing
-
-All contributions of any size and areas are welcome, being it coding, testing, documentation or consulting. The framework is heavily tested under stress with integration tests, in fact most of the code is tests, not implementation, and this approach is more preferred to adding unstable features.
-
-PRs are raised against [develop](https://github.com/aloneguid/storage/tree/develop) branch.
-
-### Code
-
-Storage.Net tries to enforce idential behavior on all implementaions of storage interfaces to the smallest details possible and you will find a lot of test specifications which will help you to add another provider.
-
-The solution is created in Visual Studio 2017 (Community Edition).
