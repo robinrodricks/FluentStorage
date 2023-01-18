@@ -4,7 +4,7 @@
       <PackageLicense>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicense>
       <FileVersion>2.6.204.0</FileVersion>
       <AssemblyVersion>2.0.0.0</AssemblyVersion>
-      <Description>Provides FluentStorage integration with Azure Service Fabric. This library implements Reliable Storage as Blobs and Messages.</Description>
+      <Description>Extension to FluentStorage providing Azure Service Fabric integration. This library implements Reliable Storage as Blobs and Messages.</Description>
       <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
       <PackageId>FluentStorage.Azure.ServiceFabric</PackageId>
       <AssemblyName>FluentStorage.Azure.ServiceFabric</AssemblyName>

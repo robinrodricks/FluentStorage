@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
-      <TargetFramework>netstandard2.0</TargetFramework>
+      <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
       <PackageId>FluentStorage.GCP</PackageId>
       <AssemblyName>FluentStorage.GCP</AssemblyName>
       <RootNamespace>FluentStorage.GCP</RootNamespace>
-      <Description>Extension to FluentStorage providing integration with Google Cloud Storage</Description>
+      <Description>Extension to FluentStorage providing Google Cloud Storage as blob storage.</Description>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>

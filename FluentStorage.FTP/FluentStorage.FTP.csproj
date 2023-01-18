@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
-      <TargetFramework>netstandard2.0</TargetFramework>
-      <Description>FTP bindings for FluentStorage</Description>
+      <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
+      <Description>Extension to FluentStorage providing FTP and FTPS support using FluentFTP.</Description>
       <PackageId>FluentStorage.FTP</PackageId>
       <AssemblyName>FluentStorage.FTP</AssemblyName>
       <RootNamespace>FluentStorage.FTP</RootNamespace>

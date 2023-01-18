@@ -4,7 +4,7 @@
       <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
       <AssemblyName>FluentStorage</AssemblyName>
       <PackageId>FluentStorage</PackageId>
-      <Description>FluentStorage abstracts storage implementation like blobs, tables and messages from the .NET Application Developer. It's aimed to provide a generic interface regardless on which storage provider you are using. It also provides both synchronous and asynchronous alternatives of all methods and implements it to the best effort possible. Supports .NET 4.5.1 and .NET Standard 1.6.</Description>
+      <Description>FluentStorage, originally known as Storage.NET, is a polycloud .NET cloud storage library to interface with multiple cloud providers from a single unified interface. Provides Blob storage (AWS S3, GCP, FTP, SFTP, Azure Blob/File/Event Hub/Data Lake) and Messaging (AWS SQS, Azure Queue/ServiceBus). Supports .NET 5+ and .NET Standard 2.0+. Pure C#. MIT license. Commercial use allowed.</Description>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>

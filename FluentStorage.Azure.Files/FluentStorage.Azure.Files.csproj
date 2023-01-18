@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
-      <TargetFramework>netstandard2.0</TargetFramework>
+      <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
       <AssemblyName>FluentStorage.Azure.Files</AssemblyName>
       <RootNamespace>FluentStorage.Azure.Files</RootNamespace>
-      <Description>Azure Storage Files support in FluentStorage.</Description>
+      <Description>Extension to FluentStorage providing Azure Storage Files support.</Description>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>

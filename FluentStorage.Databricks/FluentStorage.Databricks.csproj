@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
-      <TargetFramework>netstandard2.0</TargetFramework>
+      <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
       <PackageId>FluentStorage.Databricks</PackageId>
-      <Description>Extension to FluentStorage that provides access to various aspects of Databricks, such as DBFS, secrets, clusters, workbooks and so on. Azure and AWS are fully supported.</Description>
+      <Description>Extension to FluentStorage providing Databricks integration, including DBFS, secrets, clusters, workbooks and so on. Azure and AWS are fully supported.</Description>
       <AssemblyName>FluentStorage.Databricks</AssemblyName>
       <RootNamespace>FluentStorage.Databricks</RootNamespace>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>

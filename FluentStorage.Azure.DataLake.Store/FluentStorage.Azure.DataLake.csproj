@@ -2,7 +2,7 @@
    <PropertyGroup>
       <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
       <PackageLicense>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicense>
-      <Description>Provides Azure Data Lake Store integration for FluentStorage library. Supports only ADLS Gen 1. To use Gen 2, use FluentStorage.Azure.Blobs package.</Description>
+      <Description>Extension to FluentStorage providing Azure Data Lake Store integration. Supports only ADLS Gen 1. To use Gen 2, use FluentStorage.Blobs package.</Description>
       <PackageId>FluentStorage.Azure.DataLake</PackageId>
       <AssemblyName>FluentStorage.Azure.DataLake</AssemblyName>
       <RootNamespace>FluentStorage.Azure.DataLake</RootNamespace>

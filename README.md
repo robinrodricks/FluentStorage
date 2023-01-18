@@ -11,9 +11,9 @@
 
 FluentStorage, originally known as Storage.NET, is a field-tested polycloud .NET cloud storage library that helps you interface with multiple cloud providers from a single unified interface.
 
-It provides a generic interface for popular cloud storage providers like Amazon S3, Azure Service Bus, Azure Event Hub, Azure Storage, Azure Data Lake Store thus abstracting Blob and Messaging services.
+It provides a generic interface for Blob storage across all cloud storage providers (AWS S3, GCP, FTP, SFTP, Azure Blob/File/Event Hub/Data Lake) and cloud messaging providers (AWS SQS, Azure Queue/ServiceBus).
 
-It is written entirely in C#, with no external dependency.
+It is written entirely in C#. Supports .NET 5+ and .NET Standard 2.0+. External dependencies are only added by FluentStorage sub-packages.
 
 FluentStorage is released under the permissive MIT License, so it can be used in both proprietary and free/open source applications.
 
@@ -29,8 +29,6 @@ FluentStorage is released under the permissive MIT License, so it can be used in
 * Supports **Amazon S3**, **Azure Storage**, **Azure Service Bus**, **Azure Event Hub**, **Azure Data Lake Store**, **Azure Key Vault** and many more, out of the box, with hassle-free configuration and zero learning path.
 
 * Implements inmemory and on disk versions of all the abstractions, therefore you can develop fast on a local machine or use vendor free serverless implementations for parts of your applciation which don't require a separate third party backend at a particular point in development.
-
-* Supports .NET Standard 2.0 and higher.
 
 * Attempts to enforce idential behavior on all implementaions of storage interfaces to the smallest details possible and you will find a lot of test specifications which will help you to add another provider.
 
@@ -51,6 +49,7 @@ In 2023 we added:
 * **FTP** provider [FluentFTP](https://github.com/robinrodricks/FluentFTP) updated to v44
 * **AWS** Nuget bumped to latest versions
 * **Wiki** created for documentation
+* **Platform** support updated to `netstandard2.0`,`netstandard2.1`,`net50`,`net60`
 
 
 ## Releases

@@ -4,7 +4,7 @@
       <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
       <AssemblyName>FluentStorage.AWS</AssemblyName>
       <PackageId>FluentStorage.AWS</PackageId>
-      <Description>Extension to FluentStorage providing integration with Amazon S3 blobs.</Description>
+      <Description>Extension to FluentStorage providing integration with AWS S3 blob storage.</Description>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>

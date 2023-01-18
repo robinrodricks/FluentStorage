@@ -6,7 +6,7 @@
       <FileVersion>1.0.0.0</FileVersion>
       <AssemblyVersion>1.0.0.0</AssemblyVersion>
       <PackageLicense>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicense>
-      <Description>Extension to FluentStorage providing integration with Microsoft Azure Storage for blobs, tables and queues.</Description>
+      <Description>Extension to FluentStorage providing Azure ServiceBus for blobs.</Description>
       <AssemblyName>FluentStorage.Azure.ServiceBus</AssemblyName>
       <RootNamespace>FluentStorage.Azure.ServiceBus</RootNamespace>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
