@@ -37,7 +37,7 @@ FluentStorage is released under the permissive MIT License, so it can be used in
 
 ## Supported Cloud Services
 
-![Slide](doc/slide.svg)
+![Slide](https://raw.githubusercontent.com/robinrodricks/FluentStorage/develop/.github/providers.svg)
 
 
 ## Releases
