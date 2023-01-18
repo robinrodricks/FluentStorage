@@ -82,6 +82,12 @@ Binaries for all platforms are built from a single Visual Studio Project. You wi
 
 
 
+## Documentation
+
+Check the [Wiki](https://github.com/robinrodricks/FluentStorage/wiki).
+
+
+
 ## What's New
 
 In 2023 we added:
@@ -100,10 +106,6 @@ In 2023 we added:
 
 
 
-
-## Documentation
-
-Check the [Wiki](https://github.com/robinrodricks/FluentStorage/wiki).
 
 
 ## Contributors
