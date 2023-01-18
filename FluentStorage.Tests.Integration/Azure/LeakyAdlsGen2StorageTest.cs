@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentStorage.Blobs;
-using FluentStorage.Azure.Storage.Blobs;
-using FluentStorage.Azure.Storage.Blobs.Gen2.Model;
+using FluentStorage.Azure.Blobs;
+using FluentStorage.Azure.Blobs.Gen2.Model;
 using Xunit;
 
 namespace FluentStorage.Tests.Integration.Azure

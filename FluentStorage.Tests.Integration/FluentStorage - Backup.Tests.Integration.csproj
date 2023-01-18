@@ -19,14 +19,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FluentStorage.AWS\FluentStorage.AWS.csproj" />
-    <ProjectReference Include="..\FluentStorage.Azure.DataLake.Store\FluentStorage.Azure.DataLake.csproj" />
+    <ProjectReference Include="..\FluentStorage.Azure.DataLake.Store\FluentStorage.Azure.DataLake.Store.csproj" />
     <ProjectReference Include="..\FluentStorage.Azure.EventHub\FluentStorage.Azure.EventHub.csproj" />
     <ProjectReference Include="..\FluentStorage.Azure.KeyVault\FluentStorage.Azure.KeyVault.csproj" />
     <ProjectReference Include="..\FluentStorage.Azure.Queues\FluentStorage.Azure.Queues.csproj" />
     <ProjectReference Include="..\FluentStorage.Azure.ServiceBus\FluentStorage.Azure.ServiceBus.csproj" />
     <ProjectReference Include="..\FluentStorage.Azure.ServiceFabric\FluentStorage.Azure.ServiceFabric.csproj" />
     <ProjectReference Include="..\FluentStorage.Azure.Blobs\FluentStorage.Azure.Blobs.csproj" />
-    <ProjectReference Include="..\FluentStorage.Azure.Files\FluentStorage.Azure.Files.csproj" />
+    <ProjectReference Include="..\FluentStorage.Azure.Storage.Files\FluentStorage.Azure.Storage.Files.csproj" />
     <ProjectReference Include="..\FluentStorage.Databricks\FluentStorage.Databricks.csproj" />
     <ProjectReference Include="..\FluentStorage.FTP\FluentStorage.FTP.csproj" />
     <ProjectReference Include="..\FluentStorage.GCP\FluentStorage.GCP.csproj" />

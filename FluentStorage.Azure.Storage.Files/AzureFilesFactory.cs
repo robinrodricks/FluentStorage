@@ -1,6 +1,6 @@
 ﻿using FluentStorage.Blobs;
 using FluentStorage.ConnectionString;
-using FluentStorage.Azure.Storage.Files;
+using FluentStorage.Azure.Files;
 
 namespace FluentStorage
 {

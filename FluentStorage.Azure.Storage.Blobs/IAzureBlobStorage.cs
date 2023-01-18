@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentStorage.Blobs;
 
-namespace FluentStorage.Azure.Storage.Blobs
+namespace FluentStorage.Azure.Blobs
 {
 
    /// <summary>

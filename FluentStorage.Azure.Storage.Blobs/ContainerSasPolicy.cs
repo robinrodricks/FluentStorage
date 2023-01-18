@@ -2,7 +2,7 @@
 using Azure.Storage;
 using Azure.Storage.Sas;
 
-namespace FluentStorage.Azure.Storage.Blobs
+namespace FluentStorage.Azure.Blobs
 {
    /// <summary>
    /// Defines a SAS policy for a container

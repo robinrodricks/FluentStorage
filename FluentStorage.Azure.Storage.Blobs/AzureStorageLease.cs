@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Azure;
 using Azure.Storage.Blobs.Specialized;
 
-namespace FluentStorage.Azure.Storage.Blobs
+namespace FluentStorage.Azure.Blobs
 {
    /// <summary>
    /// Represents a blob lease

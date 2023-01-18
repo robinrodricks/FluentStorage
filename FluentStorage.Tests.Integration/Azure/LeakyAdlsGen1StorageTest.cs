@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FluentStorage.Blobs;
-using FluentStorage.Azure.DataLake.Store.Gen1;
+using FluentStorage.Azure.DataLake;
 using Xunit;
 
 namespace FluentStorage.Tests.Integration.Azure

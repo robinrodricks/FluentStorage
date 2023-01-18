@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FluentStorage.Azure.Storage.Blobs
+namespace FluentStorage.Azure.Blobs
 {
    /// <summary>
    /// Specifies possible permissions flags for container access policy

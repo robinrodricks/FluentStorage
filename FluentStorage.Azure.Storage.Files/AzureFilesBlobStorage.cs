@@ -12,7 +12,7 @@ using FluentStorage.Blobs;
 using FluentStorage.Streaming;
 using AzStorageException = Microsoft.Azure.Storage.StorageException;
 
-namespace FluentStorage.Azure.Storage.Files
+namespace FluentStorage.Azure.Files
 {
    class AzureFilesBlobStorage : GenericBlobStorage
    {

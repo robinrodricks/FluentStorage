@@ -1,5 +1,5 @@
 ﻿using FluentStorage.Blobs;
-using FluentStorage.Azure.Storage.Blobs;
+using FluentStorage.Azure.Blobs;
 using System;
 using System.Collections.Generic;
 using System.Linq;

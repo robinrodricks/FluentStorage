@@ -1,7 +1,7 @@
 ﻿using FluentStorage.Blobs;
 using FluentStorage.ConnectionString;
 using FluentStorage.Messaging;
-using FluentStorage.Azure.DataLake.Store.Gen1;
+using FluentStorage.Azure.DataLake;
 
 namespace FluentStorage.Azure.DataLake.Store
 {

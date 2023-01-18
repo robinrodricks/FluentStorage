@@ -5,7 +5,7 @@ using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
 using FluentStorage.ConnectionString;
-using FluentStorage.Azure.Storage.Blobs;
+using FluentStorage.Azure.Blobs;
 
 namespace FluentStorage
 {

@@ -2,7 +2,7 @@
 using System.IO;
 using Microsoft.Azure.DataLake.Store;
 
-namespace FluentStorage.Azure.DataLake.Store.Gen1
+namespace FluentStorage.Azure.DataLake
 {
    class AdlsWriteableStream : Stream
    {

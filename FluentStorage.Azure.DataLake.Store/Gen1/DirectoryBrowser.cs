@@ -8,7 +8,7 @@ using Microsoft.Azure.DataLake.Store;
 using Microsoft.Azure.DataLake.Store.RetryPolicies;
 using FluentStorage.Blobs;
 
-namespace FluentStorage.Azure.DataLake.Store.Gen1
+namespace FluentStorage.Azure.DataLake
 {
    class DirectoryBrowser
    {

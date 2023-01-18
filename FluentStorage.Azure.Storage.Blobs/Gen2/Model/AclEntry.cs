@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace FluentStorage.Azure.Storage.Blobs.Gen2.Model
+namespace FluentStorage.Azure.Blobs.Gen2.Model
 {
    /// <summary>
    /// Access Control List entry

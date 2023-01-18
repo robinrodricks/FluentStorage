@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FluentStorage.Azure.Storage.Blobs.Gen2.Model
+namespace FluentStorage.Azure.Blobs.Gen2.Model
 {
 
    /// <summary>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace FluentStorage.Azure.Storage.Blobs.Gen2.Model
+namespace FluentStorage.Azure.Blobs.Gen2.Model
 {
    class Gen2Path
    {

@@ -7,9 +7,9 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using NetBox.Extensions;
 using FluentStorage.Blobs;
-using FluentStorage.Azure.Storage.Blobs.Gen2.Model;
+using FluentStorage.Azure.Blobs.Gen2.Model;
 
-namespace FluentStorage.Azure.Storage.Blobs
+namespace FluentStorage.Azure.Blobs
 {
    static class AzConvert
    {

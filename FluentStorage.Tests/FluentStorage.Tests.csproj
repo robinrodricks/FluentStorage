@@ -5,7 +5,7 @@
       <LangVersion>latest</LangVersion>
    </PropertyGroup>
    <ItemGroup>
-      <ProjectReference Include="..\FluentStorage.Azure.DataLake.Store\FluentStorage.Azure.DataLake.Store.csproj" />
+      <ProjectReference Include="..\FluentStorage.Azure.DataLake.Store\FluentStorage.Azure.DataLake.csproj" />
       <ProjectReference Include="..\FluentStorage\FluentStorage.csproj" />
    </ItemGroup>
    <ItemGroup>

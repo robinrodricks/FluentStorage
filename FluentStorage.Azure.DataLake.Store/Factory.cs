@@ -1,6 +1,6 @@
 ﻿using FluentStorage.Blobs;
 using FluentStorage.Azure.DataLake.Store;
-using FluentStorage.Azure.DataLake.Store.Gen1;
+using FluentStorage.Azure.DataLake;
 using System;
 using System.Net;
 

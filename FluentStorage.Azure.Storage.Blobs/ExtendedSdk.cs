@@ -15,8 +15,8 @@ using Blobs.Gen2;
 using NetBox.Extensions;
 using FluentStorage;
 using FluentStorage.Blobs;
-using FluentStorage.Azure.Storage.Blobs;
-using FluentStorage.Azure.Storage.Blobs.Gen2.Model;
+using FluentStorage.Azure.Blobs;
+using FluentStorage.Azure.Blobs.Gen2.Model;
 
 namespace Blobs
 {

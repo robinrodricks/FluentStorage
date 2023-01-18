@@ -7,9 +7,9 @@ using Azure.Storage;
 using Azure.Storage.Blobs;
 using Blobs;
 using FluentStorage.Blobs;
-using FluentStorage.Azure.Storage.Blobs.Gen2.Model;
+using FluentStorage.Azure.Blobs.Gen2.Model;
 
-namespace FluentStorage.Azure.Storage.Blobs
+namespace FluentStorage.Azure.Blobs
 {
    class AzureDataLakeStorage : AzureBlobStorage, IAzureDataLakeStorage
    {

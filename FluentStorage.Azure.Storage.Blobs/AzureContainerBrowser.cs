@@ -8,7 +8,7 @@ using Azure.Storage.Blobs.Models;
 using NetBox.Async;
 using FluentStorage.Blobs;
 
-namespace FluentStorage.Azure.Storage.Blobs
+namespace FluentStorage.Azure.Blobs
 {
    class AzureContainerBrowser : IDisposable
    {

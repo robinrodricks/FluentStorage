@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FluentStorage.Azure.Storage.Blobs.Gen2.Model
+namespace FluentStorage.Azure.Blobs.Gen2.Model
 {
    class PathList
    {

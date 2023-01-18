@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using FluentStorage.Blobs;
 
-namespace FluentStorage.Azure.DataLake.Store.Gen1
+namespace FluentStorage.Azure.DataLake
 {
    /// <summary>
    /// Gen 1 specific API

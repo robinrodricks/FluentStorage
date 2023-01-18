@@ -3,7 +3,7 @@ using Microsoft.Azure.Storage.File;
 using NetBox.Extensions;
 using FluentStorage.Blobs;
 
-namespace FluentStorage.Azure.Storage.Files
+namespace FluentStorage.Azure.Files
 {
    static class AzConvert
    {

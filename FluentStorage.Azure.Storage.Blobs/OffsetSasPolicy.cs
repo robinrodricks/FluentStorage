@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FluentStorage.Azure.Storage.Blobs
+namespace FluentStorage.Azure.Blobs
 {
    /// <summary>
    /// Base SAS policy with date and time offset

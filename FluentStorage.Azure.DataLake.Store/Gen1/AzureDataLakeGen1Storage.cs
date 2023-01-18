@@ -12,7 +12,7 @@ using System.Threading;
 using Microsoft.Azure.DataLake.Store;
 using Microsoft.Azure.DataLake.Store.Acl;
 
-namespace FluentStorage.Azure.DataLake.Store.Gen1
+namespace FluentStorage.Azure.DataLake
 {
    class AzureDataLakeGen1Storage : IAzureDataLakeGen1BlobStorage, IExtendedBlobStorage
    {

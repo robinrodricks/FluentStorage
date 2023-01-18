@@ -2,7 +2,7 @@
 using FluentStorage.ConnectionString;
 using FluentStorage.Messaging;
 
-namespace FluentStorage.Azure.Storage.Blobs
+namespace FluentStorage.Azure.Blobs
 {
    class Module : IExternalModule, IConnectionFactory
    {
