@@ -35,9 +35,21 @@ FluentStorage is released under the permissive MIT License, so it can be used in
 * Attempts to enforce idential behavior on all implementaions of storage interfaces to the smallest details possible and you will find a lot of test specifications which will help you to add another provider.
 
 
+
+## What's New
+
+In 2023 we added:
+
+* **SFTP** provider [SSH.NET](https://github.com/sshnet/SSH.NET) added 
+* **FTP** provider [FluentFTP](https://github.com/robinrodricks/FluentFTP) updated to v44
+* **AWS** Nuget bumped to latest versions
+
+
+
 ## Supported Cloud Services
 
 ![Slide](https://raw.githubusercontent.com/robinrodricks/FluentStorage/develop/.github/providers.svg)
+
 
 
 ## Releases
