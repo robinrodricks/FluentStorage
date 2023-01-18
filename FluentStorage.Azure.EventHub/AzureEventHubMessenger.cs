@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
-using Storage.Net.Messaging;
+using FluentStorage.Messaging;
 using Microsoft.Azure.EventHubs;
 using System;
 using System.Threading;
 
-namespace Storage.Net.Microsoft.Azure.EventHub
+namespace FluentStorage.Azure.EventHub
 {
    /// <summary>
    /// Publishes messages to Azure Event Hub

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 using Objects = Google.Apis.Storage.v1.Data.Objects;
 using Object = Google.Apis.Storage.v1.Data.Object;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 using NetBox.Extensions;
 using Google.Api.Gax;
 using System.Threading.Tasks;
 using System.Collections;
 
-namespace Storage.Net.Gcp.CloudStorage.Blobs
+namespace FluentStorage.Gcp.CloudStorage.Blobs
 {
    static class GConvert
    {

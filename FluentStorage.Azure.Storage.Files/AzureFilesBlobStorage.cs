@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Auth;
 using Microsoft.Azure.Storage.File;
-using Storage.Net.Blobs;
-using Storage.Net.Streaming;
+using FluentStorage.Blobs;
+using FluentStorage.Streaming;
 using AzStorageException = Microsoft.Azure.Storage.StorageException;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Files
+namespace FluentStorage.Azure.Storage.Files
 {
    class AzureFilesBlobStorage : GenericBlobStorage
    {

@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 using NetBox;
 using NetBox.Extensions;
 using NetBox.Generator;
-using Storage.Net.Blobs;
-using Storage.Net.Tests.Integration.Util;
+using FluentStorage.Blobs;
+using FluentStorage.Tests.Integration.Util;
 using Xunit;
 
-namespace Storage.Net.Tests.Integration.Blobs
+namespace FluentStorage.Tests.Integration.Blobs
 {
    [Trait("Category", "Blobs")]
    public abstract class BlobTest : IAsyncLifetime

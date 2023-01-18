@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon;
-using Storage.Net.Amazon.Aws.Blobs;
-using Storage.Net.Blobs;
+using FluentStorage.AWS.Blobs;
+using FluentStorage.Blobs;
 using Xunit;
 
-namespace Storage.Net.Tests.Integration.AWS
+namespace FluentStorage.Tests.Integration.AWS
 {
    [Trait("Category", "Blobs")]
    public class LeakyAmazonS3StorageTest

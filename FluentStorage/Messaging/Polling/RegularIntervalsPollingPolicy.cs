@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Storage.Net.Messaging.Polling
+namespace FluentStorage.Messaging.Polling
 {
    class RegularIntervalsPollingPolicy : IPollingPolicy
    {

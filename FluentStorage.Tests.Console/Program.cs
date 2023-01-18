@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Config.Net;
-using Storage.Net.Messaging;
-using Storage.Net.Tests;
+using FluentStorage.Messaging;
+using FluentStorage.Tests;
 
-namespace Storage.Net.ConsoleRunner
+namespace FluentStorage.ConsoleRunner
 {
    class Program
    {

@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.DataLake.Store;
 using Microsoft.Azure.DataLake.Store.RetryPolicies;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 
-namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen1
+namespace FluentStorage.Azure.DataLake.Store.Gen1
 {
    class DirectoryBrowser
    {

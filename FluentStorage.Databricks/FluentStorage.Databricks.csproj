@@ -2,10 +2,10 @@
 
    <PropertyGroup>
       <TargetFramework>netstandard2.0</TargetFramework>
-      <PackageId>Storage.Net.Databricks</PackageId>
-      <Description>Extension to Storage.Net that provides access to various aspects of Databricks, such as DBFS, secrets, clusters, workbooks and so on. Azure and AWS are fully supported.</Description>
-      <AssemblyName>Storage.Net.Databricks</AssemblyName>
-      <RootNamespace>Storage.Net.Databricks</RootNamespace>
+      <PackageId>FluentStorage.Databricks</PackageId>
+      <Description>Extension to FluentStorage that provides access to various aspects of Databricks, such as DBFS, secrets, clusters, workbooks and so on. Azure and AWS are fully supported.</Description>
+      <AssemblyName>FluentStorage.Databricks</AssemblyName>
+      <RootNamespace>FluentStorage.Databricks</RootNamespace>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>
@@ -18,7 +18,7 @@
       <LangVersion>latest</LangVersion>
       <SignAssembly>True</SignAssembly>
       <AssemblyOriginatorKeyFile>..\FluentStorage\sn.snk</AssemblyOriginatorKeyFile>
-      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>$
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>
    </PropertyGroup>
 
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">

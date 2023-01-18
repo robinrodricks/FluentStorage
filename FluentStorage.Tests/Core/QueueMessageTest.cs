@@ -1,4 +1,4 @@
-﻿ using Storage.Net.Messaging;
+﻿ using FluentStorage.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Storage.Net.Tests.Core
+namespace FluentStorage.Tests.Core
 {
    public class QueueMessageTest
    {

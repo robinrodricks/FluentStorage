@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 using Xunit;
 
-namespace Storage.Net.Tests.Blobs
+namespace FluentStorage.Tests.Blobs
 {
    public class BlobStorageExtensionsTest
    {

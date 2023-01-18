@@ -1,11 +1,11 @@
 ﻿using Microsoft.ServiceFabric.Data;
-using Storage.Net.Blobs;
-using Storage.Net.Messaging;
-using Storage.Net.Microsoft.ServiceFabric.Blobs;
-using Storage.Net.Microsoft.ServiceFabric.Messaging;
+using FluentStorage.Blobs;
+using FluentStorage.Messaging;
+using FluentStorage.Microsoft.ServiceFabric.Blobs;
+using FluentStorage.Microsoft.ServiceFabric.Messaging;
 using System;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    public static class Factory
    {

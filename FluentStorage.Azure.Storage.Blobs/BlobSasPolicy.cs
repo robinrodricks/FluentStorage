@@ -4,7 +4,7 @@ using System.Text;
 using Azure.Storage;
 using Azure.Storage.Sas;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Blobs
+namespace FluentStorage.Azure.Storage.Blobs
 {
    /// <summary>
    /// Defines a SAS policy for a blob

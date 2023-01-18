@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Auth;
 using Microsoft.Azure.Storage.Queue;
-using Storage.Net.Messaging;
+using FluentStorage.Messaging;
 using WSE = Microsoft.Azure.Storage.StorageException;
 
-namespace Storage.Net.Microsoft.Azure.Queues
+namespace FluentStorage.Azure.Queues
 {
    class AzureStorageQueueMessenger : IMessenger
    {

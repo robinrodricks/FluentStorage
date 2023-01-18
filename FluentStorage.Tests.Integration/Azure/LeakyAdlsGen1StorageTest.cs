@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Storage.Net.Blobs;
-using Storage.Net.Microsoft.Azure.DataLake.Store.Gen1;
+using FluentStorage.Blobs;
+using FluentStorage.Azure.DataLake.Store.Gen1;
 using Xunit;
 
-namespace Storage.Net.Tests.Integration.Azure
+namespace FluentStorage.Tests.Integration.Azure
 {
    [Trait("Category", "Blobs")]
    public class LeakyAdlsGen1StorageTest

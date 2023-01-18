@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Storage.Net.Messaging
+namespace FluentStorage.Messaging
 {
    class InMemoryMessenger : IMessenger
    {

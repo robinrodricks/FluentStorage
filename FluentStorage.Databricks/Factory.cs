@@ -1,8 +1,8 @@
 ﻿using System;
-using Storage.Net.Blobs;
-using Storage.Net.Databricks;
+using FluentStorage.Blobs;
+using FluentStorage.Databricks;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    /// <summary>
    /// Library Factory

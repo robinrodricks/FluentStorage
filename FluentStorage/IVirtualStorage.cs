@@ -1,6 +1,6 @@
-﻿using Storage.Net.Blobs;
+﻿using FluentStorage.Blobs;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    /// <summary>
    /// Virtual storage

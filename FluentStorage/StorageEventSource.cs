@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics.Tracing;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    /// <summary>
    /// Internal logger
    /// </summary>
-   [EventSource(Name = "Storage.Net")]
+   [EventSource(Name = "FluentStorage")]
    public sealed class StorageEventSource : EventSource
    {
       /// <summary>

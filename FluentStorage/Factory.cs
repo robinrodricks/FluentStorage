@@ -1,16 +1,16 @@
 ﻿using System;
 using System.IO;
-using Storage.Net.Blobs;
-using Storage.Net.Blobs.Files;
-using Storage.Net.Messaging;
-using Storage.Net.ConnectionString;
-using Storage.Net.Messaging.Large;
-using Storage.Net.Messaging.Files;
+using FluentStorage.Blobs;
+using FluentStorage.Blobs.Files;
+using FluentStorage.Messaging;
+using FluentStorage.ConnectionString;
+using FluentStorage.Messaging.Large;
+using FluentStorage.Messaging.Files;
 using System.IO.Compression;
-using Storage.Net.Blobs.Sinks.Impl;
-using Storage.Net.Blobs.Sinks;
+using FluentStorage.Blobs.Sinks.Impl;
+using FluentStorage.Blobs.Sinks;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    /// <summary>
    /// Factory extension methods

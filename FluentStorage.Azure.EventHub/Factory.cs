@@ -1,7 +1,7 @@
-﻿using Storage.Net.Messaging;
-using Storage.Net.Microsoft.Azure.EventHub;
+﻿using FluentStorage.Messaging;
+using FluentStorage.Azure.EventHub;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    /// <summary>
    /// Factory class that implement factory methods for Microsoft Azure implememtations

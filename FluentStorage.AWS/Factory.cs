@@ -1,15 +1,15 @@
 ﻿using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
-using Storage.Net.Amazon.Aws.Messaging;
-using Storage.Net.Amazon.Aws.Blobs;
-using Storage.Net.Blobs;
-using Storage.Net.Messaging;
-using Storage.Net.Amazon.Aws;
-using Storage.Net.ConnectionString;
+using FluentStorage.AWS.Messaging;
+using FluentStorage.AWS.Blobs;
+using FluentStorage.Blobs;
+using FluentStorage.Messaging;
+using FluentStorage.AWS;
+using FluentStorage.ConnectionString;
 using Amazon.S3.Transfer;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    /// <summary>
    /// Factory class that implement factory methods for Amazon AWS implementation

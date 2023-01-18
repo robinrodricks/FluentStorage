@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NetBox.Extensions;
 
-namespace Storage.Net.ConnectionString
+namespace FluentStorage.ConnectionString
 {
    /// <summary>
    /// Holds a parsed connection string to the storage

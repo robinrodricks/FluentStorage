@@ -1,11 +1,11 @@
 ﻿using Microsoft.Azure.EventHubs;
 using NetBox.Extensions;
-using Storage.Net.Messaging;
+using FluentStorage.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Storage.Net.Microsoft.Azure.EventHub
+namespace FluentStorage.Azure.EventHub
 {
    static class Converter
    {

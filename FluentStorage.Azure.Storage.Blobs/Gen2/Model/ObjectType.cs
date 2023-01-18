@@ -1,4 +1,4 @@
-﻿namespace Storage.Net.Microsoft.Azure.Storage.Blobs.Gen2.Model
+﻿namespace FluentStorage.Azure.Storage.Blobs.Gen2.Model
 {
    /// <summary>
    /// ACL object type

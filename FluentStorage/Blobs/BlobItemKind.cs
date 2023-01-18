@@ -1,4 +1,4 @@
-﻿namespace Storage.Net.Blobs
+﻿namespace FluentStorage.Blobs
 {
    /// <summary>
    /// Type of the blob item in the storage

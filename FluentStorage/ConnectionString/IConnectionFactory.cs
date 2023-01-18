@@ -1,7 +1,7 @@
-﻿using Storage.Net.Blobs;
-using Storage.Net.Messaging;
+﻿using FluentStorage.Blobs;
+using FluentStorage.Messaging;
 
-namespace Storage.Net.ConnectionString
+namespace FluentStorage.ConnectionString
 {
    /// <summary>
    /// Connection factory is responsible for creating storage instances from connection strings. It

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    /// <summary>
    /// Generic storage exception

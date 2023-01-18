@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Storage.Net.Microsoft.Azure.Storage.Blobs.Gen2.Model;
+using FluentStorage.Azure.Storage.Blobs.Gen2.Model;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Blobs
+namespace FluentStorage.Azure.Storage.Blobs
 {
    /// <summary>
    /// Additional Gen 2 storage operations

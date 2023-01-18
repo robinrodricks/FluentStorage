@@ -1,6 +1,6 @@
-﻿using Storage.Net.ConnectionString;
+﻿using FluentStorage.ConnectionString;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    /// <summary>
    /// An entry point for implementing initialisation of an external module

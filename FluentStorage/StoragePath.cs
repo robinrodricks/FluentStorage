@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    /// <summary>
    /// Storage Path utilities

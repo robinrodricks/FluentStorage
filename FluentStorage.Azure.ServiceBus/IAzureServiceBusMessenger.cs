@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Storage.Net.Messaging;
+using FluentStorage.Messaging;
 
-namespace Storage.Net.Microsoft.Azure.ServiceBus
+namespace FluentStorage.Azure.ServiceBus
 {
    /// <summary>
    /// Azure Service Bus specific information

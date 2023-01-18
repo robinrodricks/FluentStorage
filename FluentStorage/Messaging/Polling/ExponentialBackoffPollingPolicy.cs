@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Storage.Net.Messaging.Polling
+namespace FluentStorage.Messaging.Polling
 {
    class ExponentialBackoffPollingPolicy : IPollingPolicy
    {

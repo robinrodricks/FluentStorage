@@ -2,7 +2,10 @@
 
    <PropertyGroup>
       <TargetFramework>netstandard2.0</TargetFramework>
-      <Description>Extension to Storage.Net providing integration with Google Cloud Storage</Description>
+      <PackageId>FluentStorage.GCP</PackageId>
+      <AssemblyName>FluentStorage.GCP</AssemblyName>
+      <RootNamespace>FluentStorage.GCP</RootNamespace>
+      <Description>Extension to FluentStorage providing integration with Google Cloud Storage</Description>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>
@@ -15,7 +18,7 @@
       <LangVersion>latest</LangVersion>
       <SignAssembly>True</SignAssembly>
       <AssemblyOriginatorKeyFile>..\FluentStorage\sn.snk</AssemblyOriginatorKeyFile>
-      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>$
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentStorage.GCP.xml</DocumentationFile>
    </PropertyGroup>
 
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">

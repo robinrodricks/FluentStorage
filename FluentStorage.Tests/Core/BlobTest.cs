@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 using Xunit;
 
-namespace Storage.Net.Tests.Core
+namespace FluentStorage.Tests.Core
 {
    public class BlobTest
    {

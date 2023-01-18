@@ -1,13 +1,13 @@
 ﻿using Xunit;
-using Storage.Net.Messaging;
+using FluentStorage.Messaging;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Storage.Net.Microsoft.Azure.ServiceBus;
+using FluentStorage.Azure.ServiceBus;
 using System.Linq;
 using System.Threading;
 
-namespace Storage.Net.Tests.Integration.Messaging
+namespace FluentStorage.Tests.Integration.Messaging
 {
    [Trait("Category", "Messenger")]
    public abstract class MessagingTest : IAsyncLifetime

@@ -2,9 +2,9 @@
 
    <PropertyGroup>
       <TargetFramework>netstandard2.0</TargetFramework>
-      <PackageId>Storage.Net.Microsoft.Azure.Storage.Blobs</PackageId>
-      <RootNamespace>Storage.Net.Microsoft.Azure.Storage.Blobs</RootNamespace>
-      <AssemblyName>Storage.Net.Microsoft.Azure.Storage.Blobs</AssemblyName>
+      <PackageId>FluentStorage.Azure.Storage.Blobs</PackageId>
+      <RootNamespace>FluentStorage.Azure.Storage.Blobs</RootNamespace>
+      <AssemblyName>FluentStorage.Azure.Storage.Blobs</AssemblyName>
       <Description>Support for Azure blob storage.</Description>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -18,7 +18,7 @@
       <LangVersion>latest</LangVersion>
       <SignAssembly>True</SignAssembly>
       <AssemblyOriginatorKeyFile>..\FluentStorage\sn.snk</AssemblyOriginatorKeyFile>
-      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>$
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentStorage.Azure.Storage.Blobs.xml</DocumentationFile>
    </PropertyGroup>
 
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">

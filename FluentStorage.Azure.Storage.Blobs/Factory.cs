@@ -4,10 +4,10 @@ using Azure.Identity;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
-using Storage.Net.ConnectionString;
-using Storage.Net.Microsoft.Azure.Storage.Blobs;
+using FluentStorage.ConnectionString;
+using FluentStorage.Azure.Storage.Blobs;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    /// <summary>
    /// Blob storage factory

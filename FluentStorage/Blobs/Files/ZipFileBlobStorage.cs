@@ -5,9 +5,9 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Storage.Net.Streaming;
+using FluentStorage.Streaming;
 
-namespace Storage.Net.Blobs.Files
+namespace FluentStorage.Blobs.Files
 {
    class ZipFileBlobStorage : IBlobStorage
    {

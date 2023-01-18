@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.EventHubs.Processor;
-using Storage.Net.Messaging;
+using FluentStorage.Messaging;
 
-namespace Storage.Net.Microsoft.Azure.EventHub
+namespace FluentStorage.Azure.EventHub
 {
    class MessageProcessorEventProcessor : IEventProcessor
    {

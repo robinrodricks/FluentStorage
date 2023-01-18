@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using FluentFTP;
 using Polly;
 using Polly.Retry;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 
-namespace Storage.Net.Ftp
+namespace FluentStorage.Ftp
 {
    class FluentFtpBlobStorage : IBlobStorage
    {

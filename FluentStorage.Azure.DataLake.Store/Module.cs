@@ -1,9 +1,9 @@
-﻿using Storage.Net.Blobs;
-using Storage.Net.ConnectionString;
-using Storage.Net.Messaging;
-using Storage.Net.Microsoft.Azure.DataLake.Store.Gen1;
+﻿using FluentStorage.Blobs;
+using FluentStorage.ConnectionString;
+using FluentStorage.Messaging;
+using FluentStorage.Azure.DataLake.Store.Gen1;
 
-namespace Storage.Net.Microsoft.Azure.DataLake.Store
+namespace FluentStorage.Azure.DataLake.Store
 {
    class Module : IExternalModule, IConnectionFactory
    {

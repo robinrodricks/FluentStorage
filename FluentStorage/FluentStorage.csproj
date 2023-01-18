@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
    <PropertyGroup>
-      <AssemblyTitle>Storage.Net</AssemblyTitle>
+      <AssemblyTitle>FluentStorage</AssemblyTitle>
       <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
-      <AssemblyName>Storage.Net</AssemblyName>
-      <PackageId>Storage.Net</PackageId>
-      <Description>Storage.Net abstracts storage implementation like blobs, tables and messages from the .NET Application Developer. It's aimed to provide a generic interface regardless on which storage provider you are using. It also provides both synchronous and asynchronous alternatives of all methods and implements it to the best effort possible. Supports .NET 4.5.1 and .NET Standard 1.6.</Description>
+      <AssemblyName>FluentStorage</AssemblyName>
+      <PackageId>FluentStorage</PackageId>
+      <Description>FluentStorage abstracts storage implementation like blobs, tables and messages from the .NET Application Developer. It's aimed to provide a generic interface regardless on which storage provider you are using. It also provides both synchronous and asynchronous alternatives of all methods and implements it to the best effort possible. Supports .NET 4.5.1 and .NET Standard 1.6.</Description>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>
@@ -17,7 +17,7 @@
       <LangVersion>latest</LangVersion>
       <SignAssembly>True</SignAssembly>
       <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
-      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentStorage.xml</DocumentationFile>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>

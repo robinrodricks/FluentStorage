@@ -1,5 +1,5 @@
 ﻿using Microsoft.Rest.Azure.Authentication;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -12,7 +12,7 @@ using System.Threading;
 using Microsoft.Azure.DataLake.Store;
 using Microsoft.Azure.DataLake.Store.Acl;
 
-namespace Storage.Net.Microsoft.Azure.DataLake.Store.Gen1
+namespace FluentStorage.Azure.DataLake.Store.Gen1
 {
    class AzureDataLakeGen1Storage : IAzureDataLakeGen1BlobStorage, IExtendedBlobStorage
    {

@@ -2,9 +2,9 @@
 
    <PropertyGroup>
       <TargetFramework>netstandard2.0</TargetFramework>
-      <AssemblyName>Storage.Net.Microsoft.Azure.Storage.Files</AssemblyName>
-      <RootNamespace>Storage.Net.Microsoft.Azure.Storage.Files</RootNamespace>
-      <Description>Azure Storage Files support in Storage.Net.</Description>
+      <AssemblyName>FluentStorage.Azure.Storage.Files</AssemblyName>
+      <RootNamespace>FluentStorage.Azure.Storage.Files</RootNamespace>
+      <Description>Azure Storage Files support in FluentStorage.</Description>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>
@@ -17,7 +17,7 @@
       <LangVersion>latest</LangVersion>
       <SignAssembly>True</SignAssembly>
       <AssemblyOriginatorKeyFile>..\FluentStorage\sn.snk</AssemblyOriginatorKeyFile>
-      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>$
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentStorage.Azure.Storage.Files.xml</DocumentationFile>
    </PropertyGroup>
 
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">

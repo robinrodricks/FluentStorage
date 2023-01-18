@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Storage.Net.Messaging
+namespace FluentStorage.Messaging
 {
    /// <summary>
    /// Extensions for <see cref="IMessenger"/>

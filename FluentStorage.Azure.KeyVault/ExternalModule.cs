@@ -1,9 +1,9 @@
 ﻿using System;
-using Storage.Net.Blobs;
-using Storage.Net.ConnectionString;
-using Storage.Net.Messaging;
+using FluentStorage.Blobs;
+using FluentStorage.ConnectionString;
+using FluentStorage.Messaging;
 
-namespace Storage.Net.Microsoft.Azure.KeyVault
+namespace FluentStorage.Azure.KeyVault
 {
    class ExternalModule : IExternalModule, IConnectionFactory
    {

@@ -1,17 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
    <PropertyGroup>
       <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
-      <AssemblyTitle>Storage.Net.Microsoft.Azure.ServiceBus</AssemblyTitle>
-      <PackageId>Storage.Net.Microsoft.Azure.ServiceBus</PackageId>
-      <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-      <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-      <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+      <AssemblyTitle>FluentStorage.Azure.ServiceBus</AssemblyTitle>
+      <PackageId>FluentStorage.Azure.ServiceBus</PackageId>
       <FileVersion>1.0.0.0</FileVersion>
       <AssemblyVersion>1.0.0.0</AssemblyVersion>
       <PackageLicense>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicense>
-      <Description>Extension to Storage.Net providing integration with Microsoft Azure Storage for blobs, tables and queues.</Description>
-      <AssemblyName>Storage.Net.Microsoft.Azure.ServiceBus</AssemblyName>
-      <RootNamespace>Storage.Net.Microsoft.Azure.ServiceBus</RootNamespace>
+      <Description>Extension to FluentStorage providing integration with Microsoft Azure Storage for blobs, tables and queues.</Description>
+      <AssemblyName>FluentStorage.Azure.ServiceBus</AssemblyName>
+      <RootNamespace>FluentStorage.Azure.ServiceBus</RootNamespace>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>
@@ -24,7 +21,7 @@
       <LangVersion>latest</LangVersion>
       <SignAssembly>True</SignAssembly>
       <AssemblyOriginatorKeyFile>..\FluentStorage\sn.snk</AssemblyOriginatorKeyFile>
-      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>$
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentStorage.Azure.ServiceBus.xml</DocumentationFile>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>

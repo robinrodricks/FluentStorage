@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
-using Storage.Net.Blobs;
-using Storage.Net.ConnectionString;
-using Storage.Net.Messaging;
+using FluentStorage.Blobs;
+using FluentStorage.ConnectionString;
+using FluentStorage.Messaging;
 
-namespace Storage.Net.Databricks
+namespace FluentStorage.Databricks
 {
    class Module : IExternalModule, IConnectionFactory
    {

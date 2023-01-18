@@ -2,7 +2,7 @@
 using System.Net;
 using Config.Net;
 
-namespace Storage.Net.Tests
+namespace FluentStorage.Tests
 {
    public interface ITestSettings
    {

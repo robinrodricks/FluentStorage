@@ -7,11 +7,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
-using Storage.Net.Messaging;
-using IMessageReceiver = Storage.Net.Messaging.IMessageReceiver;
+using FluentStorage.Messaging;
+using IMessageReceiver = FluentStorage.Messaging.IMessageReceiver;
 using ISBMessageReceiver = Microsoft.Azure.ServiceBus.Core.IMessageReceiver;
 
-namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
+namespace FluentStorage.Azure.ServiceBus.Messaging
 {
    abstract class AzureServiceBusReceiver : IMessageReceiver
    {

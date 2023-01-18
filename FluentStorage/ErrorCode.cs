@@ -1,4 +1,4 @@
-﻿namespace Storage.Net
+﻿namespace FluentStorage
 {
    /// <summary>
    /// Generic error codes for storage operations

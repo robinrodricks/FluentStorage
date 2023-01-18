@@ -1,5 +1,5 @@
-﻿using Storage.Net.Blobs;
-using Storage.Net.Microsoft.Azure.Storage.Blobs;
+﻿using FluentStorage.Blobs;
+using FluentStorage.Azure.Storage.Blobs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Storage.Net.Tests.Integration.Azure
+namespace FluentStorage.Tests.Integration.Azure
 {
    [Trait("Category", "Blobs")]
    public class LeakyAzureBlobStorageTest

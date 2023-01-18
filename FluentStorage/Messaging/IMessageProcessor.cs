@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Storage.Net.Messaging
+namespace FluentStorage.Messaging
 {
    /// <summary>
    /// Message processing interface used to register a callback that receives a message

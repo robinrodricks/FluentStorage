@@ -1,8 +1,8 @@
-﻿using Storage.Net.Blobs;
-using Storage.Net.ConnectionString;
-using Storage.Net.Messaging;
+﻿using FluentStorage.Blobs;
+using FluentStorage.ConnectionString;
+using FluentStorage.Messaging;
 
-namespace Storage.Net.Microsoft.Azure.Queues
+namespace FluentStorage.Azure.Queues
 {
    class Module : IExternalModule, IConnectionFactory
    {

@@ -1,11 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
    <PropertyGroup>
       <TargetFramework>net60</TargetFramework>
-      <VersionPrefix>3.5.0-alpha-4</VersionPrefix>
-      <AssemblyName>Storage.Net.Tests</AssemblyName>
-      <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-      <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-      <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+      <AssemblyName>FluentStorage.Tests</AssemblyName>
       <LangVersion>latest</LangVersion>
    </PropertyGroup>
    <ItemGroup>

@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Storage.Net.Blobs
+namespace FluentStorage.Blobs
 {
    /// <summary>
    /// Extended blob storage operations that may be supported natively by a provider as are slow otherwise.

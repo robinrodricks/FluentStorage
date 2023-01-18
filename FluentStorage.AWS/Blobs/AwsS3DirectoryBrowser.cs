@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
 using NetBox.Async;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 
-namespace Storage.Net.Amazon.Aws.Blobs
+namespace FluentStorage.AWS.Blobs
 {
    class AwsS3DirectoryBrowser : IDisposable
    {

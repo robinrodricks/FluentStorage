@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Storage.Net.ConnectionString;
+using FluentStorage.ConnectionString;
 using Xunit;
 
-namespace Storage.Net.Tests
+namespace FluentStorage.Tests
 {
    public class StorageConnectionStringTest
    {

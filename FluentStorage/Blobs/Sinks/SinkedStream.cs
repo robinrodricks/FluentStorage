@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.IO;
 
-namespace Storage.Net.Blobs.Sinks
+namespace FluentStorage.Blobs.Sinks
 {
    class SinkedStream : Stream
    {

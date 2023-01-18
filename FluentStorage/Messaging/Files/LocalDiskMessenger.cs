@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Storage.Net.Messaging;
+using FluentStorage.Messaging;
 
-namespace Storage.Net.Messaging.Files
+namespace FluentStorage.Messaging.Files
 {
    /// <summary>
    /// Messages themselves can be human readable. THe speed is not an issue because the main bottleneck is disk anyway.

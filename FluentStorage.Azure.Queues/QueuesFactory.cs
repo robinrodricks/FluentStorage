@@ -1,9 +1,9 @@
 ﻿using System;
-using Storage.Net.ConnectionString;
-using Storage.Net.Messaging;
-using Storage.Net.Microsoft.Azure.Queues;
+using FluentStorage.ConnectionString;
+using FluentStorage.Messaging;
+using FluentStorage.Azure.Queues;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    public static class QueuesFactory
    {

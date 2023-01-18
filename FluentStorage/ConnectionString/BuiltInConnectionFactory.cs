@@ -1,9 +1,9 @@
-﻿using Storage.Net.Blobs;
-using Storage.Net.Blobs.Files;
-using Storage.Net.Messaging;
-using Storage.Net.Messaging.Files;
+﻿using FluentStorage.Blobs;
+using FluentStorage.Blobs.Files;
+using FluentStorage.Messaging;
+using FluentStorage.Messaging.Files;
 
-namespace Storage.Net.ConnectionString
+namespace FluentStorage.ConnectionString
 {
    class BuiltInConnectionFactory : IConnectionFactory
    {

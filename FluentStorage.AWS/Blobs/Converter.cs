@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
 using NetBox.Extensions;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 
-namespace Storage.Net.Amazon.Aws.Blobs
+namespace FluentStorage.AWS.Blobs
 {
    static class Converter
    {

@@ -1,12 +1,12 @@
 ﻿using Microsoft.Azure.Storage.Queue;
 using NetBox.Extensions;
-using Storage.Net.Messaging;
+using FluentStorage.Messaging;
 using System;
 using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Storage.Net.Microsoft.Azure.Queues
+namespace FluentStorage.Azure.Queues
 {
    internal static class Converter
    {

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Storage.Net.Blobs;
-using Storage.Net.Microsoft.Azure.Storage.Blobs;
-using Storage.Net.Microsoft.Azure.Storage.Blobs.Gen2.Model;
+using FluentStorage.Blobs;
+using FluentStorage.Azure.Storage.Blobs;
+using FluentStorage.Azure.Storage.Blobs.Gen2.Model;
 using Xunit;
 
-namespace Storage.Net.Tests.Integration.Azure
+namespace FluentStorage.Tests.Integration.Azure
 {
    [Trait("Category", "Blobs")]
    public class LeakyAdlsGen2StorageTest : IAsyncLifetime

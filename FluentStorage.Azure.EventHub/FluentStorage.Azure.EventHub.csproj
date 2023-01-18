@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
    <PropertyGroup>
       <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
-      <AssemblyTitle>Storage.Net.Microsoft.Azure.EventHub</AssemblyTitle>
-      <PackageId>Storage.Net.Microsoft.Azure.EventHub</PackageId>
+      <AssemblyTitle>FluentStorage.Azure.EventHub</AssemblyTitle>
+      <PackageId>FluentStorage.Azure.EventHub</PackageId>
       <PackageLicense>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicense>
-      <Description>Extension to Storage.Net providing integration with Microsoft Azure Storage for blobs, tables and queues.</Description>
-      <AssemblyName>Storage.Net.Microsoft.Azure.EventHub</AssemblyName>
-      <RootNamespace>Storage.Net.Microsoft.Azure.EventHub</RootNamespace>
+      <Description>Extension to FluentStorage providing integration with Microsoft Azure Storage for blobs, tables and queues.</Description>
+      <AssemblyName>FluentStorage.Azure.EventHub</AssemblyName>
+      <RootNamespace>FluentStorage.Azure.EventHub</RootNamespace>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>
@@ -19,13 +19,13 @@
       <LangVersion>latest</LangVersion>
       <SignAssembly>True</SignAssembly>
       <AssemblyOriginatorKeyFile>..\FluentStorage\sn.snk</AssemblyOriginatorKeyFile>
-      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>$
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentStorage.Azure.EventHub.xml</DocumentationFile>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
    </PropertyGroup>
    <ItemGroup>
-      <Compile Include="..\..\JsonExtensions.cs" Link="JsonExtensions.cs" />
+      <Compile Include="..\JsonExtensions.cs" Link="JsonExtensions.cs" />
    </ItemGroup>
    <ItemGroup>
       <PackageReference Include="Microsoft.Azure.EventHubs" Version="4.1.0" />

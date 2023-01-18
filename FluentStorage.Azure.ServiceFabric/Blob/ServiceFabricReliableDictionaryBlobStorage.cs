@@ -2,15 +2,15 @@
 using Microsoft.ServiceFabric.Data.Collections;
 using NetBox;
 using NetBox.Extensions;
-using Storage.Net.Blobs;
-using Storage.Net.Streaming;
+using FluentStorage.Blobs;
+using FluentStorage.Streaming;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Storage.Net.Microsoft.ServiceFabric.Blobs
+namespace FluentStorage.Microsoft.ServiceFabric.Blobs
 {
    class ServiceFabricReliableDictionaryBlobStorageProvider : IBlobStorage
    {

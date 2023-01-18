@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Amazon.SQS.Model;
-using Storage.Net.Messaging;
+using FluentStorage.Messaging;
 
-namespace Storage.Net.Amazon.Aws.Messaging
+namespace FluentStorage.AWS.Messaging
 {
    static class Converter
    {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Storage.Net.Microsoft.ServiceFabric.Blobs
+namespace FluentStorage.Microsoft.ServiceFabric.Blobs
 {
    /// <summary>
    /// Metadata tag

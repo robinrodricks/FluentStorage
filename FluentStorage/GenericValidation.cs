@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    /// <summary>
    /// A collection of generic library wise validations

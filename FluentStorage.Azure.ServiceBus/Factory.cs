@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
-using Storage.Net.Messaging;
-using Storage.Net.Microsoft.Azure.ServiceBus;
-using Storage.Net.Microsoft.Azure.ServiceBus.Messaging;
+using FluentStorage.Messaging;
+using FluentStorage.Azure.ServiceBus;
+using FluentStorage.Azure.ServiceBus.Messaging;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    /// <summary>
    /// Factory class that implement factory methods for Microsoft Azure implememtations

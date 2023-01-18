@@ -1,10 +1,10 @@
-﻿using Storage.Net.Blobs;
-using Storage.Net.Microsoft.Azure.DataLake.Store;
-using Storage.Net.Microsoft.Azure.DataLake.Store.Gen1;
+﻿using FluentStorage.Blobs;
+using FluentStorage.Azure.DataLake.Store;
+using FluentStorage.Azure.DataLake.Store.Gen1;
 using System;
 using System.Net;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    /// <summary>
    /// Factory class that implement factory methods for Microsoft Azure implememtations

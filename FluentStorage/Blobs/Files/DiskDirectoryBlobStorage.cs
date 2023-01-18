@@ -8,7 +8,7 @@ using System.Threading;
 using NetBox.Extensions;
 using NetBox;
 
-namespace Storage.Net.Blobs.Files
+namespace FluentStorage.Blobs.Files
 {
    /// <summary>
    /// Blob storage implementation which uses local file system directory

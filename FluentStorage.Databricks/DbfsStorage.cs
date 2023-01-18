@@ -6,10 +6,10 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Databricks.Client;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 using FileInfo = Microsoft.Azure.Databricks.Client.FileInfo;
 
-namespace Storage.Net.Databricks
+namespace FluentStorage.Databricks
 {
    class DbfsStorage : IBlobStorage
    {

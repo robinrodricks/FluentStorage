@@ -1,5 +1,5 @@
 ﻿using Microsoft.Azure.ServiceBus;
-using Storage.Net.Messaging;
+using FluentStorage.Messaging;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Azure.ServiceBus.Core;
 
-namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
+namespace FluentStorage.Azure.ServiceBus.Messaging
 {
    /// <summary>
    /// Implements message receiver on Azure Service Bus Queues

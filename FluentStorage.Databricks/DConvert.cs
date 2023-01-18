@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 using FileInfo = Microsoft.Azure.Databricks.Client.FileInfo;
 
-namespace Storage.Net.Databricks
+namespace FluentStorage.Databricks
 {
    static class DConvert
    {

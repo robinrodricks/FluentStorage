@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using Amazon.Runtime;
 
-namespace Storage.Net.Amazon.Aws
+namespace FluentStorage.AWS
 {
    /// <summary>
    /// Provides helper utilities to read profiles from ~/.aws/credentials file

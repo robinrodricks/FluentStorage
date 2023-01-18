@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using NetBox;
 using NetBox.Extensions;
 
-namespace Storage.Net.Blobs
+namespace FluentStorage.Blobs
 {
    /// <summary>
    /// Blob storage on steroids. Takes in <see cref="IBlobStorage"/> and adds a lot of extra useful operations on top we as
@@ -478,7 +478,7 @@ namespace Storage.Net.Blobs
 
             await blobStorage.WriteTextAsync(
                fullPath,
-               "created as a workaround by Storage.Net when creating an empty parent folder",
+               "created as a workaround by FluentStorage when creating an empty parent folder",
                null,
                cancellationToken).ConfigureAwait(false);
          }

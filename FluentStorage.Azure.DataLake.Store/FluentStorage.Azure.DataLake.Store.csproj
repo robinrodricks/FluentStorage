@@ -2,10 +2,10 @@
    <PropertyGroup>
       <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
       <PackageLicense>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicense>
-      <Description>Provides Azure Data Lake Store integration for Storage.Net library. Supports only ADLS Gen 1. To use Gen 2, use Storage.Net.Microsoft.Azure.Storage.Blobs package.</Description>
-      <PackageId>Storage.Net.Microsoft.Azure.DataLake.Storage.Gen1</PackageId>
-      <AssemblyName>Storage.Net.Microsoft.Azure.DataLake.Storage.Gen1</AssemblyName>
-      <RootNamespace>Storage.Net.Microsoft.Azure.DataLake.Storage.Gen1</RootNamespace>
+      <Description>Provides Azure Data Lake Store integration for FluentStorage library. Supports only ADLS Gen 1. To use Gen 2, use FluentStorage.Azure.Storage.Blobs package.</Description>
+      <PackageId>FluentStorage.Azure.DataLake.Storage.Gen1</PackageId>
+      <AssemblyName>FluentStorage.Azure.DataLake.Storage.Gen1</AssemblyName>
+      <RootNamespace>FluentStorage.Azure.DataLake.Storage.Gen1</RootNamespace>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>
@@ -18,7 +18,7 @@
       <LangVersion>latest</LangVersion>
       <SignAssembly>True</SignAssembly>
       <AssemblyOriginatorKeyFile>..\FluentStorage\sn.snk</AssemblyOriginatorKeyFile>
-      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>$
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentStorage.Azure.DataLake.Storage.Gen1.xml</DocumentationFile>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>

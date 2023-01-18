@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
    <PropertyGroup>
       <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
-      <Description>Extension to Storage.Net providing integration with Microsoft Azure Key vault as a blob storage.</Description>
+      <Description>Extension to FluentStorage providing integration with Microsoft Azure Key vault as a blob storage.</Description>
       <FileVersion>1.0.0.0</FileVersion>
       <AssemblyVersion>1.0.0.0</AssemblyVersion>
       <PackageLicense>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicense>
-      <PackageId>Storage.Net.Microsoft.Azure.KeyVault</PackageId>
-      <AssemblyName>Storage.Net.Microsoft.Azure.KeyVault</AssemblyName>
-      <RootNamespace>Storage.Net.Microsoft.Azure.KeyVault</RootNamespace>
+      <PackageId>FluentStorage.Azure.KeyVault</PackageId>
+      <AssemblyName>FluentStorage.Azure.KeyVault</AssemblyName>
+      <RootNamespace>FluentStorage.Azure.KeyVault</RootNamespace>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>
@@ -20,7 +20,7 @@
       <LangVersion>latest</LangVersion>
       <SignAssembly>True</SignAssembly>
       <AssemblyOriginatorKeyFile>..\FluentStorage\sn.snk</AssemblyOriginatorKeyFile>
-      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>$
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentStorage.Azure.KeyVault.xml</DocumentationFile>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>

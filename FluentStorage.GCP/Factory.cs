@@ -1,10 +1,10 @@
 ﻿using Google.Apis.Auth.OAuth2;
-using Storage.Net.Blobs;
-using Storage.Net.Gcp.CloudStorage;
-using Storage.Net.Gcp.CloudStorage.Blobs;
+using FluentStorage.Blobs;
+using FluentStorage.Gcp.CloudStorage;
+using FluentStorage.Gcp.CloudStorage.Blobs;
 using NetBox.Extensions;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    /// <summary>
    /// Factory methods

@@ -7,9 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Databricks.Client;
 using Newtonsoft.Json;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 
-namespace Storage.Net.Databricks
+namespace FluentStorage.Databricks
 {
    class JobsStorage : GenericBlobStorage
    {

@@ -1,13 +1,13 @@
 ﻿using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
-using Storage.Net.Messaging;
+using FluentStorage.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Storage.Net.Microsoft.ServiceFabric.Messaging
+namespace FluentStorage.Microsoft.ServiceFabric.Messaging
 {
    class ServiceFabricReliableConcurrentQueueReceiver : AbstractServiceFabricReliableQueueReceiver
    {

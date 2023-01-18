@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Storage.Net.Tests.Integration.Util
+namespace FluentStorage.Tests.Integration.Util
 {
    class NonSeekableStream : Stream
    {

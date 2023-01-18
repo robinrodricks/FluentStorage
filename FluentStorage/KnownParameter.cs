@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Storage.Net
+namespace FluentStorage
 {
    /// <summary>
    /// Known parameter names enouraged to be used in connection strings

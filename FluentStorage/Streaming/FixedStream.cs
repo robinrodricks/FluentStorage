@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Storage.Net.Streaming
+namespace FluentStorage.Streaming
 {
    /// <summary>
    /// Fixes deficiencies in thrird party streaming impelmentations

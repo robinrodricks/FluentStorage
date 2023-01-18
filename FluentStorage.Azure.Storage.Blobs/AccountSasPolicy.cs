@@ -2,7 +2,7 @@
 using Azure.Storage;
 using Azure.Storage.Sas;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Blobs
+namespace FluentStorage.Azure.Storage.Blobs
 {
    /// <summary>
    /// Generic Shared Access Signature policy

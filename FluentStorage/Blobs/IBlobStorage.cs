@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Storage.Net.Blobs
+namespace FluentStorage.Blobs
 {
    /// <summary>
    /// Slim interface providing access to blob storage.

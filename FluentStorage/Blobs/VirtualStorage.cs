@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NetBox.Extensions;
 
-namespace Storage.Net.Blobs
+namespace FluentStorage.Blobs
 {
    /// <summary>
    /// Allows to combine several storage providers (or even of the same type) in one virtual storage interface.

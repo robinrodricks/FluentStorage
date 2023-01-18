@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace Storage.Net.Tests.Core
+namespace FluentStorage.Tests.Core
 {
    public class StoragePathTest
    {

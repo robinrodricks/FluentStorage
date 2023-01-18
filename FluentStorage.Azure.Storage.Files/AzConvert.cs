@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.Azure.Storage.File;
 using NetBox.Extensions;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Files
+namespace FluentStorage.Azure.Storage.Files
 {
    static class AzConvert
    {

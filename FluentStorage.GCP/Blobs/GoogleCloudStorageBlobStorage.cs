@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Google.Api.Gax;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Storage.V1;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 using Objects = Google.Apis.Storage.v1.Data.Objects;
 using Object = Google.Apis.Storage.v1.Data.Object;
 using Google;
@@ -14,7 +14,7 @@ using System.Net;
 using System.Linq;
 using Google.Apis.Storage.v1;
 
-namespace Storage.Net.Gcp.CloudStorage.Blobs
+namespace FluentStorage.Gcp.CloudStorage.Blobs
 {
    class GoogleCloudStorageBlobStorage : GenericBlobStorage
    {

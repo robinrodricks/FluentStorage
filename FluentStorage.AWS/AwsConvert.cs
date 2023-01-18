@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Amazon;
 
-namespace Storage.Net.Amazon.Aws
+namespace FluentStorage.AWS
 {
    static class AwsConvert
    {

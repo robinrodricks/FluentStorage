@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data;
 using SFTransaction = Microsoft.ServiceFabric.Data.ITransaction;
 
-namespace Storage.Net.Microsoft.ServiceFabric
+namespace FluentStorage.Microsoft.ServiceFabric
 {
    class ServiceFabricTransaction : ITransaction
    {

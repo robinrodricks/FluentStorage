@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Storage.Net.Messaging
+namespace FluentStorage.Messaging
 {
    /// <summary>
    /// Message to be used in all the queueing code

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 using System.Linq;
-using Storage.Net.Messaging;
+using FluentStorage.Messaging;
 
-namespace Storage.Net.ConnectionString
+namespace FluentStorage.ConnectionString
 {
    static class ConnectionStringFactory
    {

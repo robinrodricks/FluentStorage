@@ -1,4 +1,4 @@
-﻿namespace Storage.Net.Microsoft.Azure.Storage.Blobs
+﻿namespace FluentStorage.Azure.Storage.Blobs
 {
    /// <summary>
    /// Blob container public access type

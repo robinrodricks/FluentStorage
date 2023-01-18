@@ -1,4 +1,4 @@
-﻿namespace Storage.Net
+﻿namespace FluentStorage
 {
    /// <summary>
    /// Known storage account prefixes

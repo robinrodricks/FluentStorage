@@ -1,13 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
    <PropertyGroup>
-      <AssemblyTitle>Storage.Net.Amazon.Aws</AssemblyTitle>
+      <AssemblyTitle>FluentStorage.AWS</AssemblyTitle>
       <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
-      <AssemblyName>Storage.Net.Amazon.Aws</AssemblyName>
-      <PackageId>Storage.Net.Amazon.Aws</PackageId>
-      <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-      <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-      <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-      <Description>Extension to Storage.Net providing integration with Amazon S3 blobs.</Description>
+      <AssemblyName>FluentStorage.AWS</AssemblyName>
+      <PackageId>FluentStorage.AWS</PackageId>
+      <Description>Extension to FluentStorage providing integration with Amazon S3 blobs.</Description>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>
@@ -20,7 +17,7 @@
       <LangVersion>latest</LangVersion>
       <SignAssembly>True</SignAssembly>
       <AssemblyOriginatorKeyFile>..\FluentStorage\sn.snk</AssemblyOriginatorKeyFile>
-      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>$
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentStorage.AWS.xml</DocumentationFile>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>

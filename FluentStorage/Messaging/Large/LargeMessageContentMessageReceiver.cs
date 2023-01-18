@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 
-namespace Storage.Net.Messaging.Large
+namespace FluentStorage.Messaging.Large
 {
    class LargeMessageContentMessageReceiver : IMessageReceiver
    {

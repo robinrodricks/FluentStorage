@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Storage.Net.Blobs;
+using FluentStorage.Blobs;
 using Xunit;
 
-namespace Storage.Net.Tests.Blobs
+namespace FluentStorage.Tests.Blobs
 {
    public class VirtualStorageTest
    {

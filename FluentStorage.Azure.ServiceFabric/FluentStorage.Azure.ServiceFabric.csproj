@@ -4,11 +4,11 @@
       <PackageLicense>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicense>
       <FileVersion>2.6.204.0</FileVersion>
       <AssemblyVersion>2.0.0.0</AssemblyVersion>
-      <Description>Provides Storage.Net integration with Azure Service Fabric. This library implements Reliable Storage as Blobs and Messages.</Description>
+      <Description>Provides FluentStorage integration with Azure Service Fabric. This library implements Reliable Storage as Blobs and Messages.</Description>
       <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
-      <PackageId>Storage.Net.Microsoft.Azure.ServiceFabric</PackageId>
-      <AssemblyName>Storage.Net.Microsoft.Azure.ServiceFabric</AssemblyName>
-      <RootNamespace>Storage.Net.Microsoft.Azure.ServiceFabric</RootNamespace>
+      <PackageId>FluentStorage.Azure.ServiceFabric</PackageId>
+      <AssemblyName>FluentStorage.Azure.ServiceFabric</AssemblyName>
+      <RootNamespace>FluentStorage.Azure.ServiceFabric</RootNamespace>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>
@@ -21,7 +21,7 @@
       <LangVersion>latest</LangVersion>
       <SignAssembly>True</SignAssembly>
       <AssemblyOriginatorKeyFile>..\FluentStorage\sn.snk</AssemblyOriginatorKeyFile>
-      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>$
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentStorage.Azure.ServiceFabric.xml</DocumentationFile>
    </PropertyGroup>
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>

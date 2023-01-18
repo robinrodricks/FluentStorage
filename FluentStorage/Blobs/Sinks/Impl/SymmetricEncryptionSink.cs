@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 
-namespace Storage.Net.Blobs.Sinks.Impl
+namespace FluentStorage.Blobs.Sinks.Impl
 {
    /// <summary>
    /// 

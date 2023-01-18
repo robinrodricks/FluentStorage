@@ -2,7 +2,7 @@
 
    <PropertyGroup>
       <TargetFramework>netstandard2.0</TargetFramework>
-      <AssemblyName>Storage.Net.Microsoft.Azure.Queues</AssemblyName>
+      <AssemblyName>FluentStorage.Azure.Queues</AssemblyName>
       <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>
@@ -15,7 +15,7 @@
       <LangVersion>latest</LangVersion>
       <SignAssembly>True</SignAssembly>
       <AssemblyOriginatorKeyFile>..\FluentStorage\sn.snk</AssemblyOriginatorKeyFile>
-      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentFTP.xml</DocumentationFile>$
+      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentStorage.Azure.Queues.xml</DocumentationFile>
    </PropertyGroup>
 
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
@@ -23,7 +23,7 @@
    </PropertyGroup>
 
    <ItemGroup>
-      <Compile Include="..\..\JsonExtensions.cs" Link="JsonExtensions.cs" />
+      <Compile Include="..\JsonExtensions.cs" Link="JsonExtensions.cs" />
    </ItemGroup>
 
    <ItemGroup>

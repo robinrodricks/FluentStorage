@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NetBox.Extensions;
-using Storage.Net.Messaging.Polling;
+using FluentStorage.Messaging.Polling;
 
-namespace Storage.Net.Messaging
+namespace FluentStorage.Messaging
 {
    /// <summary>
    /// Base class for implementing a polling message receiver for those providers that do not support polling natively.

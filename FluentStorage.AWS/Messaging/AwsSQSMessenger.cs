@@ -8,11 +8,13 @@ using Amazon;
 using Amazon.Runtime;
 using Amazon.SQS;
 using Amazon.SQS.Model;
-using Storage.Net.Messaging;
+using FluentStorage.Messaging;
+#if !NET6_0_OR_GREATER
 using NetBox.Extensions;
+#endif
 using System.Collections.Concurrent;
 
-namespace Storage.Net.Amazon.Aws.Messaging
+namespace FluentStorage.AWS.Messaging
 {
    class AwsSQSMessenger : IMessenger
    {

@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using System.Threading;
 using NetBox.Extensions;
 using NetBox;
-using Storage.Net.Streaming;
+using FluentStorage.Streaming;
 
-namespace Storage.Net.Blobs
+namespace FluentStorage.Blobs
 {
    class InMemoryBlobStorage : IBlobStorage
    {

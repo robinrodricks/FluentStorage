@@ -1,4 +1,4 @@
-﻿using Storage.Net.Blobs;
+﻿using FluentStorage.Blobs;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,11 +9,13 @@ using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using System.Threading.Tasks;
 using System.Threading;
-using Storage.Net.Streaming;
+using FluentStorage.Streaming;
+#if !NET6_0_OR_GREATER
 using NetBox.Extensions;
+#endif
 using System.Net;
 
-namespace Storage.Net.Amazon.Aws.Blobs
+namespace FluentStorage.AWS.Blobs
 {
    /// <summary>
    /// Amazon S3 storage adapter for blobs

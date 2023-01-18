@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
 using Microsoft.Azure.ServiceBus.Management;
-using Storage.Net.Messaging;
+using FluentStorage.Messaging;
 
-namespace Storage.Net.Microsoft.Azure.ServiceBus.Messaging
+namespace FluentStorage.Azure.ServiceBus.Messaging
 {
    class AzureServiceBusMessenger : IAzureServiceBusMessenger
    {

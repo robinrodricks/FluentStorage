@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using LogMagic;
 
-namespace Storage.Net.Tests.Integration
+namespace FluentStorage.Tests.Integration
 {
    public class AbstractTestFixture : IDisposable
    {

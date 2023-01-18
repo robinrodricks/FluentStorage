@@ -14,10 +14,10 @@ using Azure.Storage.Blobs.Specialized;
 using Azure.Storage.Sas;
 using Blobs;
 using Microsoft.Identity.Client;
-using Storage.Net.Blobs;
-using Storage.Net.Microsoft.Azure.Storage.Blobs.Gen2.Model;
+using FluentStorage.Blobs;
+using FluentStorage.Azure.Storage.Blobs.Gen2.Model;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Blobs
+namespace FluentStorage.Azure.Storage.Blobs
 {
    //auth scenarios: https://github.com/Azure/azure-sdk-for-net/blob/master/sdk/storage/Azure.Storage.Blobs/samples/Sample02_Auth.cs
 

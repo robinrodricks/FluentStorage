@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Storage.Net.Microsoft.Azure.Storage.Blobs
+namespace FluentStorage.Azure.Storage.Blobs
 {
    /// <summary>
    /// Specifies the set of possible permissions for a shared access account policy.

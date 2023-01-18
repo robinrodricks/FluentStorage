@@ -1,10 +1,10 @@
 ﻿using System;
-using Storage.Net.Amazon.Aws.Blobs;
-using Storage.Net.Blobs;
-using Storage.Net.ConnectionString;
-using Storage.Net.Messaging;
+using FluentStorage.AWS.Blobs;
+using FluentStorage.Blobs;
+using FluentStorage.ConnectionString;
+using FluentStorage.Messaging;
 
-namespace Storage.Net.Amazon.Aws
+namespace FluentStorage.AWS
 {
    class AwsStorageModule : IExternalModule, IConnectionFactory
    {
