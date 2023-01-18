@@ -36,23 +36,6 @@ FluentStorage is released under the permissive MIT License, so it can be used in
 
 
 
-
-## Supported Cloud Services
-
-![Slide](https://raw.githubusercontent.com/robinrodricks/FluentStorage/develop/.github/providers.svg)
-
-
-## What's New
-
-In 2023 we added:
-
-* **SFTP** provider [SSH.NET](https://github.com/sshnet/SSH.NET) added 
-* **FTP** provider [FluentFTP](https://github.com/robinrodricks/FluentFTP) updated to v44
-* **AWS** Nuget bumped to latest versions
-* **Wiki** created for documentation
-* **Platform** support updated to `netstandard2.0`,`netstandard2.1`,`net50`,`net60`
-
-
 ## Releases
 
 Stable binaries are released on NuGet, and contain everything you need to use Cloud Storage in your .NET/.NET Standard application.
@@ -96,6 +79,25 @@ FluentStorage is also supported on these platforms: (via .NET Standard)
   - **Universal Windows Platform** 10.0
 
 Binaries for all platforms are built from a single Visual Studio Project. You will need the latest [Visual Studio](https://visualstudio.microsoft.com/downloads/) to build or contribute to FluentStorage.
+
+
+
+## What's New
+
+In 2023 we added:
+
+* **SFTP** provider [SSH.NET](https://github.com/sshnet/SSH.NET) added 
+* **FTP** provider [FluentFTP](https://github.com/robinrodricks/FluentFTP) updated to v44
+* **AWS** Nuget bumped to latest versions
+* **Wiki** created for documentation
+* **Platform** support updated to `netstandard2.0`,`netstandard2.1`,`net50`,`net60`
+
+
+
+## Supported Cloud Services
+
+![Slide](https://raw.githubusercontent.com/robinrodricks/FluentStorage/develop/.github/providers.svg)
+
 
 
 
