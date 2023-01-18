@@ -32,7 +32,7 @@ namespace FluentStorage.Blobs
       public string FolderPath { get; private set; }
 
       /// <summary>
-      /// Gets the name of this blob, uniqueue within the folder. In most providers this is the same as file name.
+      /// Gets the name of this blob, unique within the folder. In most providers this is the same as file name.
       /// </summary>
       public string Name { get; private set; }
 
