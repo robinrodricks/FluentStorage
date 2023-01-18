@@ -17,7 +17,8 @@ It is written entirely in C#, with no external dependency.
 
 FluentStorage is released under the permissive MIT License, so it can be used in both proprietary and free/open source applications.
 
-Features:
+
+## Features
 
 * Abstracts storage implementation like `blobs`, `tables` and `messages` from the .NET Application Developer.
 
@@ -29,7 +30,7 @@ Features:
 
 * Implements inmemory and on disk versions of all the abstractions, therefore you can develop fast on a local machine or use vendor free serverless implementations for parts of your applciation which don't require a separate third party backend at a particular point in development.
 
-* Supports `.NET Standard 2.0` and higher.
+* Supports .NET Standard 2.0 and higher.
 
 * Attempts to enforce idential behavior on all implementaions of storage interfaces to the smallest details possible and you will find a lot of test specifications which will help you to add another provider.
 
@@ -37,6 +38,16 @@ Features:
 ## Supported Cloud Services
 
 ![Slide](doc/slide.svg)
+
+
+## Releases
+
+Stable binaries are released on NuGet, and contain everything you need to use Cloud Storage in your .NET/.NET Standard application.
+
+
+## Documentation
+
+Check the [Wiki](https://github.com/robinrodricks/FluentStorage/wiki).
 
 
 ## Contributors
