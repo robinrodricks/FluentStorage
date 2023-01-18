@@ -23,10 +23,10 @@
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
    </PropertyGroup>
    <ItemGroup>
-      <PackageReference Include="AWSSDK.Core" Version="3.3.104.12" />
-      <PackageReference Include="AWSSDK.S3" Version="3.3.110.8" />
-      <PackageReference Include="AWSSDK.SecurityToken" Version="3.3.104.16" />
-      <PackageReference Include="AWSSDK.SQS" Version="3.3.102.51" />
+      <PackageReference Include="AWSSDK.Core" Version="3.7.103.17" />
+      <PackageReference Include="AWSSDK.S3" Version="3.7.101.55" />
+      <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.100.55" />
+      <PackageReference Include="AWSSDK.SQS" Version="3.7.100.55" />
    </ItemGroup>
    <ItemGroup>
       <ProjectReference Include="..\FluentStorage\FluentStorage.csproj" />
