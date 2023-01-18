@@ -11,198 +11,167 @@ using Polly.Retry;
 using FluentStorage.Blobs;
 using FluentFTP.Exceptions;
 
-namespace FluentStorage.FTP
-{
-   class FluentFtpBlobStorage : IBlobStorage
-   {
-      private readonly AsyncFtpClient _client;
-      private readonly bool _dispose;
-      private static readonly AsyncRetryPolicy retryPolicy = Policy.Handle<FtpException>().RetryAsync(3);
+namespace FluentStorage.FTP {
+	class FluentFtpBlobStorage : IBlobStorage {
+		private readonly AsyncFtpClient _client;
+		private readonly bool _dispose;
+		private static readonly AsyncRetryPolicy retryPolicy = Policy.Handle<FtpException>().RetryAsync(3);
 
-      public FluentFtpBlobStorage(string hostNameOrAddress, NetworkCredential credentials, FtpDataConnectionType dataConnectionType = FtpDataConnectionType.AutoActive)
-      {
-         _client = new AsyncFtpClient(hostNameOrAddress, credentials);
-         _client.Config.DataConnectionType = dataConnectionType;
-         _dispose = true;
-      }
+		public FluentFtpBlobStorage(string hostNameOrAddress, NetworkCredential credentials, FtpDataConnectionType dataConnectionType = FtpDataConnectionType.AutoActive) {
+			_client = new AsyncFtpClient(hostNameOrAddress, credentials);
+			_client.Config.DataConnectionType = dataConnectionType;
+			_dispose = true;
+		}
 
-      public FluentFtpBlobStorage(AsyncFtpClient ftpClient, bool dispose = false)
-      {
-         _client = ftpClient ?? throw new ArgumentNullException(nameof(ftpClient));
-         _dispose = dispose;
-      }
+		public FluentFtpBlobStorage(AsyncFtpClient ftpClient, bool dispose = false) {
+			_client = ftpClient ?? throw new ArgumentNullException(nameof(ftpClient));
+			_dispose = dispose;
+		}
 
-      private async Task<AsyncFtpClient> GetClientAsync()
-      {
-         if(!_client.IsConnected)
-         {
-            await _client.Connect().ConfigureAwait(false);
+		private async Task<AsyncFtpClient> GetClientAsync() {
+			if (!_client.IsConnected) {
+				await _client.Connect().ConfigureAwait(false);
 
-            //not supported on this platform?
-            //await _client.SetHashAlgorithmAsync(FtpHashAlgorithm.MD5);
-         }
+				//not supported on this platform?
+				//await _client.SetHashAlgorithmAsync(FtpHashAlgorithm.MD5);
+			}
 
-         return _client;
-      }
+			return _client;
+		}
 
-      public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default)
-      {
-         AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
+		public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default) {
+			AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
-         if(options == null)
-            options = new ListOptions();
+			if (options == null)
+				options = new ListOptions();
 
-         FtpListItem[] items = await client.GetListing(options.FolderPath).ConfigureAwait(false);
+			FtpListItem[] items = await client.GetListing(options.FolderPath).ConfigureAwait(false);
 
-         var results = new List<Blob>();
-         foreach(FtpListItem item in items)
-         {
-            if(options.FilePrefix != null && !item.Name.StartsWith(options.FilePrefix))
-            {
-               continue;
-            }
+			var results = new List<Blob>();
+			foreach (FtpListItem item in items) {
+				if (options.FilePrefix != null && !item.Name.StartsWith(options.FilePrefix)) {
+					continue;
+				}
 
-            Blob blob = ToBlobId(item);
-            if(blob == null)
-               continue;
+				Blob blob = ToBlobId(item);
+				if (blob == null)
+					continue;
 
-            if(options.BrowseFilter != null)
-            {
-               bool include = options.BrowseFilter(blob);
-               if(!include)
-                  continue;
-            }
+				if (options.BrowseFilter != null) {
+					bool include = options.BrowseFilter(blob);
+					if (!include)
+						continue;
+				}
 
-            results.Add(blob);
+				results.Add(blob);
 
-            if(options.MaxResults != null && results.Count >= options.MaxResults.Value)
-               break;
-         }
+				if (options.MaxResults != null && results.Count >= options.MaxResults.Value)
+					break;
+			}
 
-         return results;
-      }
+			return results;
+		}
 
-      private Blob ToBlobId(FtpListItem ff)
-      {
-         if(ff.Type != FtpObjectType.Directory && ff.Type != FtpObjectType.File)
-            return null;
+		private Blob ToBlobId(FtpListItem ff) {
+			if (ff.Type != FtpObjectType.Directory && ff.Type != FtpObjectType.File)
+				return null;
 
-         var id = new Blob(ff.FullName,
-            ff.Type == FtpObjectType.File
-            ? BlobItemKind.File
-            : BlobItemKind.Folder);
+			var id = new Blob(ff.FullName,
+			   ff.Type == FtpObjectType.File
+			   ? BlobItemKind.File
+			   : BlobItemKind.Folder);
 
-         if(ff.RawPermissions != null)
-         {
-            id.Properties["RawPermissions"] = ff.RawPermissions;
-         }
+			if (ff.RawPermissions != null) {
+				id.Properties["RawPermissions"] = ff.RawPermissions;
+			}
 
-         return id;
-      }
+			return id;
+		}
 
-      public async Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
-      {
-         AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
+		public async Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
+			AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
-         foreach(string path in fullPaths)
-         {
-            try
-            {
-               await client.DeleteFile(path).ConfigureAwait(false);
-            }
-            catch(FtpCommandException ex) when(ex.CompletionCode == "550")
-            {
-               await client.DeleteDirectory(path, cancellationToken).ConfigureAwait(false);
-               //550 stands for "file not found" or "permission denied".
-               //"not found" is fine to ignore, however I'm not happy about ignoring the second error.
-            }
-         }
-      }
+			foreach (string path in fullPaths) {
+				try {
+					await client.DeleteFile(path).ConfigureAwait(false);
+				}
+				catch (FtpCommandException ex) when (ex.CompletionCode == "550") {
+					await client.DeleteDirectory(path, cancellationToken).ConfigureAwait(false);
+					//550 stands for "file not found" or "permission denied".
+					//"not found" is fine to ignore, however I'm not happy about ignoring the second error.
+				}
+			}
+		}
 
-      public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
-      {
-         AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
+		public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default) {
+			AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
-         var results = new List<bool>();
-         foreach(string path in ids)
-         {
-            bool e = await client.FileExists(path).ConfigureAwait(false);
-            results.Add(e);
-         }
+			var results = new List<bool>();
+			foreach (string path in ids) {
+				bool e = await client.FileExists(path).ConfigureAwait(false);
+				results.Add(e);
+			}
 
-         return results;
-      }
+			return results;
+		}
 
-      public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
-      {
-         AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
+		public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default) {
+			AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
-         var results = new List<Blob>();
-         foreach(string path in ids)
-         {
-            string cpath = StoragePath.Normalize(path);
-            string parentPath = StoragePath.GetParent(cpath);
+			var results = new List<Blob>();
+			foreach (string path in ids) {
+				string cpath = StoragePath.Normalize(path);
+				string parentPath = StoragePath.GetParent(cpath);
 
-            FtpListItem[] all = await client.GetListing(parentPath).ConfigureAwait(false);
-            FtpListItem foundItem = all.FirstOrDefault(i => i.FullName == cpath);
+				FtpListItem[] all = await client.GetListing(parentPath).ConfigureAwait(false);
+				FtpListItem foundItem = all.FirstOrDefault(i => i.FullName == cpath);
 
-            if(foundItem == null)
-            {
-               results.Add(null);
-               continue;
-            }
+				if (foundItem == null) {
+					results.Add(null);
+					continue;
+				}
 
-            var r = new Blob(path)
-            {
-               Size = foundItem.Size,
-               LastModificationTime = foundItem.Modified
-            };
-            results.Add(r);
-         }
-         return results;
-      }
+				var r = new Blob(path) {
+					Size = foundItem.Size,
+					LastModificationTime = foundItem.Modified
+				};
+				results.Add(r);
+			}
+			return results;
+		}
 
-      public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default)
-      {
-         throw new NotSupportedException();
-      }
+		public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) {
+			throw new NotSupportedException();
+		}
 
-      public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
-      {
-         AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
+		public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default) {
+			AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
-         try
-         {
-            return await client.OpenRead(fullPath, FtpDataType.Binary, 0, true).ConfigureAwait(false);
-         }
-         catch(FtpCommandException ex) when(ex.CompletionCode == "550")
-         {
-            return null;
-         }
-      }
+			try {
+				return await client.OpenRead(fullPath, FtpDataType.Binary, 0, true).ConfigureAwait(false);
+			}
+			catch (FtpCommandException ex) when (ex.CompletionCode == "550") {
+				return null;
+			}
+		}
 
-      public Task<ITransaction> OpenTransactionAsync() => Task.FromResult(EmptyTransaction.Instance);
+		public Task<ITransaction> OpenTransactionAsync() => Task.FromResult(EmptyTransaction.Instance);
 
-      public async Task WriteAsync(string fullPath, Stream dataStream,
-         bool append = false, CancellationToken cancellationToken = default)
-      {
-         AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
+		public async Task WriteAsync(string fullPath, Stream dataStream,
+		   bool append = false, CancellationToken cancellationToken = default) {
+			AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
-         await retryPolicy.ExecuteAsync(async () =>
-         {
-            using(Stream dest = await client.OpenWrite(fullPath, FtpDataType.Binary, true).ConfigureAwait(false))
-            {
-               await dataStream.CopyToAsync(dest).ConfigureAwait(false);
-            }
-         }).ConfigureAwait(false);
-      }
+			await retryPolicy.ExecuteAsync(async () => {
+				using (Stream dest = await client.OpenWrite(fullPath, FtpDataType.Binary, true).ConfigureAwait(false)) {
+					await dataStream.CopyToAsync(dest).ConfigureAwait(false);
+				}
+			}).ConfigureAwait(false);
+		}
 
-      public void Dispose()
-      {
-         if(_dispose && _client.IsDisposed)
-         {
-            _client.Dispose();
-         }
-      }
-   }
+		public void Dispose() {
+			if (_dispose && _client.IsDisposed) {
+				_client.Dispose();
+			}
+		}
+	}
 }
