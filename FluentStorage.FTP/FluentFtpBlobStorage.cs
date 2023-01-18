@@ -9,35 +9,34 @@ using FluentFTP;
 using Polly;
 using Polly.Retry;
 using FluentStorage.Blobs;
+using FluentFTP.Exceptions;
 
 namespace FluentStorage.FTP
 {
    class FluentFtpBlobStorage : IBlobStorage
    {
-      private readonly FtpClient _client;
+      private readonly AsyncFtpClient _client;
       private readonly bool _dispose;
       private static readonly AsyncRetryPolicy retryPolicy = Policy.Handle<FtpException>().RetryAsync(3);
 
-      public FluentFtpBlobStorage(
-         string hostNameOrAddress,
-         NetworkCredential credentials,
-         FtpDataConnectionType dataConnectionType = FtpDataConnectionType.AutoActive)
-         : this(new FtpClient(hostNameOrAddress, credentials) { DataConnectionType = dataConnectionType }, true)
+      public FluentFtpBlobStorage(string hostNameOrAddress, NetworkCredential credentials, FtpDataConnectionType dataConnectionType = FtpDataConnectionType.AutoActive)
       {
-         
+         _client = new AsyncFtpClient(hostNameOrAddress, credentials);
+         _client.Config.DataConnectionType = dataConnectionType;
+         _dispose = true;
       }
 
-      public FluentFtpBlobStorage(FtpClient ftpClient, bool dispose = false)
+      public FluentFtpBlobStorage(AsyncFtpClient ftpClient, bool dispose = false)
       {
          _client = ftpClient ?? throw new ArgumentNullException(nameof(ftpClient));
          _dispose = dispose;
       }
 
-      private async Task<FtpClient> GetClientAsync()
+      private async Task<AsyncFtpClient> GetClientAsync()
       {
          if(!_client.IsConnected)
          {
-            await _client.ConnectAsync().ConfigureAwait(false);
+            await _client.Connect().ConfigureAwait(false);
 
             //not supported on this platform?
             //await _client.SetHashAlgorithmAsync(FtpHashAlgorithm.MD5);
@@ -48,11 +47,12 @@ namespace FluentStorage.FTP
 
       public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default)
       {
-         FtpClient client = await GetClientAsync().ConfigureAwait(false);
+         AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
-         if (options == null) options = new ListOptions();
+         if(options == null)
+            options = new ListOptions();
 
-         FtpListItem[] items = await client.GetListingAsync(options.FolderPath).ConfigureAwait(false);
+         FtpListItem[] items = await client.GetListing(options.FolderPath).ConfigureAwait(false);
 
          var results = new List<Blob>();
          foreach(FtpListItem item in items)
@@ -63,17 +63,20 @@ namespace FluentStorage.FTP
             }
 
             Blob blob = ToBlobId(item);
-            if (blob == null) continue;
+            if(blob == null)
+               continue;
 
             if(options.BrowseFilter != null)
             {
                bool include = options.BrowseFilter(blob);
-               if (!include) continue;
+               if(!include)
+                  continue;
             }
 
             results.Add(blob);
 
-            if (options.MaxResults != null && results.Count >= options.MaxResults.Value) break;
+            if(options.MaxResults != null && results.Count >= options.MaxResults.Value)
+               break;
          }
 
          return results;
@@ -81,14 +84,15 @@ namespace FluentStorage.FTP
 
       private Blob ToBlobId(FtpListItem ff)
       {
-         if (ff.Type != FtpFileSystemObjectType.Directory && ff.Type != FtpFileSystemObjectType.File) return null;
+         if(ff.Type != FtpObjectType.Directory && ff.Type != FtpObjectType.File)
+            return null;
 
-         var id = new  Blob(ff.FullName,
-            ff.Type == FtpFileSystemObjectType.File
+         var id = new Blob(ff.FullName,
+            ff.Type == FtpObjectType.File
             ? BlobItemKind.File
             : BlobItemKind.Folder);
 
-         if (ff.RawPermissions != null)
+         if(ff.RawPermissions != null)
          {
             id.Properties["RawPermissions"] = ff.RawPermissions;
          }
@@ -98,17 +102,17 @@ namespace FluentStorage.FTP
 
       public async Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default)
       {
-         FtpClient client = await GetClientAsync().ConfigureAwait(false);
+         AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
          foreach(string path in fullPaths)
          {
             try
             {
-               await client.DeleteFileAsync(path).ConfigureAwait(false);
+               await client.DeleteFile(path).ConfigureAwait(false);
             }
             catch(FtpCommandException ex) when(ex.CompletionCode == "550")
             {
-               await client.DeleteDirectoryAsync(path, cancellationToken).ConfigureAwait(false);
+               await client.DeleteDirectory(path, cancellationToken).ConfigureAwait(false);
                //550 stands for "file not found" or "permission denied".
                //"not found" is fine to ignore, however I'm not happy about ignoring the second error.
             }
@@ -117,12 +121,12 @@ namespace FluentStorage.FTP
 
       public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         FtpClient client = await GetClientAsync().ConfigureAwait(false);
+         AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
          var results = new List<bool>();
-         foreach (string path in ids)
+         foreach(string path in ids)
          {
-            bool e = await client.FileExistsAsync(path).ConfigureAwait(false);
+            bool e = await client.FileExists(path).ConfigureAwait(false);
             results.Add(e);
          }
 
@@ -131,7 +135,7 @@ namespace FluentStorage.FTP
 
       public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default)
       {
-         FtpClient client = await GetClientAsync().ConfigureAwait(false);
+         AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
          var results = new List<Blob>();
          foreach(string path in ids)
@@ -139,7 +143,7 @@ namespace FluentStorage.FTP
             string cpath = StoragePath.Normalize(path);
             string parentPath = StoragePath.GetParent(cpath);
 
-            FtpListItem[] all = await client.GetListingAsync(parentPath).ConfigureAwait(false);
+            FtpListItem[] all = await client.GetListing(parentPath).ConfigureAwait(false);
             FtpListItem foundItem = all.FirstOrDefault(i => i.FullName == cpath);
 
             if(foundItem == null)
@@ -165,13 +169,13 @@ namespace FluentStorage.FTP
 
       public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default)
       {
-         FtpClient client = await GetClientAsync().ConfigureAwait(false);
+         AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
          try
          {
-            return await client.OpenReadAsync(fullPath, FtpDataType.Binary, 0, true).ConfigureAwait(false);
+            return await client.OpenRead(fullPath, FtpDataType.Binary, 0, true).ConfigureAwait(false);
          }
-         catch(FtpCommandException ex) when (ex.CompletionCode == "550")
+         catch(FtpCommandException ex) when(ex.CompletionCode == "550")
          {
             return null;
          }
@@ -182,11 +186,11 @@ namespace FluentStorage.FTP
       public async Task WriteAsync(string fullPath, Stream dataStream,
          bool append = false, CancellationToken cancellationToken = default)
       {
-         FtpClient client = await GetClientAsync().ConfigureAwait(false);
+         AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
          await retryPolicy.ExecuteAsync(async () =>
          {
-            using(Stream dest = await client.OpenWriteAsync(fullPath, FtpDataType.Binary, true).ConfigureAwait(false))
+            using(Stream dest = await client.OpenWrite(fullPath, FtpDataType.Binary, true).ConfigureAwait(false))
             {
                await dataStream.CopyToAsync(dest).ConfigureAwait(false);
             }
@@ -195,7 +199,7 @@ namespace FluentStorage.FTP
 
       public void Dispose()
       {
-         if (_dispose && _client.IsDisposed)
+         if(_dispose && _client.IsDisposed)
          {
             _client.Dispose();
          }

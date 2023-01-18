@@ -36,7 +36,7 @@ namespace FluentStorage
       /// Constructs an instance of FTP client by accepting a custom instance of FluentFTP client
       /// </summary>
       public static IBlobStorage FtpFromFluentFtpClient(this IBlobStorageFactory factory,
-         FtpClient ftpClient)
+         AsyncFtpClient ftpClient)
       {
          return new FluentFtpBlobStorage(ftpClient, false);
       }
