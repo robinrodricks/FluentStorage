@@ -3,7 +3,7 @@ using System.Net;
 using FluentFTP;
 using FluentStorage.Blobs;
 using FluentStorage.ConnectionString;
-using FluentStorage.Ftp;
+using FluentStorage.FTP;
 
 namespace FluentStorage
 {

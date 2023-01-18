@@ -3,7 +3,7 @@ using FluentStorage.Blobs;
 using FluentStorage.ConnectionString;
 using FluentStorage.Messaging;
 
-namespace FluentStorage.Ftp
+namespace FluentStorage.FTP
 {
    class ConnectionFactory : IConnectionFactory
    {

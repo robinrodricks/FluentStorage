@@ -10,7 +10,7 @@ using Polly;
 using Polly.Retry;
 using FluentStorage.Blobs;
 
-namespace FluentStorage.Ftp
+namespace FluentStorage.FTP
 {
    class FluentFtpBlobStorage : IBlobStorage
    {
