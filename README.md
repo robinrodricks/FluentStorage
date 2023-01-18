@@ -50,7 +50,7 @@ In 2023 we added:
 * **SFTP** provider [SSH.NET](https://github.com/sshnet/SSH.NET) added 
 * **FTP** provider [FluentFTP](https://github.com/robinrodricks/FluentFTP) updated to v44
 * **AWS** Nuget bumped to latest versions
-
+* **Wiki** created for documentation
 
 
 ## Releases
