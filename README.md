@@ -32,6 +32,8 @@ FluentStorage is released under the permissive MIT License, so it can be used in
 
 * Implements [in-memory and on-disk versions](https://github.com/robinrodricks/FluentStorage/wiki/Standard-Storage) of all the abstractions, therefore you can develop fast on a local machine or use vendor-free serverless implementations for parts of your application.
 
+* Implements [data transformation sinks](https://github.com/robinrodricks/FluentStorage/wiki/Data-Transformation) for encryption and compression.
+
 * Attempts to enforce idential behavior on all implementations of storage interfaces to the smallest details possible, and contains many test specifications which will help you to add another provider.
 
 
