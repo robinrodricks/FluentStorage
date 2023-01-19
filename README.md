@@ -114,10 +114,10 @@ In 2023 we added:
 
 Special thanks to these awesome people who helped create FluentStorage! Shoutout to [Ivan Gavryliuk](https://github.com/aloneguid) for the original project [Storage.Net](https://github.com/aloneguid/storage).
 
-<!---
-<img src="https://github.com/robinrodricks/FluentStorage/raw/develop/.github/contributors.png" />
--->
 
 <a href="https://github.com/robinrodricks/FluentStorage/graphs/contributors">
-  <img src="https://contributors-img.web.app/image?repo=robinrodricks/FluentStorage" />
+	<!---
+	<img src="https://contributors-img.web.app/image?repo=robinrodricks/FluentStorage" />
+	-->
+	<img src="https://github.com/robinrodricks/FluentStorage/raw/develop/.github/contributors.png" />
 </a>
