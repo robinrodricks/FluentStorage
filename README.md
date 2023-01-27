@@ -17,6 +17,15 @@ It is written entirely in C#. Supports .NET 5+ and .NET Standard 2.0+. External 
 
 FluentStorage is released under the permissive MIT License, so it can be used in both proprietary and free/open source applications.
 
+## Architecture
+
+### Without FluentStorage
+
+![Arch](https://raw.githubusercontent.com/robinrodricks/FluentStorage/develop/.github/arch-without.png)
+
+### With FluentStorage
+
+![Arch](https://raw.githubusercontent.com/robinrodricks/FluentStorage/develop/.github/arch-with.png)
 
 ## Features
 
