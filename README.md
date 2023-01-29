@@ -17,16 +17,6 @@ It is written entirely in C#. Supports .NET 5+ and .NET Standard 2.0+. External 
 
 FluentStorage is released under the permissive MIT License, so it can be used in both proprietary and free/open source applications.
 
-## Architecture
-
-### Without FluentStorage
-
-![Arch](https://raw.githubusercontent.com/robinrodricks/FluentStorage/develop/.github/arch-without.png)
-
-### With FluentStorage
-
-![Arch](https://raw.githubusercontent.com/robinrodricks/FluentStorage/develop/.github/arch-with.png)
-
 ## Features
 
 * Unified API to interface with all major cloud providers for [Blobs](https://github.com/robinrodricks/FluentStorage/wiki/Blob-Storage) and [Messaging](https://github.com/robinrodricks/FluentStorage/wiki/Message-Storage).
@@ -44,6 +34,40 @@ FluentStorage is released under the permissive MIT License, so it can be used in
 * Implements [data transformation sinks](https://github.com/robinrodricks/FluentStorage/wiki/Data-Transformation) for encryption and compression.
 
 * Attempts to enforce idential behavior on all implementations of storage interfaces to the smallest details possible, and contains many test specifications which will help you to add another provider.
+
+
+
+## Architecture
+
+### Without FluentStorage
+
+Today, most cloud applications and services are developed against vendor-specific APIs like Amazon S3 API or Azure Blob API for cloud storage capabilities.
+
+Using multiple vendor-specific APIs can increase your vendor lock-in, and makes your application more complex and harder to maintain. And sometimes these APIs may not offer all the functionality you need for your application. Polycloud also becomes very hard to implement.
+
+![Arch](https://raw.githubusercontent.com/robinrodricks/FluentStorage/develop/.github/arch-without.png)
+
+### With FluentStorage
+
+What if we had a single, consistent API to deal with all types of cloud storage? That would solve these issues and bring more flexibility in switching cloud providers or cloud services.
+
+Thus was born the idea for FluentStorage.
+
+You can use a single, consistent API to interact with multiple cloud providers, where each provider is supported through its own special Nuget package.
+
+![Arch](https://raw.githubusercontent.com/robinrodricks/FluentStorage/develop/.github/arch-with.png)
+
+
+
+## Benefits
+
+1. Easy to write code that is not tied to a specific cloud provider.
+
+2. Easily switch between different providers without having to rewrite any part of their application or service.
+
+3. Easily migrate to using a new storage technology for some part of your cloud application (S3 buckets, Azure Blobs, FTP, etc.)
+
+4. Natively implement polycloud (support for multiple public clouds)
 
 
 
