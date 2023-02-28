@@ -39,6 +39,11 @@ namespace FluentStorage.AWS.Blobs {
 				Delimiter = "/"   //this tells S3 not to go into the folder recursively
 			};
 
+			// Server side filtering is supported by supplying a FilePrefix			
+			if (!string.IsNullOrEmpty(options.FilePrefix)) {
+				request.Prefix += options.FilePrefix;
+			}
+
 			var folderContainer = new List<Blob>();
 
 			while (options.MaxResults == null || (container.Count < options.MaxResults)) {
