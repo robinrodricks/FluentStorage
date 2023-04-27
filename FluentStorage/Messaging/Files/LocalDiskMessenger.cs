@@ -6,8 +6,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using FluentStorage.Messaging;
-
 namespace FluentStorage.Messaging.Files {
 	/// <summary>
 	/// Messages themselves can be human readable. THe speed is not an issue because the main bottleneck is disk anyway.
@@ -87,12 +85,14 @@ namespace FluentStorage.Messaging.Files {
 				if (Directory.Exists(dir))
 					Directory.Delete(dir, true);
 
+#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
 				if (_watchers.TryGetValue(channelName, out (FileSystemWatcher Watcher, FileSystemEventHandler Handler, ISet<IMessageProcessor> Processors) watcherAndProcessor)) {
 					watcherAndProcessor.Watcher.Created -= watcherAndProcessor.Handler;
 					watcherAndProcessor.Watcher.Dispose();
 				}
 
-				_watchers.Remove(channelName);
+				_watchers.Remove(channelName); 
+#endif
 			}
 
 			return Task.CompletedTask;
@@ -136,9 +136,10 @@ namespace FluentStorage.Messaging.Files {
 		public void Dispose() {
 
 #if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
-			foreach (var watcher in _watchers) {
-				watcher.Value.Watcher -= watcher.Value.Handler;
-				watcher.Value.Watcher?.Dispose();
+			foreach (( _ , (FileSystemWatcher watcher, FileSystemEventHandler handler, ISet<IMessageProcessor> processors)) in _watchers) {
+
+				watcher.Created -= handler;
+				watcher?.Dispose();
 			}
 #endif
 		}
@@ -164,6 +165,15 @@ namespace FluentStorage.Messaging.Files {
 		public Task StartMessageProcessorAsync(string channelName, IMessageProcessor messageProcessor) {
 
 #if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
+			
+			if (string.IsNullOrWhiteSpace(channelName)) {
+				throw new ArgumentNullException(nameof(channelName), $"'{nameof(channelName)}' cannot be null");
+			}
+
+			if (messageProcessor == null) {
+				throw new ArgumentNullException(nameof (messageProcessor), $"'{nameof(messageProcessor)}' cannot be null");
+			}
+
 			if (!_watchers.TryGetValue(channelName, out (FileSystemWatcher Watcher, FileSystemEventHandler Handler, ISet<IMessageProcessor> Processors) watcherAndProcessor)) {
 				FileSystemWatcher watcher = new FileSystemWatcher(GetChannelPath(channelName), $"*.{FileExtension}");
 				FileSystemEventHandler fileSystemEventHandler = async (sender, args) => {
