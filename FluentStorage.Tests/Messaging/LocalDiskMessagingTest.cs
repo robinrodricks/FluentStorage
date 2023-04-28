@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 using Xunit;
@@ -83,11 +82,11 @@ namespace FluentStorage.Tests.Messaging {
 			string channelName = Guid.NewGuid().ToString();
 
 			// Act
-			Func<Task> startingMessageProcessorWhenChannelDoesNotExist = async () =>await _sut.StartMessageProcessorAsync(channelName, _messageProcessor)
+			Func<Task> startingMessageProcessorWhenChannelDoesNotExist = async () => await _sut.StartMessageProcessorAsync(channelName, _messageProcessor)
 																							  .ConfigureAwait(false);
 
 			// Assert
-			await startingMessageProcessorWhenChannelDoesNotExist.Should().ThrowAsync<StorageException>("the specified channel does not exist")
+			await startingMessageProcessorWhenChannelDoesNotExist.Should().ThrowAsync<StorageException>("the specified channel does not exist");
 		}
 	}
 
