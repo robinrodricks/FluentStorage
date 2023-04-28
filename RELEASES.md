@@ -1,5 +1,8 @@
 # Release Notes
 
+#### 5.0.1
+ - Fix : Implementation of `LocalDiskMessenger.StartProcessorAsync` (issue [#14](https://github.com/robinrodricks/FluentStorage/issues/14))(`netstandard2.1` / `net6.0` and above
+
 #### 5.0.0
  - New: Introducing the FluentStorage set of libraries created from Storage.NET
  - New: Added SFTP provider using [SSH.NET](https://github.com/sshnet/SSH.NET)

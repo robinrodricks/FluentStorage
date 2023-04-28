@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NetBox.Extensions;
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -15,7 +17,7 @@ namespace FluentStorage.Messaging.Files {
 
 		private readonly string _root;
 #if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
-		private readonly IDictionary<string, (FileSystemWatcher Watcher, FileSystemEventHandler handler,  ISet<IMessageProcessor> Processors)> _watchers;
+		private readonly IDictionary<string, (FileSystemWatcher Watcher, FileSystemEventHandler handler, ISet<IMessageProcessor> Processors)> _watchers;
 #endif
 
 		public LocalDiskMessenger(string directoryPath) {
@@ -91,7 +93,7 @@ namespace FluentStorage.Messaging.Files {
 					watcherAndProcessor.Watcher.Dispose();
 				}
 
-				_watchers.Remove(channelName); 
+				_watchers.Remove(channelName);
 #endif
 			}
 
@@ -136,7 +138,7 @@ namespace FluentStorage.Messaging.Files {
 		public void Dispose() {
 
 #if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
-			foreach (( _ , (FileSystemWatcher watcher, FileSystemEventHandler handler, ISet<IMessageProcessor> processors)) in _watchers) {
+			foreach ((_, (FileSystemWatcher watcher, FileSystemEventHandler handler, ISet<IMessageProcessor> processors)) in _watchers) {
 
 				watcher.Created -= handler;
 				watcher?.Dispose();
@@ -162,37 +164,53 @@ namespace FluentStorage.Messaging.Files {
 			   .ToList();
 		}
 
+		///<inheritdoc/>
 		public Task StartMessageProcessorAsync(string channelName, IMessageProcessor messageProcessor) {
 
 #if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
-			
+
 			if (string.IsNullOrWhiteSpace(channelName)) {
-				throw new ArgumentNullException(nameof(channelName), $"'{nameof(channelName)}' cannot be null");
+				throw new ArgumentNullException(nameof(channelName), $"'{nameof(channelName)}' cannot be null or whitespace");
 			}
 
-			if (messageProcessor == null) {
-				throw new ArgumentNullException(nameof (messageProcessor), $"'{nameof(messageProcessor)}' cannot be null");
+			if (messageProcessor is null) {
+				throw new ArgumentNullException(nameof(messageProcessor), $"'{nameof(messageProcessor)}' cannot be null");
 			}
 
-			if (!_watchers.TryGetValue(channelName, out (FileSystemWatcher Watcher, FileSystemEventHandler Handler, ISet<IMessageProcessor> Processors) watcherAndProcessor)) {
-				FileSystemWatcher watcher = new FileSystemWatcher(GetChannelPath(channelName), $"*.{FileExtension}");
-				FileSystemEventHandler fileSystemEventHandler = async (sender, args) => {
-					FileInfo messageFileInfo = new FileInfo(Path.Combine(GetMessagePath(channelName), args.Name));
+			HashSet<IMessageProcessor> messageProcessors = new();
 
-					QueueMessage queueMessage = ToQueueMessage(messageFileInfo);
+			if (_watchers.TryGetValue(channelName, out (FileSystemWatcher Watcher, FileSystemEventHandler Handler, ISet<IMessageProcessor> Processors) watcherAndProcessor)) {
 
-					await messageProcessor.ProcessMessagesAsync(new[] { queueMessage })
-										  .ConfigureAwait(false);
+				watcherAndProcessor.Watcher.Changed -= watcherAndProcessor.Handler; // avoid memory leaks
+				watcherAndProcessor.Watcher.Dispose();
+				_watchers.Remove(channelName);
+
+				messageProcessors.AddRange(watcherAndProcessor.Processors);
+			}
+
+			if (messageProcessors.Add(messageProcessor)) {
+				FileSystemWatcher watcher = new(GetChannelPath(channelName), $"*{FileExtension}");
+				FileSystemEventHandler fileSystemEventHandler = (sender, args) => {
+					if (args.ChangeType == WatcherChangeTypes.Changed) {
+						FileInfo messageFileInfo = new(args.FullPath);
+
+						QueueMessage queueMessage = ToQueueMessage(messageFileInfo);
+
+						foreach (IMessageProcessor item in messageProcessors) {
+							try {
+								item.ProcessMessagesAsync(new[] { queueMessage }).GetAwaiter().GetResult();
+							}
+							catch (Exception) {
+								// swalllow the exception has no caller can could be notified anyway
+							}
+						}
+					}
 				};
-				watcher.Created += fileSystemEventHandler;
 
-				ISet<IMessageProcessor> messageProcessors = new HashSet<IMessageProcessor>() { messageProcessor };
+				watcher.Changed += fileSystemEventHandler;
+				watcher.EnableRaisingEvents = true;
 
 				_watchers.Add(channelName, (watcher, fileSystemEventHandler, messageProcessors));
-			}
-			else
-			{
-				watcherAndProcessor.Processors.Add(messageProcessor);
 			}
 
 			return Task.CompletedTask;
@@ -200,6 +218,11 @@ namespace FluentStorage.Messaging.Files {
 			throw new NotImplementedException();
 #endif
 
+		}
+
+		private void FileSystemErrorHandler(object sender, ErrorEventArgs args) {
+
+			throw new StorageException("An expected error occurred", args.GetException());
 		}
 	}
 }

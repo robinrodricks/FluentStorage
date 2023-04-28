@@ -5,20 +5,16 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FluentStorage.Azure.DataLake.Store\FluentStorage.Azure.DataLake.csproj" />
     <ProjectReference Include="..\FluentStorage\FluentStorage.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
     <PackageReference Include="FluentAssertions" Version="6.11.0" />
     <PackageReference Include="LogMagic" Version="2.17.5" />
     <PackageReference Include="Config.Net" Version="4.14.20" />
     <PackageReference Include="Moq" Version="4.13.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 
 </Project>
