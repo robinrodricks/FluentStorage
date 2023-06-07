@@ -1,6 +1,7 @@
-﻿using System.IO;
-using System.Net;
-using FluentStorage.Blobs;
+﻿using FluentStorage.Blobs;
+
+using System.IO;
+
 using Xunit;
 
 namespace FluentStorage.Tests.Integration.Blobs {
@@ -153,23 +154,6 @@ namespace FluentStorage.Tests.Integration.Blobs {
 		public AzureKeyVaultTest(AzureKeyVaultFixture fixture) : base(fixture) {
 		}
 	}
-
-	public class FtpFixture : BlobFixture {
-		protected override IBlobStorage CreateStorage(ITestSettings settings) {
-			return StorageFactory.Blobs.Ftp(
-			   settings.FtpHostName,
-			   new NetworkCredential(settings.FtpUsername, settings.FtpPassword));
-		}
-	}
-
-	/* i don't have an ftp server anymore
-	public class FtpTest : BlobTest, IClassFixture<FtpFixture>
-	{
-	   public FtpTest(FtpFixture fixture) : base(fixture)
-	   {
-
-	   }
-	}*/
 
 #if DEBUG
 	public class DatabricksFixture : BlobFixture {
