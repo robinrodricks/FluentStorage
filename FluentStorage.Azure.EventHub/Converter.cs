@@ -1,5 +1,5 @@
 ﻿using Microsoft.Azure.EventHubs;
-using NetBox.Extensions;
+
 using FluentStorage.Messaging;
 using System;
 using System.Collections.Generic;

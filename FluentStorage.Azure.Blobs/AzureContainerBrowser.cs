@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using NetBox.Async;
+
 using FluentStorage.Blobs;
 
 namespace FluentStorage.Azure.Blobs {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using NetBox;
-using NetBox.Extensions;
+
 using FluentStorage.Blobs;
 using FluentStorage.Streaming;
 using System;
@@ -70,7 +70,7 @@ namespace FluentStorage.Microsoft.ServiceFabric.Blobs {
 				var meta = new BlobMetaTag {
 					LastModificationTime = DateTimeOffset.UtcNow,
 					Length = value.LongLength,
-					Md = value.GetHash(HashType.Md5).ToHexString()
+					Md = value.MD5().ToHexString()
 				};
 
 				await metaColl.AddOrUpdateAsync(tx.Tx, fullPath, meta, (k, v) => meta).ConfigureAwait(false);

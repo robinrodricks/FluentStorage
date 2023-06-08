@@ -2,7 +2,7 @@
 using FluentStorage.Blobs;
 using FluentStorage.Gcp.CloudStorage;
 using FluentStorage.Gcp.CloudStorage.Blobs;
-using NetBox.Extensions;
+using System;
 
 namespace FluentStorage {
 	/// <summary>

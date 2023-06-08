@@ -1,13 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System;
-using NetBox.Model;
 using System.Linq;
 using NetBox.IO;
 using System.Threading.Tasks;
 using System.Threading;
-using NetBox.Extensions;
-using NetBox;
 using FluentStorage.Streaming;
 
 namespace FluentStorage.Blobs {
@@ -175,7 +172,7 @@ namespace FluentStorage.Blobs {
 					blob = new Blob(fullPath) {
 						Size = data.Length,
 						LastModificationTime = DateTime.UtcNow,
-						MD5 = data.GetHash(HashType.Md5).ToHexString()
+						MD5 = data.MD5().ToHexString()
 					}
 				};
 			}
@@ -183,7 +180,7 @@ namespace FluentStorage.Blobs {
 				tag.data = data;
 				tag.blob.Size = data.Length;
 				tag.blob.LastModificationTime = DateTime.UtcNow;
-				tag.blob.MD5 = data.GetHash(HashType.Md5).ToHexString();
+				tag.blob.MD5 = data.MD5().ToHexString();
 			}
 			_pathToTag[fullPath] = tag;
 

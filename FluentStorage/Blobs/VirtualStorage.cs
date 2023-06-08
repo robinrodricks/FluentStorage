@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NetBox.Extensions;
 
 namespace FluentStorage.Blobs {
 	/// <summary>
@@ -208,7 +207,7 @@ namespace FluentStorage.Blobs {
 
 				IReadOnlyCollection<TResult> br = await action(pair.Key, rps).ConfigureAwait(false);
 
-				foreach (Tuple<TResult, MpTag<TResult>> doublePair in EnumerableEx.MultiIterate(br, pair.Value)) {
+				foreach (Tuple<TResult, MpTag<TResult>> doublePair in EnumerableExtensions.MultiIterate(br, pair.Value)) {
 					doublePair.Item2.result = doublePair.Item1;
 				}
 			}

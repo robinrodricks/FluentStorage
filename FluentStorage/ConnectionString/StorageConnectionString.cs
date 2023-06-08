@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NetBox.Extensions;
 
 namespace FluentStorage.ConnectionString {
 	/// <summary>

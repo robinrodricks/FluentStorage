@@ -1,12 +1,9 @@
-﻿using NetBox.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
-using NetBox.Extensions;
-using NetBox;
 
 namespace FluentStorage.Blobs.Files {
 	/// <summary>

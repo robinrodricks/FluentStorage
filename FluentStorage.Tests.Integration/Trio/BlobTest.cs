@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NetBox;
-using NetBox.Extensions;
+
 using NetBox.Generator;
 using FluentStorage.Blobs;
 using FluentStorage.Tests.Integration.Util;
@@ -223,7 +223,7 @@ namespace FluentStorage.Tests.Integration.Blobs {
 			Blob meta = await _storage.GetBlobAsync(id);
 
 			long size = Encoding.UTF8.GetBytes(content).Length;
-			string md5 = content.GetHash(HashType.Md5);
+			string md5 = content.MD5();
 
 			if (meta.Size != null)
 				Assert.Equal(size, meta.Size);
@@ -532,7 +532,7 @@ namespace FluentStorage.Tests.Integration.Blobs {
 		public async Task GetMd5HashAsync() {
 			var blob = new Blob(RandomBlobPath());
 			string content = RandomGenerator.RandomString;
-			string hash = content.GetHash(HashType.Md5);
+			string hash = content.MD5();
 
 			await _storage.WriteTextAsync(blob, content);
 

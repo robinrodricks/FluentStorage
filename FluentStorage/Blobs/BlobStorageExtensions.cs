@@ -6,8 +6,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using NetBox;
-using NetBox.Extensions;
 
 namespace FluentStorage.Blobs {
 	/// <summary>
@@ -371,7 +369,7 @@ namespace FluentStorage.Blobs {
 				if (s == null)
 					return null;
 
-				string hash = s.GetHash(HashType.Md5);
+				string hash = s.MD5().ToHexString();
 
 				return hash;
 			}

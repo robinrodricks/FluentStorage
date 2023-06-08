@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using FluentStorage.Streaming;
 #if !NET6_0_OR_GREATER
-using NetBox.Extensions;
+
 #endif
 using System.Net;
 

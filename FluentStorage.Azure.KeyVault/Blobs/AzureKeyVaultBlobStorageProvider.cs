@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
 using System.Text.RegularExpressions;
-using NetBox.Extensions;
+
 using NetBox;
 using System.Net;
 using FluentStorage.Blobs;

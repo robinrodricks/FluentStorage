@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Azure.Storage.File;
-using NetBox.Extensions;
+
 using FluentStorage.Blobs;
 
 namespace FluentStorage.Azure.Files {

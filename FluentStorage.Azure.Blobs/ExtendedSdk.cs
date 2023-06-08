@@ -12,7 +12,7 @@ using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.Storage.Blobs;
 using Blobs.Gen2;
-using NetBox.Extensions;
+
 using FluentStorage;
 using FluentStorage.Blobs;
 using FluentStorage.Azure.Blobs;

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Databricks.Client;
-using NetBox.Extensions;
+
 using FluentStorage.Blobs;
 
 namespace FluentStorage.Databricks {

@@ -10,7 +10,7 @@ using Amazon.SQS;
 using Amazon.SQS.Model;
 using FluentStorage.Messaging;
 #if !NET6_0_OR_GREATER
-using NetBox.Extensions;
+
 #endif
 using System.Collections.Concurrent;
 
