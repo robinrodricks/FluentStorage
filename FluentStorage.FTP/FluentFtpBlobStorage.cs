@@ -1,15 +1,18 @@
-﻿using System;
+﻿using FluentFTP;
+using FluentFTP.Exceptions;
+
+using FluentStorage.Blobs;
+
+using Polly;
+using Polly.Retry;
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentFTP;
-using Polly;
-using Polly.Retry;
-using FluentStorage.Blobs;
-using FluentFTP.Exceptions;
 
 namespace FluentStorage.FTP {
 	class FluentFtpBlobStorage : IBlobStorage {
@@ -47,7 +50,7 @@ namespace FluentStorage.FTP {
 
 			FtpListItem[] items = await client.GetListing(options.FolderPath).ConfigureAwait(false);
 
-			var results = new List<Blob>();
+			List<Blob> results = new List<Blob>();
 			foreach (FtpListItem item in items) {
 				if (options.FilePrefix != null && !item.Name.StartsWith(options.FilePrefix)) {
 					continue;
@@ -76,7 +79,7 @@ namespace FluentStorage.FTP {
 			if (ff.Type != FtpObjectType.Directory && ff.Type != FtpObjectType.File)
 				return null;
 
-			var id = new Blob(ff.FullName,
+			Blob id = new Blob(ff.FullName,
 			   ff.Type == FtpObjectType.File
 			   ? BlobItemKind.File
 			   : BlobItemKind.Folder);
@@ -106,7 +109,7 @@ namespace FluentStorage.FTP {
 		public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default) {
 			AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
-			var results = new List<bool>();
+			List<bool> results = new List<bool>();
 			foreach (string path in ids) {
 				bool e = await client.FileExists(path).ConfigureAwait(false);
 				results.Add(e);
@@ -118,7 +121,7 @@ namespace FluentStorage.FTP {
 		public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default) {
 			AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
-			var results = new List<Blob>();
+			List<Blob> results = new List<Blob>();
 			foreach (string path in ids) {
 				string cpath = StoragePath.Normalize(path);
 				string parentPath = StoragePath.GetParent(cpath);
@@ -131,7 +134,7 @@ namespace FluentStorage.FTP {
 					continue;
 				}
 
-				var r = new Blob(path) {
+				Blob r = new Blob(path) {
 					Size = foundItem.Size,
 					LastModificationTime = foundItem.Modified
 				};
@@ -159,12 +162,25 @@ namespace FluentStorage.FTP {
 
 		public async Task WriteAsync(string fullPath, Stream dataStream,
 		   bool append = false, CancellationToken cancellationToken = default) {
+
 			AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
 			await retryPolicy.ExecuteAsync(async () => {
-				using (Stream dest = await client.OpenWrite(fullPath, FtpDataType.Binary, true).ConfigureAwait(false)) {
-					await dataStream.CopyToAsync(dest).ConfigureAwait(false);
+				string directory = Path.GetDirectoryName(fullPath);
+
+				if (!string.IsNullOrWhiteSpace(directory) && !(await client.DirectoryExists(directory).ConfigureAwait(false))) {
+					await client.CreateDirectory(directory, cancellationToken);
 				}
+
+				using Stream dest = append
+					? await client.OpenAppend(fullPath, FtpDataType.Binary, true, token: cancellationToken).ConfigureAwait(false)
+					: await client.OpenWrite(fullPath, FtpDataType.Binary, true, token: cancellationToken).ConfigureAwait(false);
+
+#if NETSTANDARD2_0
+				await dataStream.CopyToAsync(dest).ConfigureAwait(false);
+#else
+				await dataStream.CopyToAsync(dest, cancellationToken).ConfigureAwait(false);
+#endif
 			}).ConfigureAwait(false);
 		}
 
