@@ -16,12 +16,7 @@ namespace FluentStorage.Tests.Integration.Ftp {
 
 		public string UserName => _userName;
 
-		public string Password => _userName;
-
-
-		public IEnumerable<int> GetPassivePorts() => _passivePorts;
-
-		private readonly ISet<int> _passivePorts;
+		public string Password => _password;
 
 		private const int MaxUsersCount = 5;
 
@@ -32,7 +27,7 @@ namespace FluentStorage.Tests.Integration.Ftp {
 		public FtpFixture() {
 			_userName = Faker.Internet.UserName();
 			_password = Faker.Internet.Password();
-			_passivePorts = new HashSet<int>((MaxUsersCount * 2) + 1);
+			int passivePortEnd = PassivePortStart + (MaxUsersCount);
 
 			ContainerBuilder containerBuilder = new ContainerBuilder()
 				.WithAutoRemove(autoRemove: false)
@@ -43,17 +38,14 @@ namespace FluentStorage.Tests.Integration.Ftp {
 					["FTP_USER_PASS"] = Password,
 					["FTP_USER_HOME"] = $"/home/{UserName}",
 					["FTP_MAX_CLIENTS"] = $"{MaxUsersCount}",
-					["FTP_PASSIVE_PORTS"] = $"{PassivePortStart}:{(PassivePortStart + (MaxUsersCount * 2))}"
+					["FTP_PASSIVE_PORTS"] = $"{PassivePortStart}:{passivePortEnd}"
 				})
 				.WithPortBinding(21, assignRandomHostPort: true)
 				.WithTmpfsMount($"/home/{UserName}/data", AccessMode.ReadWrite)
-				.WithTmpfsMount($"/etc/pure-ftpd/passwd", AccessMode.ReadWrite)
-				;
+				.WithTmpfsMount($"/etc/pure-ftpd/passwd", AccessMode.ReadWrite);
 
-			for (int i = 0; i < MaxUsersCount; i++) {
-				int port = PassivePortStart + i;
-				containerBuilder = containerBuilder.WithPortBinding(port, assignRandomHostPort: true)
-								.WithExposedPort(port);
+			for (int port = PassivePortStart; port < passivePortEnd; port++) {
+				containerBuilder = containerBuilder.WithPortBinding(port);
 			}
 
 			FtpContainer = containerBuilder.Build();
@@ -62,11 +54,6 @@ namespace FluentStorage.Tests.Integration.Ftp {
 		///<inheritdoc/>
 		public async Task InitializeAsync() {
 			await FtpContainer.StartAsync().ConfigureAwait(false);
-			//for (int i = 0; i < MaxUsersCount; i++) {
-			//	int containerPort = PassivePortStart + i;
-			//	_passivePorts.Add(FtpContainer.GetMappedPublicPort(containerPort));
-			//}
-
 		}
 
 		///<inheritdoc/>

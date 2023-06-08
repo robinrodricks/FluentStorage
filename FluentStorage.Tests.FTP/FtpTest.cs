@@ -1,54 +1,57 @@
-﻿namespace FluentStorage.Tests.Integration.Ftp
-{
-    public class FtpTest : IClassFixture<FtpFixture>, IAsyncLifetime
-    {
+﻿using Bogus;
 
-        private IBlobStorage _storage;
-        private FtpFixture Fixture { get; }
+using FluentAssertions;
 
-        private static readonly Faker Faker = new();
+using FluentFTP;
 
-        private readonly ITestOutputHelper _outputHelper;
+using FluentStorage.Blobs;
 
-        public FtpTest(FtpFixture ftpFixture)
-        {
-            Fixture = ftpFixture;
-            StorageFactory.Modules.UseFtpStorage();
-        }
+using Xunit.Abstractions;
 
-        ///<inheritdoc/>
-        public async Task DisposeAsync()
-        {
-            await Fixture.DisposeAsync();
-        }
+namespace FluentStorage.Tests.Integration.Ftp {
+	public class FtpTest : IClassFixture<FtpFixture>, IAsyncLifetime {
 
-        ///<inheritdoc/>
-        public async Task InitializeAsync()
-        {
-            await Fixture.InitializeAsync();
+		private IBlobStorage _storage;
+		private FtpFixture Fixture { get; }
 
-            AsyncFtpClient client = new("localhost", new System.Net.NetworkCredential(Fixture.UserName, Fixture.Password), Fixture.GetPort(), new FtpConfig { ActivePorts = Fixture.GetPassivePorts() });
-            _outputHelper?.WriteLine($"Port utilisé durant le test : {client.Port}");
-            _storage = StorageFactory.Blobs.FtpFromFluentFtpClient(client);
-        }
+		private static readonly Faker Faker = new();
 
-        [Fact]
-        public async Task Given_Append_is_true_When_calling_WriteAsync_Then_the_file_should_be_uploaded_properly()
-        {
+		private readonly ITestOutputHelper _outputHelper;
 
-            // Arrange
-            byte[] bytesSent = Faker.Random.Bytes(1025);
-            const string fullPath = "/test/test-file.txt";
-            await _storage.OpenTransactionAsync();
-            await _storage.WriteAsync(fullPath, bytesSent.Take(1024).ToArray(), true);
+		public FtpTest(ITestOutputHelper outputHelper, FtpFixture ftpFixture) {
+			_outputHelper = outputHelper;
+			Fixture = ftpFixture;
+			StorageFactory.Modules.UseFtpStorage();
+		}
 
-            // Act
-            await _storage.WriteAsync(fullPath, bytesSent.Skip(1024).ToArray(), true);
+		///<inheritdoc/>
+		public Task DisposeAsync() => Task.CompletedTask;
 
-            // Assert
-            byte[] received = await _storage.ReadBytesAsync(fullPath);
-            received.Should().BeEquivalentTo(bytesSent);
+		///<inheritdoc/>
+		public Task InitializeAsync() {
+			AsyncFtpClient client = new("localhost", Fixture.UserName, Fixture.Password, Fixture.GetPort());
+			_outputHelper?.WriteLine($"Port utilisé durant le test : {client.Port}");
+			_storage = StorageFactory.Blobs.FtpFromFluentFtpClient(client);
 
-        }
-    }
+			return Task.CompletedTask;
+		}
+
+		[Fact]
+		public async Task Given_Append_is_true_When_calling_WriteAsync_Then_the_file_should_be_uploaded_properly() {
+
+			// Arrange
+			byte[] bytesSent = Faker.Random.Bytes(1025);
+			const string fullPath = "/test/test-file.txt";
+			await _storage.OpenTransactionAsync();
+			await _storage.WriteAsync(fullPath, bytesSent.Take(1024).ToArray(), true);
+
+			// Act
+			await _storage.WriteAsync(fullPath, bytesSent.Skip(1024).ToArray(), true);
+
+			// Assert
+			byte[] received = await _storage.ReadBytesAsync(fullPath);
+			received.Should().BeEquivalentTo(bytesSent);
+
+		}
+	}
 }

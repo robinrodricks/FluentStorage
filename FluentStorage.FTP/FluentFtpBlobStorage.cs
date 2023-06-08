@@ -162,9 +162,16 @@ namespace FluentStorage.FTP {
 
 		public async Task WriteAsync(string fullPath, Stream dataStream,
 		   bool append = false, CancellationToken cancellationToken = default) {
+
 			AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
 			await retryPolicy.ExecuteAsync(async () => {
+				string directory = Path.GetDirectoryName(fullPath);
+
+				if (!string.IsNullOrWhiteSpace(directory) && !(await client.DirectoryExists(directory).ConfigureAwait(false))) {
+					await client.CreateDirectory(directory, cancellationToken);
+				}
+
 				using Stream dest = append
 					? await client.OpenAppend(fullPath, FtpDataType.Binary, true, token: cancellationToken).ConfigureAwait(false)
 					: await client.OpenWrite(fullPath, FtpDataType.Binary, true, token: cancellationToken).ConfigureAwait(false);
