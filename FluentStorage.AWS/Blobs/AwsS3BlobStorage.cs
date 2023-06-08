@@ -10,6 +10,7 @@ using Amazon.S3.Transfer;
 using System.Threading.Tasks;
 using System.Threading;
 using FluentStorage.Streaming;
+using FluentStorage.Utils.Extensions;
 #if !NET6_0_OR_GREATER
 
 #endif

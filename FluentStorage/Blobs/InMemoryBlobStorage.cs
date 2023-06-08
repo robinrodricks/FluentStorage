@@ -2,10 +2,11 @@
 using System.IO;
 using System;
 using System.Linq;
-using NetBox.IO;
 using System.Threading.Tasks;
 using System.Threading;
 using FluentStorage.Streaming;
+using FluentStorage.Utils.Extensions;
+using FluentStorage.Utils.IO;
 
 namespace FluentStorage.Blobs {
 	class InMemoryBlobStorage : IBlobStorage {

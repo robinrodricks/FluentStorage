@@ -17,6 +17,7 @@ using FluentStorage;
 using FluentStorage.Blobs;
 using FluentStorage.Azure.Blobs;
 using FluentStorage.Azure.Blobs.Gen2.Model;
+using FluentStorage.Utils.Extensions;
 
 namespace Blobs {
 	class ExtendedSdk {

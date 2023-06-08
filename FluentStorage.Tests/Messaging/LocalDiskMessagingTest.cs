@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 
 using FluentStorage.Messaging;
-
+using FluentStorage.Utils.Extensions;
 using Moq;
 
 

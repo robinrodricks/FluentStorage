@@ -1,5 +1,6 @@
 ﻿namespace NetBox {
-    using global::System.IO;
+	using FluentStorage.Utils.Files;
+	using global::System.IO;
     using Xunit;
 
     public class TempFileTest {

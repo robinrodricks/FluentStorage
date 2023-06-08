@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Databricks.Client;
 
 using FluentStorage.Blobs;
+using FluentStorage.Utils.Extensions;
 
 namespace FluentStorage.Databricks {
 	class SecretStorage : GenericBlobStorage {

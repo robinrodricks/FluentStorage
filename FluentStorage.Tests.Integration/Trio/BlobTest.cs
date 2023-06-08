@@ -10,6 +10,7 @@ using NetBox.Generator;
 using FluentStorage.Blobs;
 using FluentStorage.Tests.Integration.Util;
 using Xunit;
+using FluentStorage.Utils.Extensions;
 
 namespace FluentStorage.Tests.Integration.Blobs {
 	[Trait("Category", "Blobs")]

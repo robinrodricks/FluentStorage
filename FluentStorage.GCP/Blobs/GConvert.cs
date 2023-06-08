@@ -8,6 +8,7 @@ using FluentStorage.Blobs;
 using Google.Api.Gax;
 using System.Threading.Tasks;
 using System.Collections;
+using FluentStorage.Utils.Extensions;
 
 namespace FluentStorage.Gcp.CloudStorage.Blobs {
 	static class GConvert {

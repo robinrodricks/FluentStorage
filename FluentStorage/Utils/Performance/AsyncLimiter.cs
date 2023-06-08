@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace System {
+namespace FluentStorage.Utils.Performance {
 	/// <summary>
 	/// Limit the amount of async tasks that can run at once
 	/// </summary>

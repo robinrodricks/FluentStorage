@@ -8,6 +8,7 @@ using Azure.Storage.Blobs.Models;
 
 using FluentStorage.Blobs;
 using FluentStorage.Azure.Blobs.Gen2.Model;
+using FluentStorage.Utils.Extensions;
 
 namespace FluentStorage.Azure.Blobs {
 	static class AzConvert {

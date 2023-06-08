@@ -1,7 +1,5 @@
 ﻿using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
-using NetBox;
-
 using FluentStorage.Blobs;
 using FluentStorage.Streaming;
 using System;
@@ -9,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentStorage.Utils.Extensions;
 
 namespace FluentStorage.Microsoft.ServiceFabric.Blobs {
 	class ServiceFabricReliableDictionaryBlobStorageProvider : IBlobStorage {

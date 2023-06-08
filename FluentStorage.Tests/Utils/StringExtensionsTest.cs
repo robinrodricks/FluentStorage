@@ -1,11 +1,13 @@
 ﻿namespace NetBox {
-    using global::System;
-    using global::System.IO;
-    using global::System.Text;
-    using global::System.Threading.Tasks;
-    using Xunit;
+	using FluentStorage.Utils.Extensions;
+	using FluentStorage.Utils.Files;
+	using global::System;
+	using global::System.IO;
+	using global::System.Text;
+	using global::System.Threading.Tasks;
+	using Xunit;
 
-    public class StringExtensionsTest {
+	public class StringExtensionsTest {
         [Theory]
         [InlineData("<string>test text</string>", "test text")]
         public void StripHtml_Variable_Variable(string html, string stripped) {

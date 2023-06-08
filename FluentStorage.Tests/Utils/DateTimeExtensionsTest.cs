@@ -1,6 +1,7 @@
 ﻿namespace NetBox
 {
-   using global::System;
+	using FluentStorage.Utils.Extensions;
+	using global::System;
    using Xunit;
 
    public class DateTimeExtensionsTest

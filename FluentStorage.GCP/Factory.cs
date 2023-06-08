@@ -3,6 +3,7 @@ using FluentStorage.Blobs;
 using FluentStorage.Gcp.CloudStorage;
 using FluentStorage.Gcp.CloudStorage.Blobs;
 using System;
+using FluentStorage.Utils.Extensions;
 
 namespace FluentStorage {
 	/// <summary>

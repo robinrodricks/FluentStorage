@@ -2,6 +2,7 @@
 using Microsoft.Azure.Storage.File;
 
 using FluentStorage.Blobs;
+using FluentStorage.Utils.Extensions;
 
 namespace FluentStorage.Azure.Files {
 	static class AzConvert {

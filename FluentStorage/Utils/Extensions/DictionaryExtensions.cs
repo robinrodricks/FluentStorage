@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace System {
+namespace FluentStorage.Utils.Extensions {
 	public static class DictionaryExtensions {
 		//
 		// Summary:

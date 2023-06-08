@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using FluentStorage.Utils.Extensions;
 
 namespace FluentStorage.Azure.Queues {
 	internal static class Converter {

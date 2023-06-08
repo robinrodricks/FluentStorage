@@ -9,6 +9,7 @@ using Amazon.Runtime;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 using FluentStorage.Messaging;
+using FluentStorage.Utils.Extensions;
 #if !NET6_0_OR_GREATER
 
 #endif

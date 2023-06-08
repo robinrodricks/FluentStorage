@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace System {
+namespace FluentStorage.Utils.Extensions {
 	public static class CollectionExtensions {
 
 		public static void AddRange<T>(this ICollection<T> destination,

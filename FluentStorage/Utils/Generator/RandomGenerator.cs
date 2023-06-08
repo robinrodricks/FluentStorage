@@ -1,4 +1,4 @@
-﻿namespace NetBox.Generator {
+﻿namespace FluentStorage.Utils.Generator {
     using System;
     using System.IO;
     using System.Security.Cryptography;

@@ -7,6 +7,7 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 
 using FluentStorage.Blobs;
+using FluentStorage.Utils.Performance;
 
 namespace FluentStorage.Azure.Blobs {
 	class AzureContainerBrowser : IDisposable {

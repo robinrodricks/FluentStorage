@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
 using System.Text.RegularExpressions;
-
-using NetBox;
-using System.Net;
 using FluentStorage.Blobs;
 using Azure.Security.KeyVault.Secrets;
 using Azure.Core;
 using Azure;
+using FluentStorage.Utils.Extensions;
 
 namespace FluentStorage.Azure.KeyVault.Blobs {
 	class AzureKeyVaultBlobStorageProvider : IBlobStorage {

@@ -4,6 +4,7 @@ using FluentStorage.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentStorage.Utils.Extensions;
 
 namespace FluentStorage.Azure.EventHub {
 	static class Converter {

@@ -1,4 +1,4 @@
-﻿namespace NetBox.IO
+﻿namespace FluentStorage.Utils.IO
 {
    using System;
    using System.IO;

@@ -8,6 +8,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 
 using FluentStorage.Blobs;
+using FluentStorage.Utils.Performance;
 
 namespace FluentStorage.AWS.Blobs {
 	class AwsS3DirectoryBrowser : IDisposable {

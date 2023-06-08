@@ -1,4 +1,4 @@
-﻿namespace NetBox.Performance
+﻿namespace FluentStorage.Utils.Performance
 {
    using System;
    using System.Diagnostics;
