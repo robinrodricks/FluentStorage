@@ -1,15 +1,15 @@
 # Release Notes
 
-#### FluentStorage 5.2.0
+#### FluentStorage 5.2.1
  - New: Implement `LocalDiskMessenger.StartProcessorAsync`
  - Package: Add Nuget reference to `Newtonsoft.Json 13.0.3`
  - Package: Remove Nuget reference to `Newtonsoft.Json 12.x.x`
  - Package: Remove Nuget reference to `NetBox` and add the required utilities within this library
 
-#### FluentStorage.AWS 5.2.0
+#### FluentStorage.AWS 5.2.1
  - New: Implement server-side filtering in `AwsS3DirectoryBrowser.ListAsync` by supplying a `FilePrefix` (thanks SRJames)
 
-#### FluentStorage.FTP 5.2.0
+#### FluentStorage.FTP 5.2.1
  - Fix: Support for the append parameter in FluentFtpBlobStorage (thanks candoumbe)
  - Fix: `IBlobStorage.WriteAsync` will create the directory hierarchy if required (thanks candoumbe)
 
