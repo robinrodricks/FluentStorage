@@ -1,6 +1,6 @@
-﻿using NetBox.Generator;
-using FluentStorage.Blobs;
+﻿using FluentStorage.Blobs;
 using FluentStorage.Messaging;
+using FluentStorage.Utils.Generator;
 using System.Threading.Tasks;
 using Xunit;
 

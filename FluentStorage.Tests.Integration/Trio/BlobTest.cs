@@ -4,13 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NetBox;
-
-using NetBox.Generator;
 using FluentStorage.Blobs;
 using FluentStorage.Tests.Integration.Util;
 using Xunit;
 using FluentStorage.Utils.Extensions;
+using FluentStorage.Utils.Generator;
 
 namespace FluentStorage.Tests.Integration.Blobs {
 	[Trait("Category", "Blobs")]

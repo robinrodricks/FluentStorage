@@ -1,26 +1,26 @@
-﻿namespace NetBox {
+﻿namespace FluentStorage.Tests.Utils {
 	using FluentStorage.Utils.Files;
 	using global::System.IO;
-    using Xunit;
+	using Xunit;
 
-    public class TempFileTest {
-        [Fact]
-        public void NotInUse() {
-            using(var tf = new TempFile()) {
+	public class TempFileTest {
+		[Fact]
+		public void NotInUse() {
+			using (var tf = new TempFile()) {
 
-            }
-        }
+			}
+		}
 
-        [Fact]
-        public void InUse() {
-            string path;
+		[Fact]
+		public void InUse() {
+			string path;
 
-            using(var tf = new TempFile()) {
-                path = tf;
-                File.WriteAllText(tf, "test");
-            }
+			using (var tf = new TempFile()) {
+				path = tf;
+				File.WriteAllText(tf, "test");
+			}
 
-            Assert.False(File.Exists(path));
-        }
-    }
+			Assert.False(File.Exists(path));
+		}
+	}
 }
