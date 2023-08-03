@@ -218,11 +218,17 @@ namespace FluentStorage.SFTP {
 				try {
 					IEnumerable<SftpFile> directoryContents = await client.ListDirectoryAsync(fullPathGrouping.Key);
 
-					IEnumerable<Blob> blobCollection = directoryContents
+					List<Blob> blobCollection = directoryContents
 					   .Where(f => (f.IsDirectory || f.IsRegularFile) && f.FullName == fullPath)
-					   .Select(ConvertSftpFileToBlob);
+					   .Select(ConvertSftpFileToBlob).ToList();
 
 					if (blobCollection.Any()) {
+						// If using a RoodDirectory, remove from full path.
+						if (RootDirectory != null) {
+							foreach (var b in blobCollection) {
+								b.SetFullPath(b.FullPath.Substring(RootDirectory.Length + 1));
+							}
+						}
 						results.AddRange(blobCollection);
 					}
 					else {
@@ -351,12 +357,36 @@ namespace FluentStorage.SFTP {
 		public async Task WriteAsync(string fullPath, Stream dataStream, bool append = false, CancellationToken cancellationToken = default) {
 			ThrowIfDisposed();
 
-			fullPath = StoragePath.Combine(RootDirectory, StoragePath.Normalize(fullPath));
-
 			SftpClient client = GetClient();
+			var fullPathWithRoot = StoragePath.Combine(RootDirectory, StoragePath.Normalize(fullPath));
+
+			// First, for speed, let's try to write the file assuming the directory requested already exists.
+
+			try {
+				using (Stream dest = client.OpenWrite(fullPathWithRoot)) {
+					await dataStream.CopyToAsync(dest).ConfigureAwait(false);
+				}
+				return;
+			}
+			catch (Renci.SshNet.Common.SftpPathNotFoundException) {
+				// If the folder did not exist, continue below.
+			}
+
+			// Create any non-existing directories. We'll need to recursively check each part and
+			// create if it does not exist.
+
+			var parts = StoragePath.Split(fullPath).ToList();
+			parts.RemoveAt(parts.Count - 1);
+			var fullFolder = RootDirectory;
 
 			await _retryPolicy.ExecuteAsync(async () => {
-				using (Stream dest = client.OpenWrite(fullPath)) {
+				foreach (var folder in parts) {
+					fullFolder = StoragePath.Combine(fullFolder, folder);
+					if (!client.Exists(fullFolder))
+						client.CreateDirectory(fullFolder);
+				}
+
+				using (Stream dest = client.OpenWrite(fullPathWithRoot)) {
 					await dataStream.CopyToAsync(dest).ConfigureAwait(false);
 				}
 			}).ConfigureAwait(false);
