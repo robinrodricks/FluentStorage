@@ -24,9 +24,11 @@ namespace FluentStorage.SFTP {
 				connectionString.GetRequired("host", true, out string host);
 				connectionString.GetRequired("user", true, out string user);
 				connectionString.GetRequired("password", true, out string password);
+				var path = connectionString.Get("path") ?? "";
+
 				ushort port = ushort.TryParse(connectionString.Get("port"), out port) ? port : DefaultPort;
 
-				return new SshNetSftpBlobStorage(host, port, user, password);
+				return new SshNetSftpBlobStorage(host, port, user, password, path);
 			}
 
 			return null;
