@@ -1,5 +1,10 @@
 # Release Notes
 
+#### FluentStorage.SFTP 5.2.2
+ - New: Added support for a root path in the SFTP connection string
+ - Fix: `GetBlobsAsync` should return an array with a single null if the file does not exist
+ - Fix: `WriteAsync` will create the directory if it does not exist
+
 #### FluentStorage 5.2.1
  - New: Implement `LocalDiskMessenger.StartProcessorAsync`
  - Package: Add Nuget reference to `Newtonsoft.Json 13.0.3`
