@@ -37,7 +37,7 @@ namespace FluentStorage {
 		/// <exception cref="T:System.ArgumentException"><paramref name="host" /> is invalid. <para>-or-</para> <paramref name="username" /> is <b>null</b> or contains only whitespace characters.</exception>
 		/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="port" /> is not within <see cref="F:System.Net.IPEndPoint.MinPort" /> and <see cref="F:System.Net.IPEndPoint.MaxPort" />.</exception>
 		public static IBlobStorage Sftp(this IBlobStorageFactory factory, string host, int port, string username, string password)
-		   => new SshNetSftpBlobStorage(host, port, username, password);
+		   => new SshNetSftpBlobStorage(host, port, username, password, null);
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:FluentStorage.SFTP.SshNetSftpBlobStorage" /> class.

@@ -42,6 +42,14 @@ namespace FluentStorage.SFTP {
 		public int MaxRetryCount { get; set; } = 3;
 
 		/// <summary>
+		/// Root directory, relative to which all paths will resolve to.
+		/// </summary>
+		/// <value>
+		/// Directory required or null.
+		/// </value>
+		public string RootDirectory { get; private set; }
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="T:FluentStorage.SFTP.SshNetSftpBlobStorage" /> class.
 		/// </summary>
 		/// <param name="connectionInfo">The connection info.</param>
@@ -60,8 +68,9 @@ namespace FluentStorage.SFTP {
 		/// <exception cref="T:System.ArgumentNullException"><paramref name="password" /> is <b>null</b>.</exception>
 		/// <exception cref="T:System.ArgumentException"><paramref name="host" /> is invalid. <para>-or-</para> <paramref name="username" /> is <b>null</b> or contains only whitespace characters.</exception>
 		/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="port" /> is not within <see cref="F:System.Net.IPEndPoint.MinPort" /> and <see cref="F:System.Net.IPEndPoint.MaxPort" />.</exception>
-		public SshNetSftpBlobStorage(string host, int port, string username, string password)
+		public SshNetSftpBlobStorage(string host, int port, string username, string password, string path)
 		  : this(new SftpClient(host, port, username, password), true) {
+			RootDirectory = path;
 		}
 
 		/// <summary>
@@ -140,7 +149,7 @@ namespace FluentStorage.SFTP {
 				return Task.FromCanceled(cancellationToken);
 			}
 
-			fullPath = StoragePath.Normalize(fullPath);
+			fullPath = StoragePath.Combine(RootDirectory, StoragePath.Normalize(fullPath));
 
 			client.Delete(fullPath);
 
@@ -177,7 +186,7 @@ namespace FluentStorage.SFTP {
 				return Task.FromCanceled<bool>(cancellationToken);
 			}
 
-			fullPath = StoragePath.Normalize(fullPath);
+			fullPath = StoragePath.Combine(RootDirectory, StoragePath.Normalize(fullPath));
 
 			bool fullPathExists = client.Exists(fullPath);
 
@@ -198,20 +207,40 @@ namespace FluentStorage.SFTP {
 			SftpClient client = GetClient();
 
 			var results = new List<Blob>();
-			foreach (IGrouping<string, string> fullPathGrouping in fullPaths.GroupBy(StoragePath.GetParent)) {
-				string fullPath = StoragePath.Normalize(fullPathGrouping.SingleOrDefault());
+			var fullPathsWithRoot = fullPaths.Select(fullPath => StoragePath.Combine(RootDirectory, fullPath));
+			foreach (IGrouping<string, string> fullPathGrouping in fullPathsWithRoot.GroupBy(StoragePath.GetParent)) {
+				string fullPath = fullPathGrouping.SingleOrDefault();
 
 				if (cancellationToken.IsCancellationRequested) {
 					break;
 				}
 
-				IEnumerable<SftpFile> directoryContents = await client.ListDirectoryAsync(fullPathGrouping.Key);
+				try {
+					IEnumerable<SftpFile> directoryContents = await client.ListDirectoryAsync(fullPathGrouping.Key);
 
-				IEnumerable<Blob> blobCollection = directoryContents
-				   .Where(f => (f.IsDirectory || f.IsRegularFile) && f.FullName == fullPath)
-				   .Select(ConvertSftpFileToBlob);
+					List<Blob> blobCollection = directoryContents
+					   .Where(f => (f.IsDirectory || f.IsRegularFile) && f.FullName == fullPath)
+					   .Select(ConvertSftpFileToBlob).ToList();
 
-				results.AddRange(blobCollection);
+					if (blobCollection.Any()) {
+						// If using a RoodDirectory, remove from full path.
+						if (RootDirectory != null) {
+							foreach (var b in blobCollection) {
+								b.SetFullPath(b.FullPath.Substring(RootDirectory.Length + 1));
+							}
+						}
+						results.AddRange(blobCollection);
+					}
+					else {
+						results.Add(null);
+					}
+				}
+				catch (Renci.SshNet.Common.SftpPathNotFoundException) {
+					// If the directoy did not exists, the SSH client will return this exception. To
+					// normalize with other storage implementations, we'll return null without
+					// raising an error.
+					results.Add(null);
+				}
 			}
 
 			return results;
@@ -261,7 +290,7 @@ namespace FluentStorage.SFTP {
 		public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default) {
 			ThrowIfDisposed();
 
-			fullPath = StoragePath.Normalize(fullPath);
+			fullPath = StoragePath.Combine(RootDirectory, StoragePath.Normalize(fullPath));
 
 			SftpClient client = GetClient();
 
@@ -293,8 +322,8 @@ namespace FluentStorage.SFTP {
 		public Task RenameAsync(string oldPath, string newPath, CancellationToken cancellationToken = default) {
 			ThrowIfDisposed();
 
-			oldPath = StoragePath.Normalize(oldPath);
-			newPath = StoragePath.Normalize(newPath);
+			oldPath = StoragePath.Combine(RootDirectory, StoragePath.Normalize(oldPath));
+			newPath = StoragePath.Combine(RootDirectory, StoragePath.Normalize(newPath));
 
 			SftpClient client = GetClient();
 
@@ -328,12 +357,36 @@ namespace FluentStorage.SFTP {
 		public async Task WriteAsync(string fullPath, Stream dataStream, bool append = false, CancellationToken cancellationToken = default) {
 			ThrowIfDisposed();
 
-			fullPath = StoragePath.Normalize(fullPath);
-
 			SftpClient client = GetClient();
+			var fullPathWithRoot = StoragePath.Combine(RootDirectory, StoragePath.Normalize(fullPath));
+
+			// First, for speed, let's try to write the file assuming the directory requested already exists.
+
+			try {
+				using (Stream dest = client.OpenWrite(fullPathWithRoot)) {
+					await dataStream.CopyToAsync(dest).ConfigureAwait(false);
+				}
+				return;
+			}
+			catch (Renci.SshNet.Common.SftpPathNotFoundException) {
+				// If the folder did not exist, continue below.
+			}
+
+			// Create any non-existing directories. We'll need to recursively check each part and
+			// create if it does not exist.
+
+			var parts = StoragePath.Split(fullPath).ToList();
+			parts.RemoveAt(parts.Count - 1);
+			var fullFolder = RootDirectory;
 
 			await _retryPolicy.ExecuteAsync(async () => {
-				using (Stream dest = client.OpenWrite(fullPath)) {
+				foreach (var folder in parts) {
+					fullFolder = StoragePath.Combine(fullFolder, folder);
+					if (!client.Exists(fullFolder))
+						client.CreateDirectory(fullFolder);
+				}
+
+				using (Stream dest = client.OpenWrite(fullPathWithRoot)) {
 					await dataStream.CopyToAsync(dest).ConfigureAwait(false);
 				}
 			}).ConfigureAwait(false);
