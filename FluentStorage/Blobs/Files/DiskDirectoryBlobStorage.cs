@@ -85,7 +85,7 @@ namespace FluentStorage.Blobs.Files {
 				blob.TryAddProperties(
 				   "IsReadOnly", fi.IsReadOnly.ToString(),
 				   // Universal sortable ("u") is always the same regardless of culture.
-				   "LastAccessTime", fi.LastAccessTimeUtc.ToString("u"),
+				   "LastAccessTimeUtc", fi.LastAccessTimeUtc.ToString("u"),
 				   "Attributes", FormatFlags(fi.Attributes));
 
 				if (includeMeta) {
@@ -101,7 +101,7 @@ namespace FluentStorage.Blobs.Files {
 				blob.LastModificationTime = di.LastWriteTime;
 				blob.CreatedTime = di.CreationTime;
 				blob.TryAddProperties(
-				   "LastAccessTime", di.LastAccessTimeUtc.ToString("u"),
+				   "LastAccessTimeUtc", di.LastAccessTimeUtc.ToString("u"),
 				   "Attributes", FormatFlags(di.Attributes));
 
 				if (includeMeta) {
