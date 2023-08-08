@@ -79,11 +79,13 @@ namespace FluentStorage.Blobs.Files {
 
 				var blob = new Blob(relPath, kind);
 				blob.Size = fi.Length;
-				blob.LastModificationTime = fi.CreationTimeUtc;
+				// Converting the local time to a DateTimeOffset will save the offset of UTC.
+				blob.LastModificationTime = fi.LastWriteTime;
+				blob.CreatedTime = fi.CreationTime;
 				blob.TryAddProperties(
 				   "IsReadOnly", fi.IsReadOnly.ToString(),
-				   "LastAccessTimeUtc", fi.LastAccessTimeUtc.ToString(),
-				   "LastWriteTimeUtc", fi.LastWriteTimeUtc.ToString(),
+				   // Universal sortable ("u") is always the same regardless of culture.
+				   "LastAccessTime", fi.LastAccessTimeUtc.ToString("u"),
 				   "Attributes", FormatFlags(fi.Attributes));
 
 				if (includeMeta) {
@@ -96,10 +98,10 @@ namespace FluentStorage.Blobs.Files {
 				var di = new DirectoryInfo(fullPath);
 
 				var blob = new Blob(relPath, BlobItemKind.Folder);
-				blob.LastModificationTime = di.CreationTimeUtc;
+				blob.LastModificationTime = di.LastWriteTime;
+				blob.CreatedTime = di.CreationTime;
 				blob.TryAddProperties(
-				   "LastAccessTimeUtc", di.LastAccessTimeUtc.ToString(),
-				   "LastWriteTimeUtc", di.LastWriteTimeUtc.ToString(),
+				   "LastAccessTime", di.LastAccessTimeUtc.ToString("u"),
 				   "Attributes", FormatFlags(di.Attributes));
 
 				if (includeMeta) {

@@ -24,7 +24,7 @@ namespace FluentStorage.SFTP {
 				connectionString.GetRequired("host", true, out string host);
 				connectionString.GetRequired("user", true, out string user);
 				connectionString.GetRequired("password", true, out string password);
-				var path = connectionString.Get("path") ?? "";
+				var path = connectionString.Get("path");
 
 				ushort port = ushort.TryParse(connectionString.Get("port"), out port) ? port : DefaultPort;
 
