@@ -65,6 +65,7 @@ namespace FluentStorage.SFTP {
 		/// <param name="port">Connection port.</param>
 		/// <param name="username">Authentication username.</param>
 		/// <param name="password">Authentication password.</param>
+		/// <param name="path">Starting root directory or null.</param>
 		/// <exception cref="T:System.ArgumentNullException"><paramref name="password" /> is <b>null</b>.</exception>
 		/// <exception cref="T:System.ArgumentException"><paramref name="host" /> is invalid. <para>-or-</para> <paramref name="username" /> is <b>null</b> or contains only whitespace characters.</exception>
 		/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="port" /> is not within <see cref="F:System.Net.IPEndPoint.MinPort" /> and <see cref="F:System.Net.IPEndPoint.MaxPort" />.</exception>
@@ -151,6 +152,7 @@ namespace FluentStorage.SFTP {
 
 			fullPath = StoragePath.Combine(RootDirectory, StoragePath.Normalize(fullPath));
 
+			// Todo: Support recursive deleting of folders with files.
 			client.Delete(fullPath);
 
 			return Task.CompletedTask;
@@ -263,9 +265,10 @@ namespace FluentStorage.SFTP {
 
 			SftpClient client = GetClient();
 
-			IEnumerable<SftpFile> directoryContents = await client.ListDirectoryAsync(options.FolderPath);
+			var folder = StoragePath.Combine(RootDirectory, StoragePath.Normalize(options.FolderPath));
+			IEnumerable<SftpFile> directoryContents = await client.ListDirectoryAsync(folder);
 
-			IEnumerable<Blob> blobCollection = directoryContents
+			List<Blob> blobCollection = directoryContents
 			   .Where(dc => (options.FilePrefix == null || dc.Name.StartsWith(options.FilePrefix))
 							&& (dc.IsDirectory || dc.IsRegularFile || dc.OwnerCanRead)
 							&& !cancellationToken.IsCancellationRequested
@@ -273,9 +276,16 @@ namespace FluentStorage.SFTP {
 							&& dc.Name != "..")
 			   .Take(options.MaxResults.Value)
 			   .Select(ConvertSftpFileToBlob)
-			   .Where(options.BrowseFilter);
+			   .Where(options.BrowseFilter)
+			   .ToList();
 
-			return blobCollection.ToList();
+			if (RootDirectory != null) {
+				foreach (var b in blobCollection) {
+					b.SetFullPath(b.FullPath.Substring(RootDirectory.Length + 1));
+				}
+			}
+
+			return blobCollection;
 		}
 
 		/// <summary>
@@ -374,12 +384,11 @@ namespace FluentStorage.SFTP {
 
 			// Create any non-existing directories. We'll need to recursively check each part and
 			// create if it does not exist.
-
 			var parts = StoragePath.Split(fullPath).ToList();
 			parts.RemoveAt(parts.Count - 1);
-			var fullFolder = RootDirectory;
 
 			await _retryPolicy.ExecuteAsync(async () => {
+				var fullFolder = RootDirectory;
 				foreach (var folder in parts) {
 					fullFolder = StoragePath.Combine(fullFolder, folder);
 					if (!client.Exists(fullFolder))

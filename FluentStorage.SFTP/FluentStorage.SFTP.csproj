@@ -22,9 +22,9 @@
    </PropertyGroup>
 
    <ItemGroup>
-     <PackageReference Include="Polly" Version="7.2.0" />
+     <PackageReference Include="Polly" Version="7.2.4" />
     <PackageReference Include="Renci.SshNet.Async" Version="1.4.0" />
-    <PackageReference Include="SSH.NET" Version="2016.1.0" />
+    <PackageReference Include="SSH.NET" Version="2020.0.2" />
    </ItemGroup>
 
    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
