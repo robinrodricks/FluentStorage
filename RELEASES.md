@@ -1,5 +1,8 @@
 # Release Notes
 
+#### FluentStorage.Azure.Blobs 5.2.2
+ - Fix: Upgrade `System.Text.Json` package from v4 to v7
+
 #### FluentStorage 5.2.2
  - Fix: Upgrade `System.Text.Json` package from v4 to v7
  - Fix: Local storage: Handling of `LastModificationTime` and `CreatedTime`

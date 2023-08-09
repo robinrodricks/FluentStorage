@@ -10,7 +10,7 @@
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
       <PackageIcon>logo-nuget.png</PackageIcon>
       <Authors>Robin Rodricks, Ivan Gavryliuk, FluentStorage Contributors</Authors>
-      <Version>5.2.1</Version>
+      <Version>5.2.2</Version>
       <PackageProjectUrl>https://github.com/robinrodricks/FluentStorage</PackageProjectUrl>
       <RepositoryUrl>https://github.com/robinrodricks/FluentStorage</RepositoryUrl>
       <RepositoryType>GitHub</RepositoryType>
@@ -29,7 +29,7 @@
    <ItemGroup>
       <PackageReference Include="Azure.Identity" Version="1.1.0" />
       <PackageReference Include="Azure.Storage.Blobs" Version="12.10.0" />
-      <PackageReference Include="System.Text.Json" Version="4.7.0" />
+      <PackageReference Include="System.Text.Json" Version="7.0.3" />
    </ItemGroup>
 
    <ItemGroup>
