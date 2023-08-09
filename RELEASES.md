@@ -1,5 +1,14 @@
 # Release Notes
 
+#### FluentStorage 5.2.2
+ - Fix: Upgrade `System.Text.Json` package from v4 to v7
+ - Fix: Local storage: Handling of `LastModificationTime` and `CreatedTime`
+ - Fix: Local storage: `LastAccessTimeUtc` is saved as a Universal sortable string in the Blob properties
+
+#### FluentStorage.SFTP 5.2.3
+ - Fix: Various fixes to `ListAsync` path handling
+ - Fix: Upgrade `SSH.NET` package from v2016 to v2020
+
 #### FluentStorage.SFTP 5.2.2
  - New: Added support for a root path in the SFTP connection string
  - Fix: `GetBlobsAsync` should return an array with a single null if the file does not exist
