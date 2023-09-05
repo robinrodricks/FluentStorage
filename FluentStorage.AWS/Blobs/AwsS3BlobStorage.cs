@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using FluentStorage.Streaming;
 using FluentStorage.Utils.Extensions;
+using Amazon.S3.Util;
 #if !NET6_0_OR_GREATER
 
 #endif
@@ -107,17 +108,15 @@ namespace FluentStorage.AWS.Blobs {
 
 		private async Task<AmazonS3Client> GetClientAsync() {
 			if (!_initialised) {
-				try {
-					var request = new PutBucketRequest { BucketName = _bucketName };
+				var bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(_client, _bucketName);
+                if (!bucketExists)
+                {
+                    var request = new PutBucketRequest { BucketName = _bucketName };
 
-					await _client.PutBucketAsync(request).ConfigureAwait(false);
+                    await _client.PutBucketAsync(request).ConfigureAwait(false);
+                }
 
-					_initialised = true;
-				}
-				catch (AmazonS3Exception ex) when (ex.ErrorCode == "BucketAlreadyOwnedByYou") {
-					//ignore this error as bucket already exists
-					_initialised = true;
-				}
+                _initialised = true;
 			}
 
 			return _client;
