@@ -1,5 +1,8 @@
 # Release Notes
 
+#### FluentStorage.AWS 5.2.2
+ - Fix: `AwsS3BlobStorage` checks if a bucket exists before trying to create one (thanks AntMaster7)
+
 #### FluentStorage.Azure.Blobs 5.2.2
  - Fix: Upgrade `System.Text.Json` package from v4 to v7
 
