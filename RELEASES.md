@@ -1,5 +1,11 @@
 # Release Notes
 
+#### FluentStorage 5.3.0
+ - New: Addition of `AesSymmetricEncryptionSink` and `WithAesSymmetricEncryption` extension
+ - Fix: Obsolesence of `SymmetricEncryptionSink` and `WithSymmetricEncryption` extension
+ - New: Updated Tests for `AesSymmetricEncryptionSink`
+ - New: Additional Blob/Stream file tests and XUnit `FileDataAttribute` to support tests
+
 #### FluentStorage.AWS 5.2.2
  - Fix: `AwsS3BlobStorage` checks if a bucket exists before trying to create one (thanks AntMaster7)
 
