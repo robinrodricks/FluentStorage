@@ -5,17 +5,16 @@ using System.Security.Cryptography;
 
 namespace FluentStorage.Blobs.Sinks.Impl {
 	/// <summary>
-	/// 
+	/// Provides ITransformSink support for Aes encryption over the obsolete Rijndael
 	/// </summary>
-	[Obsolete("Please use AesSymmetricEncryptionSink instead as Rijndael is obsolete in .Net 6 and above")]
-	public class SymmetricEncryptionSink : ITransformSink {
+	public class AesSymmetricEncryptionSink : ITransformSink {
 		private readonly SymmetricAlgorithm _cryptoAlgorithm;
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public SymmetricEncryptionSink(string base64Key) {
-			_cryptoAlgorithm = new RijndaelManaged();
+		public AesSymmetricEncryptionSink(string base64Key) {
+			_cryptoAlgorithm = Aes.Create();
 			_cryptoAlgorithm.Key = Convert.FromBase64String(base64Key);
 			_cryptoAlgorithm.GenerateIV();
 		}
