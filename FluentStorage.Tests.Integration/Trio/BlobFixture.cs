@@ -27,7 +27,7 @@ namespace FluentStorage.Tests.Integration.Blobs {
 		public string TestDir {
 			get {
 				if (_testDir == null) {
-					string buildDir = new FileInfo(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath).Directory.FullName;
+					string buildDir = new FileInfo(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath).Directory.FullName;
 					_testDir = Path.Combine(buildDir, "TEST-" + Guid.NewGuid());
 				}
 

@@ -1,37 +1,25 @@
 ﻿#if !NET16
 using System;
-using System.IO;
 using System.Security.Cryptography;
 
 namespace FluentStorage.Blobs.Sinks.Impl {
 	/// <summary>
-	/// 
+	/// Provides ITransformSink support for Rijndael encryption
 	/// </summary>
 	[Obsolete("Please use AesSymmetricEncryptionSink instead as Rijndael is obsolete in .Net 6 and above")]
-	public class SymmetricEncryptionSink : ITransformSink {
-		private readonly SymmetricAlgorithm _cryptoAlgorithm;
-
+	public class SymmetricEncryptionSink : EncryptionSink, ITransformSink {
 		/// <summary>
-		/// 
+		/// Items encrypted with this wil be unencryptable except within the same instance of the SymmetricEncryptionSink
 		/// </summary>
-		public SymmetricEncryptionSink(string base64Key) {
-			_cryptoAlgorithm = new RijndaelManaged();
-			_cryptoAlgorithm.Key = Convert.FromBase64String(base64Key);
-			_cryptoAlgorithm.GenerateIV();
+		public SymmetricEncryptionSink(string key) : base(Rijndael.Create(), key) {
 		}
 
 		/// <summary>
-		/// 
+		/// Items encrypted with this wil be unencryptable only with both keys the same on each instance of the SymmetricEncryptionSink
 		/// </summary>
-		public Stream OpenReadStream(string fullPath, Stream parentStream) {
-			return new CryptoStream(parentStream, _cryptoAlgorithm.CreateDecryptor(), CryptoStreamMode.Read);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public Stream OpenWriteStream(string fullPath, Stream parentStream) {
-			return new CryptoStream(parentStream, _cryptoAlgorithm.CreateEncryptor(), CryptoStreamMode.Write);
+		/// <param name="key"></param>
+		/// <param name="iv"></param>
+		public SymmetricEncryptionSink(string key, string iv) : base(Rijndael.Create(), key, iv) {
 		}
 	}
 }

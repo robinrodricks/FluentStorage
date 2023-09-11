@@ -1,36 +1,26 @@
 ﻿#if !NET16
-using System;
-using System.IO;
 using System.Security.Cryptography;
 
 namespace FluentStorage.Blobs.Sinks.Impl {
 	/// <summary>
 	/// Provides ITransformSink support for Aes encryption over the obsolete Rijndael
 	/// </summary>
-	public class AesSymmetricEncryptionSink : ITransformSink {
-		private readonly SymmetricAlgorithm _cryptoAlgorithm;
-
+	public class AesSymmetricEncryptionSink : EncryptionSink, ITransformSink
+	{
 		/// <summary>
-		/// 
+		/// Items encrypted with this wil be unencryptable except within the same instance of the AesSymmetricEncryptionSink
 		/// </summary>
-		public AesSymmetricEncryptionSink(string base64Key) {
-			_cryptoAlgorithm = Aes.Create();
-			_cryptoAlgorithm.Key = Convert.FromBase64String(base64Key);
-			_cryptoAlgorithm.GenerateIV();
+		public AesSymmetricEncryptionSink(string key) : base(Aes.Create(), key) {
+
 		}
 
 		/// <summary>
-		/// 
+		/// Items encrypted with this wil be unencryptable only with both keys the same on each instance of the AesSymmetricEncryptionSink
 		/// </summary>
-		public Stream OpenReadStream(string fullPath, Stream parentStream) {
-			return new CryptoStream(parentStream, _cryptoAlgorithm.CreateDecryptor(), CryptoStreamMode.Read);
-		}
+		/// <param name="key"></param>
+		/// <param name="iv"></param>
+		public AesSymmetricEncryptionSink(string key, string iv) : base(Aes.Create(), key, iv) {
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public Stream OpenWriteStream(string fullPath, Stream parentStream) {
-			return new CryptoStream(parentStream, _cryptoAlgorithm.CreateEncryptor(), CryptoStreamMode.Write);
 		}
 	}
 }
