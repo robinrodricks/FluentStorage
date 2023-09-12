@@ -1,11 +1,14 @@
-﻿using System;
+﻿using FluentStorage.Tests.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Xunit.Sdk;
 
-namespace FluentStorage.Tests {
+namespace FluentStorage.Tests
+{
+	[DataDiscoverer("FluentStorage.Tests.FileDataDiscoverer", "FluentStorage.Tests")]
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
 	public class FileDataAttribute : DataAttribute
 	{
@@ -22,14 +25,8 @@ namespace FluentStorage.Tests {
 			var pars = testMethod.GetParameters();
 			var parameterTypes = pars.Select(par => par.ParameterType).ToArray();
 
-			var file = new StreamReader(GetFullFilename(_folder, _filename));
-			yield return new object[] {file.BaseStream};
-		}
-
-		static string GetFullFilename(string folder, string filename)
-		{
-			string executable = new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath;
-			return Path.GetFullPath(Path.Combine(Path.GetDirectoryName(executable), folder, filename));
+			var file = new StreamReader(PathHelper.GetFullFilename(_folder, _filename));
+			yield return new object[] { _folder, _filename, file.BaseStream};
 		}
 	}
 }

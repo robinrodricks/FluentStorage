@@ -170,7 +170,7 @@ namespace FluentStorage.Tests.Integration.Blobs {
 			});
 
 
-			Assert.Equal(1, files.Count);
+			Assert.Single(files);
 			Assert.Equal(id1, files.First().FullPath);
 		}
 

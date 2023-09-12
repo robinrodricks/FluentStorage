@@ -92,7 +92,7 @@ namespace FluentStorage.Tests.Integration.Messaging {
 				await Task.Delay(TimeSpan.FromSeconds(5));
 			}
 
-			Assert.True(false, $"channel not found after {maxRetries} retries.");
+			Assert.Fail($"channel not found after {maxRetries} retries.");
 		}
 
 		[Fact]

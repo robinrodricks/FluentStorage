@@ -52,7 +52,7 @@ namespace FluentStorage.Tests.Integration {
 		protected DirectoryInfo BuildDir {
 			get {
 				return _buildDir ??
-					   (_buildDir = new FileInfo(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath).Directory);
+					   (_buildDir = new FileInfo(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath).Directory);
 			}
 		}
 

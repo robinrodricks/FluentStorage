@@ -160,11 +160,40 @@ namespace FluentStorage {
 		/// </summary>
 		/// <param name="blobStorage"></param>
 		/// <param name="encryptionKey"></param>
+		/// <param name="encryptionSecret"></param>
+		/// <returns></returns>
+		[Obsolete("Please use WithAesSymmetricEncryption as Rijndael is obsolete in .Net 6 and above")]
+		public static IBlobStorage WithSymmetricEncryption(
+		   this IBlobStorage blobStorage,
+		   string encryptionKey,
+		   string encryptionSecret) {
+			return blobStorage.WithSinks(new SymmetricEncryptionSink(encryptionKey, encryptionSecret));
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="blobStorage"></param>
+		/// <param name="encryptionKey"></param>
 		/// <returns></returns>
 		public static IBlobStorage WithAesSymmetricEncryption(
 		   this IBlobStorage blobStorage,
 		   string encryptionKey) {
 			return blobStorage.WithSinks(new AesSymmetricEncryptionSink(encryptionKey));
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="blobStorage"></param>
+		/// <param name="encryptionKey"></param>
+		/// <param name="encryptionSecret"></param>
+		/// <returns></returns>
+		public static IBlobStorage WithAesSymmetricEncryption(
+		   this IBlobStorage blobStorage,
+		   string encryptionKey,
+		   string encryptionSecret) {
+			return blobStorage.WithSinks(new AesSymmetricEncryptionSink(encryptionKey, encryptionSecret));
 		}
 
 #endif
