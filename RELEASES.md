@@ -1,6 +1,15 @@
 # Release Notes
 
+#### FluentStorage 5.4.0
+(thanks dammitjanet)
+ - New: Constructor for `SymmetricEncryptionSink` and `AesSymmetricEncryptionSink` to pass IV and key 
+ - New: Constructor for `EncryptedSink` abstract base class to pass in IV and key
+ - New: Additional tests for encryption/decryption repeatability when the decrpytion IV is known
+ - Fix: Resolved Xunit errors and issue with with Xunit `FileData` attribute only finding a single file per test
+ - Fix: Package updates and consolidation to latest Xunit
+
 #### FluentStorage 5.3.0
+(thanks dammitjanet)
  - New: Addition of `AesSymmetricEncryptionSink` and `WithAesSymmetricEncryption` extension
  - Fix: Obsolesence of `SymmetricEncryptionSink` and `WithSymmetricEncryption` extension
  - New: Updated Tests for `AesSymmetricEncryptionSink`
