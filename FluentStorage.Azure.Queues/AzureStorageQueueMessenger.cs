@@ -140,7 +140,7 @@ namespace FluentStorage.Azure.Queues {
 			}
 		}
 
-		public async Task SendAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) {
+		public async Task SendAsync(string channelName, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default) {
 			CloudQueue queue = await GetQueueAsync(channelName).ConfigureAwait(false);
 
 			await Task.WhenAll(messages.Select(async m => {
@@ -150,7 +150,7 @@ namespace FluentStorage.Azure.Queues {
 			})).ConfigureAwait(false);
 		}
 
-		public async Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) {
+		public async Task<IReadOnlyCollection<IQueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) {
 			if (channelName is null)
 				throw new ArgumentNullException(nameof(channelName));
 
@@ -166,7 +166,7 @@ namespace FluentStorage.Azure.Queues {
 
 		}
 
-		public async Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(
+		public async Task<IReadOnlyCollection<IQueueMessage>> ReceiveAsync(
 		   string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default) {
 			if (channelName is null)
 				throw new ArgumentNullException(nameof(channelName));
@@ -182,7 +182,7 @@ namespace FluentStorage.Azure.Queues {
 			if (batch == null)
 				return new QueueMessage[0];
 
-			List<QueueMessage> result = batch.Select(Converter.ToQueueMessage).ToList();
+			List<IQueueMessage> result = batch.Select(Converter.ToQueueMessage).ToList();
 			return result;
 		}
 
@@ -191,7 +191,7 @@ namespace FluentStorage.Azure.Queues {
 
 		}
 
-		public Task DeleteAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+		public Task DeleteAsync(string channelName, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 		public Task StartMessageProcessorAsync(string channelName, IMessageProcessor messageProcessor) => throw new NotImplementedException();
 
 

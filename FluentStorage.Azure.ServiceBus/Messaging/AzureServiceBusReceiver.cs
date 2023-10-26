@@ -33,7 +33,7 @@ namespace FluentStorage.Azure.ServiceBus.Messaging {
 					* So if you set this to 24 hours e.g. Timespan.FromHours(24) and your processing was to take 12 hours, it would be renewed. However, if you set
 					* this to 12 hours using Timespan.FromHours(12) and your code ran for 24, when you went to complete the message it would give a lockLost exception
 					* (as I was getting above over shorter intervals!).
-					* 
+					*
 					* in fact, Microsoft's implementation runs a background task that periodically renews the message lock until it expires.
 					*/
 				   MaxAutoRenewDuration = TimeSpan.FromMinutes(10), //should be in fact called "max processing time"
@@ -54,14 +54,14 @@ namespace FluentStorage.Azure.ServiceBus.Messaging {
 			return Task.FromResult(true);
 		}
 
-		public async Task ConfirmMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default) {
+		public async Task ConfirmMessagesAsync(IReadOnlyCollection<IQueueMessage> messages, CancellationToken cancellationToken = default) {
 			if (_autoComplete)
 				return;
 
 			await Task.WhenAll(messages.Select(m => ConfirmAsync(m))).ConfigureAwait(false);
 		}
 
-		private async Task ConfirmAsync(QueueMessage message) {
+		private async Task ConfirmAsync(IQueueMessage message) {
 			//delete the message and get the deleted element, very nice method!
 			if (!_messageIdToBrokeredMessage.TryRemove(message.Id, out Message bm))
 				return;
@@ -72,7 +72,7 @@ namespace FluentStorage.Azure.ServiceBus.Messaging {
 		public Task<int> GetMessageCountAsync() => throw new NotSupportedException();
 
 
-		public async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default) {
+		public async Task DeadLetterAsync(IQueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default) {
 			if (_autoComplete)
 				return;
 
@@ -82,7 +82,7 @@ namespace FluentStorage.Azure.ServiceBus.Messaging {
 			await _receiverClient.DeadLetterAsync(bm.MessageId).ConfigureAwait(false);
 		}
 
-		public async Task KeepAliveAsync(QueueMessage message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default) {
+		public async Task KeepAliveAsync(IQueueMessage message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default) {
 			if (_autoComplete)
 				return;
 
@@ -97,7 +97,7 @@ namespace FluentStorage.Azure.ServiceBus.Messaging {
 		}
 
 		public Task StartMessagePumpAsync(
-		   Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task> onMessageAsync,
+		   Func<IReadOnlyCollection<IQueueMessage>, CancellationToken, Task> onMessageAsync,
 		   int maxBatchSize = 1,
 		   CancellationToken cancellationToken = default) {
 			if (onMessageAsync == null)
@@ -107,7 +107,7 @@ namespace FluentStorage.Azure.ServiceBus.Messaging {
 
 			_receiverClient.RegisterMessageHandler(
 			   async (message, token) => {
-				   QueueMessage qm = Converter.ToQueueMessage(message);
+				   IQueueMessage qm = Converter.ToQueueMessage(message);
 
 				   if (!_autoComplete)
 					   _messageIdToBrokeredMessage[qm.Id] = message;
@@ -128,6 +128,6 @@ namespace FluentStorage.Azure.ServiceBus.Messaging {
 			return new MessageReceiver(connectionString, entityName, mode);
 		}
 
-		public Task<IReadOnlyCollection<QueueMessage>> PeekMessagesAsync(int maxMessages, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+		public Task<IReadOnlyCollection<IQueueMessage>> PeekMessagesAsync(int maxMessages, CancellationToken cancellationToken = default) => throw new NotSupportedException();
 	}
 }

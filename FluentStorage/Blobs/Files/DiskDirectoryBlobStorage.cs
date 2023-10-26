@@ -27,15 +27,15 @@ namespace FluentStorage.Blobs.Files {
 		/// <summary>
 		/// Returns the list of blob names in this storage, optionally filtered by prefix
 		/// </summary>
-		public Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken) {
+		public Task<IReadOnlyCollection<IBlob>> ListAsync(ListOptions options, CancellationToken cancellationToken) {
 			if (options == null) options = new ListOptions();
 
 			GenericValidation.CheckBlobPrefix(options.FilePrefix);
 
-			if (!Directory.Exists(_directoryFullName)) return Task.FromResult<IReadOnlyCollection<Blob>>(new List<Blob>());
+			if (!Directory.Exists(_directoryFullName)) return Task.FromResult<IReadOnlyCollection<IBlob>>(new List<IBlob>());
 
 			string fullPath = GetFolder(options?.FolderPath, false);
-			if (fullPath == null) return Task.FromResult<IReadOnlyCollection<Blob>>(new List<Blob>());
+			if (fullPath == null) return Task.FromResult<IReadOnlyCollection<IBlob>>(new List<IBlob>());
 
 			string[] fileIds = Directory.GetFiles(
 			   fullPath,
@@ -51,7 +51,7 @@ namespace FluentStorage.Blobs.Files {
 					 : options.FilePrefix + "*",
 				  options.Recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
-			var result = new List<Blob>();
+			var result = new List<IBlob>();
 			result.AddRange(directoryIds.Select(id => ToBlobItem(id, BlobItemKind.Folder, options.IncludeAttributes)));
 			result.AddRange(
 			   fileIds.Where(fid => !fid.EndsWith(AttributesFileExtension)).Select(id => ToBlobItem(id, BlobItemKind.File, options.IncludeAttributes)));
@@ -59,7 +59,7 @@ namespace FluentStorage.Blobs.Files {
 			   .Where(i => options.BrowseFilter == null || options.BrowseFilter(i))
 			   .Take(options.MaxResults == null ? int.MaxValue : options.MaxResults.Value)
 			   .ToList();
-			return Task.FromResult<IReadOnlyCollection<Blob>>(result);
+			return Task.FromResult<IReadOnlyCollection<IBlob>>(result);
 		}
 
 		private static string FormatFlags(FileAttributes fa) {
@@ -259,8 +259,8 @@ namespace FluentStorage.Blobs.Files {
 		/// <summary>
 		/// See interface
 		/// </summary>
-		public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default) {
-			var result = new List<Blob>();
+		public Task<IReadOnlyCollection<IBlob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default) {
+			var result = new List<IBlob>();
 
 			foreach (string blobId in ids) {
 				GenericValidation.CheckBlobFullPath(blobId);
@@ -275,10 +275,10 @@ namespace FluentStorage.Blobs.Files {
 				result.Add(ToBlobItem(filePath, BlobItemKind.File, true));
 			}
 
-			return Task.FromResult<IReadOnlyCollection<Blob>>(result);
+			return Task.FromResult<IReadOnlyCollection<IBlob>>(result);
 		}
 
-		public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) {
+		public Task SetBlobsAsync(IEnumerable<IBlob> blobs, CancellationToken cancellationToken = default) {
 			GenericValidation.CheckBlobFullPaths(blobs);
 
 			foreach (Blob blob in blobs.Where(b => b != null)) {

@@ -46,7 +46,7 @@ namespace FluentStorage.Messaging {
 		/// <param name="messages"></param>
 		/// <param name="cancellationToken"></param>
 		/// <returns></returns>
-		Task SendAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default);
+		Task SendAsync(string channelName, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default);
 
 		/// <summary>
 		/// Receive messages from a channel
@@ -56,7 +56,7 @@ namespace FluentStorage.Messaging {
 		/// <param name="visibility"></param>
 		/// <param name="cancellationToken"></param>
 		/// <returns></returns>
-		Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(
+		Task<IReadOnlyCollection<IQueueMessage>> ReceiveAsync(
 		   string channelName,
 		   int count = 100,
 		   TimeSpan? visibility = null,
@@ -69,7 +69,7 @@ namespace FluentStorage.Messaging {
 		/// <param name="count"></param>
 		/// <param name="cancellationToken"></param>
 		/// <returns></returns>
-		Task<IReadOnlyCollection<QueueMessage>> PeekAsync(
+		Task<IReadOnlyCollection<IQueueMessage>> PeekAsync(
 		   string channelName,
 		   int count = 100,
 		   CancellationToken cancellationToken = default);
@@ -83,7 +83,7 @@ namespace FluentStorage.Messaging {
 		/// <returns></returns>
 		Task DeleteAsync(
 		   string channelName,
-		   IEnumerable<QueueMessage> messages,
+		   IEnumerable<IQueueMessage> messages,
 		   CancellationToken cancellationToken = default);
 
 		/// <summary>

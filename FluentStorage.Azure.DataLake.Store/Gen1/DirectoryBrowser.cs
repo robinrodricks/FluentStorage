@@ -18,20 +18,20 @@ namespace FluentStorage.Azure.DataLake {
 			_listBatchSize = listBatchSize;
 		}
 
-		public async Task<IReadOnlyCollection<Blob>> BrowseAsync(ListOptions options, CancellationToken token) {
+		public async Task<IReadOnlyCollection<IBlob>> BrowseAsync(ListOptions options, CancellationToken token) {
 			string path = StoragePath.Normalize(options.FolderPath);
-			var result = new List<Blob>();
+			var result = new List<IBlob>();
 
 			await BrowseAsync(path, options, result, token).ConfigureAwait(false);
 
 			return result;
 		}
 
-		private async Task BrowseAsync(string path, ListOptions options, ICollection<Blob> container, CancellationToken token) {
-			List<Blob> batch;
+		private async Task BrowseAsync(string path, ListOptions options, ICollection<IBlob> container, CancellationToken token) {
+			List<IBlob> batch;
 
 			try {
-				IEnumerable<Blob> entries =
+				IEnumerable<IBlob> entries =
 				   (await EnumerateDirectoryAsync(path, options, UserGroupRepresentation.ObjectID).ConfigureAwait(false))
 				   .Where(options.IsMatch);
 
@@ -64,12 +64,12 @@ namespace FluentStorage.Azure.DataLake {
 				}
 			}
 		}
-		private async Task<IReadOnlyCollection<Blob>> EnumerateDirectoryAsync(
+		private async Task<IReadOnlyCollection<IBlob>> EnumerateDirectoryAsync(
 		   string path,
 		   ListOptions options,
 		   UserGroupRepresentation userIdFormat = UserGroupRepresentation.ObjectID,
 		   CancellationToken cancelToken = default) {
-			var result = new List<Blob>();
+			var result = new List<IBlob>();
 
 			string listAfter = "";
 

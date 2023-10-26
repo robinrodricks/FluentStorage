@@ -157,7 +157,7 @@ namespace FluentStorage.Tests.Integration.Messaging {
 			string tag = await SendAsync();
 
 			try {
-				IReadOnlyCollection<QueueMessage> messages = await _msg.ReceiveAsync(_qn);
+				IReadOnlyCollection<IQueueMessage> messages = await _msg.ReceiveAsync(_qn);
 
 				Assert.Contains(messages, m => m.Properties.TryGetValue("tag", out string itag) && itag == tag);
 			}
@@ -176,7 +176,7 @@ namespace FluentStorage.Tests.Integration.Messaging {
 			try {
 				await SendAsync();
 
-				IReadOnlyCollection<QueueMessage> messages = await _msg.PeekAsync(_qn);
+				IReadOnlyCollection<IQueueMessage> messages = await _msg.PeekAsync(_qn);
 
 				Assert.NotEmpty(messages);
 			}

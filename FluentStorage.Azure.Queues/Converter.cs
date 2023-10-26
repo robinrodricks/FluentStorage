@@ -13,7 +13,7 @@ namespace FluentStorage.Azure.Queues {
 		private static readonly Guid CustomFlag = new Guid("820e7dc0-46a3-4177-a241-cdac97275ca9");
 		private static readonly byte[] CustomFlagBytes = CustomFlag.ToByteArray();
 
-		public static CloudQueueMessage ToCloudQueueMessage(QueueMessage message) {
+		public static CloudQueueMessage ToCloudQueueMessage(IQueueMessage message) {
 			if (message == null)
 				throw new ArgumentNullException(nameof(message));
 
@@ -49,7 +49,7 @@ namespace FluentStorage.Azure.Queues {
 			return result;
 		}
 
-		public static QueueMessage ToQueueMessage(CloudQueueMessage message) {
+		public static IQueueMessage ToQueueMessage(CloudQueueMessage message) {
 			if (message == null) return null;
 
 			byte[] mb = message.AsBytes;

@@ -8,7 +8,7 @@ namespace FluentStorage.AWS.Messaging {
 	static class Converter {
 		public const string ReceiptHandlePropertyName = "ReceiptHandle";
 
-		public static SendMessageBatchRequestEntry ToSQSMessage(QueueMessage message) {
+		public static SendMessageBatchRequestEntry ToSQSMessage(IQueueMessage message) {
 			if (message == null)
 				throw new ArgumentNullException(nameof(message));
 
@@ -26,7 +26,7 @@ namespace FluentStorage.AWS.Messaging {
 			return r;
 		}
 
-		public static QueueMessage ToQueueMessage(Message sqsMessage) {
+		public static IQueueMessage ToQueueMessage(Message sqsMessage) {
 			var r = new QueueMessage(sqsMessage.Body);
 			r.Id = sqsMessage.MessageId;
 

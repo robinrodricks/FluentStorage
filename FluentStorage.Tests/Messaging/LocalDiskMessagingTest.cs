@@ -104,8 +104,8 @@ namespace FluentStorage.Tests.Messaging {
 			await _sut.SendAsync(channelName, message).ConfigureAwait(false);
 
 			// Assert
-			messageProcessorMock.Verify(mock => mock.ProcessMessagesAsync(It.IsAny<IReadOnlyCollection<QueueMessage>>()), Times.Once);
-			messageProcessorMock.Verify(mock => mock.ProcessMessagesAsync(It.Is<IReadOnlyCollection<QueueMessage>>(messages => messages.Count == 1
+			messageProcessorMock.Verify(mock => mock.ProcessMessagesAsync(It.IsAny<IReadOnlyCollection<IQueueMessage>>()), Times.Once);
+			messageProcessorMock.Verify(mock => mock.ProcessMessagesAsync(It.Is<IReadOnlyCollection<IQueueMessage>>(messages => messages.Count == 1
 																															   && messages.ElementAt(0).StringContent == message.StringContent)),
 																												   Times.Once);
 
@@ -133,17 +133,17 @@ namespace FluentStorage.Tests.Messaging {
 			await _sut.SendAsync(channelName, message).ConfigureAwait(false);
 
 			// Assert
-			firstProcessorMock.Verify(mock => mock.ProcessMessagesAsync(It.Is<IReadOnlyCollection<QueueMessage>>(messages => messages.Count == 1
+			firstProcessorMock.Verify(mock => mock.ProcessMessagesAsync(It.Is<IReadOnlyCollection<IQueueMessage>>(messages => messages.Count == 1
 																														     && messages.ElementAt(0).StringContent == message.StringContent)),
 																												 Times.Once);
 			firstProcessorMock.VerifyNoOtherCalls();
 
-			secondProcessorMock.Verify(mock => mock.ProcessMessagesAsync(It.Is<IReadOnlyCollection<QueueMessage>>(messages => messages.Count == 1
+			secondProcessorMock.Verify(mock => mock.ProcessMessagesAsync(It.Is<IReadOnlyCollection<IQueueMessage>>(messages => messages.Count == 1
 																														     && messages.ElementAt(0).StringContent == message.StringContent)),
 																												 Times.Once);
 			secondProcessorMock.VerifyNoOtherCalls();
 
-			thirdProcessorMock.Verify(mock => mock.ProcessMessagesAsync(It.Is<IReadOnlyCollection<QueueMessage>>(messages => messages.Count == 1
+			thirdProcessorMock.Verify(mock => mock.ProcessMessagesAsync(It.Is<IReadOnlyCollection<IQueueMessage>>(messages => messages.Count == 1
 																														     && messages.ElementAt(0).StringContent == message.StringContent)),
 																												 Times.Once);
 			thirdProcessorMock.VerifyNoOtherCalls();
@@ -156,16 +156,16 @@ namespace FluentStorage.Tests.Messaging {
 
 	public class StoreEventMessageProcessor : IMessageProcessor {
 
-		public IReadOnlyCollection<QueueMessage> Messages => _messages.ToImmutableArray();
+		public IReadOnlyCollection<IQueueMessage> Messages => _messages.ToImmutableArray();
 
-		private readonly IList<QueueMessage> _messages;
+		private readonly IList<IQueueMessage> _messages;
 
 		public StoreEventMessageProcessor() {
-			_messages = new List<QueueMessage>();
+			_messages = new List<IQueueMessage>();
 		}
 
 		///<inheritdoc/>
-		public Task ProcessMessagesAsync(IReadOnlyCollection<QueueMessage> messages) {
+		public Task ProcessMessagesAsync(IReadOnlyCollection<IQueueMessage> messages) {
 			_messages.AddRange(messages);
 
 			return Task.CompletedTask;

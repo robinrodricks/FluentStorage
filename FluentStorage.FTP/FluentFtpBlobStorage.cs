@@ -42,7 +42,7 @@ namespace FluentStorage.FTP {
 			return _client;
 		}
 
-		public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default) {
+		public async Task<IReadOnlyCollection<IBlob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default) {
 			AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
 			if (options == null)
@@ -50,7 +50,7 @@ namespace FluentStorage.FTP {
 
 			FtpListItem[] items = await client.GetListing(options.FolderPath).ConfigureAwait(false);
 
-			List<Blob> results = new List<Blob>();
+			List<IBlob> results = new List<IBlob>();
 			foreach (FtpListItem item in items) {
 				if (options.FilePrefix != null && !item.Name.StartsWith(options.FilePrefix)) {
 					continue;
@@ -118,10 +118,10 @@ namespace FluentStorage.FTP {
 			return results;
 		}
 
-		public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default) {
+		public async Task<IReadOnlyCollection<IBlob>> GetBlobsAsync(IEnumerable<string> ids, CancellationToken cancellationToken = default) {
 			AsyncFtpClient client = await GetClientAsync().ConfigureAwait(false);
 
-			List<Blob> results = new List<Blob>();
+			List<IBlob> results = new List<IBlob>();
 			foreach (string path in ids) {
 				string cpath = StoragePath.Normalize(path);
 				string parentPath = StoragePath.GetParent(cpath);
@@ -143,7 +143,7 @@ namespace FluentStorage.FTP {
 			return results;
 		}
 
-		public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) {
+		public Task SetBlobsAsync(IEnumerable<IBlob> blobs, CancellationToken cancellationToken = default) {
 			throw new NotSupportedException();
 		}
 

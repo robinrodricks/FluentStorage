@@ -7,7 +7,7 @@ namespace FluentStorage.Messaging {
 	/// <summary>
 	/// Message to be used in all the queueing code
 	/// </summary>
-	public class QueueMessage {
+	public class QueueMessage : IQueueMessage {
 		/// <summary>
 		/// Message header that points to large message content, if you are using content offloading feature
 		/// </summary>

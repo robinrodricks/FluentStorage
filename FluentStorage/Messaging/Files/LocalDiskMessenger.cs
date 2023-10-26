@@ -103,7 +103,7 @@ namespace FluentStorage.Messaging.Files {
 			return Task.FromResult<long>(GetMessageFiles(channelName).Count);
 		}
 
-		public Task SendAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) {
+		public Task SendAsync(string channelName, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default) {
 			if (channelName is null)
 				throw new ArgumentNullException(nameof(channelName));
 
@@ -122,7 +122,7 @@ namespace FluentStorage.Messaging.Files {
 			return Task.FromResult(true);
 		}
 
-		public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(
+		public Task<IReadOnlyCollection<IQueueMessage>> ReceiveAsync(
 		   string channelName,
 		   int count = 100,
 		   TimeSpan? visibility = null,
@@ -130,7 +130,7 @@ namespace FluentStorage.Messaging.Files {
 			return Task.FromResult(GetMessages(channelName, count));
 		}
 
-		public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) {
+		public Task<IReadOnlyCollection<IQueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) {
 			return Task.FromResult(GetMessages(channelName, count));
 		}
 
@@ -145,11 +145,11 @@ namespace FluentStorage.Messaging.Files {
 #endif
 		}
 
-		public Task DeleteAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+		public Task DeleteAsync(string channelName, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
 		#endregion
 
-		private IReadOnlyCollection<QueueMessage> GetMessages(
+		private IReadOnlyCollection<IQueueMessage> GetMessages(
 		   string channelName,
 		   int count) {
 			//get all files (not efficient, but we hope there won't be many)

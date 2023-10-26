@@ -28,12 +28,12 @@ namespace FluentStorage.Gcp.CloudStorage.Blobs {
 			_bucketName = bucketName;
 		}
 
-		protected override async Task<IReadOnlyCollection<Blob>> ListAtAsync(string path, ListOptions options, CancellationToken cancellationToken) {
+		protected override async Task<IReadOnlyCollection<IBlob>> ListAtAsync(string path, ListOptions options, CancellationToken cancellationToken) {
 			ObjectsResource.ListRequest request = _client.Service.Objects.List(_bucketName);
 			request.Prefix = StoragePath.IsRootPath(path) ? null : (NormalisePath(path) + "/");
 			request.Delimiter = "/";
 
-			var page = new List<Blob>();
+			var page = new List<IBlob>();
 			do {
 				Objects serviceObjects = await request.ExecuteAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 
@@ -55,7 +55,7 @@ namespace FluentStorage.Gcp.CloudStorage.Blobs {
 		}
 
 
-		private async Task<IReadOnlyCollection<Blob>> LegacyListAtAsync(string path, ListOptions options, CancellationToken cancellationToken) {
+		private async Task<IReadOnlyCollection<IBlob>> LegacyListAtAsync(string path, ListOptions options, CancellationToken cancellationToken) {
 			PagedAsyncEnumerable<Objects, Object> objects = _client.ListObjectsAsync(
 			   _bucketName,
 			   StoragePath.IsRootPath(options.FolderPath) ? null : options.FolderPath,
@@ -66,13 +66,13 @@ namespace FluentStorage.Gcp.CloudStorage.Blobs {
 			return await GConvert.ToBlobsAsync(objects, options).ConfigureAwait(false);
 		}
 
-		public override async Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) {
+		public override async Task SetBlobsAsync(IEnumerable<IBlob> blobs, CancellationToken cancellationToken = default) {
 			GenericValidation.CheckBlobFullPaths(blobs);
 
 			await Task.WhenAll(blobs.Select(b => SetBlobAsync(b, cancellationToken))).ConfigureAwait(false);
 		}
 
-		private async Task SetBlobAsync(Blob blob, CancellationToken cancellationToken = default) {
+		private async Task SetBlobAsync(IBlob blob, CancellationToken cancellationToken = default) {
 			Object item = await _client.GetObjectAsync(_bucketName, NormalisePath(blob.FullPath), cancellationToken: cancellationToken).ConfigureAwait(false);
 
 			if (item.Metadata == null) {
@@ -91,7 +91,7 @@ namespace FluentStorage.Gcp.CloudStorage.Blobs {
 			await _client.UpdateObjectAsync(item, cancellationToken: cancellationToken).ConfigureAwait(false);
 		}
 
-		protected override async Task<Blob> GetBlobAsync(string fullPath, CancellationToken cancellationToken) {
+		protected override async Task<IBlob> GetBlobAsync(string fullPath, CancellationToken cancellationToken) {
 			fullPath = NormalisePath(fullPath);
 
 			try {
@@ -116,7 +116,7 @@ namespace FluentStorage.Gcp.CloudStorage.Blobs {
 				//when not found, just ignore
 
 				//try delete everything recursively
-				IReadOnlyCollection<Blob> childObjects = await ListAsync(new ListOptions { Recurse = true }, cancellationToken).ConfigureAwait(false);
+				IReadOnlyCollection<IBlob> childObjects = await ListAsync(new ListOptions { Recurse = true }, cancellationToken).ConfigureAwait(false);
 				foreach (Blob blob in childObjects) {
 					try {
 						await _client.DeleteObjectAsync(_bucketName, NormalisePath(blob.FullPath), cancellationToken: cancellationToken).ConfigureAwait(false);

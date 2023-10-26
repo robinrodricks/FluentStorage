@@ -20,10 +20,10 @@ namespace FluentStorage.Microsoft.ServiceFabric.Blobs {
 			_collectionName = collectionName ?? throw new ArgumentNullException(nameof(collectionName));
 		}
 
-		public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken) {
+		public async Task<IReadOnlyCollection<IBlob>> ListAsync(ListOptions options, CancellationToken cancellationToken) {
 			if (options == null) options = new ListOptions();
 
-			var result = new List<Blob>();
+			var result = new List<IBlob>();
 
 			using (ServiceFabricTransaction tx = GetTransaction()) {
 				IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync().ConfigureAwait(false);
@@ -147,10 +147,10 @@ namespace FluentStorage.Microsoft.ServiceFabric.Blobs {
 			return result;
 		}
 
-		public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken) {
+		public async Task<IReadOnlyCollection<IBlob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken) {
 			GenericValidation.CheckBlobFullPaths(fullPaths);
 
-			var result = new List<Blob>();
+			var result = new List<IBlob>();
 
 			using (ServiceFabricTransaction tx = GetTransaction()) {
 				IReliableDictionary<string, byte[]> coll = await OpenCollectionAsync().ConfigureAwait(false);
@@ -172,7 +172,7 @@ namespace FluentStorage.Microsoft.ServiceFabric.Blobs {
 			return result;
 		}
 
-		public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) {
+		public Task SetBlobsAsync(IEnumerable<IBlob> blobs, CancellationToken cancellationToken = default) {
 			throw new NotSupportedException();
 		}
 

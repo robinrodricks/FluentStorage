@@ -27,7 +27,7 @@ namespace FluentStorage.Blobs {
 		/// Note that filtering will be happening on the client side, therefore this is the least efficient filter and should
 		/// only be used when you're concerned about RAM usage.
 		/// </summary>
-		public Func<Blob, bool> BrowseFilter { get; set; }
+		public Func<IBlob, bool> BrowseFilter { get; set; }
 
 		/// <summary>
 		/// Prefix to filter file name by. Folders are not affected by this filter. If you list files recursively
@@ -61,14 +61,14 @@ namespace FluentStorage.Blobs {
 		/// <summary>
 		/// Helper method that returns true if a <see cref="Blob"/> matches these list options.
 		/// </summary>
-		public bool IsMatch(Blob blob) {
+		public bool IsMatch(IBlob blob) {
 			return _prefix == null || blob.Kind != BlobItemKind.File || blob.Name.StartsWith(_prefix);
 		}
 
 		/// <summary>
 		/// Only for internal use
 		/// </summary>
-		public bool Add(ICollection<Blob> dest, ICollection<Blob> src) {
+		public bool Add(ICollection<IBlob> dest, ICollection<IBlob> src) {
 			if (MaxResults == null || (dest.Count + src.Count < MaxResults.Value)) {
 				dest.AddRange(src);
 				return false;

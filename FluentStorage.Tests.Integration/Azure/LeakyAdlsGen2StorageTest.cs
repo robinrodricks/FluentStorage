@@ -77,7 +77,7 @@ namespace FluentStorage.Tests.Integration.Azure {
 
 			await _storage.WriteTextAsync(fsName + "/fff", "test");
 
-			Blob fsBlob = await _storage.GetBlobAsync(fsName);
+			IBlob fsBlob = await _storage.GetBlobAsync(fsName);
 
 
 		}
@@ -235,7 +235,7 @@ namespace FluentStorage.Tests.Integration.Azure {
 
 		public async Task InitializeAsync() {
 			//drop all blobs in test storage
-			IReadOnlyCollection<Blob> topLevel =
+			IReadOnlyCollection<IBlob> topLevel =
 			   (await _storage.ListAsync(recurse: false, folderPath: Filesystem)).ToList();
 
 			try {

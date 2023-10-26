@@ -31,9 +31,9 @@ namespace FluentStorage.Databricks {
 
 		protected override bool CanListHierarchy => false;
 
-		protected override async Task<IReadOnlyCollection<Blob>> ListAtAsync(
+		protected override async Task<IReadOnlyCollection<IBlob>> ListAtAsync(
 		   string path, ListOptions options, CancellationToken cancellationToken) {
-			var r = new List<Blob>();
+			var r = new List<IBlob>();
 
 			// listing from "/secrets"
 			if (StoragePath.IsRootPath(path)) {

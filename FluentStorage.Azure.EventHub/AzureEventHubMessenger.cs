@@ -83,7 +83,7 @@ namespace FluentStorage.Azure.EventHub {
 			return Task.FromResult(0L);
 		}
 
-		public async Task SendAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) {
+		public async Task SendAsync(string channelName, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default) {
 			if (channelName is null)
 				throw new ArgumentNullException(nameof(channelName));
 
@@ -96,7 +96,7 @@ namespace FluentStorage.Azure.EventHub {
 			await _client.SendAsync(messages.Select(Converter.ToEventData)).ConfigureAwait(false);
 		}
 
-		public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(
+		public Task<IReadOnlyCollection<IQueueMessage>> ReceiveAsync(
 		   string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default) {
 			if (channelName is null)
 				throw new ArgumentNullException(nameof(channelName));
@@ -104,7 +104,7 @@ namespace FluentStorage.Azure.EventHub {
 			throw new NotSupportedException();
 		}
 
-		public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) {
+		public Task<IReadOnlyCollection<IQueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) {
 			if (channelName is null)
 				throw new ArgumentNullException(nameof(channelName));
 
@@ -118,7 +118,7 @@ namespace FluentStorage.Azure.EventHub {
 			_client.Close();
 		}
 
-		public Task DeleteAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+		public Task DeleteAsync(string channelName, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotSupportedException();
 
 		public async Task StartMessageProcessorAsync(string channelName, IMessageProcessor messageProcessor) {
 			if (channelName is null)

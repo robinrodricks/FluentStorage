@@ -25,7 +25,7 @@ namespace FluentStorage.ConsoleRunner {
 	}
 
 	class Processor : IMessageProcessor {
-		public async Task ProcessMessagesAsync(IReadOnlyCollection<QueueMessage> messages) {
+		public async Task ProcessMessagesAsync(IReadOnlyCollection<IQueueMessage> messages) {
 			foreach (QueueMessage qm in messages) {
 				Console.WriteLine($"received {qm.Id}: {qm.StringContent}");
 			}

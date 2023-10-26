@@ -45,12 +45,12 @@ namespace FluentStorage.Azure.Blobs {
 			return _extended.DeleteAsync(fullPath, cancellationToken);
 		}
 
-		public override Task<IReadOnlyCollection<Blob>> ListAsync(
+		public override Task<IReadOnlyCollection<IBlob>> ListAsync(
 		   ListOptions options, CancellationToken cancellationToken) {
 			return _extended.ListAsync(options, cancellationToken);
 		}
 
-		protected override Task<Blob> GetBlobAsync(string fullPath, CancellationToken cancellationToken) {
+		protected override Task<IBlob> GetBlobAsync(string fullPath, CancellationToken cancellationToken) {
 			return _extended.GetBlobAsync(fullPath, cancellationToken);
 		}
 

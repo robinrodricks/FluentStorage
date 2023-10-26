@@ -44,11 +44,11 @@ namespace FluentStorage.Databricks {
 			return true;
 		}
 
-		public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
+		public async Task<IReadOnlyCollection<IBlob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
 			return await Task.WhenAll(fullPaths.Select(fp => GetBlobAsync(fp))).ConfigureAwait(false);
 		}
 
-		private async Task<Blob> GetBlobAsync(string fullPath) {
+		private async Task<IBlob> GetBlobAsync(string fullPath) {
 			fullPath = StoragePath.Normalize(fullPath);
 			FileInfo status;
 			try {
@@ -63,11 +63,11 @@ namespace FluentStorage.Databricks {
 			};
 		}
 
-		public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default) {
+		public async Task<IReadOnlyCollection<IBlob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default) {
 			if (options == null)
 				options = new ListOptions();
 
-			var result = new List<Blob>();
+			var result = new List<IBlob>();
 
 			await ListFolderAsync(options.FolderPath, result, options).ConfigureAwait(false);
 
@@ -78,7 +78,7 @@ namespace FluentStorage.Databricks {
 			return result;
 		}
 
-		private async Task ListFolderAsync(string path, List<Blob> container, ListOptions options) {
+		private async Task ListFolderAsync(string path, List<IBlob> container, ListOptions options) {
 			IEnumerable<FileInfo> objects;
 
 			try {
@@ -131,7 +131,7 @@ namespace FluentStorage.Databricks {
 			await _dbfs.Upload(fullPath, true, dataStream).ConfigureAwait(false);
 		}
 
-		public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+		public Task SetBlobsAsync(IEnumerable<IBlob> blobs, CancellationToken cancellationToken = default) => throw new NotSupportedException();
 
 		public void Dispose() {
 

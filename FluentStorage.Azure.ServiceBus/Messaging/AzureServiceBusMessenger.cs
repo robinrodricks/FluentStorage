@@ -114,7 +114,7 @@ namespace FluentStorage.Azure.ServiceBus.Messaging {
 		}
 
 
-		public async Task SendAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) {
+		public async Task SendAsync(string channelName, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default) {
 			ISenderClient client = CreateOrGetSenderClient(channelName);
 
 			IList<Message> sbmsg = messages.Select(Converter.ToMessage).ToList();
@@ -181,7 +181,7 @@ namespace FluentStorage.Azure.ServiceBus.Messaging {
 			return channels;
 		}
 
-		public async Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) {
+		public async Task<IReadOnlyCollection<IQueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) {
 			if (channelName is null)
 				throw new ArgumentNullException(nameof(channelName));
 
@@ -191,7 +191,7 @@ namespace FluentStorage.Azure.ServiceBus.Messaging {
 			return messages.Select(Converter.ToQueueMessage).ToList();
 		}
 
-		public async Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(
+		public async Task<IReadOnlyCollection<IQueueMessage>> ReceiveAsync(
 		   string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default) {
 			if (channelName is null)
 				throw new ArgumentNullException(nameof(channelName));
@@ -214,7 +214,7 @@ namespace FluentStorage.Azure.ServiceBus.Messaging {
 			await _mgmt.CreateQueueAsync(name).ConfigureAwait(false);
 		}
 
-		public Task DeleteAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+		public Task DeleteAsync(string channelName, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 		public Task StartMessageProcessorAsync(string channelName, IMessageProcessor messageProcessor) => throw new NotImplementedException();
 
 

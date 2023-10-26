@@ -21,8 +21,8 @@ namespace FluentStorage.AWS.Blobs {
 			_bucketName = bucketName;
 		}
 
-		public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken) {
-			var container = new List<Blob>();
+		public async Task<IReadOnlyCollection<IBlob>> ListAsync(ListOptions options, CancellationToken cancellationToken) {
+			var container = new List<IBlob>();
 
 			await ListFolderAsync(container, options.FolderPath, options, cancellationToken).ConfigureAwait(false);
 
@@ -33,19 +33,19 @@ namespace FluentStorage.AWS.Blobs {
 				  : container;
 		}
 
-		private async Task ListFolderAsync(List<Blob> container, string path, ListOptions options, CancellationToken cancellationToken) {
+		private async Task ListFolderAsync(List<IBlob> container, string path, ListOptions options, CancellationToken cancellationToken) {
 			var request = new ListObjectsV2Request() {
 				BucketName = _bucketName,
 				Prefix = FormatFolderPrefix(path),
 				Delimiter = "/"   //this tells S3 not to go into the folder recursively
 			};
 
-			// Server side filtering is supported by supplying a FilePrefix			
+			// Server side filtering is supported by supplying a FilePrefix
 			if (!string.IsNullOrEmpty(options.FilePrefix)) {
 				request.Prefix += options.FilePrefix;
 			}
 
-			var folderContainer = new List<Blob>();
+			var folderContainer = new List<IBlob>();
 
 			while (options.MaxResults == null || (container.Count < options.MaxResults)) {
 				ListObjectsV2Response response;
@@ -65,7 +65,7 @@ namespace FluentStorage.AWS.Blobs {
 			container.AddRange(folderContainer);
 
 			if (options.Recurse) {
-				List<Blob> folders = folderContainer.Where(b => b.Kind == BlobItemKind.Folder).ToList();
+				List<IBlob> folders = folderContainer.Where(b => b.Kind == BlobItemKind.Folder).ToList();
 
 				await Task.WhenAll(folders.Select(f => ListFolderAsync(container, f.FullPath, options, cancellationToken))).ConfigureAwait(false);
 			}

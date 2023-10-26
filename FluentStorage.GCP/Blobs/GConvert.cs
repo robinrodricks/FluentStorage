@@ -49,7 +49,7 @@ namespace FluentStorage.Gcp.CloudStorage.Blobs {
 			return blob;
 		}
 
-		public static IEnumerable<Blob> ToBlobs(IEnumerable<Object> objects, ListOptions options) {
+		public static IEnumerable<IBlob> ToBlobs(IEnumerable<Object> objects, ListOptions options) {
 			foreach (Object obj in objects) {
 				Blob item = ToBlob(obj);
 
@@ -65,8 +65,8 @@ namespace FluentStorage.Gcp.CloudStorage.Blobs {
 			yield break;
 		}
 
-		public static async Task<IReadOnlyCollection<Blob>> ToBlobsAsync(PagedAsyncEnumerable<Objects, Object> pae, ListOptions options) {
-			var result = new List<Blob>();
+		public static async Task<IReadOnlyCollection<IBlob>> ToBlobsAsync(PagedAsyncEnumerable<Objects, Object> pae, ListOptions options) {
+			var result = new List<IBlob>();
 
 #pragma warning disable IDE0008 // Use explicit type (async enumerator conflict)
 			using (var enumerator = pae.GetEnumerator())

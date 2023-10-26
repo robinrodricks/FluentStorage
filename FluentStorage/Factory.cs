@@ -112,14 +112,14 @@ namespace FluentStorage {
 		/// <param name="blobPathGenerator">Optional generator for blob path used to save large message content.</param>
 		/// <returns></returns>
 		public static IMessenger HandleLargeContent(this IMessenger messenger, IBlobStorage offloadStorage, int minSizeLarge,
-		   Func<QueueMessage, string> blobPathGenerator = null) {
+		   Func<IQueueMessage, string> blobPathGenerator = null) {
 			return new LargeMessageMessenger(messenger, offloadStorage, minSizeLarge, blobPathGenerator, false);
 		}
 
 		#region [ Data Decorators ]
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="blobStorage"></param>
 		/// <param name="sinks"></param>
@@ -143,7 +143,7 @@ namespace FluentStorage {
 #if !NET16
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="blobStorage"></param>
 		/// <param name="encryptionKey"></param>
@@ -156,7 +156,7 @@ namespace FluentStorage {
 		}
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="blobStorage"></param>
 		/// <param name="encryptionKey"></param>
@@ -171,7 +171,7 @@ namespace FluentStorage {
 		}
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="blobStorage"></param>
 		/// <param name="encryptionKey"></param>
@@ -183,7 +183,7 @@ namespace FluentStorage {
 		}
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="blobStorage"></param>
 		/// <param name="encryptionKey"></param>

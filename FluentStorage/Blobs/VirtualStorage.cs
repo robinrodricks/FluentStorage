@@ -13,8 +13,8 @@ namespace FluentStorage.Blobs {
 	/// Providers are distinguished using a prefix. Essentially this allows to mount providers in a virtual filesystem.
 	/// </summary>
 	public class VirtualStorage : IVirtualStorage {
-		private readonly ConcurrentDictionary<string, HashSet<Blob>> _pathToMountBlobs = new ConcurrentDictionary<string, HashSet<Blob>>();
-		private readonly List<Blob> _mountPoints = new List<Blob>();
+		private readonly ConcurrentDictionary<string, HashSet<IBlob>> _pathToMountBlobs = new ConcurrentDictionary<string, HashSet<IBlob>>();
+		private readonly List<IBlob> _mountPoints = new List<IBlob>();
 
 		/// <summary>
 		/// Creates an instance
@@ -58,8 +58,8 @@ namespace FluentStorage.Blobs {
 		private void MountPath(string path, IBlobStorage storage, bool isMountPoint) {
 			string containerPath = StoragePath.IsRootPath(path) ? path : StoragePath.GetParent(path);
 
-			if (!_pathToMountBlobs.TryGetValue(containerPath, out HashSet<Blob> blobs)) {
-				blobs = new HashSet<Blob>();
+			if (!_pathToMountBlobs.TryGetValue(containerPath, out HashSet<IBlob> blobs)) {
+				blobs = new HashSet<IBlob>();
 				_pathToMountBlobs[containerPath] = blobs;
 			}
 
@@ -177,9 +177,9 @@ namespace FluentStorage.Blobs {
 		}
 
 		private async Task ExecuteAsync(
-		   IEnumerable<Blob> blobs,
-		   Func<IBlobStorage, IEnumerable<Blob>, Task> action) {
-			Dictionary<IBlobStorage, List<XTag<Blob, Blob, bool>>> map = Explode<Blob, Blob, bool>(blobs,
+		   IEnumerable<IBlob> blobs,
+		   Func<IBlobStorage, IEnumerable<IBlob>, Task> action) {
+			Dictionary<IBlobStorage, List<XTag<IBlob, Blob, bool>>> map = Explode<IBlob, Blob, bool>(blobs,
 			   b => b.FullPath,
 			   (b, f, r) => {
 				   Blob reduced = (Blob)b.Clone();
@@ -187,8 +187,8 @@ namespace FluentStorage.Blobs {
 				   return reduced;
 			   });
 
-			foreach (KeyValuePair<IBlobStorage, List<XTag<Blob, Blob, bool>>> pair in map) {
-				IEnumerable<Blob> relBlobs = pair.Value.Select(x => x.reducedInput);
+			foreach (KeyValuePair<IBlobStorage, List<XTag<IBlob, Blob, bool>>> pair in map) {
+				IEnumerable<IBlob> relBlobs = pair.Value.Select(x => x.reducedInput);
 
 				await action(pair.Key, relBlobs).ConfigureAwait(false);
 			}
@@ -247,7 +247,7 @@ namespace FluentStorage.Blobs {
 		/// <summary>
 		///
 		/// </summary>
-		public virtual Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
+		public virtual Task<IReadOnlyCollection<IBlob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
 			return ExecuteAsync(
 			   fullPaths,
 			   (storage, fps) => storage.GetBlobsAsync(fps, cancellationToken));
@@ -256,14 +256,14 @@ namespace FluentStorage.Blobs {
 		/// <summary>
 		///
 		/// </summary>
-		public async virtual Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default) {
+		public async virtual Task<IReadOnlyCollection<IBlob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default) {
 			if (options == null)
 				options = new ListOptions();
 
-			var result = new List<Blob>();
+			var result = new List<IBlob>();
 
 			//mount folders/points
-			if (_pathToMountBlobs.TryGetValue(options.FolderPath, out HashSet<Blob> mounts)) {
+			if (_pathToMountBlobs.TryGetValue(options.FolderPath, out HashSet<IBlob> mounts)) {
 				foreach (Blob blob in mounts) {
 					if (blob.Tag == null) {
 						result.Add(blob);
@@ -292,7 +292,7 @@ namespace FluentStorage.Blobs {
 
 			//find mount points
 
-			List<Blob> mountPoints = _mountPoints.Where(mp => options.FolderPath.StartsWith(mp.FullPath)).ToList();
+			List<IBlob> mountPoints = _mountPoints.Where(mp => options.FolderPath.StartsWith(mp.FullPath)).ToList();
 
 			foreach (Blob mountPoint in mountPoints) {
 				IBlobStorage storage = (IBlobStorage)mountPoint.Tag;
@@ -302,7 +302,7 @@ namespace FluentStorage.Blobs {
 				ListOptions mountOptions = options.Clone();
 				mountOptions.FolderPath = StoragePath.Normalize(relPath);
 
-				IReadOnlyCollection<Blob> mountResults = await storage.ListAsync(mountOptions, cancellationToken).ConfigureAwait(false);
+				IReadOnlyCollection<IBlob> mountResults = (IReadOnlyCollection<IBlob>)await storage.ListAsync(mountOptions, cancellationToken).ConfigureAwait(false);
 				foreach (Blob blob in mountResults) {
 					blob.PrependPath(mountPoint.FullPath);
 				}
@@ -335,7 +335,7 @@ namespace FluentStorage.Blobs {
 		/// <summary>
 		///
 		/// </summary>
-		public virtual Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) {
+		public virtual Task SetBlobsAsync(IEnumerable<IBlob> blobs, CancellationToken cancellationToken = default) {
 			return ExecuteAsync(blobs, (s, rb) => s.SetBlobsAsync(rb, cancellationToken));
 		}
 
@@ -348,7 +348,7 @@ namespace FluentStorage.Blobs {
 
 			fullPath = StoragePath.Normalize(fullPath);
 
-			Blob mountPoint = _mountPoints.FirstOrDefault(mp => fullPath.StartsWith(mp.FullPath));
+			IBlob mountPoint = _mountPoints.FirstOrDefault(mp => fullPath.StartsWith(mp.FullPath));
 			if (mountPoint == null)
 				return false;
 

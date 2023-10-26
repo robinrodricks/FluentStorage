@@ -15,7 +15,7 @@ namespace FluentStorage.Blobs {
 		/// <param name="options"></param>
 		/// <param name="cancellationToken"></param>
 		/// <returns>List of blob IDs</returns>
-		Task<IReadOnlyCollection<Blob>> ListAsync(
+		Task<IReadOnlyCollection<IBlob>> ListAsync(
 		   ListOptions options = null,
 		   CancellationToken cancellationToken = default);
 
@@ -63,12 +63,12 @@ namespace FluentStorage.Blobs {
 		/// <summary>
 		/// Gets blob information which is useful for retreiving blob metadata
 		/// </summary>
-		Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default);
+		Task<IReadOnlyCollection<IBlob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default);
 
 		/// <summary>
 		/// Set blob information which is useful for setting blob attributes (user metadata etc.)
 		/// </summary>
-		Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default);
+		Task SetBlobsAsync(IEnumerable<IBlob> blobs, CancellationToken cancellationToken = default);
 
 		/// <summary>
 		/// Starts a new transaction

@@ -26,14 +26,14 @@ namespace FluentStorage.Azure.KeyVault.Blobs {
 
 		#region [ IBlobStorage ]
 
-		public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken) {
+		public async Task<IReadOnlyCollection<IBlob>> ListAsync(ListOptions options, CancellationToken cancellationToken) {
 			if (options == null) options = new ListOptions();
 
 			GenericValidation.CheckBlobPrefix(options.FilePrefix);
 
-			if (!StoragePath.IsRootPath(options.FolderPath)) return new List<Blob>();
+			if (!StoragePath.IsRootPath(options.FolderPath)) return new List<IBlob>();
 
-			var secrets = new List<Blob>();
+			var secrets = new List<IBlob>();
 
 			await foreach (SecretProperties secretProperties in _client.GetPropertiesOfSecretsAsync(cancellationToken).ConfigureAwait(false)) {
 				Blob blob = ToBlob(secretProperties);
@@ -139,17 +139,17 @@ namespace FluentStorage.Azure.KeyVault.Blobs {
 			return true;
 		}
 
-		public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
+		public async Task<IReadOnlyCollection<IBlob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
 			GenericValidation.CheckBlobFullPaths(fullPaths);
 
 			return await Task.WhenAll(fullPaths.Select(fullPath => GetBlobAsync(fullPath))).ConfigureAwait(false);
 		}
 
-		public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) {
+		public Task SetBlobsAsync(IEnumerable<IBlob> blobs, CancellationToken cancellationToken = default) {
 			throw new NotSupportedException();
 		}
 
-		private async Task<Blob> GetBlobAsync(string fullPath) {
+		private async Task<IBlob> GetBlobAsync(string fullPath) {
 			fullPath = NormaliseSecretName(fullPath);
 
 			try {

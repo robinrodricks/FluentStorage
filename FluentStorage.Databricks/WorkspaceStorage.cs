@@ -18,20 +18,20 @@ namespace FluentStorage.Databricks {
 
 		protected override bool CanListHierarchy => false;
 
-		protected override async Task<IReadOnlyCollection<Blob>> ListAtAsync(string path, ListOptions options, CancellationToken cancellationToken) {
+		protected override async Task<IReadOnlyCollection<IBlob>> ListAtAsync(string path, ListOptions options, CancellationToken cancellationToken) {
 			IEnumerable<ObjectInfo> objects = await _api.List(StoragePath.Normalize(path)).ConfigureAwait(false);
 
 			return objects.Select(ToBlob).Where(b => b != null).ToList();
 		}
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="fullPath"></param>
 		/// <param name="cancellationToken"></param>
 		/// <returns></returns>
 		/// <remarks>
-		/// 
+		///
 		/// </remarks>
 		public override async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default) {
 			if (fullPath is null)

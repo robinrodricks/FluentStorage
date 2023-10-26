@@ -42,11 +42,11 @@ namespace FluentStorage.Azure.Blobs {
 
 		#region [ Interface Methods ]
 
-		public virtual async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default) {
+		public virtual async Task<IReadOnlyCollection<IBlob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default) {
 			if (options == null)
 				options = new ListOptions();
 
-			var result = new List<Blob>();
+			var result = new List<IBlob>();
 			var containers = new List<BlobContainerClient>();
 
 			if (StoragePath.IsRootPath(options.FolderPath) && _containerName == null) {
@@ -60,7 +60,7 @@ namespace FluentStorage.Azure.Blobs {
 			else {
 				(BlobContainerClient container, string path) = await GetPartsAsync(options.FolderPath, false).ConfigureAwait(false);
 				if (container == null)
-					return new List<Blob>();
+					return new List<IBlob>();
 				options = options.Clone();
 				options.FolderPath = path; //scan from subpath now
 				containers.Add(container);
@@ -88,7 +88,7 @@ namespace FluentStorage.Azure.Blobs {
 			return await Task.WhenAll(fullPaths.Select(p => ExistsAsync(p, cancellationToken))).ConfigureAwait(false);
 		}
 
-		public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
+		public async Task<IReadOnlyCollection<IBlob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
 			return await Task.WhenAll(fullPaths.Select(p => GetBlobAsync(p, cancellationToken))).ConfigureAwait(false);
 		}
 
@@ -137,7 +137,7 @@ namespace FluentStorage.Azure.Blobs {
 				//happens when trying to write to a non-file object i.e. folder
 			}
 		}
-		public async Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) {
+		public async Task SetBlobsAsync(IEnumerable<IBlob> blobs, CancellationToken cancellationToken = default) {
 			GenericValidation.CheckBlobFullPaths(blobs);
 
 			await Task.WhenAll(blobs.Select(b => SetBlobAsync(b, cancellationToken))).ConfigureAwait(false);
@@ -307,11 +307,11 @@ namespace FluentStorage.Azure.Blobs {
 		#endregion
 
 
-		private async Task SetBlobAsync(Blob blob, CancellationToken cancellationToken) {
-			if (!(await ExistsAsync(blob, cancellationToken).ConfigureAwait(false)))
+		private async Task SetBlobAsync(IBlob blob, CancellationToken cancellationToken) {
+			if (!(await ExistsAsync(blob.FullPath, cancellationToken).ConfigureAwait(false)))
 				return;
 
-			(BlobContainerClient container, string path) = await GetPartsAsync(blob, false).ConfigureAwait(false);
+			(BlobContainerClient container, string path) = await GetPartsAsync(blob.FullPath, false).ConfigureAwait(false);
 
 			if (string.IsNullOrEmpty(path)) {
 				//it's a container!
@@ -325,7 +325,7 @@ namespace FluentStorage.Azure.Blobs {
 			}
 		}
 
-		protected virtual async Task<Blob> GetBlobAsync(string fullPath, CancellationToken cancellationToken) {
+		protected virtual async Task<IBlob> GetBlobAsync(string fullPath, CancellationToken cancellationToken) {
 			(BlobContainerClient container, string path) = await GetPartsAsync(fullPath, false).ConfigureAwait(false);
 
 			if (container == null)
@@ -379,11 +379,11 @@ namespace FluentStorage.Azure.Blobs {
 		}
 
 		private async Task ListAsync(BlobContainerClient container,
-		   List<Blob> result,
+		   List<IBlob> result,
 		   ListOptions options,
 		   CancellationToken cancellationToken) {
 			using (var browser = new AzureContainerBrowser(container, _containerName == null, BrowserParallelism)) {
-				IReadOnlyCollection<Blob> containerBlobs =
+				IReadOnlyCollection<IBlob> containerBlobs =
 				   await browser.ListFolderAsync(options, cancellationToken)
 					  .ConfigureAwait(false);
 

@@ -125,7 +125,7 @@ namespace FluentStorage.AWS.Blobs {
 		/// <summary>
 		/// Lists all buckets, optionaly filtering by prefix. Prefix filtering happens on client side.
 		/// </summary>
-		public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default) {
+		public async Task<IReadOnlyCollection<IBlob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default) {
 			if (options == null)
 				options = new ListOptions();
 
@@ -133,13 +133,13 @@ namespace FluentStorage.AWS.Blobs {
 
 			AmazonS3Client client = await GetClientAsync().ConfigureAwait(false);
 
-			IReadOnlyCollection<Blob> blobs;
+			IReadOnlyCollection<IBlob> blobs;
 			using (var browser = new AwsS3DirectoryBrowser(client, _bucketName)) {
 				blobs = await browser.ListAsync(options, cancellationToken).ConfigureAwait(false);
 			}
 
 			if (options.IncludeAttributes) {
-				foreach (IEnumerable<Blob> page in blobs.Where(b => !b.IsFolder).Chunk(ListChunkSize)) {
+				foreach (IEnumerable<IBlob> page in blobs.Where(b => !b.IsFolder).Chunk(ListChunkSize)) {
 					await Converter.AppendMetadataAsync(client, _bucketName, page, cancellationToken).ConfigureAwait(false);
 				}
 			}
@@ -211,11 +211,11 @@ namespace FluentStorage.AWS.Blobs {
 			return false;
 		}
 
-		public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
+		public async Task<IReadOnlyCollection<IBlob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
 			return await Task.WhenAll(fullPaths.Select(GetBlobAsync)).ConfigureAwait(false);
 		}
 
-		private async Task<Blob> GetBlobAsync(string fullPath) {
+		private async Task<IBlob> GetBlobAsync(string fullPath) {
 			GenericValidation.CheckBlobFullPath(fullPath);
 			fullPath = StoragePath.Normalize(fullPath, true);
 
@@ -232,13 +232,13 @@ namespace FluentStorage.AWS.Blobs {
 			return null;
 		}
 
-		public async Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) {
+		public async Task SetBlobsAsync(IEnumerable<IBlob> blobs, CancellationToken cancellationToken = default) {
 			if (blobs == null)
 				return;
 
 			AmazonS3Client client = await GetClientAsync().ConfigureAwait(false);
 
-			foreach (Blob blob in blobs.Where(b => b != null)) {
+			foreach (IBlob blob in blobs.Where(b => b != null)) {
 				if (blob.Metadata != null) {
 					await Converter.UpdateMetadataAsync(
 					   client,

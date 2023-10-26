@@ -25,10 +25,10 @@ namespace FluentStorage.Blobs {
 		/// <param name="options"></param>
 		/// <param name="cancellationToken"></param>
 		/// <returns>List of blob IDs</returns>
-		public static async Task<IReadOnlyCollection<Blob>> ListFilesAsync(this IBlobStorage blobStorage,
+		public static async Task<IReadOnlyCollection<IBlob>> ListFilesAsync(this IBlobStorage blobStorage,
 		   ListOptions options,
 		   CancellationToken cancellationToken = default) {
-			IReadOnlyCollection<Blob> all = await blobStorage.ListAsync(options, cancellationToken).ConfigureAwait(false);
+			IReadOnlyCollection<IBlob> all = await blobStorage.ListAsync(options, cancellationToken).ConfigureAwait(false);
 
 			return all.Where(i => i != null && i.IsFile).ToList();
 		}
@@ -45,9 +45,9 @@ namespace FluentStorage.Blobs {
 		/// <param name="includeAttributes"><see cref="ListOptions.IncludeAttributes"/></param>
 		/// <param name="cancellationToken"></param>
 		/// <returns>List of blob IDs</returns>
-		public static Task<IReadOnlyCollection<Blob>> ListAsync(this IBlobStorage blobStorage,
+		public static Task<IReadOnlyCollection<IBlob>> ListAsync(this IBlobStorage blobStorage,
 		   string folderPath = null,
-		   Func<Blob, bool> browseFilter = null,
+		   Func<IBlob, bool> browseFilter = null,
 		   string filePrefix = null,
 		   bool recurse = false,
 		   int? maxResults = null,
@@ -146,7 +146,7 @@ namespace FluentStorage.Blobs {
 		/// </summary>
 		public static Task DeleteAsync(
 		   this IBlobStorage storage,
-		   IEnumerable<Blob> blobs,
+		   IEnumerable<IBlob> blobs,
 		   CancellationToken cancellationToken = default) {
 			return storage.DeleteAsync(blobs.Select(b => b.FullPath), cancellationToken);
 		}
@@ -155,7 +155,7 @@ namespace FluentStorage.Blobs {
 		/// Gets basic blob metadata
 		/// </summary>
 		/// <returns>Blob metadata or null if blob doesn't exist</returns>
-		public static async Task<Blob> GetBlobAsync(this IBlobStorage storage,
+		public static async Task<IBlob> GetBlobAsync(this IBlobStorage storage,
 		   string fullPath, CancellationToken cancellationToken = default) {
 			return (await storage.GetBlobsAsync(new[] { fullPath }, cancellationToken).ConfigureAwait(false)).First();
 		}
@@ -352,7 +352,7 @@ namespace FluentStorage.Blobs {
 		/// Calculates an MD5 hash of a blob. Comparing to <see cref="Blob.MD5"/> field, it always returns
 		/// a hash, even if the underlying storage doesn't support it natively.
 		/// </summary>
-		public static async Task<string> GetMD5HashAsync(this IBlobStorage blobStorage, Blob blob, CancellationToken cancellationToken = default) {
+		public static async Task<string> GetMD5HashAsync(this IBlobStorage blobStorage, IBlob blob, CancellationToken cancellationToken = default) {
 			if (blob == null)
 				throw new ArgumentNullException(nameof(blob));
 
@@ -434,7 +434,7 @@ namespace FluentStorage.Blobs {
 			else {
 				string fullPath = StoragePath.Combine(folderPath, dummyFileName ?? ".empty");
 
-				// Check if the file already exists before we try to create it to prevent 
+				// Check if the file already exists before we try to create it to prevent
 				// AccessDenied exceptions if two processes are creating the folder at the same time.
 				if (await blobStorage.ExistsAsync(fullPath)) {
 					return;

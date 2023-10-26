@@ -28,17 +28,17 @@ namespace FluentStorage.Blobs.Sinks {
 			return _parent.ExistsAsync(fullPaths, cancellationToken);
 		}
 
-		public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
+		public Task<IReadOnlyCollection<IBlob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
 			return _parent.GetBlobsAsync(fullPaths, cancellationToken);
 		}
 
-		public Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default) {
+		public Task<IReadOnlyCollection<IBlob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default) {
 			return _parent.ListAsync(options, cancellationToken);
 		}
 
 		public Task<ITransaction> OpenTransactionAsync() => _parent.OpenTransactionAsync();
 
-		public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) => _parent.SetBlobsAsync(blobs, cancellationToken);
+		public Task SetBlobsAsync(IEnumerable<IBlob> blobs, CancellationToken cancellationToken = default) => _parent.SetBlobsAsync(blobs, cancellationToken);
 
 		public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default) {
 			//chain streams

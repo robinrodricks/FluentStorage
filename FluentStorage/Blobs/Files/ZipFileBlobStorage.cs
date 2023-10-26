@@ -50,8 +50,8 @@ namespace FluentStorage.Blobs.Files {
 			return Task.FromResult<IReadOnlyCollection<bool>>(result);
 		}
 
-		public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
-			var result = new List<Blob>();
+		public Task<IReadOnlyCollection<IBlob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
+			var result = new List<IBlob>();
 			ZipArchive zipArchive = GetArchive(false);
 
 			foreach (string fullPath in fullPaths) {
@@ -69,23 +69,23 @@ namespace FluentStorage.Blobs.Files {
 				}
 			}
 
-			return Task.FromResult<IReadOnlyCollection<Blob>>(result);
+			return Task.FromResult<IReadOnlyCollection<IBlob>>(result);
 		}
 
-		public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) {
+		public Task SetBlobsAsync(IEnumerable<IBlob> blobs, CancellationToken cancellationToken = default) {
 			throw new NotSupportedException();
 		}
 
-		public Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken = default) {
+		public Task<IReadOnlyCollection<IBlob>> ListAsync(ListOptions options, CancellationToken cancellationToken = default) {
 			if (!File.Exists(_filePath))
-				return Task.FromResult<IReadOnlyCollection<Blob>>(new List<Blob>());
+				return Task.FromResult<IReadOnlyCollection<IBlob>>(new List<IBlob>());
 
 			ZipArchive archive = GetArchive(false);
 
 			if (options == null)
 				options = new ListOptions();
 
-			IEnumerable<Blob> blobs = archive.Entries.Select(ze => new Blob(ze.FullName, BlobItemKind.File));
+			IEnumerable<IBlob> blobs = archive.Entries.Select(ze => new Blob(ze.FullName, BlobItemKind.File));
 
 			if (options.FilePrefix != null)
 				blobs = blobs.Where(id => id.Name.StartsWith(options.FilePrefix));
@@ -114,10 +114,10 @@ namespace FluentStorage.Blobs.Files {
 			if (options.MaxResults != null)
 				blobs = blobs.Take(options.MaxResults.Value);
 
-			return Task.FromResult<IReadOnlyCollection<Blob>>(blobs.ToList());
+			return Task.FromResult<IReadOnlyCollection<IBlob>>(blobs.ToList());
 		}
 
-		private IEnumerable<Blob> AppendVirtualFolders(string rootFolderPath, List<Blob> files) {
+		private IEnumerable<IBlob> AppendVirtualFolders(string rootFolderPath, List<IBlob> files) {
 			var uniqueFolders = new HashSet<string>(
 			   files.Where(f => f.FolderPath != rootFolderPath).Select(f => f.FolderPath));
 

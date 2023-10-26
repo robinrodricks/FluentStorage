@@ -8,7 +8,7 @@ using FluentStorage.Utils.Extensions;
 
 namespace FluentStorage.Azure.EventHub {
 	static class Converter {
-		public static EventData ToEventData(QueueMessage message) {
+		public static EventData ToEventData(IQueueMessage message) {
 			if (message == null)
 				throw new ArgumentNullException(nameof(message));
 
@@ -19,7 +19,7 @@ namespace FluentStorage.Azure.EventHub {
 			return ev;
 		}
 
-		public static QueueMessage ToQueueMessage(EventData ed, string partitionId) {
+		public static IQueueMessage ToQueueMessage(EventData ed, string partitionId) {
 			if (ed == null)
 				return null;
 

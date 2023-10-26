@@ -31,14 +31,14 @@ namespace FluentStorage.AWS.Messaging {
 			return attrs.ApproximateNumberOfMessages;
 		}
 
-		public override async Task ConfirmMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default) {
+		public override async Task ConfirmMessagesAsync(IReadOnlyCollection<IQueueMessage> messages, CancellationToken cancellationToken = default) {
 			var request = new DeleteMessageBatchRequest(_queueUrl,
 			   messages.Select(m => new DeleteMessageBatchRequestEntry(m.Id, m.Properties[Converter.ReceiptHandlePropertyName])).ToList());
 
 			await _client.DeleteMessageBatchAsync(request, cancellationToken).ConfigureAwait(false);
 		}
 
-		protected override async Task<IReadOnlyCollection<QueueMessage>> ReceiveMessagesAsync(int maxBatchSize, CancellationToken cancellationToken) {
+		protected override async Task<IReadOnlyCollection<IQueueMessage>> ReceiveMessagesAsync(int maxBatchSize, CancellationToken cancellationToken) {
 			var request = new ReceiveMessageRequest(_queueUrl) {
 				MessageAttributeNames = new List<string> { ".*" },
 				MaxNumberOfMessages = Math.Min(10, maxBatchSize)
@@ -49,7 +49,7 @@ namespace FluentStorage.AWS.Messaging {
 			return messages.Messages.Select(Converter.ToQueueMessage).ToList();
 		}
 
-		public override async Task<IReadOnlyCollection<QueueMessage>> PeekMessagesAsync(int maxMessages, CancellationToken cancellationToken = default) {
+		public override async Task<IReadOnlyCollection<IQueueMessage>> PeekMessagesAsync(int maxMessages, CancellationToken cancellationToken = default) {
 			var request = new ReceiveMessageRequest(_queueUrl) {
 				MessageAttributeNames = new List<string> { ".*" },
 				MaxNumberOfMessages = maxMessages,
@@ -62,7 +62,7 @@ namespace FluentStorage.AWS.Messaging {
 			return messages.Messages.Select(Converter.ToQueueMessage).ToList();
 		}
 
-		public override Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default) {
+		public override Task DeadLetterAsync(IQueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default) {
 			throw new NotSupportedException();
 		}
 	}

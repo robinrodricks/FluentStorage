@@ -58,7 +58,7 @@ namespace FluentStorage.Azure.DataLake {
 			return new AzureDataLakeGen1Storage(accountName, credential.Domain, credential.UserName, credential.Password, null);
 		}
 
-		public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken) {
+		public async Task<IReadOnlyCollection<IBlob>> ListAsync(ListOptions options, CancellationToken cancellationToken) {
 			if (options == null) options = new ListOptions();
 
 			AdlsClient client = await GetAdlsClientAsync().ConfigureAwait(false);
@@ -133,7 +133,7 @@ namespace FluentStorage.Azure.DataLake {
 			return result;
 		}
 
-		public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken) {
+		public async Task<IReadOnlyCollection<IBlob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken) {
 			GenericValidation.CheckBlobFullPaths(fullPaths);
 
 			AdlsClient client = await GetAdlsClientAsync().ConfigureAwait(false);
@@ -141,11 +141,11 @@ namespace FluentStorage.Azure.DataLake {
 			return await Task.WhenAll(fullPaths.Select(fullPath => GetBlobWithMetaAsync(fullPath, client, cancellationToken))).ConfigureAwait(false);
 		}
 
-		public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) {
+		public Task SetBlobsAsync(IEnumerable<IBlob> blobs, CancellationToken cancellationToken = default) {
 			throw new NotSupportedException("ADLS Gen1 doesn't support file metadata");
 		}
 
-		private async Task<Blob> GetBlobWithMetaAsync(string fullPath, AdlsClient client, CancellationToken cancellationToken) {
+		private async Task<IBlob> GetBlobWithMetaAsync(string fullPath, AdlsClient client, CancellationToken cancellationToken) {
 			try {
 				DirectoryEntry entry = await client.GetDirectoryEntryAsync(fullPath, cancelToken: cancellationToken).ConfigureAwait(false);
 				return new Blob(fullPath) {

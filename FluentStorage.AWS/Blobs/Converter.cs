@@ -15,7 +15,7 @@ namespace FluentStorage.AWS.Blobs {
 		/// </summary>
 		private const string MetaDataHeaderPrefix = "x-amz-meta-";
 
-		public static async Task UpdateMetadataAsync(AmazonS3Client client, Blob blob, string bucketName, string key) {
+		public static async Task UpdateMetadataAsync(AmazonS3Client client, IBlob blob, string bucketName, string key) {
 			// there is no way to update metadata in S3, and the only way is to recreate it
 			// however, you can copy object on top of itself (effectively a replace) and rewrite metadata, and this won't have to download the blob on the client
 
@@ -35,7 +35,7 @@ namespace FluentStorage.AWS.Blobs {
 			await client.CopyObjectAsync(request).ConfigureAwait(false);
 		}
 
-		private static async Task AppendMetadataAsync(AmazonS3Client client, string bucketName, Blob blob, CancellationToken cancellationToken) {
+		private static async Task AppendMetadataAsync(AmazonS3Client client, string bucketName, IBlob blob, CancellationToken cancellationToken) {
 			if (blob == null)
 				return;
 
@@ -44,12 +44,12 @@ namespace FluentStorage.AWS.Blobs {
 			AddMetadata(blob, obj.Metadata);
 		}
 
-		public static async Task AppendMetadataAsync(AmazonS3Client client, string bucketName, IEnumerable<Blob> blobs, CancellationToken cancellationToken) {
+		public static async Task AppendMetadataAsync(AmazonS3Client client, string bucketName, IEnumerable<IBlob> blobs, CancellationToken cancellationToken) {
 			await Task.WhenAll(
 			   blobs.Select(blob => AppendMetadataAsync(client, bucketName, blob, cancellationToken))).ConfigureAwait(false);
 		}
 
-		public static Blob ToBlob(this GetObjectMetadataResponse obj, string fullPath) {
+		public static IBlob ToBlob(this GetObjectMetadataResponse obj, string fullPath) {
 			if (obj == null)
 				return null;
 
@@ -65,7 +65,7 @@ namespace FluentStorage.AWS.Blobs {
 			return r;
 		}
 
-		private static void AddMetadata(Blob blob, MetadataCollection metadata) {
+		private static void AddMetadata(IBlob blob, MetadataCollection metadata) {
 			//add metadata and strip all
 			foreach (string key in metadata.Keys) {
 				string value = metadata[key];
@@ -92,8 +92,8 @@ namespace FluentStorage.AWS.Blobs {
 			return blob;
 		}
 
-		public static IReadOnlyCollection<Blob> ToBlobs(this ListObjectsV2Response response, ListOptions options) {
-			var result = new List<Blob>();
+		public static IReadOnlyCollection<IBlob> ToBlobs(this ListObjectsV2Response response, ListOptions options) {
+			var result = new List<IBlob>();
 
 			//the files are listed as the S3Objects member, but they don't specifically contain folders,
 			//but even if they do, they need to be filtered out

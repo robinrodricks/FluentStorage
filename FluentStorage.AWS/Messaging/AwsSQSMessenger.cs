@@ -81,7 +81,7 @@ namespace FluentStorage.AWS.Messaging {
 			}
 		}
 
-		public async Task SendAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) {
+		public async Task SendAsync(string channelName, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default) {
 			if (channelName is null)
 				throw new ArgumentNullException(nameof(channelName));
 			if (messages is null)
@@ -90,7 +90,7 @@ namespace FluentStorage.AWS.Messaging {
 			string queueUri = GetQueueUri(channelName);
 
 			// SQS request size is limited
-			foreach (IEnumerable<QueueMessage> chunk in messages.Chunk(MaxEntriesPerRequest)) {
+			foreach (IEnumerable<IQueueMessage> chunk in messages.Chunk(MaxEntriesPerRequest)) {
 				var request = new SendMessageBatchRequest(
 				   queueUri,
 				   chunk.Select(Converter.ToSQSMessage).ToList());
@@ -105,15 +105,15 @@ namespace FluentStorage.AWS.Messaging {
 			}
 		}
 
-		public Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default) {
+		public Task<IReadOnlyCollection<IQueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null, CancellationToken cancellationToken = default) {
 			return ReceiveInternalAsync(channelName, count, visibility ?? TimeSpan.FromMinutes(1), cancellationToken);
 		}
 
-		public Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) {
+		public Task<IReadOnlyCollection<IQueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) {
 			return ReceiveInternalAsync(channelName, count, TimeSpan.FromSeconds(1), cancellationToken);
 		}
 
-		private async Task<IReadOnlyCollection<QueueMessage>> ReceiveInternalAsync(
+		private async Task<IReadOnlyCollection<IQueueMessage>> ReceiveInternalAsync(
 		   string channelName, int count, TimeSpan visibility, CancellationToken cancellationToken) {
 			if (channelName is null)
 				throw new ArgumentNullException(nameof(channelName));
@@ -133,7 +133,7 @@ namespace FluentStorage.AWS.Messaging {
 
 		}
 
-		public Task DeleteAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+		public Task DeleteAsync(string channelName, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 		public Task StartMessageProcessorAsync(string channelName, IMessageProcessor messageProcessor) => throw new NotImplementedException();
 
 		#endregion

@@ -36,7 +36,7 @@ namespace FluentStorage.Azure.Files {
 			return new AzureFilesBlobStorage(account.CreateCloudFileClient());
 		}
 
-		protected override async Task<IReadOnlyCollection<Blob>> ListAtAsync(
+		protected override async Task<IReadOnlyCollection<IBlob>> ListAtAsync(
 		   string path, ListOptions options, CancellationToken cancellationToken) {
 			if (StoragePath.IsRootPath(path)) {
 				//list file shares
@@ -46,7 +46,7 @@ namespace FluentStorage.Azure.Files {
 				return shares.Results.Select(AzConvert.ToBlob).ToList();
 			}
 			else {
-				var chunk = new List<Blob>();
+				var chunk = new List<IBlob>();
 
 				CloudFileDirectory dir = await GetDirectoryReferenceAsync(path, cancellationToken).ConfigureAwait(false);
 
@@ -93,7 +93,7 @@ namespace FluentStorage.Azure.Files {
 			}
 		}
 
-		protected override async Task<Blob> GetBlobAsync(string fullPath, CancellationToken cancellationToken) {
+		protected override async Task<IBlob> GetBlobAsync(string fullPath, CancellationToken cancellationToken) {
 			CloudFile file = await GetFileReferenceAsync(fullPath, false, cancellationToken).ConfigureAwait(false);
 
 			try {

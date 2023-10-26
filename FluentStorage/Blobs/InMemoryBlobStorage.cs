@@ -11,13 +11,13 @@ using FluentStorage.Utils.IO;
 namespace FluentStorage.Blobs {
 	class InMemoryBlobStorage : IBlobStorage {
 		struct Tag {
-			public Blob blob;
+			public IBlob blob;
 			public byte[] data;
 		}
 
 		private readonly Dictionary<string, Tag> _pathToTag = new Dictionary<string, Tag>();
 
-		public Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options, CancellationToken cancellationToken) {
+		public Task<IReadOnlyCollection<IBlob>> ListAsync(ListOptions options, CancellationToken cancellationToken) {
 			if (options == null) options = new ListOptions();
 
 			IEnumerable<KeyValuePair<string, Tag>> query = _pathToTag;
@@ -45,7 +45,7 @@ namespace FluentStorage.Blobs {
 				query = query.Take(options.MaxResults.Value);
 			}
 
-			IReadOnlyCollection<Blob> matches = query.Select(p => p.Value.blob).ToList();
+			IReadOnlyCollection<IBlob> matches = query.Select(p => p.Value.blob).ToList();
 
 			return Task.FromResult(matches);
 		}
@@ -109,7 +109,7 @@ namespace FluentStorage.Blobs {
 
 				string prefix = StoragePath.Normalize(path) + StoragePath.PathSeparatorString;
 
-				List<Blob> candidates = _pathToTag.Where(p => p.Value.blob.FullPath.StartsWith(prefix)).Select(p => p.Value.blob).ToList();
+				List<IBlob> candidates = _pathToTag.Where(p => p.Value.blob.FullPath.StartsWith(prefix)).Select(p => p.Value.blob).ToList();
 
 				foreach (Blob candidate in candidates) {
 					_pathToTag.Remove(candidate);
@@ -128,10 +128,10 @@ namespace FluentStorage.Blobs {
 			return Task.FromResult<IReadOnlyCollection<bool>>(result);
 		}
 
-		public Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken) {
+		public Task<IReadOnlyCollection<IBlob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken) {
 			GenericValidation.CheckBlobFullPaths(fullPaths);
 
-			var result = new List<Blob>();
+			var result = new List<IBlob>();
 
 			foreach (string fullPath in fullPaths) {
 				if (!_pathToTag.TryGetValue(StoragePath.Normalize(fullPath), out Tag tag)) {
@@ -142,10 +142,10 @@ namespace FluentStorage.Blobs {
 				}
 			}
 
-			return Task.FromResult<IReadOnlyCollection<Blob>>(result);
+			return Task.FromResult<IReadOnlyCollection<IBlob>>(result);
 		}
 
-		public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) {
+		public Task SetBlobsAsync(IEnumerable<IBlob> blobs, CancellationToken cancellationToken = default) {
 			if (blobs == null)
 				return Task.FromResult(true);
 
@@ -188,7 +188,7 @@ namespace FluentStorage.Blobs {
 			AddVirtualFolderHierarchy(tag.blob);
 		}
 
-		private void AddVirtualFolderHierarchy(Blob fileBlob) {
+		private void AddVirtualFolderHierarchy(IBlob fileBlob) {
 			string path = fileBlob.FolderPath;
 
 			while (!StoragePath.IsRootPath(path)) {

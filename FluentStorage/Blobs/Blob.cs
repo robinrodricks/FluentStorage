@@ -8,7 +8,7 @@ namespace FluentStorage.Blobs {
 	/// <summary>
 	/// Blob item description
 	/// </summary>
-	public sealed class Blob : IEquatable<Blob>, ICloneable {
+	public sealed class Blob : IEquatable<Blob>, IBlob {
 		/// <summary>
 		/// Gets the kind of item
 		/// </summary>
@@ -89,7 +89,7 @@ namespace FluentStorage.Blobs {
 		/// </summary>
 		public Dictionary<string, string> Metadata { get; private set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-		internal object Tag { get; set; }
+		public object Tag { get; set; }
 
 		/// <summary>
 		/// Tries to add properties in pairs when value is not null

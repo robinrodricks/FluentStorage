@@ -203,12 +203,12 @@ namespace FluentStorage.SFTP {
 		/// <returns>
 		/// List of blob IDs
 		/// </returns>
-		public async Task<IReadOnlyCollection<Blob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
+		public async Task<IReadOnlyCollection<IBlob>> GetBlobsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
 			ThrowIfDisposed();
 
 			SftpClient client = GetClient();
 
-			var results = new List<Blob>();
+			var results = new List<IBlob>();
 			var fullPathsWithRoot = fullPaths.Select(fullPath => StoragePath.Combine(RootDirectory, fullPath));
 			foreach (IGrouping<string, string> fullPathGrouping in fullPathsWithRoot.GroupBy(StoragePath.GetParent)) {
 				string fullPath = fullPathGrouping.SingleOrDefault();
@@ -220,7 +220,7 @@ namespace FluentStorage.SFTP {
 				try {
 					IEnumerable<SftpFile> directoryContents = await client.ListDirectoryAsync(fullPathGrouping.Key);
 
-					List<Blob> blobCollection = directoryContents
+					List<IBlob> blobCollection = directoryContents
 					   .Where(f => (f.IsDirectory || f.IsRegularFile) && f.FullName == fullPath)
 					   .Select(ConvertSftpFileToBlob).ToList();
 
@@ -256,7 +256,7 @@ namespace FluentStorage.SFTP {
 		/// <returns>
 		/// List of blob IDs
 		/// </returns>
-		public async Task<IReadOnlyCollection<Blob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default) {
+		public async Task<IReadOnlyCollection<IBlob>> ListAsync(ListOptions options = null, CancellationToken cancellationToken = default) {
 			ThrowIfDisposed();
 
 			options ??= new ListOptions();
@@ -268,7 +268,7 @@ namespace FluentStorage.SFTP {
 			var folder = StoragePath.Combine(RootDirectory, StoragePath.Normalize(options.FolderPath));
 			IEnumerable<SftpFile> directoryContents = await client.ListDirectoryAsync(folder);
 
-			List<Blob> blobCollection = directoryContents
+			List<IBlob> blobCollection = directoryContents
 			   .Where(dc => (options.FilePrefix == null || dc.Name.StartsWith(options.FilePrefix))
 							&& (dc.IsDirectory || dc.IsRegularFile || dc.OwnerCanRead)
 							&& !cancellationToken.IsCancellationRequested
@@ -349,7 +349,7 @@ namespace FluentStorage.SFTP {
 		/// <param name="cancellationToken"></param>
 		/// <returns></returns>
 		/// <exception cref="System.NotSupportedException"></exception>
-		public Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) {
+		public Task SetBlobsAsync(IEnumerable<IBlob> blobs, CancellationToken cancellationToken = default) {
 			ThrowIfDisposed();
 			throw new NotSupportedException();
 		}
@@ -420,7 +420,7 @@ namespace FluentStorage.SFTP {
 		/// </summary>
 		/// <param name="file">The file.</param>
 		/// <returns></returns>
-		private static Blob ConvertSftpFileToBlob(SftpFile file) {
+		private static IBlob ConvertSftpFileToBlob(SftpFile file) {
 			if (file.IsDirectory || file.IsRegularFile || file.OwnerCanRead) {
 				BlobItemKind itemKind = file.IsDirectory
 				   ? BlobItemKind.Folder

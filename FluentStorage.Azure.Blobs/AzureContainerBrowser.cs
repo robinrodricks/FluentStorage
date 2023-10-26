@@ -21,8 +21,8 @@ namespace FluentStorage.Azure.Blobs {
 			_asyncLimiter = new AsyncLimiter(maxTasks);
 		}
 
-		public async Task<IReadOnlyCollection<Blob>> ListFolderAsync(ListOptions options, CancellationToken cancellationToken) {
-			var result = new List<Blob>();
+		public async Task<IReadOnlyCollection<IBlob>> ListFolderAsync(ListOptions options, CancellationToken cancellationToken) {
+			var result = new List<IBlob>();
 
 			await foreach (BlobHierarchyItem item in
 			   _client.GetBlobsByHierarchyAsync(
@@ -46,7 +46,7 @@ namespace FluentStorage.Azure.Blobs {
 			return result;
 		}
 
-		private static void AssumeImplicitPrefixes(string absoluteRoot, List<Blob> blobs) {
+		private static void AssumeImplicitPrefixes(string absoluteRoot, List<IBlob> blobs) {
 			absoluteRoot = StoragePath.Normalize(absoluteRoot);
 
 			List<Blob> implicitFolders = blobs

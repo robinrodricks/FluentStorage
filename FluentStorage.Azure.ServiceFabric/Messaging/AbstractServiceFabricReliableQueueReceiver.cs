@@ -38,7 +38,7 @@ namespace FluentStorage.Microsoft.ServiceFabric.Messaging {
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 		public async Task StartMessagePumpAsync(
-		   Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task> onMessageAsync,
+		   Func<IReadOnlyCollection<IQueueMessage>, CancellationToken, Task> onMessageAsync,
 		   int maxBatchSize = 1,
 		   CancellationToken cancellationToken = default)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -48,24 +48,24 @@ namespace FluentStorage.Microsoft.ServiceFabric.Messaging {
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 		}
 
-		public Task ConfirmMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default) {
+		public Task ConfirmMessagesAsync(IReadOnlyCollection<IQueueMessage> messages, CancellationToken cancellationToken = default) {
 			return Task.FromResult(true);
 		}
 
-		public Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default) {
+		public Task DeadLetterAsync(IQueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default) {
 			return Task.FromResult(true);
 		}
 
 		protected abstract Task<ConditionalValue<byte[]>> TryDequeueAsync(ServiceFabricTransaction tx, IReliableState collectionBase, CancellationToken cancellationToken);
 
-		private async Task ReceiveMessagesAsync(Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken) {
+		private async Task ReceiveMessagesAsync(Func<IReadOnlyCollection<IQueueMessage>, CancellationToken, Task> onMessage, int maxBatchSize, CancellationToken cancellationToken) {
 
 			while (!cancellationToken.IsCancellationRequested && !_disposed) {
 				try {
 					using (var tx = new ServiceFabricTransaction(_stateManager, null)) {
 						IReliableState collection = await GetCollectionAsync().ConfigureAwait(false);
 
-						var messages = new List<QueueMessage>();
+						var messages = new List<IQueueMessage>();
 
 						while (messages.Count < maxBatchSize) {
 							ConditionalValue<byte[]> message = await TryDequeueAsync(tx, collection, cancellationToken).ConfigureAwait(false);
@@ -109,7 +109,7 @@ namespace FluentStorage.Microsoft.ServiceFabric.Messaging {
 		}
 
 		protected abstract Task<IReliableState> GetCollectionAsync();
-		public Task KeepAliveAsync(QueueMessage message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default) => throw new NotSupportedException();
-		public Task<IReadOnlyCollection<QueueMessage>> PeekMessagesAsync(int maxMessages, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+		public Task KeepAliveAsync(IQueueMessage message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+		public Task<IReadOnlyCollection<IQueueMessage>> PeekMessagesAsync(int maxMessages, CancellationToken cancellationToken = default) => throw new NotSupportedException();
 	}
 }

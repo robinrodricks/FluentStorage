@@ -1,11 +1,12 @@
 ﻿using Microsoft.Azure.ServiceBus;
 using System;
 using System.Collections.Generic;
+using FluentStorage.Messaging;
 using QueueMessage = FluentStorage.Messaging.QueueMessage;
 
 namespace FluentStorage.Azure.ServiceBus {
 	static class Converter {
-		public static Message ToMessage(QueueMessage message) {
+		public static Message ToMessage(IQueueMessage message) {
 			if (message == null)
 				throw new ArgumentNullException(nameof(message));
 
@@ -21,7 +22,7 @@ namespace FluentStorage.Azure.ServiceBus {
 			return result;
 		}
 
-		public static QueueMessage ToQueueMessage(Message message) {
+		public static IQueueMessage ToQueueMessage(Message message) {
 			string id = message.MessageId ?? message.SystemProperties.SequenceNumber.ToString();
 
 			var result = new QueueMessage(id, message.Body);

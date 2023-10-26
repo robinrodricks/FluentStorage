@@ -9,10 +9,10 @@ namespace FluentStorage.Messaging {
 	/// </summary>
 	public interface IMessageProcessor {
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="messages"></param>
 		/// <returns></returns>
-		Task ProcessMessagesAsync(IReadOnlyCollection<QueueMessage> messages);
+		Task ProcessMessagesAsync(IReadOnlyCollection<IQueueMessage> messages);
 	}
 }

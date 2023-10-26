@@ -17,7 +17,7 @@ namespace FluentStorage.Databricks {
 		protected override bool CanListHierarchy => false;
 
 
-		protected override async Task<IReadOnlyCollection<Blob>> ListAtAsync(
+		protected override async Task<IReadOnlyCollection<IBlob>> ListAtAsync(
 		   string path, ListOptions options, CancellationToken cancellationToken) {
 			if (StoragePath.IsRootPath(path)) {
 				IEnumerable<Job> jobs = await _jobs.List().ConfigureAwait(false);
@@ -31,7 +31,7 @@ namespace FluentStorage.Databricks {
 			string jobName = StoragePath.Split(path)[0];
 			long? jobId = await GetJobIdFromJobNameAsync(jobName).ConfigureAwait(false);
 			IReadOnlyCollection<Run> allRuns = await GetAllJobRunsAsync(jobId.Value).ConfigureAwait(false);
-			List<Blob> rr = allRuns.Select(r => ToBlob(jobName, r)).ToList();
+			List<IBlob> rr = allRuns.Select(r => ToBlob(jobName, r)).ToList();
 			rr.Reverse();
 			return rr;
 		}
@@ -85,7 +85,7 @@ namespace FluentStorage.Databricks {
 			return null;
 		}
 
-		private async Task<Blob> ToBlobAsync(Job dbJob) {
+		private async Task<IBlob> ToBlobAsync(Job dbJob) {
 			var blob = new Blob(dbJob.Settings.Name, BlobItemKind.Folder);
 			blob.CreatedTime = blob.LastModificationTime = dbJob.CreatedTime;
 			blob.TryAddProperties(
@@ -112,7 +112,7 @@ namespace FluentStorage.Databricks {
 			return blob;
 		}
 
-		private static Blob ToBlob(string jobName, Run dbRun) {
+		private static IBlob ToBlob(string jobName, Run dbRun) {
 			var blob = new Blob(jobName, dbRun.RunId.ToString(), BlobItemKind.File);
 			blob.LastModificationTime = dbRun.EndTime ?? dbRun.StartTime;
 			AddProperties(blob, dbRun);

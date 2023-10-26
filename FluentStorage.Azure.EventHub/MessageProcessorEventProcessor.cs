@@ -31,7 +31,7 @@ namespace FluentStorage.Azure.EventHub {
 
 		public async Task ProcessEventsAsync(PartitionContext context, IEnumerable<EventData> messages) {
 			//forward to message processor
-			List<QueueMessage> qms = messages.Select(ed => Converter.ToQueueMessage(ed, context.PartitionId)).ToList();
+			List<IQueueMessage> qms = messages.Select(ed => Converter.ToQueueMessage(ed, context.PartitionId)).ToList();
 
 			await _messageProcessor.ProcessMessagesAsync(qms).ConfigureAwait(false);
 
