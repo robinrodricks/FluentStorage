@@ -15,7 +15,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus {
 		/// </summary>
 		/// <param name="factory">Factory reference</param>
 		/// <param name="connectionString">Service Bus connection string pointing to a namespace or an entity</param>
-		public static IMessenger AzureServiceBus(this IMessagingFactory factory, string connectionString) {
+		public static IMessenger AzureMessagingServiceBus(this IMessagingFactory factory, string connectionString) {
 			return new AzureServiceBusMessenger(connectionString);
 		}
 
@@ -26,15 +26,15 @@ namespace FluentStorage.Azure.Messaging.ServiceBus {
 		/// <param name="factory">Factory reference</param>
 		/// <param name="connectionString">Service Bus connection string pointing to a namespace or an entity</param>
 		/// <param name="serviceBusOptions">Service bus clients specific options</param>
-		public static IMessenger AzureServiceBus(this IMessagingFactory factory, string connectionString,
-		                                         AzureServiceBusMessengerOptions serviceBusOptions) {
+		public static IMessenger AzureMessagingServiceBus(this IMessagingFactory factory, string connectionString,
+		                                                  AzureServiceBusMessengerOptions serviceBusOptions) {
 			return new AzureServiceBusMessenger(connectionString,serviceBusOptions);
 		}
 
 		/// <summary>
 		/// Creates Azure Service Bus Receiver for topic and subscriptions
 		/// </summary>
-		public static IMessageReceiver AzureServiceBusTopicReceiver(this IMessagingFactory factory,
+		public static IMessageReceiver AzureMessagingServiceBusTopicReceiver(this IMessagingFactory factory,
 		   string connectionString,
 		   string topicName,
 		   string subscriptionName,
@@ -46,11 +46,11 @@ namespace FluentStorage.Azure.Messaging.ServiceBus {
 		/// <summary>
 		/// Creates Azure Service Bus Receiver for queues
 		/// </summary>
-		public static IMessageReceiver AzureServiceBusQueueReceiver(this IMessagingFactory factory,
-		                                                            string connectionString,
-		                                                            string queueName,
-		                                                            ServiceBusClientOptions serviceBusClientOptions = null,
-		                                                            ServiceBusProcessorOptions messageProcessorOptions = null) {
+		public static IMessageReceiver AzureMessagingServiceBusQueueReceiver(this IMessagingFactory factory,
+		                                                                     string connectionString,
+		                                                                     string queueName,
+		                                                                     ServiceBusClientOptions serviceBusClientOptions = null,
+		                                                                     ServiceBusProcessorOptions messageProcessorOptions = null) {
 			return new AzureServiceBusQueueReceiver(connectionString, queueName, serviceBusClientOptions, messageProcessorOptions);
 		}
 
