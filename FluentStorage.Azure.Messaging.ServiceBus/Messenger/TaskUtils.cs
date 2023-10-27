@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger;
 
-internal class TaskUtils {
+static class TaskUtils {
 	private static readonly TaskFactory _myTaskFactory = new
 		TaskFactory(CancellationToken.None,
 			TaskCreationOptions.None,

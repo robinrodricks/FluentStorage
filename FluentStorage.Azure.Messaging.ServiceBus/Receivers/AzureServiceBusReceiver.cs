@@ -21,12 +21,12 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 		private readonly ServiceBusClient _mgmt;
 		private Func<IReadOnlyCollection<IQueueMessage>, CancellationToken, Task> _onMessage;
 
-		public AzureServiceBusReceiver(string connectionstring,
-		                               string queueName,
-		                               string topicName,
-		                               string subscriptionName,
-		                               ServiceBusClientOptions clientOptions,
-		                               ServiceBusProcessorOptions processorOptions) {
+		protected AzureServiceBusReceiver(string connectionstring,
+		                                  string queueName,
+		                                  string topicName,
+		                                  string subscriptionName,
+		                                  ServiceBusClientOptions clientOptions,
+		                                  ServiceBusProcessorOptions processorOptions) {
 			_queueName        = queueName;
 			_topicName        = topicName;
 			_subscriptionName = subscriptionName;

@@ -9,8 +9,10 @@ using Azure.Messaging.ServiceBus.Administration;
 using FluentStorage.Messaging;
 
 namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger {
+	/// <summary>
+	/// Messenger service for Azure ServiceBus, cast to IAzureMessagingServiceBusMessenger to access utility methods for queues, topics and subscriptions
+	/// </summary>
 	public class AzureServiceBusMessenger : IAzureMessagingServiceBusMessenger {
-
 
 		private readonly ServiceBusClient _mgmt;
 		private readonly ServiceBusAdministrationClient _mgmtAdminClient;
@@ -188,9 +190,6 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger {
 		public Task StartMessageProcessorAsync(string channelName, IMessageProcessor messageProcessor) =>
 			throw new NotImplementedException();
 
-		/// <summary>
-		/// Disposes all the message senders and receivers associated with this object.
-		/// </summary>
 		public void Dispose() {
 			foreach (var sender in _channelNameToMessageSender) {
 				TaskUtils.RunSync(() => sender.Value.CloseAsync());
