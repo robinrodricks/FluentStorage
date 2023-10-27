@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net50;net60</TargetFrameworks>
+        <AssemblyTitle>FluentStorage.Azure.Messaging.ServiceBus</AssemblyTitle>
+        <PackageId>FluentStorage.Azure.Messaging.ServiceBus</PackageId>
+        <FileVersion>1.0.0.0</FileVersion>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <PackageLicense>https://github.com/aloneguid/storage/blob/master/LICENSE</PackageLicense>
+        <Description>Extension to FluentStorage providing Azure ServiceBus Messaging.</Description>
+        <AssemblyName>FluentStorage.Azure.Messaging.ServiceBus</AssemblyName>
+        <RootNamespace>FluentStorage.Azure.Messaging.ServiceBus</RootNamespace>
+        <Copyright>Copyright (c) 2023 Robin Rodricks and FluentStorage Contributors</Copyright>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageIcon>logo-nuget.png</PackageIcon>
+        <Authors>Robin Rodricks, Ivan Gavryliuk, FluentStorage Contributors</Authors>
+        <Version>5.2.1</Version>
+        <PackageProjectUrl>https://github.com/robinrodricks/FluentStorage</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/robinrodricks/FluentStorage</RepositoryUrl>
+        <RepositoryType>GitHub</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <LangVersion>latest</LangVersion>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>..\FluentStorage\sn.snk</AssemblyOriginatorKeyFile>
+        <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FluentStorage.Azure.Messaging.ServiceBus.xml</DocumentationFile>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.16.2" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\FluentStorage\FluentStorage.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\.github\logo-nuget.png">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
+    </ItemGroup>
+
+</Project>
