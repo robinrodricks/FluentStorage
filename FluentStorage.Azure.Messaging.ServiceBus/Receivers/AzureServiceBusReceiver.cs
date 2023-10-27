@@ -19,7 +19,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 		private readonly ServiceBusProcessorOptions _messageHandlerOptions;
 		private readonly bool _autoComplete;
 		private readonly ServiceBusClient _mgmt;
-		private Func<IReadOnlyCollection<IQueueMessage>, CancellationToken, Task> _onMessage;
+		private Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task> _onMessage;
 
 		protected AzureServiceBusReceiver(string connectionstring,
 		                                  string queueName,
@@ -59,7 +59,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 			//note: we can't use management SDK as it requires high priviledged SP in Azure
 		}
 
-		public async Task ConfirmMessagesAsync(IReadOnlyCollection<IQueueMessage> messages,
+		public async Task ConfirmMessagesAsync(IReadOnlyCollection<QueueMessage> messages,
 		                                       CancellationToken cancellationToken = default) {
 			if (_autoComplete)
 				return;
@@ -67,7 +67,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 			await Task.WhenAll(messages.Select(ConfirmAsync)).ConfigureAwait(false);
 		}
 
-		private async Task ConfirmAsync(IQueueMessage message) {
+		private async Task ConfirmAsync(QueueMessage message) {
 			//delete the message and get the deleted element, very nice method!
 			if (!_messageIdToBrokeredMessage.TryRemove(message.Id, out ServiceBusReceivedMessage bm))
 				return;
@@ -78,7 +78,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 		public Task<int> GetMessageCountAsync() => throw new NotSupportedException();
 
 
-		public async Task DeadLetterAsync(IQueueMessage message, string reason, string errorDescription,
+		public async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription,
 		                                  CancellationToken cancellationToken = default) {
 			if (_autoComplete)
 				return;
@@ -90,7 +90,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 			                     .ConfigureAwait(false);
 		}
 
-		public async Task KeepAliveAsync(IQueueMessage message, TimeSpan? timeToLive = null,
+		public async Task KeepAliveAsync(QueueMessage message, TimeSpan? timeToLive = null,
 		                                 CancellationToken cancellationToken = default) {
 			if (_autoComplete)
 				return;
@@ -107,7 +107,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 
 
 		public async Task StartMessagePumpAsync(
-			Func<IReadOnlyCollection<IQueueMessage>, CancellationToken, Task> onMessageAsync,
+			Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task> onMessageAsync,
 			int maxBatchSize = 1,
 			CancellationToken cancellationToken = default) {
 			_onMessage = onMessageAsync ?? throw new ArgumentNullException(nameof(onMessageAsync));
@@ -132,7 +132,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 		}
 
 		private async Task ProcessorOnProcessMessage(ProcessMessageEventArgs args) {
-			IQueueMessage qm = Converter.ToQueueMessage(args.Message);
+			QueueMessage qm = Converter.ToQueueMessage(args.Message);
 			if (!_autoComplete)
 				_messageIdToBrokeredMessage[qm.Id] = args.Message;
 
@@ -158,7 +158,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 			return Task.FromResult(true);
 		}
 
-		public async Task<IReadOnlyCollection<IQueueMessage>> PeekMessagesAsync(
+		public async Task<IReadOnlyCollection<QueueMessage>> PeekMessagesAsync(
 			int maxMessages, CancellationToken cancellationToken = default) {
 			var peek = await _receiverClient
 			       .PeekMessagesAsync(maxMessages, cancellationToken: cancellationToken)

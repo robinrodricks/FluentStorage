@@ -129,7 +129,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger {
 			return await CountTopicAsync(channel.Name, cancellationToken);
 		}
 
-		public async Task SendAsync(string channelName, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default) {
+		public async Task SendAsync(string channelName, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) {
 			var client       = CreateOrGetSenderClient(channelName);
 			var messageQueue = new Queue<ServiceBusMessage>();
 
@@ -161,7 +161,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger {
 			}
 		}
 
-		public async Task<IReadOnlyCollection<IQueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null,
+		public async Task<IReadOnlyCollection<QueueMessage>> ReceiveAsync(string channelName, int count = 100, TimeSpan? visibility = null,
 		                                                                   CancellationToken cancellationToken = default) {
 			if (channelName is null)
 				throw new ArgumentNullException(nameof(channelName));
@@ -172,7 +172,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger {
 			return messages.Select(Converter.ToQueueMessage).ToList();
 		}
 
-		public async Task<IReadOnlyCollection<IQueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) {
+		public async Task<IReadOnlyCollection<QueueMessage>> PeekAsync(string channelName, int count = 100, CancellationToken cancellationToken = default) {
 			if (channelName is null)
 				throw new ArgumentNullException(nameof(channelName));
 
@@ -183,7 +183,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger {
 		}
 
 		/// <exception cref="NotImplementedException"></exception>
-		public Task DeleteAsync(string channelName, IEnumerable<IQueueMessage> messages,
+		public Task DeleteAsync(string channelName, IEnumerable<QueueMessage> messages,
 		                        CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
 		/// <exception cref="NotImplementedException"></exception>
@@ -206,16 +206,16 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger {
 
 		#region [ IAzureServiceBusMessenger ]
 
-		public async Task SendToQueueAsync(string queue, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default) {
+		public async Task SendToQueueAsync(string queue, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) {
 			var channel = $"{AzureServiceBusChannel.QueuePrefix}{queue}";
 			await SendAsync(channel, messages, cancellationToken);
 		}
 
-		public async Task SendToTopicAsync(string topic, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default) {
+		public async Task SendToTopicAsync(string topic, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) {
 			var channel = $"{AzureServiceBusChannel.TopicPrefix}{topic}";
 			await SendAsync(channel, messages, cancellationToken);
 		}
-		public async Task SendToSubscriptionAsync(string topic, string subscription, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default) {
+		public async Task SendToSubscriptionAsync(string topic, string subscription, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) {
 			var channel = $"{AzureServiceBusChannel.TopicPrefix}{topic}/{subscription}";
 			await SendAsync(channel, messages, cancellationToken);
 		}

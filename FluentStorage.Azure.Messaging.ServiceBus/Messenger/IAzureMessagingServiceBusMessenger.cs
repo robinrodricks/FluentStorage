@@ -16,7 +16,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger {
 		/// <param name="messages">The collection of messages to send.</param>
 		/// <param name="cancellationToken">The cancellation token.</param>
 		/// <returns>A task representing the asynchronous operation.</returns>
-		Task SendToQueueAsync(string queue, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default);
+		Task SendToQueueAsync(string queue, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default);
 
 		/// <summary>
 		/// Sends a collection of messages to the specified topic asynchronously.
@@ -25,7 +25,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger {
 		/// <param name="messages">The collection of messages to send.</param>
 		/// <param name="cancellationToken">The cancellation token.</param>
 		/// <returns>A task representing the asynchronous operation.</returns>
-		Task SendToTopicAsync(string topic, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default);
+		Task SendToTopicAsync(string topic, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default);
 
 		/// <summary>
 		/// Sends a collection of messages to the specified topic subscription asynchronously.
@@ -35,7 +35,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger {
 		/// <param name="messages">The collection of messages to send.</param>
 		/// <param name="cancellationToken">The cancellation token.</param>
 		/// <returns>A task representing the asynchronous operation.</returns>
-		Task SendToSubscriptionAsync(string topic, string subscription, IEnumerable<IQueueMessage> messages, CancellationToken cancellationToken = default);
+		Task SendToSubscriptionAsync(string topic, string subscription, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default);
 
 		/// <summary>
 		/// Create a new Queue in Azure ServiceBus

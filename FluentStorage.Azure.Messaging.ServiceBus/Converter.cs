@@ -6,7 +6,7 @@ using QueueMessage = FluentStorage.Messaging.QueueMessage;
 
 namespace FluentStorage.Azure.Messaging.ServiceBus {
 	static class Converter {
-		public static ServiceBusMessage ToMessage(IQueueMessage message) {
+		public static ServiceBusMessage ToMessage(QueueMessage message) {
 			if (message == null)
 				throw new ArgumentNullException(nameof(message));
 
@@ -22,7 +22,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus {
 			return result;
 		}
 
-		public static IQueueMessage ToQueueMessage(ServiceBusReceivedMessage message) {
+		public static QueueMessage ToQueueMessage(ServiceBusReceivedMessage message) {
 			string id = message.MessageId;
 
 			var result = new QueueMessage(id, message.Body.ToArray());
