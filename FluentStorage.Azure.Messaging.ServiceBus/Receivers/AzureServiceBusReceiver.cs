@@ -25,6 +25,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 		                                  string queueName,
 		                                  string topicName,
 		                                  string subscriptionName,
+		                                  bool autocompleteMessages,
 		                                  ServiceBusClientOptions clientOptions,
 		                                  ServiceBusProcessorOptions processorOptions) {
 			_queueName        = queueName;
@@ -41,7 +42,7 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 
 			_messageHandlerOptions = processorOptions ??
 			                         new ServiceBusProcessorOptions {
-				                         AutoCompleteMessages = false,
+				                         AutoCompleteMessages = autocompleteMessages,
 				                         /*
 				                          * In fact, what the property actually means is the maximum about of time they lock renewal will happen for internally on the subscription client.
 				                          * So if you set this to 24 hours e.g. Timespan.FromHours(24) and your processing was to take 12 hours, it would be renewed. However, if you set
@@ -50,7 +51,8 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 				                          *
 				                          * in fact, Microsoft's implementation runs a background task that periodically renews the message lock until it expires.
 				                          */
-				                         MaxAutoLockRenewalDuration = TimeSpan.FromMinutes(10), //should be in fact called "max processing time"
+				                         MaxAutoLockRenewalDuration =
+					                         TimeSpan.FromMinutes(10), //should be in fact called "max processing time"
 				                         MaxConcurrentCalls = 1
 			                         };
 
@@ -64,15 +66,23 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 			if (_autoComplete)
 				return;
 
-			await Task.WhenAll(messages.Select(ConfirmAsync)).ConfigureAwait(false);
+			await Task.WhenAll(messages.Select(m => ConfirmAsync(m,cancellationToken))).ConfigureAwait(false);
 		}
 
-		private async Task ConfirmAsync(QueueMessage message) {
+		private async Task ConfirmAsync(QueueMessage message, CancellationToken cancellationToken) {
 			//delete the message and get the deleted element, very nice method!
 			if (!_messageIdToBrokeredMessage.TryRemove(message.Id, out ServiceBusReceivedMessage bm))
 				return;
 
-			await _receiverClient.CompleteMessageAsync(bm).ConfigureAwait(false);
+			try {
+				await _receiverClient.CompleteMessageAsync(bm,cancellationToken).ConfigureAwait(false);
+			}
+			catch (ServiceBusException ex ) when (ex.Reason == ServiceBusFailureReason.MessageLockLost) {
+				//message expired or already completed
+			}
+			catch (ServiceBusException ex ) when (ex.Reason == ServiceBusFailureReason.SessionLockLost) {
+				//message expired or already completed
+			}
 		}
 
 		public Task<int> GetMessageCountAsync() => throw new NotSupportedException();
@@ -86,8 +96,15 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 			if (!_messageIdToBrokeredMessage.TryRemove(message.Id, out ServiceBusReceivedMessage bm))
 				return;
 
-			await _receiverClient.DeadLetterMessageAsync(bm, cancellationToken: cancellationToken)
-			                     .ConfigureAwait(false);
+			try {
+				await _receiverClient.DeadLetterMessageAsync(bm, cancellationToken: cancellationToken).ConfigureAwait(false);
+			}
+			catch (ServiceBusException ex ) when (ex.Reason == ServiceBusFailureReason.MessageLockLost) {
+				//message expired or already completed
+			}
+			catch (ServiceBusException ex ) when (ex.Reason == ServiceBusFailureReason.SessionLockLost) {
+				//message expired or already completed
+			}
 		}
 
 		public async Task KeepAliveAsync(QueueMessage message, TimeSpan? timeToLive = null,
@@ -128,7 +145,8 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 			processor.ProcessMessageAsync += ProcessorOnProcessMessage;
 			processor.ProcessErrorAsync   += DefaultExceptionReceiverHandler;
 
-			await processor.StartProcessingAsync(cancellationToken).ConfigureAwait(false);
+			if (processor.IsProcessing == false)
+				await processor.StartProcessingAsync(cancellationToken).ConfigureAwait(false);
 		}
 
 		private async Task ProcessorOnProcessMessage(ProcessMessageEventArgs args) {
@@ -161,8 +179,8 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 		public async Task<IReadOnlyCollection<QueueMessage>> PeekMessagesAsync(
 			int maxMessages, CancellationToken cancellationToken = default) {
 			var peek = await _receiverClient
-			       .PeekMessagesAsync(maxMessages, cancellationToken: cancellationToken)
-			       .ConfigureAwait(false);
+			                 .PeekMessagesAsync(maxMessages, cancellationToken: cancellationToken)
+			                 .ConfigureAwait(false);
 
 			return peek.Select(Converter.ToQueueMessage).ToList();
 		}

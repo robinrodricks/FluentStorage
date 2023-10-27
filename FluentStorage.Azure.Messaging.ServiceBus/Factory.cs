@@ -38,9 +38,10 @@ namespace FluentStorage.Azure.Messaging.ServiceBus {
 		   string connectionString,
 		   string topicName,
 		   string subscriptionName,
+		   bool autocompleteMessages = false,
 		   ServiceBusClientOptions serviceBusClientOptions = null,
 		   ServiceBusProcessorOptions messageProcessorOptions = null) {
-			return new AzureServiceBusTopicReceiver(connectionString, topicName, subscriptionName, serviceBusClientOptions);
+			return new AzureServiceBusTopicReceiver(connectionString, topicName, subscriptionName, autocompleteMessages, serviceBusClientOptions, messageProcessorOptions);
 		}
 
 		/// <summary>
@@ -49,9 +50,10 @@ namespace FluentStorage.Azure.Messaging.ServiceBus {
 		public static IMessageReceiver AzureMessagingServiceBusQueueReceiver(this IMessagingFactory factory,
 		                                                                     string connectionString,
 		                                                                     string queueName,
+		                                                                     bool autocompleteMessages = false,
 		                                                                     ServiceBusClientOptions serviceBusClientOptions = null,
 		                                                                     ServiceBusProcessorOptions messageProcessorOptions = null) {
-			return new AzureServiceBusQueueReceiver(connectionString, queueName, serviceBusClientOptions, messageProcessorOptions);
+			return new AzureServiceBusQueueReceiver(connectionString, queueName, autocompleteMessages, serviceBusClientOptions, messageProcessorOptions);
 		}
 
 	}

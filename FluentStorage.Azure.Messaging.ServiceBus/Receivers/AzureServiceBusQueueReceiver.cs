@@ -6,9 +6,10 @@ namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
 	/// </summary>
 	internal class AzureServiceBusQueueReceiver : AzureServiceBusReceiver {
 		internal AzureServiceBusQueueReceiver(string connectionString, string queueName,
-		                                       ServiceBusClientOptions clientOptions = null,
-		                                       ServiceBusProcessorOptions processorOptions = null)
-			: base(connectionString, queueName, "", "", clientOptions, processorOptions) {
+		                                      bool autocompleteMessages = false,
+		                                      ServiceBusClientOptions clientOptions = null,
+		                                      ServiceBusProcessorOptions processorOptions = null)
+			: base(connectionString, queueName, "", "", autocompleteMessages, clientOptions, processorOptions) {
 		}
 	}
 }
