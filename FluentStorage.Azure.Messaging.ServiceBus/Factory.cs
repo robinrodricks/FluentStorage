@@ -19,8 +19,14 @@ namespace FluentStorage.Azure.Messaging.ServiceBus {
 			return new AzureServiceBusMessenger(connectionString);
 		}
 
+		/// <summary>
+		/// Creates a new instance of Azure Service Bus Queue by connection string and queue name.
+		/// Cast to IAzureMessagingServiceBusMessenger to access utility methods for queues, topics and subscriptions
+		/// </summary>
+		/// <param name="factory">Factory reference</param>
+		/// <param name="connectionString">Service Bus connection string pointing to a namespace or an entity</param>
+		/// <param name="serviceBusOptions">Service bus clients specific options</param>
 		public static IMessenger AzureServiceBus(this IMessagingFactory factory, string connectionString,
-		                                         ServiceBusClientOptions clientOptions,
 		                                         AzureServiceBusMessengerOptions serviceBusOptions) {
 			return new AzureServiceBusMessenger(connectionString,serviceBusOptions);
 		}

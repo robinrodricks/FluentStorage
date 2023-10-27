@@ -2,11 +2,11 @@
 
 namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger;
 
-internal class AzureServiceBusChannel {
+class AzureServiceBusChannel {
 	internal const string TopicPrefix = "t/";
 	internal const string QueuePrefix = "q/";
 
-	internal AzureServiceBusChannel(bool isQueue, string name, string subscription) {
+	public AzureServiceBusChannel(bool isQueue, string name, string subscription) {
 		IsQueue      = isQueue;
 		Name         = name;
 		Subscription = subscription;
@@ -17,8 +17,8 @@ internal class AzureServiceBusChannel {
 	internal string Subscription { get; }
 }
 
-internal static class AzureServiceBusChannelExtensions {
-	internal static AzureServiceBusChannel ToServiceBusChannel(this string channelName) {
+static class AzureServiceBusChannelExtensions {
+	public static AzureServiceBusChannel ToServiceBusChannel(this string channelName) {
 
 		if (channelName.StartsWith(AzureServiceBusChannel.QueuePrefix)) {
 			var queue = channelName.Substring(2);
