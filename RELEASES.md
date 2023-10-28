@@ -1,5 +1,8 @@
 # Release Notes
 
+#### FluentStorage 5.4.1
+ - Fix: Remove unused dependency package `Newtonsoft.Json` from main project
+
 #### FluentStorage 5.4.0
 (thanks dammitjanet)
  - New: Constructor for `SymmetricEncryptionSink` and `AesSymmetricEncryptionSink` to pass IV and key 
