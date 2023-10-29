@@ -1,6 +1,6 @@
 ﻿using Azure.Messaging.ServiceBus;
 
-namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
+namespace FluentStorage.Azure.ServiceBus.Receivers {
 	/// <summary>
 	/// Implements message receiver on Azure Service Bus Queues
 	/// </summary>

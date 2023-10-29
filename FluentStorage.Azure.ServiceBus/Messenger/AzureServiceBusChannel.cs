@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger;
+namespace FluentStorage.Azure.ServiceBus.Messenger;
 
 class AzureServiceBusChannel {
 	internal const string TopicPrefix = "t/";
@@ -41,7 +41,7 @@ static class AzureServiceBusChannelExtensions {
 		}
 
 		throw new ArgumentException(
-			$"Channel '{channelName}' is not a valid channel name. It should start with '{AzureServiceBusChannel.QueuePrefix}' for queues, '{AzureServiceBusChannel.TopicPrefix}' for topics and subscriptions",
+			$"Channel '{channelName}' is not a valid channel name. It should start with '{AzureServiceBusChannel.QueuePrefix}' for queues, '{AzureServiceBusChannel.TopicPrefix}' for topics and subscriptions (the subscription format is topic/subscription)",
 			nameof(channelName));
 	}
 }

@@ -1,7 +1,7 @@
 ﻿using Azure.Messaging.ServiceBus;
 using Azure.Messaging.ServiceBus.Administration;
 
-namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger;
+namespace FluentStorage.Azure.ServiceBus.Messenger;
 
 /// <summary>
 /// Represents the options for configuring the Azure Service Bus messenger.

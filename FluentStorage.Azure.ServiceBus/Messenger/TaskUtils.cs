@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger;
+namespace FluentStorage.Azure.ServiceBus.Messenger;
 
 static class TaskUtils {
 	private static readonly TaskFactory _myTaskFactory = new

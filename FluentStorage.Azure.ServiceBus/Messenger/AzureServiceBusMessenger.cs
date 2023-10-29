@@ -8,11 +8,11 @@ using Azure.Messaging.ServiceBus;
 using Azure.Messaging.ServiceBus.Administration;
 using FluentStorage.Messaging;
 
-namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger {
+namespace FluentStorage.Azure.ServiceBus.Messenger {
 	/// <summary>
-	/// Messenger service for Azure ServiceBus, cast to IAzureMessagingServiceBusMessenger to access utility methods for queues, topics and subscriptions
+	/// Messenger service for Azure ServiceBus, cast to IAzureServiceBusMessenger to access utility methods for queues, topics and subscriptions
 	/// </summary>
-	public class AzureServiceBusMessenger : IAzureMessagingServiceBusMessenger {
+	public class AzureServiceBusMessenger : IAzureServiceBusMessenger {
 
 		private readonly ServiceBusClient _mgmt;
 		private readonly ServiceBusAdministrationClient _mgmtAdminClient;

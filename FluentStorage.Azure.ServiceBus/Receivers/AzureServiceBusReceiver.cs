@@ -8,7 +8,7 @@ using Azure.Messaging.ServiceBus;
 using FluentStorage.Messaging;
 using IMessageReceiver = FluentStorage.Messaging.IMessageReceiver;
 
-namespace FluentStorage.Azure.Messaging.ServiceBus.Receivers {
+namespace FluentStorage.Azure.ServiceBus.Receivers {
 	internal abstract class AzureServiceBusReceiver : IMessageReceiver {
 		private readonly string _queueName;
 		private readonly string _topicName;

@@ -1,6 +1,6 @@
 ﻿using System;
 using Amazon;
-using FluentStorage.Azure.Messaging.ServiceBus;
+using FluentStorage.Azure.ServiceBus;
 using FluentStorage.Blobs;
 using FluentStorage.Messaging;
 using Xunit;
@@ -86,34 +86,14 @@ namespace FluentStorage.Tests.Integration.Messaging {
 		}
 	}
 
+	public class AzureServiceBusSubscriptionTest : MessagingTest, IClassFixture<AzureServiceBusFixture> {
+		public AzureServiceBusSubscriptionTest(AzureServiceBusFixture fixture) : base(fixture, "t/", "t/fxtopic/fxsubscription", receiveChannelSuffix: "/default") {
+		}
+	}
+
+
 	public class AzureServiceBusQueueTest : MessagingTest, IClassFixture<AzureServiceBusFixture> {
 		public AzureServiceBusQueueTest(AzureServiceBusFixture fixture) : base(fixture, "q/", "q/fxqueue") {
-		}
-	}
-
-	#endregion
-
-	#region [ Azure Messaging Service Bus ]
-
-	public class AzureMessagingServiceBusFixture : MessagingFixture {
-		protected override IMessenger CreateMessenger(ITestSettings settings) {
-			return StorageFactory.Messages.AzureMessagingServiceBus(settings.AzureServiceBusConnectionString);
-
-		}
-	}
-
-	public class AzureMessagingServiceBusTopicTest : MessagingTest, IClassFixture<AzureServiceBusFixture> {
-		public AzureMessagingServiceBusTopicTest(AzureServiceBusFixture fixture) : base(fixture, "t/", "t/fxtopic", receiveChannelSuffix: "/default") {
-		}
-	}
-
-	public class AzureMessagingServiceBusSubscriptionTest : MessagingTest, IClassFixture<AzureServiceBusFixture> {
-		public AzureMessagingServiceBusSubscriptionTest(AzureServiceBusFixture fixture) : base(fixture, "t/", "t/fxtopic/fxsubscription", receiveChannelSuffix: "/default") {
-		}
-	}
-
-	public class AzureMessagingServiceBusQueueTest : MessagingTest, IClassFixture<AzureServiceBusFixture> {
-		public AzureMessagingServiceBusQueueTest(AzureServiceBusFixture fixture) : base(fixture, "q/", "q/fxqueue") {
 		}
 	}
 

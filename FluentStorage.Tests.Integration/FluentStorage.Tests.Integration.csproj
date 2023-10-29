@@ -25,7 +25,6 @@
     <ProjectReference Include="..\FluentStorage.Azure.DataLake.Store\FluentStorage.Azure.DataLake.csproj" />
     <ProjectReference Include="..\FluentStorage.Azure.EventHub\FluentStorage.Azure.EventHub.csproj" />
     <ProjectReference Include="..\FluentStorage.Azure.KeyVault\FluentStorage.Azure.KeyVault.csproj" />
-    <ProjectReference Include="..\FluentStorage.Azure.Messaging.ServiceBus\FluentStorage.Azure.Messaging.ServiceBus.csproj" />
     <ProjectReference Include="..\FluentStorage.Azure.Queues\FluentStorage.Azure.Queues.csproj" />
     <ProjectReference Include="..\FluentStorage.Azure.ServiceBus\FluentStorage.Azure.ServiceBus.csproj" />
     <ProjectReference Include="..\FluentStorage.Azure.ServiceFabric\FluentStorage.Azure.ServiceFabric.csproj" />

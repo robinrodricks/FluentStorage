@@ -3,11 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentStorage.Messaging;
 
-namespace FluentStorage.Azure.Messaging.ServiceBus.Messenger {
+namespace FluentStorage.Azure.ServiceBus.Messenger {
 	/// <summary>
 	/// Provides specific messaging capabilities to Azure Service Bus IMessenger.
 	/// </summary>
-	public interface IAzureMessagingServiceBusMessenger : IMessenger {
+	public interface IAzureServiceBusMessenger : IMessenger {
 
 		/// <summary>
 		/// Sends a collection of messages to the specified queue asynchronously.
