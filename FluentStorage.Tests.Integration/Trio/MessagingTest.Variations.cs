@@ -1,5 +1,6 @@
 ﻿using System;
 using Amazon;
+using FluentStorage.Azure.ServiceBus;
 using FluentStorage.Blobs;
 using FluentStorage.Messaging;
 using Xunit;
@@ -84,6 +85,12 @@ namespace FluentStorage.Tests.Integration.Messaging {
 		public AzureServiceBusTopicTest(AzureServiceBusFixture fixture) : base(fixture, "t/", "t/fxtopic", receiveChannelSuffix: "/default") {
 		}
 	}
+
+	public class AzureServiceBusSubscriptionTest : MessagingTest, IClassFixture<AzureServiceBusFixture> {
+		public AzureServiceBusSubscriptionTest(AzureServiceBusFixture fixture) : base(fixture, "t/", "t/fxtopic/fxsubscription", receiveChannelSuffix: "/default") {
+		}
+	}
+
 
 	public class AzureServiceBusQueueTest : MessagingTest, IClassFixture<AzureServiceBusFixture> {
 		public AzureServiceBusQueueTest(AzureServiceBusFixture fixture) : base(fixture, "q/", "q/fxqueue") {
