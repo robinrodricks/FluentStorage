@@ -211,13 +211,28 @@ namespace FluentStorage.Azure.ServiceBus.Messenger {
 			await SendAsync(channel, messages, cancellationToken);
 		}
 
+		public async Task SendToQueueAsync(string queue, QueueMessage message, CancellationToken cancellationToken = default) {
+			var channel = $"{AzureServiceBusChannel.QueuePrefix}{queue}";
+			await SendAsync(channel, new []{message}, cancellationToken);
+		}
+
 		public async Task SendToTopicAsync(string topic, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) {
 			var channel = $"{AzureServiceBusChannel.TopicPrefix}{topic}";
 			await SendAsync(channel, messages, cancellationToken);
 		}
+
+		public async Task SendToTopicAsync(string topic, QueueMessage message, CancellationToken cancellationToken = default) {
+			var channel = $"{AzureServiceBusChannel.TopicPrefix}{topic}";
+			await SendAsync(channel, new []{message}, cancellationToken);
+		}
 		public async Task SendToSubscriptionAsync(string topic, string subscription, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default) {
 			var channel = $"{AzureServiceBusChannel.TopicPrefix}{topic}/{subscription}";
 			await SendAsync(channel, messages, cancellationToken);
+		}
+
+		public async Task SendToSubscriptionAsync(string topic, string subscription, QueueMessage message, CancellationToken cancellationToken = default) {
+			var channel = $"{AzureServiceBusChannel.TopicPrefix}{topic}/{subscription}";
+			await SendAsync(channel, new []{message}, cancellationToken);
 		}
 		public async Task CreateQueueAsync(string queue, CancellationToken cancellationToken = default) {
 			if (!await _mgmtAdminClient.QueueExistsAsync(queue, cancellationToken).ConfigureAwait(false))
