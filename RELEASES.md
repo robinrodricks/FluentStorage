@@ -1,5 +1,12 @@
 # Release Notes
 
+#### FluentStorage.Azure.ServiceBus 6.0.0
+(thanks GiampaoloGabba)
+ - Fix: Completely rewrite package for the new SDK `Azure.Messaging.ServiceBus`
+ - New: New API for construction `AzureServiceBusTopicReceiver` and `AzureServiceBusQueueReceiver`
+ - New: `IMessenger` interface uses structured string format for referencing queues/topics
+ - New: `IAzureServiceBusMessenger` interface with API to send/create/delete/count a queue/topic/subscription
+
 #### FluentStorage 5.4.1
  - Fix: Remove unused dependency package `Newtonsoft.Json` from main project
 
