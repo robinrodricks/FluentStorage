@@ -191,18 +191,15 @@ namespace FluentStorage.Blobs.Files {
 		public void Dispose() {
 		}
 
-		public Task WriteAsync(string fullPath, Stream dataStream, bool append, CancellationToken cancellationToken) {
+		public async Task WriteAsync(string fullPath, Stream dataStream, bool append, CancellationToken cancellationToken) {
 			if (dataStream is null)
 				throw new ArgumentNullException(nameof(dataStream));
 			GenericValidation.CheckBlobFullPath(fullPath);
 
 			fullPath = StoragePath.Normalize(fullPath);
 
-			using (Stream stream = CreateStream(fullPath, !append)) {
-				dataStream.CopyTo(stream);
-			}
-
-			return Task.FromResult(true);
+			using Stream stream = CreateStream(fullPath, !append);
+			await dataStream.CopyToAsync(stream);
 		}
 
 		/// <summary>
