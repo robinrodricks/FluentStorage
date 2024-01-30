@@ -266,18 +266,43 @@ namespace FluentStorage.SFTP {
 			SftpClient client = GetClient();
 
 			var folder = StoragePath.Combine(RootDirectory, StoragePath.Normalize(options.FolderPath));
-			IEnumerable<SftpFile> directoryContents = await client.ListDirectoryAsync(folder);
 
-			List<Blob> blobCollection = directoryContents
-			   .Where(dc => (options.FilePrefix == null || dc.Name.StartsWith(options.FilePrefix))
-							&& (dc.IsDirectory || dc.IsRegularFile || dc.OwnerCanRead)
-							&& !cancellationToken.IsCancellationRequested
-							&& dc.Name != "."
-							&& dc.Name != "..")
-			   .Take(options.MaxResults.Value)
-			   .Select(ConvertSftpFileToBlob)
-			   .Where(options.BrowseFilter)
-			   .ToList();
+			List<Blob> blobCollection = new List<Blob>();
+			object lockObject = new object();
+
+			async Task ListDirectoryAsync(string folderToList) {
+				IEnumerable<SftpFile> directoryContents = await client.ListDirectoryAsync(folderToList);
+				var tempBlobCollection = directoryContents
+					.Where(dc => (options.FilePrefix == null || dc.Name.StartsWith(options.FilePrefix))
+								 && (dc.IsDirectory || dc.IsRegularFile || dc.OwnerCanRead)
+								 && !cancellationToken.IsCancellationRequested
+								 && dc.Name != "."
+								 && dc.Name != "..")
+					.Take(options.MaxResults.Value)
+					.Select(ConvertSftpFileToBlob)
+					.Where(options.BrowseFilter).ToList();
+
+				lock (lockObject) {
+					blobCollection.AddRange(tempBlobCollection);
+				}
+
+				if (options.Recurse == true) {
+					IEnumerable<string> subFoldersToList = tempBlobCollection
+						.Where(x => x.IsFolder == true)
+						.Select(x => x.FullPath);
+#if NET6_0
+					await Parallel.ForEachAsync(subFoldersToList, async (subFolder, token) => {
+						await ListDirectoryAsync(subFolder);
+					});
+#else
+					foreach (string subFolder in subFoldersToList) { 
+						await ListDirectoryAsync(subFolder);
+					}
+#endif
+				}
+			}
+
+			await ListDirectoryAsync(folder);
 
 			if (RootDirectory != null) {
 				foreach (var b in blobCollection) {
