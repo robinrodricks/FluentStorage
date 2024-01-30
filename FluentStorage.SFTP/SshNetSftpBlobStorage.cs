@@ -369,13 +369,16 @@ namespace FluentStorage.SFTP {
 
 			SftpClient client = GetClient();
 			var fullPathWithRoot = StoragePath.Combine(RootDirectory, StoragePath.Normalize(fullPath));
+			var fileMode = append ? FileMode.Append : FileMode.OpenOrCreate;
 
 			// First, for speed, let's try to write the file assuming the directory requested already exists.
 
 			try {
-				using (Stream dest = client.OpenWrite(fullPathWithRoot)) {
+				using (Stream dest = client.Open(fullPathWithRoot, fileMode, FileAccess.Write)) {
 					await dataStream.CopyToAsync(dest).ConfigureAwait(false);
-					dest.SetLength(dataStream.Length);
+					if (append == false) {
+						dest.SetLength(dataStream.Length);
+					}
 				}
 				return;
 			}
@@ -396,9 +399,11 @@ namespace FluentStorage.SFTP {
 						client.CreateDirectory(fullFolder);
 				}
 
-				using (Stream dest = client.OpenWrite(fullPathWithRoot)) {
+				using (Stream dest = client.Open(fullPathWithRoot, fileMode, FileAccess.Write)) {
 					await dataStream.CopyToAsync(dest).ConfigureAwait(false);
-					dest.SetLength(dataStream.Length);
+					if (append == false) {
+						dest.SetLength(dataStream.Length);
+					}
 				}
 			}).ConfigureAwait(false);
 		}
