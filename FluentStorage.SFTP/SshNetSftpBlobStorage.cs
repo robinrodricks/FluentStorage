@@ -375,6 +375,7 @@ namespace FluentStorage.SFTP {
 			try {
 				using (Stream dest = client.OpenWrite(fullPathWithRoot)) {
 					await dataStream.CopyToAsync(dest).ConfigureAwait(false);
+					dest.SetLength(dataStream.Length);
 				}
 				return;
 			}
@@ -397,6 +398,7 @@ namespace FluentStorage.SFTP {
 
 				using (Stream dest = client.OpenWrite(fullPathWithRoot)) {
 					await dataStream.CopyToAsync(dest).ConfigureAwait(false);
+					dest.SetLength(dataStream.Length);
 				}
 			}).ConfigureAwait(false);
 		}
