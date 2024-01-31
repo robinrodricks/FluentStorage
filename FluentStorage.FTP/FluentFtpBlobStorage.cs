@@ -48,7 +48,14 @@ namespace FluentStorage.FTP {
 			if (options == null)
 				options = new ListOptions();
 
-			FtpListItem[] items = await client.GetListing(options.FolderPath).ConfigureAwait(false);
+			FtpListOption ftpListOption = FtpListOption.Auto;
+
+			if (options.Recurse)
+			{
+				ftpListOption |= FtpListOption.Recursive;
+			}
+
+			FtpListItem[] items = await client.GetListing(options.FolderPath, ftpListOption, cancellationToken).ConfigureAwait(false);
 
 			List<Blob> results = new List<Blob>();
 			foreach (FtpListItem item in items) {
