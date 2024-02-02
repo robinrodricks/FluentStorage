@@ -35,7 +35,7 @@ namespace FluentStorage.SFTP {
 		/// <summary>
 		/// Object used in in ListDirectoryAsync to avoid accessing collections from multiple threads at the same time.
 		/// </summary>
-		private object listDirectoryLockObject = new object();
+		private readonly object _listDirectoryLockObject = new object();
 
 		/// <summary>
 		/// Gets or sets the maximum retry count.
@@ -324,7 +324,7 @@ namespace FluentStorage.SFTP {
 #if NET6_0_OR_GREATER
 				await Parallel.ForEachAsync(subFoldersToList, async (subFolder, token) => {
 					var tempForEachBlobCollection = await ListDirectoryAsync(client, subFolder, options, cancellationToken);
-					lock (listDirectoryLockObject) {
+					lock (_listDirectoryLockObject) {
 						blobCollection.AddRange(tempForEachBlobCollection);
 					}
 				});
