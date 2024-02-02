@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Polly;
 using Polly.Retry;
 using Renci.SshNet;
-using Renci.SshNet.Async;
 using Renci.SshNet.Sftp;
 using FluentStorage.Blobs;
 
@@ -32,6 +31,11 @@ namespace FluentStorage.SFTP {
 		/// A boolean flag indicating whether this instance is disposed.
 		/// </summary>
 		private bool _disposed = false;
+
+		/// <summary>
+		/// Object used in in ListDirectoryAsync to avoid accessing collections from multiple threads at the same time.
+		/// </summary>
+		private readonly object _listDirectoryLockObject = new object();
 
 		/// <summary>
 		/// Gets or sets the maximum retry count.
@@ -218,11 +222,13 @@ namespace FluentStorage.SFTP {
 				}
 
 				try {
-					IEnumerable<SftpFile> directoryContents = await client.ListDirectoryAsync(fullPathGrouping.Key);
+					List<Blob> blobCollection = new List<Blob>();
 
-					List<Blob> blobCollection = directoryContents
-					   .Where(f => (f.IsDirectory || f.IsRegularFile) && f.FullName == fullPath)
-					   .Select(ConvertSftpFileToBlob).ToList();
+					await foreach (SftpFile sftpFile in client.ListDirectoryAsync(fullPathGrouping.Key, cancellationToken)) {
+						if ((sftpFile.IsDirectory || sftpFile.IsRegularFile) && sftpFile.FullName == fullPath) {
+							blobCollection.Add(ConvertSftpFileToBlob(sftpFile));
+						}
+					}
 
 					if (blobCollection.Any()) {
 						// If using a RoodDirectory, remove from full path.
@@ -266,23 +272,68 @@ namespace FluentStorage.SFTP {
 			SftpClient client = GetClient();
 
 			var folder = StoragePath.Combine(RootDirectory, StoragePath.Normalize(options.FolderPath));
-			IEnumerable<SftpFile> directoryContents = await client.ListDirectoryAsync(folder);
 
-			List<Blob> blobCollection = directoryContents
-			   .Where(dc => (options.FilePrefix == null || dc.Name.StartsWith(options.FilePrefix))
-							&& (dc.IsDirectory || dc.IsRegularFile || dc.OwnerCanRead)
-							&& !cancellationToken.IsCancellationRequested
-							&& dc.Name != "."
-							&& dc.Name != "..")
-			   .Take(options.MaxResults.Value)
-			   .Select(ConvertSftpFileToBlob)
-			   .Where(options.BrowseFilter)
-			   .ToList();
+			var blobCollection = await ListDirectoryAsync(client, folder, options, cancellationToken);
 
 			if (RootDirectory != null) {
 				foreach (var b in blobCollection) {
 					b.SetFullPath(b.FullPath.Substring(RootDirectory.Length + 1));
 				}
+			}
+
+			return blobCollection;
+		}
+
+
+		/// <summary>
+		/// Used internally. Returns a list of available blobs. 
+		/// </summary>
+		/// <param name="client"></param>
+		/// <param name="folderToList"></param>
+		/// <param name="options"></param>
+		/// <param name="cancellationToken"></param>
+		/// <returns>List of blob IDs</returns>
+		async Task<IReadOnlyCollection<Blob>> ListDirectoryAsync(SftpClient client, string folderToList, ListOptions options, CancellationToken cancellationToken) {
+
+			List<Blob> blobCollection = new List<Blob>();
+
+			// Note: options.FolderPath is not used here, we use the folderToList which is passed in.
+			List<SftpFile> directoryContents = new List<SftpFile>();
+			await foreach (SftpFile sftpFile in client.ListDirectoryAsync(folderToList, cancellationToken)) {
+				if ((options.FilePrefix == null || sftpFile.Name.StartsWith(options.FilePrefix))
+							 && (sftpFile.IsDirectory || sftpFile.IsRegularFile || sftpFile.OwnerCanRead)
+							 && !cancellationToken.IsCancellationRequested
+							 && sftpFile.Name != "."
+							 && sftpFile.Name != "..") {
+					directoryContents.Add(sftpFile);
+				}
+			}
+
+			var tempBlobCollection = directoryContents
+				.Take(options.MaxResults.Value)
+				.Select(ConvertSftpFileToBlob)
+				.Where(options.BrowseFilter).ToList();
+
+			blobCollection.AddRange(tempBlobCollection);
+			
+			if (options.Recurse == true) {
+				IEnumerable<string> subFoldersToList = tempBlobCollection
+					.Where(x => x.IsFolder == true)
+					.Select(x => x.FullPath);
+
+#if NET6_0_OR_GREATER
+				await Parallel.ForEachAsync(subFoldersToList, async (subFolder, token) => {
+					var tempForEachBlobCollection = await ListDirectoryAsync(client, subFolder, options, cancellationToken);
+					lock (_listDirectoryLockObject) {
+						blobCollection.AddRange(tempForEachBlobCollection);
+					}
+				});
+#else
+				foreach (string subFolder in subFoldersToList) {
+					var tempForEachBlobCollection = await ListDirectoryAsync(client, subFolder, options, cancellationToken);
+					blobCollection.AddRange(tempForEachBlobCollection);
+				}
+#endif
 			}
 
 			return blobCollection;
