@@ -34,6 +34,11 @@ namespace FluentStorage.SFTP {
 		private bool _disposed = false;
 
 		/// <summary>
+		/// Object used in in ListDirectoryAsync to avoid accessing collections from multiple threads at the same time.
+		/// </summary>
+		private object listDirectoryLockObject = new object();
+
+		/// <summary>
 		/// Gets or sets the maximum retry count.
 		/// </summary>
 		/// <value>
@@ -267,47 +272,62 @@ namespace FluentStorage.SFTP {
 
 			var folder = StoragePath.Combine(RootDirectory, StoragePath.Normalize(options.FolderPath));
 
-			List<Blob> blobCollection = new List<Blob>();
-			object lockObject = new object();
-
-			async Task ListDirectoryAsync(string folderToList) {
-				IEnumerable<SftpFile> directoryContents = await client.ListDirectoryAsync(folderToList);
-				var tempBlobCollection = directoryContents
-					.Where(dc => (options.FilePrefix == null || dc.Name.StartsWith(options.FilePrefix))
-								 && (dc.IsDirectory || dc.IsRegularFile || dc.OwnerCanRead)
-								 && !cancellationToken.IsCancellationRequested
-								 && dc.Name != "."
-								 && dc.Name != "..")
-					.Take(options.MaxResults.Value)
-					.Select(ConvertSftpFileToBlob)
-					.Where(options.BrowseFilter).ToList();
-
-				lock (lockObject) {
-					blobCollection.AddRange(tempBlobCollection);
-				}
-
-				if (options.Recurse == true) {
-					IEnumerable<string> subFoldersToList = tempBlobCollection
-						.Where(x => x.IsFolder == true)
-						.Select(x => x.FullPath);
-#if NET6_0
-					await Parallel.ForEachAsync(subFoldersToList, async (subFolder, token) => {
-						await ListDirectoryAsync(subFolder);
-					});
-#else
-					foreach (string subFolder in subFoldersToList) { 
-						await ListDirectoryAsync(subFolder);
-					}
-#endif
-				}
-			}
-
-			await ListDirectoryAsync(folder);
+			var blobCollection = await ListDirectoryAsync(client, folder, options, cancellationToken);
 
 			if (RootDirectory != null) {
 				foreach (var b in blobCollection) {
 					b.SetFullPath(b.FullPath.Substring(RootDirectory.Length + 1));
 				}
+			}
+
+			return blobCollection;
+		}
+
+
+		/// <summary>
+		/// Used internally. Returns a list of available blobs. 
+		/// </summary>
+		/// <param name="client"></param>
+		/// <param name="folderToList"></param>
+		/// <param name="options"></param>
+		/// <param name="cancellationToken"></param>
+		/// <returns>List of blob IDs</returns>
+		async Task<IReadOnlyCollection<Blob>> ListDirectoryAsync(SftpClient client, string folderToList, ListOptions options, CancellationToken cancellationToken) {
+
+			List<Blob> blobCollection = new List<Blob>();
+
+			// Note: options.FolderPath is not used here, we use the folderToList which is passed in.
+			IEnumerable<SftpFile> directoryContents = await client.ListDirectoryAsync(folderToList);
+			var tempBlobCollection = directoryContents
+				.Where(dc => (options.FilePrefix == null || dc.Name.StartsWith(options.FilePrefix))
+							 && (dc.IsDirectory || dc.IsRegularFile || dc.OwnerCanRead)
+							 && !cancellationToken.IsCancellationRequested
+							 && dc.Name != "."
+							 && dc.Name != "..")
+				.Take(options.MaxResults.Value)
+				.Select(ConvertSftpFileToBlob)
+				.Where(options.BrowseFilter).ToList();
+
+			blobCollection.AddRange(tempBlobCollection);
+			
+			if (options.Recurse == true) {
+				IEnumerable<string> subFoldersToList = tempBlobCollection
+					.Where(x => x.IsFolder == true)
+					.Select(x => x.FullPath);
+
+#if NET6_0_OR_GREATER
+				await Parallel.ForEachAsync(subFoldersToList, async (subFolder, token) => {
+					var tempForEachBlobCollection = await ListDirectoryAsync(client, subFolder, options, cancellationToken);
+					lock (listDirectoryLockObject) {
+						blobCollection.AddRange(tempForEachBlobCollection);
+					}
+				});
+#else
+				foreach (string subFolder in subFoldersToList) {
+					var tempForEachBlobCollection = await ListDirectoryAsync(client, subFolder, options, cancellationToken);
+					blobCollection.AddRange(tempForEachBlobCollection);
+				}
+#endif
 			}
 
 			return blobCollection;
