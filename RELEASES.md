@@ -2,7 +2,7 @@
 
 #### FluentStorage 5.4.2
 (thanks timbze)
- - Fix: DiskDirectoryBlobStorage `WriteAsync` uses `CopyToAsync` rather than sync
+ - Fix: Disk blob storage `WriteAsync` uses `CopyToAsync` rather than sync
 
 #### FluentStorage.FTP 5.3.0
 (thanks beeradmoore)
