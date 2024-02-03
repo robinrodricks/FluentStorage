@@ -1,5 +1,18 @@
 # Release Notes
 
+#### FluentStorage 5.4.2
+(thanks timbze)
+ - Fix: DiskDirectoryBlobStorage `WriteAsync` uses `CopyToAsync` rather than sync
+
+#### FluentStorage.FTP 5.3.0
+(thanks beeradmoore)
+ - New: `ListAsync` now supports recursion for listing directories using  `FtpListOption.Recursive`
+
+#### FluentStorage.SFTP 5.3.0
+(thanks beeradmoore)
+ - New: `ListAsync` now supports recursion for listing directories using manual async recursion
+ - Fix: `WriteAsync` now sets the length of destination stream manually to avoid resulting data being left
+
 #### FluentStorage.Azure.ServiceBus 6.0.0
 (thanks GiampaoloGabba)
  - Fix: Completely rewrite package for the new SDK `Azure.Messaging.ServiceBus`
