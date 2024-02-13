@@ -116,8 +116,13 @@ namespace FluentStorage.Gcp.CloudStorage.Blobs {
 				//when not found, just ignore
 
 				//try delete everything recursively
-				IReadOnlyCollection<Blob> childObjects = await ListAsync(new ListOptions { Recurse = true }, cancellationToken).ConfigureAwait(false);
-				foreach (Blob blob in childObjects) {
+				IReadOnlyCollection<Blob?> childObjects = await ListAtAsync(fullPath, new ListOptions { Recurse = true }, cancellationToken).ConfigureAwait(false);
+
+				foreach (Blob? blob in childObjects) {
+					if (blob == null) {
+						continue;
+					}
+					
 					try {
 						await _client.DeleteObjectAsync(_bucketName, NormalisePath(blob.FullPath), cancellationToken: cancellationToken).ConfigureAwait(false);
 					}
