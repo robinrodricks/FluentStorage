@@ -1,6 +1,5 @@
 ﻿using FluentStorage.Messaging;
 using System;
-using Config.Net;
 using System.IO;
 using System.Reflection;
 

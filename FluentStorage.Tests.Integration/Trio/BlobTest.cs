@@ -9,8 +9,11 @@ using FluentStorage.Tests.Integration.Util;
 using Xunit;
 using FluentStorage.Utils.Extensions;
 using FluentStorage.Utils.Generator;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Specialized;
 
 namespace FluentStorage.Tests.Integration.Blobs {
+
 	[Trait("Category", "Blobs")]
 	public abstract class BlobTest : IAsyncLifetime {
 		private readonly IBlobStorage _storage;
@@ -105,7 +108,6 @@ namespace FluentStorage.Tests.Integration.Blobs {
 
 				IReadOnlyCollection<Blob> items = await _storage.ListAsync(recurse: true, folderPath: folderPath);
 				Assert.Equal(4, items.Count); //1.txt + sub (folder) + 2.txt + 3.txt
-
 			}
 			catch (NotSupportedException) {
 				//it ok for providers not to support hierarchy
@@ -169,7 +171,6 @@ namespace FluentStorage.Tests.Integration.Blobs {
 				BrowseFilter = id => (id.Kind != BlobItemKind.File || id.FullPath == id1)
 			});
 
-
 			Assert.Single(files);
 			Assert.Equal(id1, files.First().FullPath);
 		}
@@ -202,7 +203,6 @@ namespace FluentStorage.Tests.Integration.Blobs {
 
 				IReadOnlyCollection<Blob> subItems = await _storage.ListAsync(recurse: false, folderPath: sub);
 				Assert.Equal(2, subItems.Count);
-
 
 				Assert.Contains(new Blob(sub + "one.txt"), subItems);
 				Assert.Contains(new Blob(sub + "sub", BlobItemKind.Folder), subItems);
@@ -259,16 +259,41 @@ namespace FluentStorage.Tests.Integration.Blobs {
 				Blob rb = await _storage.GetBlobAsync(root);
 			}
 			catch (NotSupportedException) {
-
 			}
 		}
-
 
 		[Fact]
 		public async Task Open_doesnt_exist_returns_null() {
 			string id = RandomBlobPath();
 
 			Assert.Null(await _storage.OpenReadAsync(id));
+		}
+
+
+		[Fact]
+		public async Task Open_blob_exists_returns_stream() {
+			string existingBlobPath = $"{Guid.NewGuid()}/existing-blob.txt";
+
+			await _storage.WriteTextAsync(existingBlobPath, "Hello, Blob!");
+
+			var result = await _storage.OpenReadAsync(existingBlobPath);
+			Assert.NotNull(result);
+
+			using var reader = new StreamReader(result);
+			string content = await reader.ReadToEndAsync();
+			Assert.Equal("Hello, Blob!", content);
+		}
+
+
+		[Fact]
+		public async Task Open_empty_blob_returns_empty_stream() {
+			string emptyBlobPath = $"{Guid.NewGuid()}/empty-blob.txt";
+
+			await _storage.WriteAsync(emptyBlobPath, new MemoryStream(new byte[0]));
+			Stream result = await _storage.OpenReadAsync(emptyBlobPath);
+
+			Assert.NotNull(result);
+			Assert.Equal(0, result.Length);
 		}
 
 		[Fact]
@@ -344,7 +369,6 @@ namespace FluentStorage.Tests.Integration.Blobs {
 			string file1 = StoragePath.Combine(prefix, "1.txt");
 			string file2 = StoragePath.Combine(prefix, "sub", "2.txt");
 
-
 			try {
 				//setup
 				await _storage.WriteTextAsync(file1, "1");
@@ -354,7 +378,6 @@ namespace FluentStorage.Tests.Integration.Blobs {
 				await _storage.DeleteAsync(prefix);
 			}
 			catch (NotSupportedException) {
-
 			}
 
 			//assert
@@ -376,7 +399,6 @@ namespace FluentStorage.Tests.Integration.Blobs {
 				Assert.True(list.First().Name == "2");
 			}
 			catch (NotSupportedException) {
-
 			}
 		}
 
@@ -389,7 +411,6 @@ namespace FluentStorage.Tests.Integration.Blobs {
 		public async Task Rename_NewPathNull_ThowsArgumentNull() {
 			await Assert.ThrowsAsync<ArgumentNullException>(() => _storage.RenameAsync("test/1", null));
 		}
-
 
 		[Fact]
 		public async Task Rename_Folder_Renames() {
@@ -425,7 +446,6 @@ namespace FluentStorage.Tests.Integration.Blobs {
 				Assert.Equal(text, text2);
 			}
 			catch (NotSupportedException) {
-
 			}
 		}
 
@@ -550,7 +570,6 @@ namespace FluentStorage.Tests.Integration.Blobs {
 				Assert.True(files.Any());  //check dummy file exists
 			}
 			catch (NotSupportedException) {
-
 			}
 		}
 

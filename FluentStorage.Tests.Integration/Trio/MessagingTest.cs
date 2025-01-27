@@ -1,11 +1,9 @@
-﻿using Xunit;
-using FluentStorage.Messaging;
+﻿using FluentStorage.Messaging;
 using System;
-using System.Threading.Tasks;
 using System.Collections.Generic;
-using FluentStorage.Azure.ServiceBus;
 using System.Linq;
-using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace FluentStorage.Tests.Integration.Messaging {
 	[Trait("Category", "Messenger")]

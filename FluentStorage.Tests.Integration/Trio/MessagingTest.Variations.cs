@@ -1,7 +1,5 @@
-﻿using System;
-using Amazon;
+﻿using Amazon;
 using FluentStorage.Azure.ServiceBus;
-using FluentStorage.Blobs;
 using FluentStorage.Messaging;
 using Xunit;
 

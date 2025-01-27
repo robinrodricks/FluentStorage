@@ -1,31 +1,25 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Azure;
+﻿using Azure;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
-using Azure.Storage.Sas;
-using Blobs;
-using Microsoft.Identity.Client;
 using FluentStorage.Blobs;
-using FluentStorage.Azure.Blobs.Gen2.Model;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FluentStorage.Azure.Blobs {
 	//auth scenarios: https://github.com/Azure/azure-sdk-for-net/blob/master/sdk/storage/Azure.Storage.Blobs/samples/Sample02_Auth.cs
 
-
-	class AzureBlobStorage : IAzureBlobStorage {
-
+	internal class AzureBlobStorage : IAzureBlobStorage {
 		private readonly BlobServiceClient _client;
 		private readonly StorageSharedKeyCredential _sasSigningCredentials;
 		private readonly string _containerName;
+
 		private readonly ConcurrentDictionary<string, BlobContainerClient> _containerNameToContainerClient =
 		   new ConcurrentDictionary<string, BlobContainerClient>();
 
@@ -37,7 +31,6 @@ namespace FluentStorage.Azure.Blobs {
 			_client = blobServiceClient ?? throw new ArgumentNullException(nameof(blobServiceClient));
 			_sasSigningCredentials = sasSigningCredentials;
 			_containerName = containerName;
-
 		}
 
 		#region [ Interface Methods ]
@@ -75,14 +68,14 @@ namespace FluentStorage.Azure.Blobs {
 			return result;
 		}
 
-
 		public async Task DeleteAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
 			GenericValidation.CheckBlobFullPaths(fullPaths);
 
 			await Task.WhenAll(fullPaths.Select(fullPath => DeleteAsync(fullPath, cancellationToken))).ConfigureAwait(false);
 		}
 
-		public void Dispose() { }
+		public void Dispose() {
+		}
 
 		public async Task<IReadOnlyCollection<bool>> ExistsAsync(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
 			return await Task.WhenAll(fullPaths.Select(p => ExistsAsync(p, cancellationToken))).ConfigureAwait(false);
@@ -92,7 +85,6 @@ namespace FluentStorage.Azure.Blobs {
 			return await Task.WhenAll(fullPaths.Select(p => GetBlobAsync(p, cancellationToken))).ConfigureAwait(false);
 		}
 
-
 		public async Task<Stream> OpenReadAsync(string fullPath, CancellationToken cancellationToken = default) {
 			GenericValidation.CheckBlobFullPath(fullPath);
 
@@ -101,14 +93,15 @@ namespace FluentStorage.Azure.Blobs {
 			BlockBlobClient client = container.GetBlockBlobClient(path);
 
 			try {
-				//current SDK fails to download 0-sized files
-				Response<BlobProperties> p = await client.GetPropertiesAsync().ConfigureAwait(false);
-				if (p.Value.ContentLength == 0)
+				// Backward compatibility: Explicitly handle empty blobs to ensure they return a MemoryStream,
+				// preserving the behavior of the old implementation.
+				var properties = await client.GetPropertiesAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+
+				if (properties.Value.ContentLength == 0) {
 					return new MemoryStream();
+				}
 
-				Response<BlobDownloadInfo> response = await client.DownloadAsync(cancellationToken).ConfigureAwait(false);
-
-				return response.Value.Content;
+				return await client.OpenReadAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 			}
 			catch (RequestFailedException ex) when (ex.ErrorCode == "BlobNotFound") {
 				return null;
@@ -137,13 +130,14 @@ namespace FluentStorage.Azure.Blobs {
 				//happens when trying to write to a non-file object i.e. folder
 			}
 		}
+
 		public async Task SetBlobsAsync(IEnumerable<Blob> blobs, CancellationToken cancellationToken = default) {
 			GenericValidation.CheckBlobFullPaths(blobs);
 
 			await Task.WhenAll(blobs.Select(b => SetBlobAsync(b, cancellationToken))).ConfigureAwait(false);
 		}
 
-		#endregion
+		#endregion [ Interface Methods ]
 
 		#region [ IAzureBlobStorage Specific ]
 
@@ -307,7 +301,6 @@ namespace FluentStorage.Azure.Blobs {
 		public async Task<Stream> OpenWriteAsync(string fullPath, CancellationToken cancellationToken = default) {
 			GenericValidation.CheckBlobFullPath(fullPath);
 
-
 			(BlobContainerClient container, string path) = await GetPartsAsync(fullPath, true).ConfigureAwait(false);
 
 			BlockBlobClient client = container.GetBlockBlobClient(path);
@@ -322,8 +315,7 @@ namespace FluentStorage.Azure.Blobs {
 			return null;
 		}
 
-		#endregion
-
+		#endregion [ IAzureBlobStorage Specific ]
 
 		private async Task SetBlobAsync(Blob blob, CancellationToken cancellationToken) {
 			if (!(await ExistsAsync(blob, cancellationToken).ConfigureAwait(false)))
@@ -369,7 +361,6 @@ namespace FluentStorage.Azure.Blobs {
 			}
 		}
 
-
 		private async Task<IReadOnlyCollection<BlobContainerClient>> ListContainersAsync(CancellationToken cancellationToken) {
 			var r = new List<BlobContainerClient>();
 
@@ -390,7 +381,6 @@ namespace FluentStorage.Azure.Blobs {
 				r.Add(logsContainerClient);
 			}
 			catch (RequestFailedException ex) when (ex.ErrorCode == "ContainerNotFound") {
-
 			}
 
 			return r;
@@ -419,7 +409,6 @@ namespace FluentStorage.Azure.Blobs {
 				await container.DeleteIfExistsAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 			}
 			else {
-
 				BlockBlobClient blob = string.IsNullOrEmpty(path)
 				   ? null
 				   : container.GetBlockBlobClient(StoragePath.Normalize(path));
@@ -491,7 +480,6 @@ namespace FluentStorage.Azure.Blobs {
 					try {
 						//check if container exists
 						await container.GetPropertiesAsync().ConfigureAwait(false);
-
 					}
 					catch (RequestFailedException ex) when (ex.ErrorCode == "ContainerNotFound") {
 						if (createContainer) {
