@@ -31,7 +31,7 @@
    <ItemGroup>
       <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1" />
       <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
-      <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="21.0.22" />
+      <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.0.14" />
       <PackageReference Include="System.Text.Json" Version="8.0.4" />
    </ItemGroup>
 
