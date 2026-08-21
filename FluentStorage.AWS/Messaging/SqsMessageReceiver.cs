@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon;
@@ -10,60 +9,60 @@ using Amazon.SQS;
 using Amazon.SQS.Model;
 using FluentStorage.Queue;
 
-namespace FluentStorage.AWS.Messaging {
-	class SQSMessageReceiver : PollingMessageReceiver {
-		private readonly AmazonSQSClient _client;
-		private readonly string _queueUrl;
+namespace FluentStorage.AWS.Messaging;
 
-		public SQSMessageReceiver(string accessKeyId, string secretAccessKey, string serviceUrl, string queueName, RegionEndpoint regionEndpoint) {
-			var config = new AmazonSQSConfig {
-				ServiceURL = serviceUrl,
-				RegionEndpoint = regionEndpoint ?? RegionEndpoint.USEast1
-			};
+class SQSMessageReceiver : PollingMessageReceiver {
+	private readonly AmazonSQSClient _client;
+	private readonly string _queueUrl;
 
-			_client = new AmazonSQSClient(new BasicAWSCredentials(accessKeyId, secretAccessKey), config);
-			_queueUrl = new Uri(new Uri(serviceUrl), queueName).ToString();   //convert safely to string
-		}
+	public SQSMessageReceiver(string accessKeyId, string secretAccessKey, string serviceUrl, string queueName, RegionEndpoint regionEndpoint) {
+		var config = new AmazonSQSConfig {
+			ServiceURL = serviceUrl,
+			RegionEndpoint = regionEndpoint ?? RegionEndpoint.USEast1
+		};
 
-		public override async Task<int> GetMessageCountAsync() {
-			GetQueueAttributesResponse attrs = await _client.GetQueueAttributesAsync(_queueUrl, new List<string> { "All" }).ConfigureAwait(false);
+		_client = new AmazonSQSClient(new BasicAWSCredentials(accessKeyId, secretAccessKey), config);
+		_queueUrl = new Uri(new Uri(serviceUrl), queueName).ToString();   //convert safely to string
+	}
 
-			return attrs.ApproximateNumberOfMessages;
-		}
+	public override async Task<int> GetMessageCountAsync() {
+		GetQueueAttributesResponse attrs = await _client.GetQueueAttributesAsync(_queueUrl, new List<string> { "All" }).ConfigureAwait(false);
 
-		public override async Task ConfirmMessagesAsync(List<QueueMessage> messages, CancellationToken cancellationToken = default) {
-			var request = new DeleteMessageBatchRequest(_queueUrl,
-			   messages.Select(m => new DeleteMessageBatchRequestEntry(m.Id, m.Properties[Converter.ReceiptHandlePropertyName])).ToList());
+		return attrs.ApproximateNumberOfMessages;
+	}
 
-			await _client.DeleteMessageBatchAsync(request, cancellationToken).ConfigureAwait(false);
-		}
+	public override async Task ConfirmMessagesAsync(List<QueueMessage> messages, CancellationToken cancellationToken = default) {
+		var request = new DeleteMessageBatchRequest(_queueUrl,
+			messages.Select(m => new DeleteMessageBatchRequestEntry(m.Id, m.Properties[Converter.ReceiptHandlePropertyName])).ToList());
 
-		protected override async Task<List<QueueMessage>> ReceiveMessagesAsync(int maxBatchSize, CancellationToken cancellationToken = default) {
-			var request = new ReceiveMessageRequest(_queueUrl) {
-				MessageAttributeNames = new List<string> { ".*" },
-				MaxNumberOfMessages = Math.Min(10, maxBatchSize)
-			};
+		await _client.DeleteMessageBatchAsync(request, cancellationToken).ConfigureAwait(false);
+	}
 
-			ReceiveMessageResponse messages = await _client.ReceiveMessageAsync(request, cancellationToken).ConfigureAwait(false);
+	protected override async Task<List<QueueMessage>> ReceiveMessagesAsync(int maxBatchSize, CancellationToken cancellationToken = default) {
+		var request = new ReceiveMessageRequest(_queueUrl) {
+			MessageAttributeNames = new List<string> { ".*" },
+			MaxNumberOfMessages = Math.Min(10, maxBatchSize)
+		};
 
-			return messages.Messages.Select(Converter.ToQueueMessage).ToList();
-		}
+		ReceiveMessageResponse messages = await _client.ReceiveMessageAsync(request, cancellationToken).ConfigureAwait(false);
 
-		public override async Task<List<QueueMessage>> PeekMessages(int maxMessages, CancellationToken cancellationToken = default) {
-			var request = new ReceiveMessageRequest(_queueUrl) {
-				MessageAttributeNames = new List<string> { ".*" },
-				MaxNumberOfMessages = maxMessages,
+		return messages.Messages.Select(Converter.ToQueueMessage).ToList();
+	}
 
-				//AWS doesn't have peek method, however setting visibility timeout to minimum (1 second!) we can simulate that
-				VisibilityTimeout = 1
-			};
+	public override async Task<List<QueueMessage>> PeekMessages(int maxMessages, CancellationToken cancellationToken = default) {
+		var request = new ReceiveMessageRequest(_queueUrl) {
+			MessageAttributeNames = new List<string> { ".*" },
+			MaxNumberOfMessages = maxMessages,
 
-			ReceiveMessageResponse messages = await _client.ReceiveMessageAsync(request, cancellationToken).ConfigureAwait(false);
-			return messages.Messages.Select(Converter.ToQueueMessage).ToList();
-		}
+			//AWS doesn't have peek method, however setting visibility timeout to minimum (1 second!) we can simulate that
+			VisibilityTimeout = 1
+		};
 
-		public override Task DeadLetterMessage(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default) {
-			throw new NotSupportedException();
-		}
+		ReceiveMessageResponse messages = await _client.ReceiveMessageAsync(request, cancellationToken).ConfigureAwait(false);
+		return messages.Messages.Select(Converter.ToQueueMessage).ToList();
+	}
+
+	public override Task DeadLetterMessage(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default) {
+		throw new NotSupportedException();
 	}
 }

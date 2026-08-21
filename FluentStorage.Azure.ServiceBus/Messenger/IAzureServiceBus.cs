@@ -3,138 +3,138 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentStorage.Queue;
 
-namespace FluentStorage.Azure.ServiceBus.Messenger {
+namespace FluentStorage.Azure.ServiceBus.Messenger;
+
+/// <summary>
+/// Provides specific messaging capabilities to Azure Service Bus Messenger.
+/// </summary>
+public interface IAzureServiceBus : IQueue {
+
 	/// <summary>
-	/// Provides specific messaging capabilities to Azure Service Bus Messenger.
+	/// Sends a collection of messages to the specified queue asynchronously.
 	/// </summary>
-	public interface IAzureServiceBus : IQueue {
+	/// <param name="queue">The name of the queue.</param>
+	/// <param name="messages">The collection of messages to send.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <returns>A task representing the asynchronous operation.</returns>
+	Task SendToQueue(string queue, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default);
 
-		/// <summary>
-		/// Sends a collection of messages to the specified queue asynchronously.
-		/// </summary>
-		/// <param name="queue">The name of the queue.</param>
-		/// <param name="messages">The collection of messages to send.</param>
-		/// <param name="cancellationToken">The cancellation token.</param>
-		/// <returns>A task representing the asynchronous operation.</returns>
-		Task SendToQueue(string queue, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default);
+	/// <summary>
+	/// Sends a  message to the specified queue asynchronously.
+	/// </summary>
+	/// <param name="queue">The name of the queue.</param>
+	/// <param name="message">The collection of messages to send.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <returns>A task representing the asynchronous operation.</returns>
+	Task SendToQueue(string queue, QueueMessage message, CancellationToken cancellationToken = default);
 
-		/// <summary>
-		/// Sends a  message to the specified queue asynchronously.
-		/// </summary>
-		/// <param name="queue">The name of the queue.</param>
-		/// <param name="message">The collection of messages to send.</param>
-		/// <param name="cancellationToken">The cancellation token.</param>
-		/// <returns>A task representing the asynchronous operation.</returns>
-		Task SendToQueue(string queue, QueueMessage message, CancellationToken cancellationToken = default);
+	/// <summary>
+	/// Sends a collection of messages to the specified topic asynchronously.
+	/// </summary>
+	/// <param name="topic">The name of the topic.</param>
+	/// <param name="messages">The collection of messages to send.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <returns>A task representing the asynchronous operation.</returns>
+	Task SendToTopic(string topic, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default);
 
-		/// <summary>
-		/// Sends a collection of messages to the specified topic asynchronously.
-		/// </summary>
-		/// <param name="topic">The name of the topic.</param>
-		/// <param name="messages">The collection of messages to send.</param>
-		/// <param name="cancellationToken">The cancellation token.</param>
-		/// <returns>A task representing the asynchronous operation.</returns>
-		Task SendToTopic(string topic, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default);
+	/// <summary>
+	/// Sends a single message to the specified topic asynchronously.
+	/// </summary>
+	/// <param name="topic">The name of the topic.</param>
+	/// <param name="message">The collection of messages to send.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <returns>A task representing the asynchronous operation.</returns>
+	Task SendToTopic(string topic, QueueMessage message, CancellationToken cancellationToken = default);
 
-		/// <summary>
-		/// Sends a single message to the specified topic asynchronously.
-		/// </summary>
-		/// <param name="topic">The name of the topic.</param>
-		/// <param name="message">The collection of messages to send.</param>
-		/// <param name="cancellationToken">The cancellation token.</param>
-		/// <returns>A task representing the asynchronous operation.</returns>
-		Task SendToTopic(string topic, QueueMessage message, CancellationToken cancellationToken = default);
+	/// <summary>
+	/// Sends a collection of messages to the specified topic subscription asynchronously.
+	/// </summary>
+	/// <param name="topic">The name of the topic.</param>
+	/// <param name="subscription">The name of the subscription.</param>
+	/// <param name="messages">The collection of messages to send.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <returns>A task representing the asynchronous operation.</returns>
+	Task SendToSubscription(string topic, string subscription, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default);
 
-		/// <summary>
-		/// Sends a collection of messages to the specified topic subscription asynchronously.
-		/// </summary>
-		/// <param name="topic">The name of the topic.</param>
-		/// <param name="subscription">The name of the subscription.</param>
-		/// <param name="messages">The collection of messages to send.</param>
-		/// <param name="cancellationToken">The cancellation token.</param>
-		/// <returns>A task representing the asynchronous operation.</returns>
-		Task SendToSubscription(string topic, string subscription, IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default);
+	/// <summary>
+	/// Sends a single message to the specified topic subscription asynchronously.
+	/// </summary>
+	/// <param name="topic">The name of the topic.</param>
+	/// <param name="subscription">The name of the subscription.</param>
+	/// <param name="message">The collection of messages to send.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <returns>A task representing the asynchronous operation.</returns>
+	Task SendToSubscription(string topic, string subscription, QueueMessage message, CancellationToken cancellationToken = default);
 
-		/// <summary>
-		/// Sends a single message to the specified topic subscription asynchronously.
-		/// </summary>
-		/// <param name="topic">The name of the topic.</param>
-		/// <param name="subscription">The name of the subscription.</param>
-		/// <param name="message">The collection of messages to send.</param>
-		/// <param name="cancellationToken">The cancellation token.</param>
-		/// <returns>A task representing the asynchronous operation.</returns>
-		Task SendToSubscription(string topic, string subscription, QueueMessage message, CancellationToken cancellationToken = default);
+	/// <summary>
+	/// Create a new Queue in Azure ServiceBus
+	/// </summary>
+	/// <param name="name">Queue name</param>
+	/// <param name="cancellationToken">Cancellation token</param>
+	Task CreateQueue(string name, CancellationToken cancellationToken = default);
 
-		/// <summary>
-		/// Create a new Queue in Azure ServiceBus
-		/// </summary>
-		/// <param name="name">Queue name</param>
-		/// <param name="cancellationToken">Cancellation token</param>
-		Task CreateQueue(string name, CancellationToken cancellationToken = default);
+	/// <summary>
+	/// Create a new Topic in Azure ServiceBus
+	/// </summary>
+	/// <param name="topic">Topic name</param>
+	/// <param name="cancellationToken">Cancellation token</param>
+	Task CreateTopic(string topic, CancellationToken cancellationToken = default);
 
-		/// <summary>
-		/// Create a new Topic in Azure ServiceBus
-		/// </summary>
-		/// <param name="topic">Topic name</param>
-		/// <param name="cancellationToken">Cancellation token</param>
-		Task CreateTopic(string topic, CancellationToken cancellationToken = default);
+	/// <summary>
+	/// Create a new Subscription in Azure ServiceBus
+	/// </summary>
+	/// <param name="topic">Topic name</param>
+	/// <param name="subscription">Subscription name</param>
+	/// <param name="cancellationToken">Cancellation token</param>
+	Task CreateSubscription(string topic, string subscription, CancellationToken cancellationToken = default);
 
-		/// <summary>
-		/// Create a new Subscription in Azure ServiceBus
-		/// </summary>
-		/// <param name="topic">Topic name</param>
-		/// <param name="subscription">Subscription name</param>
-		/// <param name="cancellationToken">Cancellation token</param>
-		Task CreateSubscription(string topic, string subscription, CancellationToken cancellationToken = default);
+	/// <summary>
+	/// Deletes the specified queue asynchronously.
+	/// </summary>
+	/// <param name="queue">The name of the queue.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <returns>A task representing the asynchronous operation.</returns>
+	Task DeleteQueue(string queue, CancellationToken cancellationToken = default);
 
-		/// <summary>
-		/// Deletes the specified queue asynchronously.
-		/// </summary>
-		/// <param name="queue">The name of the queue.</param>
-		/// <param name="cancellationToken">The cancellation token.</param>
-		/// <returns>A task representing the asynchronous operation.</returns>
-		Task DeleteQueue(string queue, CancellationToken cancellationToken = default);
+	/// <summary>
+	/// Deletes the specified topic subscription asynchronously.
+	/// </summary>
+	/// <param name="topic">The name of the topic.</param>
+	/// <param name="subscription">The name of the subscription.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <returns>A task representing the asynchronous operation.</returns>
+	Task DeleteSubscription(string topic, string subscription, CancellationToken cancellationToken = default);
 
-		/// <summary>
-		/// Deletes the specified topic subscription asynchronously.
-		/// </summary>
-		/// <param name="topic">The name of the topic.</param>
-		/// <param name="subscription">The name of the subscription.</param>
-		/// <param name="cancellationToken">The cancellation token.</param>
-		/// <returns>A task representing the asynchronous operation.</returns>
-		Task DeleteSubscription(string topic, string subscription, CancellationToken cancellationToken = default);
+	/// <summary>
+	/// Deletes the specified topic asynchronously.
+	/// </summary>
+	/// <param name="topic">The name of the topic.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <returns>A task representing the asynchronous operation.</returns>
+	Task DeleteTopic(string topic, CancellationToken cancellationToken = default);
 
-		/// <summary>
-		/// Deletes the specified topic asynchronously.
-		/// </summary>
-		/// <param name="topic">The name of the topic.</param>
-		/// <param name="cancellationToken">The cancellation token.</param>
-		/// <returns>A task representing the asynchronous operation.</returns>
-		Task DeleteTopic(string topic, CancellationToken cancellationToken = default);
+	/// <summary>
+	/// Counts the number of messages in the specified queue asynchronously.
+	/// </summary>
+	/// <param name="queue">The name of the queue.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <returns>The number of messages in the queue.</returns>
+	Task<long> CountQueue(string queue, CancellationToken cancellationToken = default);
 
-		/// <summary>
-		/// Counts the number of messages in the specified queue asynchronously.
-		/// </summary>
-		/// <param name="queue">The name of the queue.</param>
-		/// <param name="cancellationToken">The cancellation token.</param>
-		/// <returns>The number of messages in the queue.</returns>
-		Task<long> CountQueue(string queue, CancellationToken cancellationToken = default);
+	/// <summary>
+	/// Counts the number of messages in the specified topic subscription asynchronously.
+	/// </summary>
+	/// <param name="topic">The name of the topic.</param>
+	/// <param name="subscription">The name of the subscription.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <returns>The number of messages in the topic subscription.</returns>
+	Task<long> CountSubscription(string topic, string subscription, CancellationToken cancellationToken = default);
 
-		/// <summary>
-		/// Counts the number of messages in the specified topic subscription asynchronously.
-		/// </summary>
-		/// <param name="topic">The name of the topic.</param>
-		/// <param name="subscription">The name of the subscription.</param>
-		/// <param name="cancellationToken">The cancellation token.</param>
-		/// <returns>The number of messages in the topic subscription.</returns>
-		Task<long> CountSubscription(string topic, string subscription, CancellationToken cancellationToken = default);
-
-		/// <summary>
-		/// Counts the number of messages in the specified topic asynchronously.
-		/// </summary>
-		/// <param name="topic">The name of the topic.</param>
-		/// <param name="cancellationToken">The cancellation token.</param>
-		/// <returns>The number of messages in the topic.</returns>
-		Task<long> CountTopic(string topic, CancellationToken cancellationToken = default);
-	}
+	/// <summary>
+	/// Counts the number of messages in the specified topic asynchronously.
+	/// </summary>
+	/// <param name="topic">The name of the topic.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <returns>The number of messages in the topic.</returns>
+	Task<long> CountTopic(string topic, CancellationToken cancellationToken = default);
 }

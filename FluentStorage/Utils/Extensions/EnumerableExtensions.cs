@@ -1,14 +1,14 @@
-﻿namespace FluentStorage.Utils.Extensions {
-	using System.Collections;
-	using System.Diagnostics;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System;
+﻿namespace FluentStorage.Utils.Extensions;
 
-	/// <summary>
-	/// <see cref="System.IEquatable{T}"/> extension methods
-	/// </summary>
-	public static class EnumerableExtensions {
+using System.Collections;
+using System.Diagnostics;
+using System.Collections.Generic;
+using System;
+
+/// <summary>
+/// <see cref="System.IEquatable{T}"/> extension methods
+/// </summary>
+public static class EnumerableExtensions {
 
 #if NET6_0_OR_GREATER
 #else
@@ -139,42 +139,41 @@
 
 #endif
 
-		/// <summary>
-		/// Performs a specific action on each element of the sequence
-		/// </summary>
-		public static IEnumerable<T> ForEach<T>(this IEnumerable<T> source, Action<T> action) {
-			if (source == null)
-				throw new ArgumentNullException(nameof(source));
-			if (action == null)
-				throw new ArgumentNullException(nameof(action));
+	/// <summary>
+	/// Performs a specific action on each element of the sequence
+	/// </summary>
+	public static IEnumerable<T> ForEach<T>(this IEnumerable<T> source, Action<T> action) {
+		if (source == null)
+			throw new ArgumentNullException(nameof(source));
+		if (action == null)
+			throw new ArgumentNullException(nameof(action));
 
-			foreach (T element in source) {
-				action(element);
+		foreach (T element in source) {
+			action(element);
 
-				yield return element;
-			}
+			yield return element;
+		}
+	}
+
+	/// <summary>
+	/// Iterates over two <see cref="IEnumerable"/> until one of them reaches the end of elements
+	/// </summary>
+	/// <typeparam name="TFirst">Types of elements in the first sequence</typeparam>
+	/// <typeparam name="TSecond">Types of elements in the second sequence</typeparam>
+	/// <param name="first">First sequence</param>
+	/// <param name="second">Second sequence</param>
+	/// <returns>Sequence of tuples from the first and second sequences</returns>
+	public static IEnumerable<Tuple<TFirst, TSecond>> MultiIterate<TFirst, TSecond>(
+		IEnumerable<TFirst> first, IEnumerable<TSecond> second) {
+		if (first == null || second == null) yield break;
+
+		IEnumerator<TFirst> firstEnumerator = first.GetEnumerator();
+		IEnumerator<TSecond> secondEnumerator = second.GetEnumerator();
+
+		while (firstEnumerator.MoveNext() && secondEnumerator.MoveNext()) {
+			yield return Tuple.Create(firstEnumerator.Current, secondEnumerator.Current);
 		}
 
-		/// <summary>
-		/// Iterates over two <see cref="IEnumerable"/> until one of them reaches the end of elements
-		/// </summary>
-		/// <typeparam name="TFirst">Types of elements in the first sequence</typeparam>
-		/// <typeparam name="TSecond">Types of elements in the second sequence</typeparam>
-		/// <param name="first">First sequence</param>
-		/// <param name="second">Second sequence</param>
-		/// <returns>Sequence of tuples from the first and second sequences</returns>
-		public static IEnumerable<Tuple<TFirst, TSecond>> MultiIterate<TFirst, TSecond>(
-		   IEnumerable<TFirst> first, IEnumerable<TSecond> second) {
-			if (first == null || second == null) yield break;
-
-			IEnumerator<TFirst> firstEnumerator = first.GetEnumerator();
-			IEnumerator<TSecond> secondEnumerator = second.GetEnumerator();
-
-			while (firstEnumerator.MoveNext() && secondEnumerator.MoveNext()) {
-				yield return Tuple.Create(firstEnumerator.Current, secondEnumerator.Current);
-			}
-
-			yield break;
-		}
+		yield break;
 	}
 }

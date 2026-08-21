@@ -1,41 +1,41 @@
-﻿namespace FluentStorage.Tests.Integration.Storage.Fixture {
-	public abstract class StoreFixture : IDisposable {
+﻿namespace FluentStorage.Tests.Integration.Storage.Fixture;
 
-		private bool _initialised;
+public abstract class StoreFixture : IDisposable {
 
-		protected StoreFixture(string blobPrefix = null) {
-			Storage = CreateStorage(TestConfigLoader.Config);
-			BlobPrefix = blobPrefix;
-		}
+	private bool _initialised;
 
-		protected abstract IStore CreateStorage(TestConfig settings);
+	protected StoreFixture(string blobPrefix = null) {
+		Storage = CreateStorage(TestConfigLoader.Config);
+		BlobPrefix = blobPrefix;
+	}
 
-		public IStore Storage { get; private set; }
-		public string BlobPrefix { get; }
+	protected abstract IStore CreateStorage(TestConfig settings);
 
-		public async Task InitAsync() {
-			if (_initialised)
-				return;
+	public IStore Storage { get; private set; }
+	public string BlobPrefix { get; }
 
-			// drop all blobs in test storage
-			// FIX: do not run on SFTP and other sensitive providers
-			if (BlobPrefix != null) {
-				List<StoreObject> topLevel = (await Storage.ListDirectory(BlobPrefix, false)).ToList();
-				try {
-					await Storage.DeleteObjects(topLevel.Select(f => f.FullPath));
-				}
-				catch {}
+	public async Task InitAsync() {
+		if (_initialised)
+			return;
+
+		// drop all blobs in test storage
+		// FIX: do not run on SFTP and other sensitive providers
+		if (BlobPrefix != null) {
+			List<StoreObject> topLevel = (await Storage.ListDirectory(BlobPrefix, false)).ToList();
+			try {
+				await Storage.DeleteObjects(topLevel.Select(f => f.FullPath));
 			}
-
-			_initialised = true;
+			catch {}
 		}
 
-		public Task DisposeAsync() {
-			return Task.CompletedTask;
-		}
+		_initialised = true;
+	}
 
-		public void Dispose() {
-			Storage.Dispose();
-		}
+	public Task DisposeAsync() {
+		return Task.CompletedTask;
+	}
+
+	public void Dispose() {
+		Storage.Dispose();
 	}
 }

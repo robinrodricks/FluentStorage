@@ -3,35 +3,35 @@ using System.Threading.Tasks;
 using Azure;
 using Azure.Storage.Blobs.Specialized;
 
-namespace FluentStorage.Azure.Blobs.Policy {
+namespace FluentStorage.Azure.Blobs.Policy;
+
+/// <summary>
+/// Represents a blob lease
+/// </summary>
+public class AzureStorageLease : IDisposable {
+	internal AzureStorageLease(BlobLeaseClient leaseClient) {
+		LeaseClient = leaseClient;
+	}
+
+	internal BlobLeaseClient LeaseClient { get; }
+
 	/// <summary>
-	/// Represents a blob lease
+	/// Renews active lease
 	/// </summary>
-	public class AzureStorageLease : IDisposable {
-		internal AzureStorageLease(BlobLeaseClient leaseClient) {
-			LeaseClient = leaseClient;
+	/// <returns></returns>
+	public Task RenewLeaseAsync() {
+		return LeaseClient.RenewAsync();
+	}
+
+	/// <summary>
+	/// Releases the lease
+	/// </summary>
+	public void Dispose() {
+		try {
+			LeaseClient.Release();
 		}
-
-		internal BlobLeaseClient LeaseClient { get; }
-
-		/// <summary>
-		/// Renews active lease
-		/// </summary>
-		/// <returns></returns>
-		public Task RenewLeaseAsync() {
-			return LeaseClient.RenewAsync();
-		}
-
-		/// <summary>
-		/// Releases the lease
-		/// </summary>
-		public void Dispose() {
-			try {
-				LeaseClient.Release();
-			}
-			catch (RequestFailedException ex) when (ex.ErrorCode == "LeaseIdMismatchWithLeaseOperation") {
-				//happens when a lease expires
-			}
+		catch (RequestFailedException ex) when (ex.ErrorCode == "LeaseIdMismatchWithLeaseOperation") {
+			//happens when a lease expires
 		}
 	}
 }

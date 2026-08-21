@@ -1,12 +1,12 @@
 ﻿
-namespace FluentStorage.Azure.Queues.Utils {
-	class JsonProps {
-		public JsonProp[] props { get; set; }
-	}
+namespace FluentStorage.Azure.Queues.Utils;
 
-	class JsonProp {
-		public string name { get; set; }
+class JsonProps {
+	public JsonProp[] props { get; set; }
+}
 
-		public string value { get; set; }
-	}
+class JsonProp {
+	public string name { get; set; }
+
+	public string value { get; set; }
 }

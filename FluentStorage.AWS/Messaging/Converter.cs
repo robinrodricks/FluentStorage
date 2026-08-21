@@ -1,41 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Amazon.SQS.Model;
 using FluentStorage.Queue;
 
-namespace FluentStorage.AWS.Messaging {
-	static class Converter {
-		public const string ReceiptHandlePropertyName = "ReceiptHandle";
+namespace FluentStorage.AWS.Messaging;
 
-		public static SendMessageBatchRequestEntry ToSQSMessage(QueueMessage message) {
-			if (message == null)
-				throw new ArgumentNullException(nameof(message));
+static class Converter {
+	public const string ReceiptHandlePropertyName = "ReceiptHandle";
 
-			var r = new SendMessageBatchRequestEntry(Guid.NewGuid().ToString(), message.StringContent);
+	public static SendMessageBatchRequestEntry ToSQSMessage(QueueMessage message) {
+		if (message == null)
+			throw new ArgumentNullException(nameof(message));
 
-			if (message.Properties != null) {
-				foreach (KeyValuePair<string, string> prop in message.Properties) {
-					r.MessageAttributes[prop.Key] = new MessageAttributeValue {
-						DataType = "String",
-						StringValue = prop.Value
-					};
-				}
+		var r = new SendMessageBatchRequestEntry(Guid.NewGuid().ToString(), message.StringContent);
+
+		if (message.Properties != null) {
+			foreach (KeyValuePair<string, string> prop in message.Properties) {
+				r.MessageAttributes[prop.Key] = new MessageAttributeValue {
+					DataType = "String",
+					StringValue = prop.Value
+				};
 			}
-
-			return r;
 		}
 
-		public static QueueMessage ToQueueMessage(Message sqsMessage) {
-			var r = new QueueMessage(sqsMessage.Body);
-			r.Id = sqsMessage.MessageId;
+		return r;
+	}
 
-			foreach (KeyValuePair<string, MessageAttributeValue> attr in sqsMessage.MessageAttributes) {
-				r.Properties[attr.Key] = attr.Value.StringValue;
-			}
-			r.Properties[ReceiptHandlePropertyName] = sqsMessage.ReceiptHandle;
+	public static QueueMessage ToQueueMessage(Message sqsMessage) {
+		var r = new QueueMessage(sqsMessage.Body);
+		r.Id = sqsMessage.MessageId;
 
-			return r;
+		foreach (KeyValuePair<string, MessageAttributeValue> attr in sqsMessage.MessageAttributes) {
+			r.Properties[attr.Key] = attr.Value.StringValue;
 		}
+		r.Properties[ReceiptHandlePropertyName] = sqsMessage.ReceiptHandle;
+
+		return r;
 	}
 }

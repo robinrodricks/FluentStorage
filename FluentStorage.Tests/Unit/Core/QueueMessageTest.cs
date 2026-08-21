@@ -1,29 +1,29 @@
-﻿namespace FluentStorage.Tests.Unit.Core {
-	public class QueueMessageTest {
-		[Fact]
-		public void Binary_Serialize_Deserializes() {
-			var qm = new QueueMessage("id", "content");
-			qm.DequeueCount = 4;
-			qm.Properties.Add("key", "value");
+﻿namespace FluentStorage.Tests.Unit.Core;
 
-			byte[] data = qm.ToByteArray();
+public class QueueMessageTest {
+	[Fact]
+	public void Binary_Serialize_Deserializes() {
+		var qm = new QueueMessage("id", "content");
+		qm.DequeueCount = 4;
+		qm.Properties.Add("key", "value");
 
-			QueueMessage qm2 = QueueMessage.FromByteArray(data);
+		byte[] data = qm.ToByteArray();
 
-			Assert.Equal("id", qm2.Id);
-			Assert.Equal("content", qm2.StringContent);
-			Assert.Equal(4, qm2.DequeueCount);
-			Assert.Single(qm2.Properties);
-			Assert.Equal("value", qm2.Properties["key"]);
-		}
+		QueueMessage qm2 = QueueMessage.FromByteArray(data);
 
-		[Fact]
-		public void Binary_NullId_Handled() {
-			QueueMessage qm1 = QueueMessage.FromText("content2");
-			QueueMessage qm2 = QueueMessage.FromByteArray(qm1.ToByteArray());
+		Assert.Equal("id", qm2.Id);
+		Assert.Equal("content", qm2.StringContent);
+		Assert.Equal(4, qm2.DequeueCount);
+		Assert.Single(qm2.Properties);
+		Assert.Equal("value", qm2.Properties["key"]);
+	}
 
-			Assert.Null(qm2.Id);
-			Assert.Equal("content2", qm2.StringContent);
-		}
+	[Fact]
+	public void Binary_NullId_Handled() {
+		QueueMessage qm1 = QueueMessage.FromText("content2");
+		QueueMessage qm2 = QueueMessage.FromByteArray(qm1.ToByteArray());
+
+		Assert.Null(qm2.Id);
+		Assert.Equal("content2", qm2.StringContent);
 	}
 }

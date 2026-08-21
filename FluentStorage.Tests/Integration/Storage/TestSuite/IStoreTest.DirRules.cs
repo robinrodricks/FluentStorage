@@ -1,6 +1,6 @@
 ﻿	using FluentStorage.Rules;
 
-namespace FluentStorage.Tests.Integration.Storage.TestSuite {
+	namespace FluentStorage.Tests.Integration.Storage.TestSuite;
 
 	/// <summary>
 	/// Integration tests verifying that `UploadDirectory` and `DownloadDirectory` correctly apply
@@ -600,4 +600,3 @@ namespace FluentStorage.Tests.Integration.Storage.TestSuite {
 			await AssertUploadAndDownload(WideTree, rules, expected);
 		}
 	}
-}

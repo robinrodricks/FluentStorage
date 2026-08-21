@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Amazon;
 
-namespace FluentStorage.AWS.Utils {
-	static class AwsConvert {
-		public static RegionEndpoint ToRegionEndpoint(this string s) {
-			if (s is null)
-				throw new ArgumentNullException(nameof(s));
+namespace FluentStorage.AWS.Utils;
 
-			RegionEndpoint endpoint = RegionEndpoint.GetBySystemName(s);
+static class AwsConvert {
+	public static RegionEndpoint ToRegionEndpoint(this string s) {
+		if (s is null)
+			throw new ArgumentNullException(nameof(s));
 
-			return endpoint;
-		}
+		RegionEndpoint endpoint = RegionEndpoint.GetBySystemName(s);
+
+		return endpoint;
 	}
 }

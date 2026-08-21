@@ -2,156 +2,156 @@ using FluentStorage.Exceptions;
 using FluentStorage.Git.Storage;
 using LibGit2Sharp;
 
-namespace FluentStorage.Tests.Integration.Git {
-	public class GitStoreTest {
+namespace FluentStorage.Tests.Integration.Git;
 
-		private static GitStore CreateStore(GitStorageOptions options = null) {
-			string remotePath = GitTestHelpers.CreateSeedRepository();
-			options = options ?? new GitStorageOptions { PullBeforeWrite = false };
+public class GitStoreTest {
 
-			return (GitStore)GitStorage.FromUrl(remotePath, options);
-		}
+	private static GitStore CreateStore(GitStorageOptions options = null) {
+		string remotePath = GitTestHelpers.CreateSeedRepository();
+		options = options ?? new GitStorageOptions { PullBeforeWrite = false };
 
-		private static GitStore CreateStoreFromRemote(string remotePath, GitStorageOptions options = null) {
-			options = options ?? new GitStorageOptions { PullBeforeWrite = false };
-			return (GitStore)GitStorage.FromUrl(remotePath, options);
-		}
+		return (GitStore)GitStorage.FromUrl(remotePath, options);
+	}
 
-		[Fact]
-		public async Task Commit_GroupsMultipleFilesIntoOneCommit() {
-			using GitStore store = CreateStore();
+	private static GitStore CreateStoreFromRemote(string remotePath, GitStorageOptions options = null) {
+		options = options ?? new GitStorageOptions { PullBeforeWrite = false };
+		return (GitStore)GitStorage.FromUrl(remotePath, options);
+	}
 
-			await store.SetText("a.txt", "aaa");
-			await store.SetText("b.txt", "bbb");
-			await store.SetText("c.txt", "ccc");
+	[Fact]
+	public async Task Commit_GroupsMultipleFilesIntoOneCommit() {
+		using GitStore store = CreateStore();
 
-			Commit commit = await store.GitCommit("batch");
+		await store.SetText("a.txt", "aaa");
+		await store.SetText("b.txt", "bbb");
+		await store.SetText("c.txt", "ccc");
 
-			Assert.NotNull(commit);
-			Assert.NotNull(commit.Tree["a.txt"]);
-			Assert.NotNull(commit.Tree["b.txt"]);
-			Assert.NotNull(commit.Tree["c.txt"]);
-		}
+		Commit commit = await store.GitCommit("batch");
 
-		[Fact]
-		public async Task Commit_NoChanges_ReturnsNull() {
-			using GitStore store = CreateStore();
+		Assert.NotNull(commit);
+		Assert.NotNull(commit.Tree["a.txt"]);
+		Assert.NotNull(commit.Tree["b.txt"]);
+		Assert.NotNull(commit.Tree["c.txt"]);
+	}
 
-			Commit commit = await store.GitCommit("nothing");
+	[Fact]
+	public async Task Commit_NoChanges_ReturnsNull() {
+		using GitStore store = CreateStore();
 
-			Assert.Null(commit);
-		}
+		Commit commit = await store.GitCommit("nothing");
 
-		[Fact]
-		public async Task Push_IsVisibleInSecondClone() {
-			string remotePath = GitTestHelpers.CreateSeedRepository();
-			using GitStore store = CreateStoreFromRemote(remotePath);
+		Assert.Null(commit);
+	}
 
-			await store.SetText("pushed.txt", "hello");
-			await store.GitCommitAndPush("push test");
+	[Fact]
+	public async Task Push_IsVisibleInSecondClone() {
+		string remotePath = GitTestHelpers.CreateSeedRepository();
+		using GitStore store = CreateStoreFromRemote(remotePath);
 
-			string secondClone = Path.Combine(Path.GetTempPath(), "FluentStorage.Git.Tests", Guid.NewGuid().ToString("N"));
-			Directory.CreateDirectory(secondClone);
-			Repository.Clone(remotePath, secondClone);
+		await store.SetText("pushed.txt", "hello");
+		await store.GitCommitAndPush("push test");
 
-			Assert.True(File.Exists(Path.Combine(secondClone, "pushed.txt")));
-			Assert.Equal("hello", File.ReadAllText(Path.Combine(secondClone, "pushed.txt")));
-		}
+		string secondClone = Path.Combine(Path.GetTempPath(), "FluentStorage.Git.Tests", Guid.NewGuid().ToString("N"));
+		Directory.CreateDirectory(secondClone);
+		Repository.Clone(remotePath, secondClone);
 
-		[Fact]
-		public async Task Pull_BringsRemoteChanges() {
-			string remotePath = GitTestHelpers.CreateSeedRepository();
-			using GitStore storeA = CreateStoreFromRemote(remotePath);
-			using GitStore storeB = CreateStoreFromRemote(remotePath);
+		Assert.True(File.Exists(Path.Combine(secondClone, "pushed.txt")));
+		Assert.Equal("hello", File.ReadAllText(Path.Combine(secondClone, "pushed.txt")));
+	}
 
-			await storeA.SetText("shared.txt", "from-a");
-			await storeA.GitCommitAndPush("a");
+	[Fact]
+	public async Task Pull_BringsRemoteChanges() {
+		string remotePath = GitTestHelpers.CreateSeedRepository();
+		using GitStore storeA = CreateStoreFromRemote(remotePath);
+		using GitStore storeB = CreateStoreFromRemote(remotePath);
 
-			Assert.False(await storeB.ObjectExists("shared.txt"));
+		await storeA.SetText("shared.txt", "from-a");
+		await storeA.GitCommitAndPush("a");
 
-			await storeB.GitPull();
+		Assert.False(await storeB.ObjectExists("shared.txt"));
 
-			Assert.True(await storeB.ObjectExists("shared.txt"));
-			Assert.Equal("from-a", await storeB.GetText("shared.txt"));
-		}
+		await storeB.GitPull();
 
-		[Fact]
-		public async Task AutoCommit_CreatesCommitOnWrite() {
-			string remotePath = GitTestHelpers.CreateSeedRepository();
-			using GitStore store = CreateStoreFromRemote(remotePath, new GitStorageOptions { AutoCommit = true, PullBeforeWrite = false });
+		Assert.True(await storeB.ObjectExists("shared.txt"));
+		Assert.Equal("from-a", await storeB.GetText("shared.txt"));
+	}
 
-			await store.SetText("auto.txt", "x");
+	[Fact]
+	public async Task AutoCommit_CreatesCommitOnWrite() {
+		string remotePath = GitTestHelpers.CreateSeedRepository();
+		using GitStore store = CreateStoreFromRemote(remotePath, new GitStorageOptions { AutoCommit = true, PullBeforeWrite = false });
 
-			Commit head = store.GetCurrentCommit();
-			Assert.NotNull(head);
-			Assert.NotNull(head.Tree["auto.txt"]);
-		}
+		await store.SetText("auto.txt", "x");
 
-		[Fact]
-		public async Task RootPath_IsolatesSubfolder() {
-			using GitStore store = CreateStore(new GitStorageOptions { RootPath = "data", PullBeforeWrite = false });
+		Commit head = store.GetCurrentCommit();
+		Assert.NotNull(head);
+		Assert.NotNull(head.Tree["auto.txt"]);
+	}
 
-			await store.SetText("file.txt", "in-data");
+	[Fact]
+	public async Task RootPath_IsolatesSubfolder() {
+		using GitStore store = CreateStore(new GitStorageOptions { RootPath = "data", PullBeforeWrite = false });
 
-			Assert.True(File.Exists(Path.Combine(store.LocalWorkingDirectory, "data", "file.txt")));
+		await store.SetText("file.txt", "in-data");
 
-			List<StoreObject> all = await store.ListDirectory(null, true);
-			Assert.Contains(all, o => o.FullPath == "file.txt");
-		}
+		Assert.True(File.Exists(Path.Combine(store.LocalWorkingDirectory, "data", "file.txt")));
 
-		[Fact]
-		public async Task PathTraversal_IsBlocked() {
-			using GitStore store = CreateStore();
+		List<StoreObject> all = await store.ListDirectory(null, true);
+		Assert.Contains(all, o => o.FullPath == "file.txt");
+	}
 
-			await Assert.ThrowsAsync<StorageException>(() => store.SetText("../../outside.txt", "evil"));
-		}
+	[Fact]
+	public async Task PathTraversal_IsBlocked() {
+		using GitStore store = CreateStore();
 
-		[Fact]
-		public async Task Versioning_ListGetRestore() {
-			using GitStore store = CreateStore(new GitStorageOptions { AutoCommit = true, PullBeforeWrite = false });
+		await Assert.ThrowsAsync<StorageException>(() => store.SetText("../../outside.txt", "evil"));
+	}
 
-			await store.SetText("v.txt", "v1");
-			await store.SetText("v.txt", "v2");
+	[Fact]
+	public async Task Versioning_ListGetRestore() {
+		using GitStore store = CreateStore(new GitStorageOptions { AutoCommit = true, PullBeforeWrite = false });
 
-			List<StorageObjectVersion> versions = await store.ListObjectVersions("v.txt");
-			Assert.True(versions.Count >= 2);
-			Assert.Contains(versions, v => v.IsCurrent);
+		await store.SetText("v.txt", "v1");
+		await store.SetText("v.txt", "v2");
 
-			StorageObjectVersion older = versions.First(v => !v.IsCurrent);
-			StorageObjectVersion info = await store.GetObjectVersion("v.txt", older.VersionId);
-			Assert.Equal(older.VersionId, info.VersionId);
+		List<StorageObjectVersion> versions = await store.ListObjectVersions("v.txt");
+		Assert.True(versions.Count >= 2);
+		Assert.Contains(versions, v => v.IsCurrent);
 
-			bool restored = await store.RestoreObjectVersion("v.txt", older.VersionId);
-			Assert.True(restored);
-			Assert.Equal("v1", await store.GetText("v.txt"));
-		}
+		StorageObjectVersion older = versions.First(v => !v.IsCurrent);
+		StorageObjectVersion info = await store.GetObjectVersion("v.txt", older.VersionId);
+		Assert.Equal(older.VersionId, info.VersionId);
 
-		[Fact]
-		public async Task Metadata_SidecarRoundtrips() {
-			using GitStore store = CreateStore();
+		bool restored = await store.RestoreObjectVersion("v.txt", older.VersionId);
+		Assert.True(restored);
+		Assert.Equal("v1", await store.GetText("v.txt"));
+	}
 
-			await store.SetText("m.txt", "data");
+	[Fact]
+	public async Task Metadata_SidecarRoundtrips() {
+		using GitStore store = CreateStore();
 
-			var obj = new StoreObject("m.txt");
-			obj.Metadata["user"] = "ivanilson";
-			obj.Metadata["fun"] = "no";
-			await store.SetObjectInfo(obj);
+		await store.SetText("m.txt", "data");
 
-			StoreObject info = await store.GetObjectInfo("m.txt");
-			Assert.Equal("ivanilson", info.Metadata["user"]);
-			Assert.Equal("no", info.Metadata["fun"]);
+		var obj = new StoreObject("m.txt");
+		obj.Metadata["user"] = "ivanilson";
+		obj.Metadata["fun"] = "no";
+		await store.SetObjectInfo(obj);
 
-			List<StoreObject> all = await store.ListDirectory(null, true);
-			Assert.DoesNotContain(all, o => o.FullPath.EndsWith(".attr"));
-		}
+		StoreObject info = await store.GetObjectInfo("m.txt");
+		Assert.Equal("ivanilson", info.Metadata["user"]);
+		Assert.Equal("no", info.Metadata["fun"]);
 
-		[Fact]
-		public async Task FromToken_ClonesLocalRepository() {
-			string remotePath = GitTestHelpers.CreateSeedRepository();
+		List<StoreObject> all = await store.ListDirectory(null, true);
+		Assert.DoesNotContain(all, o => o.FullPath.EndsWith(".attr"));
+	}
 
-			using var store = (GitStore)GitStorage.FromToken(remotePath, "some-token");
+	[Fact]
+	public async Task FromToken_ClonesLocalRepository() {
+		string remotePath = GitTestHelpers.CreateSeedRepository();
 
-			Assert.True(await store.ObjectExists("README.md"));
-		}
+		using var store = (GitStore)GitStorage.FromToken(remotePath, "some-token");
+
+		Assert.True(await store.ObjectExists("README.md"));
 	}
 }

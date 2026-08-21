@@ -1,15 +1,15 @@
 ﻿using System;
 
-namespace FluentStorage.Queue.Polling {
-	class RegularIntervalsPollingPolicy : IPollingPolicy {
-		private readonly TimeSpan _interval;
+namespace FluentStorage.Queue.Polling;
 
-		public RegularIntervalsPollingPolicy(TimeSpan interval) {
-			_interval = interval;
-		}
+class RegularIntervalsPollingPolicy : IPollingPolicy {
+	private readonly TimeSpan _interval;
 
-		public TimeSpan GetNextDelay() => _interval;
-
-		public void Reset() { }
+	public RegularIntervalsPollingPolicy(TimeSpan interval) {
+		_interval = interval;
 	}
+
+	public TimeSpan GetNextDelay() => _interval;
+
+	public void Reset() { }
 }

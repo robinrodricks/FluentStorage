@@ -3,59 +3,59 @@ using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
 
-namespace FluentStorage.Tests.Integration.Ftp {
-	public class FtpDockerFixture : IAsyncLifetime {
+namespace FluentStorage.Tests.Integration.Ftp;
 
-		public IContainer FtpContainer { get; }
+public class FtpDockerFixture : IAsyncLifetime {
 
-		private static readonly Faker Faker = new();
+	public IContainer FtpContainer { get; }
 
-		private readonly string _userName;
-		private readonly string _password;
+	private static readonly Faker Faker = new();
 
-		public string UserName => _userName;
+	private readonly string _userName;
+	private readonly string _password;
 
-		public string Password => _password;
+	public string UserName => _userName;
 
-		private const int MaxUsersCount = 5;
+	public string Password => _password;
 
-		private const int PassivePortStart = 15_000;
+	private const int MaxUsersCount = 5;
 
-		public int GetPort() => FtpContainer.GetMappedPublicPort(21);
+	private const int PassivePortStart = 15_000;
 
-		public FtpDockerFixture() {
-			_userName = Faker.Internet.UserName();
-			_password = Faker.Internet.Password();
-			int passivePortEnd = PassivePortStart + (MaxUsersCount);
+	public int GetPort() => FtpContainer.GetMappedPublicPort(21);
 
-			ContainerBuilder containerBuilder = new ContainerBuilder()
-				.WithAutoRemove(autoRemove: false)
-				.WithImage("stilliard/pure-ftpd:latest")
-				.WithEnvironment(new Dictionary<string, string> {
-					["PUBLICHOST"] = "localhost",
-					["FTP_USER_NAME"] = UserName,
-					["FTP_USER_PASS"] = Password,
-					["FTP_USER_HOME"] = $"/home/{UserName}",
-					["FTP_MAX_CLIENTS"] = $"{MaxUsersCount}",
-					["FTP_PASSIVE_PORTS"] = $"{PassivePortStart}:{passivePortEnd}"
-				})
-				.WithPortBinding(21, assignRandomHostPort: true)
-				.WithTmpfsMount($"/home/{UserName}/data", AccessMode.ReadWrite)
-				.WithTmpfsMount($"/etc/pure-ftpd/passwd", AccessMode.ReadWrite);
+	public FtpDockerFixture() {
+		_userName = Faker.Internet.UserName();
+		_password = Faker.Internet.Password();
+		int passivePortEnd = PassivePortStart + (MaxUsersCount);
 
-			for (int port = PassivePortStart; port < passivePortEnd; port++) {
-				containerBuilder = containerBuilder.WithPortBinding(port);
-			}
+		ContainerBuilder containerBuilder = new ContainerBuilder()
+			.WithAutoRemove(autoRemove: false)
+			.WithImage("stilliard/pure-ftpd:latest")
+			.WithEnvironment(new Dictionary<string, string> {
+				["PUBLICHOST"] = "localhost",
+				["FTP_USER_NAME"] = UserName,
+				["FTP_USER_PASS"] = Password,
+				["FTP_USER_HOME"] = $"/home/{UserName}",
+				["FTP_MAX_CLIENTS"] = $"{MaxUsersCount}",
+				["FTP_PASSIVE_PORTS"] = $"{PassivePortStart}:{passivePortEnd}"
+			})
+			.WithPortBinding(21, assignRandomHostPort: true)
+			.WithTmpfsMount($"/home/{UserName}/data", AccessMode.ReadWrite)
+			.WithTmpfsMount($"/etc/pure-ftpd/passwd", AccessMode.ReadWrite);
 
-			FtpContainer = containerBuilder.Build();
+		for (int port = PassivePortStart; port < passivePortEnd; port++) {
+			containerBuilder = containerBuilder.WithPortBinding(port);
 		}
 
-		///<inheritdoc/>
-		public async Task InitializeAsync() {
-			await FtpContainer.StartAsync().ConfigureAwait(false);
-		}
-
-		///<inheritdoc/>
-		public async Task DisposeAsync() => await FtpContainer.StopAsync().ConfigureAwait(false);
+		FtpContainer = containerBuilder.Build();
 	}
+
+	///<inheritdoc/>
+	public async Task InitializeAsync() {
+		await FtpContainer.StartAsync().ConfigureAwait(false);
+	}
+
+	///<inheritdoc/>
+	public async Task DisposeAsync() => await FtpContainer.StopAsync().ConfigureAwait(false);
 }

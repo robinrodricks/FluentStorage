@@ -3,34 +3,34 @@ using FluentStorage.Git.Storage;
 using FluentStorage.Queue;
 using FluentStorage.Storage;
 
-namespace FluentStorage.Git {
-	/// <summary>
-	/// Creates <see cref="GitStore"/> instances from git connection strings.
-	/// </summary>
-	class ConnectionFactory : IConnectionFactory {
+namespace FluentStorage.Git;
 
-		/// <inheritdoc />
-		public IStore CreateStore(ConnectionString connectionString) {
-			if (connectionString.Prefix == "git") {
-				connectionString.GetRequired("url", true, out string url);
+/// <summary>
+/// Creates <see cref="GitStore"/> instances from git connection strings.
+/// </summary>
+class ConnectionFactory : IConnectionFactory {
 
-				var options = new GitStorageOptions {
-					Url = url,
-					UserName = connectionString.Get("user"),
-					Password = connectionString.Get("password"),
-					Token = connectionString.Get("token"),
-					Branch = connectionString.Get("branch"),
-					RootPath = connectionString.Get("root"),
-					LocalWorkingDirectory = connectionString.Get("localpath"),
-				};
+	/// <inheritdoc />
+	public IStore CreateStore(ConnectionString connectionString) {
+		if (connectionString.Prefix == "git") {
+			connectionString.GetRequired("url", true, out string url);
 
-				return new GitStore(options);
-			}
+			var options = new GitStorageOptions {
+				Url = url,
+				UserName = connectionString.Get("user"),
+				Password = connectionString.Get("password"),
+				Token = connectionString.Get("token"),
+				Branch = connectionString.Get("branch"),
+				RootPath = connectionString.Get("root"),
+				LocalWorkingDirectory = connectionString.Get("localpath"),
+			};
 
-			return null;
+			return new GitStore(options);
 		}
 
-		/// <inheritdoc />
-		public IQueue CreateQueue(ConnectionString connectionString) => null;
+		return null;
 	}
+
+	/// <inheritdoc />
+	public IQueue CreateQueue(ConnectionString connectionString) => null;
 }

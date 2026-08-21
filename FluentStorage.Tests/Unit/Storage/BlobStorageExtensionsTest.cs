@@ -1,44 +1,44 @@
-﻿namespace FluentStorage.Tests.Unit.Storage {
-	public class BlobStorageExtensionsTest {
-		private readonly IStore _storage = StorageFactory.InMemory();
+﻿namespace FluentStorage.Tests.Unit.Storage;
 
-		[Fact]
-		public async Task Write_read_object() {
-			var input = new MyClass { Name = "test" };
+public class BlobStorageExtensionsTest {
+	private readonly IStore _storage = StorageFactory.InMemory();
 
-			await _storage.SetJson("1.json", input);
+	[Fact]
+	public async Task Write_read_object() {
+		var input = new MyClass { Name = "test" };
 
-			MyClass output = await _storage.GetJson<MyClass>("1.json");
+		await _storage.SetJson("1.json", input);
 
-			Assert.Equal("test", output.Name);
-		}
+		MyClass output = await _storage.GetJson<MyClass>("1.json");
 
-		[Fact]
-		public async Task Read_non_existing_object_returns_Default() {
-			MyClass output = await _storage.GetJson<MyClass>("1.json");
+		Assert.Equal("test", output.Name);
+	}
 
-			Assert.Null(output);
-		}
+	[Fact]
+	public async Task Read_non_existing_object_returns_Default() {
+		MyClass output = await _storage.GetJson<MyClass>("1.json");
 
-		[Fact]
-		public async Task Read_damaged_json_with_ignore_returns_Default() {
-			await _storage.SetText("1.json", "not a json");
+		Assert.Null(output);
+	}
 
-			MyClass output = await _storage.GetJson<MyClass>("1.json", true);
+	[Fact]
+	public async Task Read_damaged_json_with_ignore_returns_Default() {
+		await _storage.SetText("1.json", "not a json");
 
-			Assert.Null(output);
-		}
+		MyClass output = await _storage.GetJson<MyClass>("1.json", true);
 
-		[Fact]
-		public async Task Read_damaged_json_without_ignore_returns_Default() {
-			await _storage.SetText("1.json", "not a json");
+		Assert.Null(output);
+	}
 
-			await Assert.ThrowsAsync<JsonException>(() => _storage.GetJson<MyClass>("1.json", false));
-		}
+	[Fact]
+	public async Task Read_damaged_json_without_ignore_returns_Default() {
+		await _storage.SetText("1.json", "not a json");
+
+		await Assert.ThrowsAsync<JsonException>(() => _storage.GetJson<MyClass>("1.json", false));
+	}
 
 
-		private class MyClass {
-			public string Name { get; set; }
-		}
+	private class MyClass {
+		public string Name { get; set; }
 	}
 }

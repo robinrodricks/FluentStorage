@@ -3,29 +3,29 @@ using FluentStorage.Storage;
 using FluentStorage.ConnectionStrings;
 using FluentStorage.Queue;
 
-namespace FluentStorage.Azure.KeyVault {
-	class ExternalModule : IExternalModule, IConnectionFactory {
-		public IConnectionFactory ConnectionFactory => this;
+namespace FluentStorage.Azure.KeyVault;
 
-		public IStore CreateStore(ConnectionString connectionString) {
-			if (connectionString.Prefix == ConnectionStringPrefix.AzureKeyVault) {
-				connectionString.GetRequired(ConnectionStringParam.VaultUri, true, out string uri);
+class ExternalModule : IExternalModule, IConnectionFactory {
+	public IConnectionFactory ConnectionFactory => this;
 
-				if (connectionString.Parameters.ContainsKey(ConnectionStringParam.MsiEnabled)) {
-					return AzureKeyVaultStorage.FromMsi(new Uri(uri));
-				}
-				else {
-					connectionString.GetRequired(ConnectionStringParam.TenantId, true, out string tenantId);
-					connectionString.GetRequired(ConnectionStringParam.ClientId, true, out string clientId);
-					connectionString.GetRequired(ConnectionStringParam.ClientSecret, true, out string clientSecret);
+	public IStore CreateStore(ConnectionString connectionString) {
+		if (connectionString.Prefix == ConnectionStringPrefix.AzureKeyVault) {
+			connectionString.GetRequired(ConnectionStringParam.VaultUri, true, out string uri);
 
-					return AzureKeyVaultStorage.FromCredentials(new Uri(uri), tenantId, clientId, clientSecret);
-				}
+			if (connectionString.Parameters.ContainsKey(ConnectionStringParam.MsiEnabled)) {
+				return AzureKeyVaultStorage.FromMsi(new Uri(uri));
 			}
+			else {
+				connectionString.GetRequired(ConnectionStringParam.TenantId, true, out string tenantId);
+				connectionString.GetRequired(ConnectionStringParam.ClientId, true, out string clientId);
+				connectionString.GetRequired(ConnectionStringParam.ClientSecret, true, out string clientSecret);
 
-			return null;
+				return AzureKeyVaultStorage.FromCredentials(new Uri(uri), tenantId, clientId, clientSecret);
+			}
 		}
 
-		public IQueue CreateQueue(ConnectionString connectionString) => null;
+		return null;
 	}
+
+	public IQueue CreateQueue(ConnectionString connectionString) => null;
 }

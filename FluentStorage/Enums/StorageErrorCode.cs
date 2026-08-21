@@ -1,26 +1,26 @@
-﻿namespace FluentStorage.Enums {
+﻿namespace FluentStorage.Enums;
+
+/// <summary>
+/// Generic error codes for storage operations
+/// </summary>
+public enum StorageErrorCode {
 	/// <summary>
-	/// Generic error codes for storage operations
+	/// Unknown error code
 	/// </summary>
-	public enum StorageErrorCode {
-		/// <summary>
-		/// Unknown error code
-		/// </summary>
-		Unknown,
+	Unknown,
 
-		/// <summary>
-		/// Resource not found
-		/// </summary>
-		NotFound,
+	/// <summary>
+	/// Resource not found
+	/// </summary>
+	NotFound,
 
-		/// <summary>
-		/// Operation failed because a key already exists
-		/// </summary>
-		DuplicateKey,
+	/// <summary>
+	/// Operation failed because a key already exists
+	/// </summary>
+	DuplicateKey,
 
-		/// <summary>
-		/// A conflict
-		/// </summary>
-		Conflict
-	}
+	/// <summary>
+	/// A conflict
+	/// </summary>
+	Conflict
 }

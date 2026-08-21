@@ -1,13 +1,13 @@
 ﻿using FluentStorage.ConnectionStrings;
 
-namespace FluentStorage {
+namespace FluentStorage;
+
+/// <summary>
+/// An entry point for implementing initialisation of an external module
+/// </summary>
+public interface IExternalModule {
 	/// <summary>
-	/// An entry point for implementing initialisation of an external module
+	/// Gets connection factory
 	/// </summary>
-	public interface IExternalModule {
-		/// <summary>
-		/// Gets connection factory
-		/// </summary>
-		IConnectionFactory ConnectionFactory { get; }
-	}
+	IConnectionFactory ConnectionFactory { get; }
 }

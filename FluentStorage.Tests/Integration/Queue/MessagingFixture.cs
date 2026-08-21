@@ -1,26 +1,26 @@
-﻿namespace FluentStorage.Tests.Integration.Queue {
-	public abstract class MessagingFixture : IDisposable {
-		private static readonly TestConfig _settings = TestConfigLoader.Config;
-		public readonly IQueue Messenger;
-		private readonly string _fixtureName;
-		protected readonly string _testDir;
+﻿namespace FluentStorage.Tests.Integration.Queue;
 
-		protected MessagingFixture() {
-			_fixtureName = GetType().Name;
-			string buildDir = new FileInfo(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath).Directory.FullName;
-			_testDir = Path.Combine(buildDir, "msg-" + Guid.NewGuid());
-			Directory.CreateDirectory(_testDir);
+public abstract class MessagingFixture : IDisposable {
+	private static readonly TestConfig _settings = TestConfigLoader.Config;
+	public readonly IQueue Messenger;
+	private readonly string _fixtureName;
+	protected readonly string _testDir;
 
-			Messenger = CreateMessenger(_settings);
-		}
+	protected MessagingFixture() {
+		_fixtureName = GetType().Name;
+		string buildDir = new FileInfo(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath).Directory.FullName;
+		_testDir = Path.Combine(buildDir, "msg-" + Guid.NewGuid());
+		Directory.CreateDirectory(_testDir);
 
-		protected abstract IQueue CreateMessenger(TestConfig settings);
+		Messenger = CreateMessenger(_settings);
+	}
 
-		public void Dispose() {
-			if (Messenger != null)
-				Messenger.Dispose();
+	protected abstract IQueue CreateMessenger(TestConfig settings);
 
-			Directory.Delete(_testDir, true);
-		}
+	public void Dispose() {
+		if (Messenger != null)
+			Messenger.Dispose();
+
+		Directory.Delete(_testDir, true);
 	}
 }

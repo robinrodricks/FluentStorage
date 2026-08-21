@@ -12,389 +12,387 @@ using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.Storage.Blobs;
 using FluentStorage.Storage;
-using FluentStorage.Azure;
 using FluentStorage.Utils.Extensions;
 using FluentStorage.Azure.Blobs.DataLake.Model;
 using FluentStorage.Azure.Blobs.DataLake;
-using FluentStorage.Utils.Validation;
 using FluentStorage.Model;
 
-namespace FluentStorage.Azure.Blobs.Utils {
-	class ExtendedSdk {
-		private readonly BlobServiceClient _sdkClient;
-		private readonly HttpPipeline _httpPipeline;
-		private readonly string _dfsBaseAddress;
-		private static readonly JsonSerializerOptions _jo = new JsonSerializerOptions {
-			PropertyNameCaseInsensitive = true
-		};
+namespace FluentStorage.Azure.Blobs.Utils;
 
-		static ExtendedSdk() {
-			_jo.Converters.Add(new DateTimeConverter());
+class ExtendedSdk {
+	private readonly BlobServiceClient _sdkClient;
+	private readonly HttpPipeline _httpPipeline;
+	private readonly string _dfsBaseAddress;
+	private static readonly JsonSerializerOptions _jo = new JsonSerializerOptions {
+		PropertyNameCaseInsensitive = true
+	};
+
+	static ExtendedSdk() {
+		_jo.Converters.Add(new DateTimeConverter());
+	}
+
+	public ExtendedSdk(BlobServiceClient sdkClient, string accountName, AzureCloudEnvironment azureCloudEnvironment) {
+		_sdkClient = sdkClient ?? throw new ArgumentNullException(nameof(sdkClient));
+
+		_httpPipeline = GetHttpPipeline(sdkClient);
+		_dfsBaseAddress = GetDfsBaseAddress(accountName, azureCloudEnvironment);
+	}
+
+	private static string GetDfsBaseAddress(string accountName, AzureCloudEnvironment azureCloudEnvironment) {
+		var endpoint = AzureCloudEndpoints.GetDataLakeEndpoint(azureCloudEnvironment);
+		return $"https://{accountName}.{endpoint}/";
+	}
+
+
+	private static HttpPipeline GetHttpPipeline(BlobServiceClient sdkClient) {
+		PropertyInfo httpPipelineProperty =
+			typeof(BlobServiceClient).GetProperty("Pipeline", BindingFlags.NonPublic | BindingFlags.Instance);
+
+		HttpPipeline httpPipeline = httpPipelineProperty.GetValue(sdkClient) as HttpPipeline;
+
+		if (httpPipeline == null)
+			throw new ArgumentException($"cannot find {typeof(HttpPipeline)} via reflection");
+
+		return httpPipeline;
+	}
+
+	public async Task<List<Filesystem>> ListFilesystemsAsync(CancellationToken cancellationToken = default) {
+		FilesystemList response = await InvokeAsync<FilesystemList>(
+			"?resource=account",
+			RequestMethod.Get,
+			cancellationToken).ConfigureAwait(false);
+
+		return response.Filesystems;
+	}
+
+	public async Task<List<StoreObject>> ListFilesystemsAsBlobsAsync(CancellationToken cancellationToken = default) {
+		List<Filesystem> fss = await ListFilesystemsAsync(cancellationToken).ConfigureAwait(false);
+
+		return fss.Select(AzConvert.ToBlob).ToList();
+	}
+
+	public async Task CreateFilesystemAsync(string name, CancellationToken cancellationToken = default) {
+		try {
+			await InvokeAsync<Void>($"{name}?resource=filesystem", RequestMethod.Put, cancellationToken)
+				.ConfigureAwait(false);
 		}
+		catch (RequestFailedException ex) when (ex.ErrorCode == "FilesystemAlreadyExists") {
 
-		public ExtendedSdk(BlobServiceClient sdkClient, string accountName, AzureCloudEnvironment azureCloudEnvironment) {
-			_sdkClient = sdkClient ?? throw new ArgumentNullException(nameof(sdkClient));
-
-			_httpPipeline = GetHttpPipeline(sdkClient);
-			_dfsBaseAddress = GetDfsBaseAddress(accountName, azureCloudEnvironment);
 		}
+	}
 
-		private static string GetDfsBaseAddress(string accountName, AzureCloudEnvironment azureCloudEnvironment) {
-			var endpoint = AzureCloudEndpoints.GetDataLakeEndpoint(azureCloudEnvironment);
-			return $"https://{accountName}.{endpoint}/";
+	public async Task DeleteFilesystemAsync(string name, CancellationToken cancellationToken = default) {
+		try {
+			await InvokeAsync<Void>($"{name}?resource=filesystem", RequestMethod.Delete, cancellationToken)
+				.ConfigureAwait(false);
 		}
+		catch (RequestFailedException ex) when (ex.ErrorCode == "FilesystemNotFound") {
 
-
-		private static HttpPipeline GetHttpPipeline(BlobServiceClient sdkClient) {
-			PropertyInfo httpPipelineProperty =
-			   typeof(BlobServiceClient).GetProperty("Pipeline", BindingFlags.NonPublic | BindingFlags.Instance);
-
-			HttpPipeline httpPipeline = httpPipelineProperty.GetValue(sdkClient) as HttpPipeline;
-
-			if (httpPipeline == null)
-				throw new ArgumentException($"cannot find {typeof(HttpPipeline)} via reflection");
-
-			return httpPipeline;
 		}
+	}
 
-		public async Task<List<Filesystem>> ListFilesystemsAsync(CancellationToken cancellationToken = default) {
-			FilesystemList response = await InvokeAsync<FilesystemList>(
-			   "?resource=account",
-			   RequestMethod.Get,
-			   cancellationToken).ConfigureAwait(false);
+	public async Task SetAccessControlAsync(
+		string fullPath,
+		AccessControl accessControl,
+		CancellationToken cancellationToken = default) {
+		DecomposePath(fullPath, out string filesystemName, out string relativePath, false);
 
-			return response.Filesystems;
+		await InvokeAsync<Void>(
+			$"{filesystemName}/{relativePath}?action=setAccessControl",
+			RequestMethod.Patch,
+			cancellationToken,
+			new Dictionary<string, string> {
+				["x-ms-acl"] = accessControl.ToString()
+			}).ConfigureAwait(false);
+	}
+
+	public async Task<AccessControl> GetAccessControlAsync(
+		string fullPath,
+		bool getUpn,
+		CancellationToken cancellationToken = default) {
+		DecomposePath(fullPath, out string filesystemName, out string relativePath, false);
+
+		(Void _, IDictionary<string, string> headers) = await InvokeExtraAsync<Void>(
+			$"{filesystemName}/{relativePath}?action=getAccessControl&upn={getUpn}",
+			RequestMethod.Head,
+			cancellationToken).ConfigureAwait(false);
+
+		headers.TryGetValue("x-ms-owner", out string owner);
+		headers.TryGetValue("x-ms-group", out string group);
+		headers.TryGetValue("x-ms-permissions", out string permissions);
+		headers.TryGetValue("x-ms-acl", out string acl);
+
+		return new AccessControl(owner, group, permissions, acl);
+	}
+
+	public async Task DeleteAsync(string fullPath, CancellationToken cancellationToken = default) {
+		DecomposePath(fullPath, out string fs, out string rp, false);
+
+		if (StoragePath.IsRootPath(rp)) {
+			await DeleteFilesystemAsync(fs, cancellationToken).ConfigureAwait(false);
 		}
-
-		public async Task<List<StoreObject>> ListFilesystemsAsBlobsAsync(CancellationToken cancellationToken = default) {
-			List<Filesystem> fss = await ListFilesystemsAsync(cancellationToken).ConfigureAwait(false);
-
-			return fss.Select(AzConvert.ToBlob).ToList();
-		}
-
-		public async Task CreateFilesystemAsync(string name, CancellationToken cancellationToken = default) {
+		else {
 			try {
-				await InvokeAsync<Void>($"{name}?resource=filesystem", RequestMethod.Put, cancellationToken)
-				   .ConfigureAwait(false);
-			}
-			catch (RequestFailedException ex) when (ex.ErrorCode == "FilesystemAlreadyExists") {
-
-			}
-		}
-
-		public async Task DeleteFilesystemAsync(string name, CancellationToken cancellationToken = default) {
-			try {
-				await InvokeAsync<Void>($"{name}?resource=filesystem", RequestMethod.Delete, cancellationToken)
-				   .ConfigureAwait(false);
-			}
-			catch (RequestFailedException ex) when (ex.ErrorCode == "FilesystemNotFound") {
-
-			}
-		}
-
-		public async Task SetAccessControlAsync(
-		   string fullPath,
-		   AccessControl accessControl,
-		   CancellationToken cancellationToken = default) {
-			DecomposePath(fullPath, out string filesystemName, out string relativePath, false);
-
-			await InvokeAsync<Void>(
-			   $"{filesystemName}/{relativePath}?action=setAccessControl",
-			   RequestMethod.Patch,
-			   cancellationToken,
-			   new Dictionary<string, string> {
-				   ["x-ms-acl"] = accessControl.ToString()
-			   }).ConfigureAwait(false);
-		}
-
-		public async Task<AccessControl> GetAccessControlAsync(
-		   string fullPath,
-		   bool getUpn,
-		   CancellationToken cancellationToken = default) {
-			DecomposePath(fullPath, out string filesystemName, out string relativePath, false);
-
-			(Void _, IDictionary<string, string> headers) = await InvokeExtraAsync<Void>(
-			   $"{filesystemName}/{relativePath}?action=getAccessControl&upn={getUpn}",
-			   RequestMethod.Head,
-			   cancellationToken).ConfigureAwait(false);
-
-			headers.TryGetValue("x-ms-owner", out string owner);
-			headers.TryGetValue("x-ms-group", out string group);
-			headers.TryGetValue("x-ms-permissions", out string permissions);
-			headers.TryGetValue("x-ms-acl", out string acl);
-
-			return new AccessControl(owner, group, permissions, acl);
-		}
-
-		public async Task DeleteAsync(string fullPath, CancellationToken cancellationToken = default) {
-			DecomposePath(fullPath, out string fs, out string rp, false);
-
-			if (StoragePath.IsRootPath(rp)) {
-				await DeleteFilesystemAsync(fs, cancellationToken).ConfigureAwait(false);
-			}
-			else {
-				try {
-					await InvokeAsync<Void>(
-					   $"{fs}/{rp}?recursive=true",
-					   RequestMethod.Delete,
-					   cancellationToken).ConfigureAwait(false);
-				}
-				catch (RequestFailedException ex) when (ex.ErrorCode == "PathNotFound") {
-					// file not found, ignore
-				}
-			}
-
-		}
-
-		public async Task<StoreObject> GetBlobAsync(string fullPath, CancellationToken cancellationToken = default) {
-			DecomposePath(fullPath, out string fs, out string rp, false);
-
-			if (StoragePath.IsRootPath(rp)) {
-				try {
-					(Void _, IDictionary<string, string> headers) = await InvokeExtraAsync<Void>(
-					   $"{fs}?resource=filesystem",
-					   RequestMethod.Head,
-					   cancellationToken).ConfigureAwait(false);
-
-					return AzConvert.ToBlob(fullPath, headers, true);
-				}
-				catch (RequestFailedException ex) when (ex.ErrorCode == "FilesystemNotFound") {
-					//filesystem doesn't exist
-					return null;
-				}
-			}
-
-			try {
-				(Void _, IDictionary<string, string> fheaders) = await InvokeExtraAsync<Void>(
-				   $"{fs}/{rp.UrlEncode()}?action=getProperties",
-				   RequestMethod.Head,
-				   cancellationToken).ConfigureAwait(false);
-
-				return AzConvert.ToBlob(fullPath, fheaders, false);
+				await InvokeAsync<Void>(
+					$"{fs}/{rp}?recursive=true",
+					RequestMethod.Delete,
+					cancellationToken).ConfigureAwait(false);
 			}
 			catch (RequestFailedException ex) when (ex.ErrorCode == "PathNotFound") {
+				// file not found, ignore
+			}
+		}
+
+	}
+
+	public async Task<StoreObject> GetBlobAsync(string fullPath, CancellationToken cancellationToken = default) {
+		DecomposePath(fullPath, out string fs, out string rp, false);
+
+		if (StoragePath.IsRootPath(rp)) {
+			try {
+				(Void _, IDictionary<string, string> headers) = await InvokeExtraAsync<Void>(
+					$"{fs}?resource=filesystem",
+					RequestMethod.Head,
+					cancellationToken).ConfigureAwait(false);
+
+				return AzConvert.ToBlob(fullPath, headers, true);
+			}
+			catch (RequestFailedException ex) when (ex.ErrorCode == "FilesystemNotFound") {
+				//filesystem doesn't exist
 				return null;
 			}
 		}
 
+		try {
+			(Void _, IDictionary<string, string> fheaders) = await InvokeExtraAsync<Void>(
+				$"{fs}/{rp.UrlEncode()}?action=getProperties",
+				RequestMethod.Head,
+				cancellationToken).ConfigureAwait(false);
 
-		public async Task<List<StoreObject>> ListAsync(
-		   StorageListOptions options, CancellationToken cancellationToken = default) {
-			if (options == null)
-				options = new StorageListOptions();
+			return AzConvert.ToBlob(fullPath, fheaders, false);
+		}
+		catch (RequestFailedException ex) when (ex.ErrorCode == "PathNotFound") {
+			return null;
+		}
+	}
 
-			List<StoreObject> result = await InternalListAsync(options, cancellationToken).ConfigureAwait(false);
 
-			if (options.IncludeAttributes) {
-				result = (await Task.WhenAll(result.Select(b => GetWithMetadata(b, cancellationToken))).ConfigureAwait(false)).ToList();
+	public async Task<List<StoreObject>> ListAsync(
+		StorageListOptions options, CancellationToken cancellationToken = default) {
+		if (options == null)
+			options = new StorageListOptions();
+
+		List<StoreObject> result = await InternalListAsync(options, cancellationToken).ConfigureAwait(false);
+
+		if (options.IncludeAttributes) {
+			result = (await Task.WhenAll(result.Select(b => GetWithMetadata(b, cancellationToken))).ConfigureAwait(false)).ToList();
+		}
+
+		return result;
+	}
+
+	private Task<StoreObject> GetWithMetadata(StoreObject b, CancellationToken cancellationToken = default) {
+		if (b.IsFile) {
+			return GetBlobAsync(b, cancellationToken);
+		}
+
+		return Task.FromResult(b);
+	}
+
+	public async Task<List<StoreObject>> InternalListAsync(StorageListOptions options, CancellationToken cancellationToken = default) {
+		if (StoragePath.IsRootPath(options.FolderPath)) {
+			//only filesystems are in the root path
+			var result = new List<StoreObject>(await ListFilesystemsAsBlobsAsync(cancellationToken).ConfigureAwait(false));
+
+			if (options.Recurse) {
+				foreach (StoreObject folder in result.Where(b => b.IsFolder).ToList()) {
+					int? maxResults = options.MaxResults == null
+						? null
+						: options.MaxResults.Value - result.Count;
+
+					result.AddRange(await ListPath(folder, maxResults, options, cancellationToken).ConfigureAwait(false));
+				}
 			}
 
 			return result;
 		}
+		else {
+			return await ListPath(options.FolderPath, options.MaxResults, options, cancellationToken).ConfigureAwait(false);
+		}
+	}
 
-		private Task<StoreObject> GetWithMetadata(StoreObject b, CancellationToken cancellationToken = default) {
-			if (b.IsFile) {
-				return GetBlobAsync(b, cancellationToken);
-			}
+	private async Task<List<StoreObject>> ListPath(string path, int? maxResults, StorageListOptions options, CancellationToken cancellationToken = default) {
+		//get filesystem name and folder path
+		string[] parts = StoragePath.Split(path);
 
-			return Task.FromResult(b);
+		string fs = parts[0];
+		string relativePath = StoragePath.Normalize(StoragePath.Combine(parts.Skip(1)));
+
+		var list = new List<Gen2Path>();
+
+		try {
+			string continuation = null;
+			do {
+				string continuationParam = continuation == null ? null : $"&continuation={continuation.UrlEncode()}";
+
+				(PathList pl, IDictionary<string, string> responseHeaders) = await InvokeExtraAsync<PathList>(
+					$"{fs}?resource=filesystem&directory={relativePath.UrlEncode()}&recursive={options.Recurse}{continuationParam}",
+					RequestMethod.Get,
+					cancellationToken).ConfigureAwait(false);
+
+				list.AddRange(pl.Paths);
+
+				responseHeaders.TryGetValue("x-ms-continuation", out continuation);
+			} while (continuation != null);
+		}
+		catch (RequestFailedException ex) when (ex.ErrorCode == "PathNotFound" || ex.ErrorCode == "FilesystemNotFound") {
+			// trying to list a path which doesn't exist, just return an empty result
+			return new List<StoreObject>();
 		}
 
-		public async Task<List<StoreObject>> InternalListAsync(StorageListOptions options, CancellationToken cancellationToken = default) {
-			if (StoragePath.IsRootPath(options.FolderPath)) {
-				//only filesystems are in the root path
-				var result = new List<StoreObject>(await ListFilesystemsAsBlobsAsync(cancellationToken).ConfigureAwait(false));
+		IEnumerable<StoreObject> result = list.Select(p => AzConvert.ToBlob(fs, p));
 
-				if (options.Recurse) {
-					foreach (StoreObject folder in result.Where(b => b.IsFolder).ToList()) {
-						int? maxResults = options.MaxResults == null
-						   ? null
-						   : options.MaxResults.Value - result.Count;
+		if (options.FilePrefix != null)
+			result = result.Where(b => b.IsFolder || b.Name.StartsWith(options.FilePrefix));
 
-						result.AddRange(await ListPath(folder, maxResults, options, cancellationToken).ConfigureAwait(false));
-					}
-				}
+		if (options.BrowseFilter != null)
+			result = result.Where(b => options.BrowseFilter(b));
 
-				return result;
-			}
-			else {
-				return await ListPath(options.FolderPath, options.MaxResults, options, cancellationToken).ConfigureAwait(false);
-			}
-		}
+		if (maxResults != null)
+			result = result.Take(maxResults.Value);
 
-		private async Task<List<StoreObject>> ListPath(string path, int? maxResults, StorageListOptions options, CancellationToken cancellationToken = default) {
-			//get filesystem name and folder path
-			string[] parts = StoragePath.Split(path);
-
-			string fs = parts[0];
-			string relativePath = StoragePath.Normalize(StoragePath.Combine(parts.Skip(1)));
-
-			var list = new List<Gen2Path>();
-
-			try {
-				string continuation = null;
-				do {
-					string continuationParam = continuation == null ? null : $"&continuation={continuation.UrlEncode()}";
-
-					(PathList pl, IDictionary<string, string> responseHeaders) = await InvokeExtraAsync<PathList>(
-					   $"{fs}?resource=filesystem&directory={relativePath.UrlEncode()}&recursive={options.Recurse}{continuationParam}",
-					   RequestMethod.Get,
-					   cancellationToken).ConfigureAwait(false);
-
-					list.AddRange(pl.Paths);
-
-					responseHeaders.TryGetValue("x-ms-continuation", out continuation);
-				} while (continuation != null);
-			}
-			catch (RequestFailedException ex) when (ex.ErrorCode == "PathNotFound" || ex.ErrorCode == "FilesystemNotFound") {
-				// trying to list a path which doesn't exist, just return an empty result
-				return new List<StoreObject>();
-			}
-
-			IEnumerable<StoreObject> result = list.Select(p => AzConvert.ToBlob(fs, p));
-
-			if (options.FilePrefix != null)
-				result = result.Where(b => b.IsFolder || b.Name.StartsWith(options.FilePrefix));
-
-			if (options.BrowseFilter != null)
-				result = result.Where(b => options.BrowseFilter(b));
-
-			if (maxResults != null)
-				result = result.Take(maxResults.Value);
-
-			return result.ToList();
-		}
+		return result.ToList();
+	}
 
 
-		private HttpMessage CreateHttpMessage(
-		   string relativeUrl,
-		   RequestMethod method,
-		   IDictionary<string, string> headers = null) {
-			HttpMessage message = _httpPipeline.CreateMessage();
-			Request request = message.Request;
+	private HttpMessage CreateHttpMessage(
+		string relativeUrl,
+		RequestMethod method,
+		IDictionary<string, string> headers = null) {
+		HttpMessage message = _httpPipeline.CreateMessage();
+		Request request = message.Request;
 
-			var url = new Uri($"{_dfsBaseAddress}{relativeUrl}");
+		var url = new Uri($"{_dfsBaseAddress}{relativeUrl}");
 
-			request.Uri.Reset(url);
-			request.Method = method;
-			request.Headers.SetValue("x-ms-version", "2019-02-02");
+		request.Uri.Reset(url);
+		request.Method = method;
+		request.Headers.SetValue("x-ms-version", "2019-02-02");
 
-			if (headers != null) {
-				foreach (KeyValuePair<string, string> header in headers) {
-					request.Headers.SetValue(header.Key, header.Value);
-				}
-			}
-
-			return message;
-		}
-
-		private async Task<TResult> DeserialiseAsync<TResult>(HttpMessage message) {
-			if (typeof(Void) == typeof(TResult))
-				return default;
-
-			string json;
-			using (var src = new StreamReader(message.Response.ContentStream)) {
-				json = await src.ReadToEndAsync().ConfigureAwait(false);
-			}
-
-			return JsonSerializer.Deserialize<TResult>(json, _jo);
-		}
-
-		private async Task<TResult> InvokeAsync<TResult>(
-		   string relativeUrl,
-		   RequestMethod method,
-		   CancellationToken cancellationToken,
-		   IDictionary<string, string> headers = null) {
-			HttpMessage message = CreateHttpMessage(relativeUrl, method, headers);
-
-			await _httpPipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
-
-			cancellationToken.ThrowIfCancellationRequested();
-			CreateAndThrowIfError(message.Response);
-
-			return await DeserialiseAsync<TResult>(message).ConfigureAwait(false);
-		}
-
-		private async Task<(TResult, IDictionary<string, string>)> InvokeExtraAsync<TResult>(
-		   string relativeUrl,
-		   RequestMethod method,
-		   CancellationToken cancellationToken,
-		   IDictionary<string, string> headers = null) {
-			HttpMessage message = CreateHttpMessage(relativeUrl, method, headers);
-
-			await _httpPipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
-
-			cancellationToken.ThrowIfCancellationRequested();
-			CreateAndThrowIfError(message.Response);
-
-			TResult ro = await DeserialiseAsync<TResult>(message).ConfigureAwait(false);
-			var responseHeaders = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
-			AddResponseHeaders(responseHeaders, message);
-			return (ro, responseHeaders);
-		}
-
-		class Void {
-
-		}
-
-		private void AddResponseHeaders(IDictionary<string, string> destination, HttpMessage message) {
-			foreach (HttpHeader header in message.Response.Headers) {
-				destination[header.Name] = header.Value;
+		if (headers != null) {
+			foreach (KeyValuePair<string, string> header in headers) {
+				request.Headers.SetValue(header.Key, header.Value);
 			}
 		}
 
-		private void CreateAndThrowIfError(Response response) {
-			int code = response.Status;
-			if (code == 200 || code == 201 || code == 202 || code == 304)
-				return;
+		return message;
+	}
 
-			response.Headers.TryGetValue(Constants.HeaderNames.ErrorCode, out string errorCode);
+	private async Task<TResult> DeserialiseAsync<TResult>(HttpMessage message) {
+		if (typeof(Void) == typeof(TResult))
+			return default;
 
-			StringBuilder sb = new StringBuilder()
-			   .Append("Status: ")
-			   .Append(response.Status)
-			   .Append(" (")
-			   .Append(response.ReasonPhrase)
-			   .AppendLine(")");
-
-			if (!string.IsNullOrEmpty(errorCode)) {
-				sb
-				   .AppendLine()
-				   .Append("ErrorCode: ")
-				   .AppendLine(errorCode);
-			}
-
-			sb
-			   .AppendLine()
-			   .AppendLine("Headers:");
-
-			foreach (HttpHeader responseHeader in response.Headers) {
-				sb
-					.Append(responseHeader.Name)
-					.Append(": ")
-					.AppendLine(responseHeader.Value);
-			}
-
-			throw new RequestFailedException(
-			   code,
-			   sb.ToString(),
-			   errorCode,
-			   null);
+		string json;
+		using (var src = new StreamReader(message.Response.ContentStream)) {
+			json = await src.ReadToEndAsync().ConfigureAwait(false);
 		}
 
-		private void DecomposePath(string path, out string filesystemName, out string relativePath, bool requireRelativePath = true) {
-			if (path == null) throw new ArgumentNullException(nameof(path));
+		return JsonSerializer.Deserialize<TResult>(json, _jo);
+	}
 
-			string[] parts = StoragePath.Split(path);
+	private async Task<TResult> InvokeAsync<TResult>(
+		string relativeUrl,
+		RequestMethod method,
+		CancellationToken cancellationToken,
+		IDictionary<string, string> headers = null) {
+		HttpMessage message = CreateHttpMessage(relativeUrl, method, headers);
 
-			if (requireRelativePath && parts.Length < 2) {
-				throw new ArgumentException($"path '{path}' must include filesystem name as root folder, i.e. 'filesystem/path'", nameof(path));
-			}
+		await _httpPipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
 
-			filesystemName = parts[0];
+		cancellationToken.ThrowIfCancellationRequested();
+		CreateAndThrowIfError(message.Response);
 
-			relativePath = StoragePath.Normalize(StoragePath.Combine(parts.Skip(1)));
-		}
+		return await DeserialiseAsync<TResult>(message).ConfigureAwait(false);
+	}
+
+	private async Task<(TResult, IDictionary<string, string>)> InvokeExtraAsync<TResult>(
+		string relativeUrl,
+		RequestMethod method,
+		CancellationToken cancellationToken,
+		IDictionary<string, string> headers = null) {
+		HttpMessage message = CreateHttpMessage(relativeUrl, method, headers);
+
+		await _httpPipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
+
+		cancellationToken.ThrowIfCancellationRequested();
+		CreateAndThrowIfError(message.Response);
+
+		TResult ro = await DeserialiseAsync<TResult>(message).ConfigureAwait(false);
+		var responseHeaders = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+		AddResponseHeaders(responseHeaders, message);
+		return (ro, responseHeaders);
+	}
+
+	class Void {
 
 	}
+
+	private void AddResponseHeaders(IDictionary<string, string> destination, HttpMessage message) {
+		foreach (HttpHeader header in message.Response.Headers) {
+			destination[header.Name] = header.Value;
+		}
+	}
+
+	private void CreateAndThrowIfError(Response response) {
+		int code = response.Status;
+		if (code == 200 || code == 201 || code == 202 || code == 304)
+			return;
+
+		response.Headers.TryGetValue(Constants.HeaderNames.ErrorCode, out string errorCode);
+
+		StringBuilder sb = new StringBuilder()
+			.Append("Status: ")
+			.Append(response.Status)
+			.Append(" (")
+			.Append(response.ReasonPhrase)
+			.AppendLine(")");
+
+		if (!string.IsNullOrEmpty(errorCode)) {
+			sb
+				.AppendLine()
+				.Append("ErrorCode: ")
+				.AppendLine(errorCode);
+		}
+
+		sb
+			.AppendLine()
+			.AppendLine("Headers:");
+
+		foreach (HttpHeader responseHeader in response.Headers) {
+			sb
+				.Append(responseHeader.Name)
+				.Append(": ")
+				.AppendLine(responseHeader.Value);
+		}
+
+		throw new RequestFailedException(
+			code,
+			sb.ToString(),
+			errorCode,
+			null);
+	}
+
+	private void DecomposePath(string path, out string filesystemName, out string relativePath, bool requireRelativePath = true) {
+		if (path == null) throw new ArgumentNullException(nameof(path));
+
+		string[] parts = StoragePath.Split(path);
+
+		if (requireRelativePath && parts.Length < 2) {
+			throw new ArgumentException($"path '{path}' must include filesystem name as root folder, i.e. 'filesystem/path'", nameof(path));
+		}
+
+		filesystemName = parts[0];
+
+		relativePath = StoragePath.Normalize(StoragePath.Combine(parts.Skip(1)));
+	}
+
 }

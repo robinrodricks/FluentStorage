@@ -1,14 +1,14 @@
 using System.Text.Json;
 
-namespace FluentStorage.Azure.Queues.Utils {
-	static class JsonExtensions {
+namespace FluentStorage.Azure.Queues.Utils;
 
-		public static string ToJsonString(this object instance) {
-			return JsonSerializer.Serialize(instance);
-		}
+static class JsonExtensions {
 
-		public static T AsJsonObject<T>(this string s) {
-			return JsonSerializer.Deserialize<T>(s)!;
-		}
+	public static string ToJsonString(this object instance) {
+		return JsonSerializer.Serialize(instance);
+	}
+
+	public static T AsJsonObject<T>(this string s) {
+		return JsonSerializer.Deserialize<T>(s)!;
 	}
 }

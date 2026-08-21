@@ -1,7 +1,7 @@
-﻿namespace FluentStorage.Enums {
-	public enum StorageUrlSigning {
-		Default,
-		AccountKey,
-		UserDelegation
-	}
+﻿namespace FluentStorage.Enums;
+
+public enum StorageUrlSigning {
+	Default,
+	AccountKey,
+	UserDelegation
 }

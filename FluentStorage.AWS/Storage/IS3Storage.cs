@@ -1,23 +1,22 @@
 ﻿using System.Threading.Tasks;
-using Amazon.S3;
 using FluentStorage.Storage;
 
-namespace FluentStorage.AWS.Storage {
+namespace FluentStorage.AWS.Storage;
+
+/// <summary>
+/// Provides access to native operations
+/// </summary>
+public interface IS3Storage : IStore {
+
 	/// <summary>
-	/// Provides access to native operations
+	/// Return bucket name.
 	/// </summary>
-	public interface IS3Storage : IStore {
+	string BucketName { get; }
 
-		/// <summary>
-		/// Return bucket name.
-		/// </summary>
-		string BucketName { get; }
-
-		/// <summary>
-		/// Set acl for object.
-		/// </summary>
-		/// <param name="fullPath"></param>
-		/// <param name="acl"></param>
-		Task SetAcl(string fullPath, string acl);
-	}
+	/// <summary>
+	/// Set acl for object.
+	/// </summary>
+	/// <param name="fullPath"></param>
+	/// <param name="acl"></param>
+	Task SetAcl(string fullPath, string acl);
 }

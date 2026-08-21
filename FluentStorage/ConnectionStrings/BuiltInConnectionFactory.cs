@@ -2,36 +2,36 @@
 using FluentStorage.Queue;
 using FluentStorage.Queue.Files;
 
-namespace FluentStorage.ConnectionStrings {
-	class BuiltInConnectionFactory : IConnectionFactory {
-		public IStore CreateStore(ConnectionString connectionString) {
-			if (connectionString.Prefix == "disk") {
-				connectionString.GetRequired("path", true, out string path);
+namespace FluentStorage.ConnectionStrings;
 
-				return new DiskStore(path);
-			}
+class BuiltInConnectionFactory : IConnectionFactory {
+	public IStore CreateStore(ConnectionString connectionString) {
+		if (connectionString.Prefix == "disk") {
+			connectionString.GetRequired("path", true, out string path);
 
-			if (connectionString.Prefix == "inmemory") {
-				return new MemoryStore();
-			}
-
-			return null;
+			return new DiskStore(path);
 		}
 
-		public IQueue CreateQueue(ConnectionString connectionString) {
-			if (connectionString.Prefix == "inmemory") {
-				connectionString.GetRequired("name", true, out string name);
-
-				return MemoryMessenger.CreateOrGet(name);
-			}
-
-			if (connectionString.Prefix == "disk") {
-				connectionString.GetRequired("path", true, out string path);
-
-				return new LocalDiskMessenger(path);
-			}
-
-			return null;
+		if (connectionString.Prefix == "inmemory") {
+			return new MemoryStore();
 		}
+
+		return null;
+	}
+
+	public IQueue CreateQueue(ConnectionString connectionString) {
+		if (connectionString.Prefix == "inmemory") {
+			connectionString.GetRequired("name", true, out string name);
+
+			return MemoryMessenger.CreateOrGet(name);
+		}
+
+		if (connectionString.Prefix == "disk") {
+			connectionString.GetRequired("path", true, out string path);
+
+			return new LocalDiskMessenger(path);
+		}
+
+		return null;
 	}
 }

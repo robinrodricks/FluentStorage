@@ -1,81 +1,81 @@
-﻿namespace FluentStorage.Utils.Extensions {
-	using System;
-	using Crypto = System.Security.Cryptography;
+﻿namespace FluentStorage.Utils.Extensions;
+
+using System;
+using Crypto = System.Security.Cryptography;
+
+/// <summary>
+/// Byte array extensions methods
+/// </summary>
+public static class ByteArrayExtensions {
+	private static readonly char[] LowerCaseHexAlphabet = "0123456789abcdef".ToCharArray();
+	private static readonly char[] UpperCaseHexAlphabet = "0123456789ABCDEF".ToCharArray();
+
 
 	/// <summary>
-	/// Byte array extensions methods
+	/// Converts byte array to hexadecimal string
 	/// </summary>
-	public static class ByteArrayExtensions {
-		private static readonly char[] LowerCaseHexAlphabet = "0123456789abcdef".ToCharArray();
-		private static readonly char[] UpperCaseHexAlphabet = "0123456789ABCDEF".ToCharArray();
+	public static string? ToHexString(this byte[]? bytes) {
+		return ToHexString(bytes, true);
+	}
 
+	private static string? ToHexString(this byte[]? bytes, bool lowerCase) {
+		if (bytes == null)
+			return null;
 
-		/// <summary>
-		/// Converts byte array to hexadecimal string
-		/// </summary>
-		public static string? ToHexString(this byte[]? bytes) {
-			return ToHexString(bytes, true);
+		char[] alphabet = lowerCase ? LowerCaseHexAlphabet : UpperCaseHexAlphabet;
+
+		int len = bytes.Length;
+		char[] result = new char[len * 2];
+
+		int i = 0;
+		int j = 0;
+
+		while (i < len) {
+			byte b = bytes[i++];
+			result[j++] = alphabet[b >> 4];
+			result[j++] = alphabet[b & 0xF];
 		}
 
-		private static string? ToHexString(this byte[]? bytes, bool lowerCase) {
-			if (bytes == null)
-				return null;
+		return new string(result);
+	}
 
-			char[] alphabet = lowerCase ? LowerCaseHexAlphabet : UpperCaseHexAlphabet;
+	public static byte[]? MD5(this byte[]? bytes) {
+		if (bytes == null)
+			return null;
 
-			int len = bytes.Length;
-			char[] result = new char[len * 2];
-
-			int i = 0;
-			int j = 0;
-
-			while (i < len) {
-				byte b = bytes[i++];
-				result[j++] = alphabet[b >> 4];
-				result[j++] = alphabet[b & 0xF];
-			}
-
-			return new string(result);
-		}
-
-		public static byte[]? MD5(this byte[]? bytes) {
-			if (bytes == null)
-				return null;
-
-			// A HashAlgorithm instance is not thread-safe, so it must never be shared across threads
-			// (https://github.com/robinrodricks/FluentStorage/issues/72). Use the allocation-free,
-			// thread-safe one-shot API where available, and a per-call instance on older targets.
+		// A HashAlgorithm instance is not thread-safe, so it must never be shared across threads
+		// (https://github.com/robinrodricks/FluentStorage/issues/72). Use the allocation-free,
+		// thread-safe one-shot API where available, and a per-call instance on older targets.
 #if NET5_0_OR_GREATER
-			return Crypto.MD5.HashData(bytes);
+		return Crypto.MD5.HashData(bytes);
 #else
 			using var md5 = Crypto.MD5.Create();
 			return md5.ComputeHash(bytes);
 #endif
-		}
+	}
 
-		public static byte[]? SHA256(this byte[]? bytes) {
-			if (bytes == null)
-				return null;
+	public static byte[]? SHA256(this byte[]? bytes) {
+		if (bytes == null)
+			return null;
 
 #if NET5_0_OR_GREATER
-			return Crypto.SHA256.HashData(bytes);
+		return Crypto.SHA256.HashData(bytes);
 #else
 			using var sha256 = Crypto.SHA256.Create();
 			return sha256.ComputeHash(bytes);
 #endif
-		}
+	}
 
-		public static byte[]? HMACSHA256(this byte[]? data, byte[] key) {
-			if (data == null)
-				return null;
+	public static byte[]? HMACSHA256(this byte[]? data, byte[] key) {
+		if (data == null)
+			return null;
 
 #pragma warning disable SYSLIB0045 // Type or member is obsolete
-			var alg = Crypto.KeyedHashAlgorithm.Create("HmacSHA256");
+		var alg = Crypto.KeyedHashAlgorithm.Create("HmacSHA256");
 #pragma warning restore SYSLIB0045 // Type or member is obsolete
-			if (alg == null)
-				throw new InvalidOperationException("could not create crypto algorithm!");
-			alg.Key = key;
-			return alg.ComputeHash(data);
-		}
+		if (alg == null)
+			throw new InvalidOperationException("could not create crypto algorithm!");
+		alg.Key = key;
+		return alg.ComputeHash(data);
 	}
 }

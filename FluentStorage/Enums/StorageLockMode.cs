@@ -1,13 +1,12 @@
-﻿namespace FluentStorage.Enums {
+﻿namespace FluentStorage.Enums;
 
-	/// <summary>
-	/// Specifies the object lock mode.
-	/// </summary>
-	public enum StorageLockMode {
-		None = 0,
+/// <summary>
+/// Specifies the object lock mode.
+/// </summary>
+public enum StorageLockMode {
+	None = 0,
 
-		Governance,
+	Governance,
 
-		Compliance
-	}
+	Compliance
 }
