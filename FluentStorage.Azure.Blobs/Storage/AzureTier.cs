@@ -1,6 +1,6 @@
-﻿using Azure.Storage.Blobs.Models;
+﻿using System.Collections.Generic;
+using Azure.Storage.Blobs.Models;
 using FluentStorage.Enums;
-using System.Collections.Generic;
 
 namespace FluentStorage.Azure.Blobs.Storage;
 

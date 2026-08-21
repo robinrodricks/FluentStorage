@@ -1,4 +1,7 @@
-﻿using Azure;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
@@ -7,9 +10,6 @@ using FluentStorage.Enums;
 using FluentStorage.Model;
 using FluentStorage.Utils.Extensions;
 using MimeMapping;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace FluentStorage.Azure.Blobs.Utils;
 

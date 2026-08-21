@@ -1,12 +1,4 @@
-﻿using FluentStorage.Enums;
-using FluentStorage.Exceptions;
-using FluentStorage.Model;
-using FluentStorage.Rules;
-using FluentStorage.Rules.Engine;
-using FluentStorage.Streaming;
-using FluentStorage.Utils.Extensions;
-using FluentStorage.Utils.Hashing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,6 +6,14 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentStorage.Enums;
+using FluentStorage.Exceptions;
+using FluentStorage.Model;
+using FluentStorage.Rules;
+using FluentStorage.Rules.Engine;
+using FluentStorage.Streaming;
+using FluentStorage.Utils.Extensions;
+using FluentStorage.Utils.Hashing;
 
 namespace FluentStorage.Storage;
 

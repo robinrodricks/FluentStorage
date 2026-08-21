@@ -1,5 +1,5 @@
-﻿using FluentStorage.Azure.Blobs.DataLake.Model;
-using FluentStorage.Azure.Blobs;
+﻿using FluentStorage.Azure.Blobs;
+using FluentStorage.Azure.Blobs.DataLake.Model;
 
 namespace FluentStorage.Tests.Integration.Azure;
 

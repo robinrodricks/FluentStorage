@@ -3,9 +3,9 @@ using Azure.Core;
 using Azure.Storage;
 using Azure.Storage.Files.Shares;
 using FluentStorage.Azure;
-using FluentStorage.Storage;
-using FluentStorage.ConnectionStrings;
 using FluentStorage.Azure.Files.Storage;
+using FluentStorage.ConnectionStrings;
+using FluentStorage.Storage;
 
 namespace FluentStorage;
 

@@ -1,5 +1,5 @@
-﻿using FluentStorage.Storage;
-using System.IO;
+﻿using System.IO;
+using FluentStorage.Storage;
 
 namespace FluentStorage.Sinks;
 

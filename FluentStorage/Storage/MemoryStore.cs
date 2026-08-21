@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
+using FluentStorage.Model;
 using FluentStorage.Streaming;
 using FluentStorage.Utils.Extensions;
 using FluentStorage.Utils.Validation;
-using FluentStorage.Model;
 
 namespace FluentStorage.Storage;
 

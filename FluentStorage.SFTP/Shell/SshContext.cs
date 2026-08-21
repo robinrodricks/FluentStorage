@@ -1,6 +1,6 @@
-﻿using Renci.SshNet;
-using System;
+﻿using System;
 using FluentStorage.Enums;
+using Renci.SshNet;
 
 namespace FluentStorage.SFTP.Shell;
 

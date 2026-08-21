@@ -1,7 +1,7 @@
+using System;
 using FluentStorage.Enums;
 using FluentStorage.Exceptions;
 using LibGit2Sharp;
-using System;
 
 namespace FluentStorage.Git.Utils;
 

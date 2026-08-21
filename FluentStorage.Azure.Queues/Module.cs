@@ -1,7 +1,7 @@
-﻿using FluentStorage.Storage;
+﻿using FluentStorage.Azure.Queues.Messenger;
 using FluentStorage.ConnectionStrings;
 using FluentStorage.Queue;
-using FluentStorage.Azure.Queues.Messenger;
+using FluentStorage.Storage;
 
 namespace FluentStorage.Azure.Queues;
 

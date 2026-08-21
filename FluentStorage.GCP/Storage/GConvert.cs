@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using Objects = Google.Apis.Storage.v1.Data.Objects;
-using Object = Google.Apis.Storage.v1.Data.Object;
-using FluentStorage.Storage;
-
-using Google.Api.Gax;
 using System.Threading.Tasks;
-using FluentStorage.Utils.Extensions;
 using FluentStorage.Model;
+using FluentStorage.Storage;
+using FluentStorage.Utils.Extensions;
+using Google.Api.Gax;
+using Object = Google.Apis.Storage.v1.Data.Object;
+using Objects = Google.Apis.Storage.v1.Data.Objects;
 
 namespace FluentStorage.GCP.Storage;
 

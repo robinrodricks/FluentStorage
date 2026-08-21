@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentStorage.Azure.Queues.Utils;
+using FluentStorage.Queue;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Auth;
 using Microsoft.Azure.Storage.Queue;
-using FluentStorage.Queue;
 using WSE = Microsoft.Azure.Storage.StorageException;
-using FluentStorage.Azure.Queues.Utils;
 
 namespace FluentStorage.Azure.Queues.Messenger;
 

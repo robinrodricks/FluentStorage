@@ -1,9 +1,9 @@
-﻿using FluentStorage.Storage;
-using FluentStorage.Sinks;
+﻿using System;
+using System.IO.Compression;
 using FluentStorage.Queue;
 using FluentStorage.Queue.Large;
-using System;
-using System.IO.Compression;
+using FluentStorage.Sinks;
+using FluentStorage.Storage;
 
 namespace FluentStorage;
 

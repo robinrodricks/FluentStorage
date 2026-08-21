@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using FluentStorage.Model;
-using FluentStorage.Enums;
 using System.Linq;
-using System;
+using FluentStorage.Enums;
+using FluentStorage.Model;
 
 namespace FluentStorage.Rules;
 

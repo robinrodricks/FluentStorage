@@ -1,5 +1,5 @@
-﻿using FluentStorage.Enums;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using FluentStorage.Enums;
 
 namespace FluentStorage.GCP.Utils;
 

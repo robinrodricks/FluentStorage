@@ -1,6 +1,6 @@
-﻿using FluentStorage.Storage;
-using FluentStorage.Queue;
+﻿using FluentStorage.Queue;
 using FluentStorage.Queue.Files;
+using FluentStorage.Storage;
 
 namespace FluentStorage.ConnectionStrings;
 

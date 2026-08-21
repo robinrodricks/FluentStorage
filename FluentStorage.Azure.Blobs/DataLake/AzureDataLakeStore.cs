@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Core.Pipeline;
 using Azure.Storage;
 using Azure.Storage.Blobs;
-using FluentStorage.Storage;
-using FluentStorage.Utils.Objects;
-using Azure.Core.Pipeline;
-using FluentStorage.Azure.Blobs.Storage;
 using FluentStorage.Azure.Blobs.DataLake.Model;
+using FluentStorage.Azure.Blobs.Storage;
 using FluentStorage.Azure.Blobs.Utils;
 using FluentStorage.Model;
+using FluentStorage.Storage;
+using FluentStorage.Utils.Objects;
 
 namespace FluentStorage.Azure.Blobs.DataLake;
 

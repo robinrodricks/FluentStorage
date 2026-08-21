@@ -1,7 +1,7 @@
-﻿using FluentFTP;
+﻿using System.Collections.Generic;
+using FluentFTP;
 using FluentStorage.Enums;
 using FluentStorage.Model;
-using System.Collections.Generic;
 
 namespace FluentStorage.FTP.Utils;
 

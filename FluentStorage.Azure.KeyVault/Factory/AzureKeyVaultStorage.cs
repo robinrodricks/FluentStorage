@@ -1,9 +1,9 @@
-﻿using Azure.Core;
+﻿using System;
+using Azure.Core;
 using Azure.Identity;
-using FluentStorage.Storage;
 using FluentStorage.Azure.KeyVault;
 using FluentStorage.Azure.KeyVault.Storage;
-using System;
+using FluentStorage.Storage;
 
 namespace FluentStorage;
 

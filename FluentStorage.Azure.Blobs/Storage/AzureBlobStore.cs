@@ -1,4 +1,11 @@
-﻿using Azure;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Azure;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -13,13 +20,6 @@ using FluentStorage.Storage;
 using FluentStorage.Streaming;
 using FluentStorage.Utils.Validation;
 using MimeMapping;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using HttpRange = Azure.HttpRange;
 
 namespace FluentStorage.Azure.Blobs.Storage;

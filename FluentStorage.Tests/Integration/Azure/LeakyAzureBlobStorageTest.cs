@@ -1,5 +1,5 @@
-﻿using FluentStorage.Azure.Blobs;
-using System.Net.Http;
+﻿using System.Net.Http;
+using FluentStorage.Azure.Blobs;
 using FluentStorage.Azure.Blobs.Policy;
 using FluentStorage.Exceptions;
 

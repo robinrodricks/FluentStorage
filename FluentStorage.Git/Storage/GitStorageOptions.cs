@@ -1,6 +1,6 @@
+using System;
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
-using System;
 
 namespace FluentStorage.Git.Storage;
 

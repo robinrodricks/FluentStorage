@@ -1,10 +1,10 @@
-﻿using Microsoft.Azure.Storage.Queue;
-using FluentStorage.Queue;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using FluentStorage.Queue;
 using FluentStorage.Utils.Extensions;
+using Microsoft.Azure.Storage.Queue;
 
 namespace FluentStorage.Azure.Queues.Utils;
 

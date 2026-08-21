@@ -1,7 +1,7 @@
-﻿using FluentStorage.Enums;
-using FluentStorage.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using FluentStorage.Enums;
+using FluentStorage.Model;
 
 namespace FluentStorage.Rules;
 

@@ -1,7 +1,4 @@
-﻿using FluentStorage.Enums;
-using FluentStorage.Model;
-using FluentStorage.Utils.Validation;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
@@ -9,6 +6,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentStorage.Enums;
+using FluentStorage.Model;
+using FluentStorage.Utils.Validation;
 
 namespace FluentStorage.Storage;
 

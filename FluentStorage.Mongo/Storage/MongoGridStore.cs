@@ -1,12 +1,4 @@
-﻿using FluentStorage.Enums;
-using FluentStorage.Model;
-using FluentStorage.Storage;
-using FluentStorage.Streaming;
-using MimeMapping;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using MongoDB.Driver.GridFS;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,6 +6,14 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentStorage.Enums;
+using FluentStorage.Model;
+using FluentStorage.Storage;
+using FluentStorage.Streaming;
+using MimeMapping;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
 
 namespace FluentStorage.Mongo.Storage;
 

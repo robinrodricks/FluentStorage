@@ -1,10 +1,3 @@
-using FluentStorage.Enums;
-using FluentStorage.Exceptions;
-using FluentStorage.Git.Utils;
-using FluentStorage.Model;
-using FluentStorage.Storage;
-using LibGit2Sharp;
-using LibGit2Sharp.Handlers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +5,13 @@ using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentStorage.Enums;
+using FluentStorage.Exceptions;
+using FluentStorage.Git.Utils;
+using FluentStorage.Model;
+using FluentStorage.Storage;
+using LibGit2Sharp;
+using LibGit2Sharp.Handlers;
 
 namespace FluentStorage.Git.Storage;
 

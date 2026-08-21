@@ -1,6 +1,6 @@
-﻿using FluentStorage.Storage;
+﻿using System;
 using FluentStorage.ConnectionStrings;
-using System;
+using FluentStorage.Storage;
 
 namespace FluentStorage;
 

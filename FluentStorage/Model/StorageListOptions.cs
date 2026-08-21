@@ -1,10 +1,10 @@
-﻿using FluentStorage.Enums;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using FluentStorage.Enums;
 using FluentStorage.Model;
 using FluentStorage.Utils.Extensions;
 using FluentStorage.Utils.Validation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace FluentStorage.Storage;
 

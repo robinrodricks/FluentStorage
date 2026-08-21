@@ -1,14 +1,14 @@
-﻿using FluentStorage.Enums;
-using FluentStorage.Model;
-using FluentStorage.Rules;
-using FluentStorage.Streaming;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentStorage.Enums;
+using FluentStorage.Model;
+using FluentStorage.Rules;
+using FluentStorage.Streaming;
 
 namespace FluentStorage.Storage;
 

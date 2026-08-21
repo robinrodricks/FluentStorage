@@ -1,4 +1,10 @@
-﻿using Aliyun.OSS;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Aliyun.OSS;
 using Aliyun.OSS.Common;
 using FluentStorage.Enums;
 using FluentStorage.Exceptions;
@@ -6,12 +12,6 @@ using FluentStorage.Model;
 using FluentStorage.Storage;
 using FluentStorage.Streaming;
 using MimeMapping;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FluentStorage.Alibaba.Storage;
 

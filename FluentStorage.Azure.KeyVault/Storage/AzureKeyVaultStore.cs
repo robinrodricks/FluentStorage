@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Threading;
 using System.Text.RegularExpressions;
-using FluentStorage.Storage;
-using Azure.Security.KeyVault.Secrets;
-using Azure.Core;
+using System.Threading;
+using System.Threading.Tasks;
 using Azure;
-using FluentStorage.Utils.Extensions;
+using Azure.Core;
+using Azure.Security.KeyVault.Secrets;
 using FluentStorage.Enums;
-using FluentStorage.Streaming;
-using FluentStorage.Utils.Validation;
 using FluentStorage.Model;
+using FluentStorage.Storage;
+using FluentStorage.Streaming;
+using FluentStorage.Utils.Extensions;
+using FluentStorage.Utils.Validation;
 
 namespace FluentStorage.Azure.KeyVault.Storage;
 

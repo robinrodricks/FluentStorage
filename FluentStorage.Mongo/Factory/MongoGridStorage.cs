@@ -1,7 +1,7 @@
-﻿using FluentStorage.Mongo.Storage;
+﻿using System.Security.Cryptography.X509Certificates;
+using FluentStorage.Mongo.Storage;
 using FluentStorage.Storage;
 using MongoDB.Driver;
-using System.Security.Cryptography.X509Certificates;
 
 namespace FluentStorage;
 

@@ -1,4 +1,10 @@
-﻿using FluentStorage.Enums;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using FluentStorage.Enums;
 using FluentStorage.Model;
 using FluentStorage.SFTP.Shell;
 using FluentStorage.Storage;
@@ -8,12 +14,6 @@ using Polly.Retry;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using Renci.SshNet.Sftp;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FluentStorage.SFTP;
 

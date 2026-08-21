@@ -1,7 +1,7 @@
-﻿using Renci.SshNet;
-using FluentStorage.Storage;
-using FluentStorage.ConnectionStrings;
+﻿using FluentStorage.ConnectionStrings;
 using FluentStorage.SFTP;
+using FluentStorage.Storage;
+using Renci.SshNet;
 
 namespace FluentStorage;
 

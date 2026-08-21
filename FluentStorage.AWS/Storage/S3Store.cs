@@ -1,4 +1,11 @@
-﻿using Amazon.Runtime;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
@@ -12,13 +19,6 @@ using FluentStorage.Streaming;
 using FluentStorage.Utils.Extensions;
 using FluentStorage.Utils.Validation;
 using MimeMapping;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FluentStorage.AWS.Storage;
 

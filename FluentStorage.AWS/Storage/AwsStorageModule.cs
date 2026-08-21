@@ -1,7 +1,7 @@
 ﻿using System;
-using FluentStorage.Storage;
 using FluentStorage.ConnectionStrings;
 using FluentStorage.Queue;
+using FluentStorage.Storage;
 
 namespace FluentStorage.AWS.Storage;
 

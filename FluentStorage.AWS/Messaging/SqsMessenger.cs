@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -8,11 +9,9 @@ using Amazon.Runtime;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 using FluentStorage.Queue;
-using FluentStorage.Utils.Extensions;
 #if !NET6_0_OR_GREATER
-
 #endif
-using System.Collections.Concurrent;
+using FluentStorage.Utils.Extensions;
 
 namespace FluentStorage.AWS.Messaging;
 

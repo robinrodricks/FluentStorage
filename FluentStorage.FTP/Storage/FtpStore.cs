@@ -1,4 +1,11 @@
-﻿using FluentFTP;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+using FluentFTP;
 using FluentFTP.Exceptions;
 using FluentStorage.Enums;
 using FluentStorage.Exceptions;
@@ -6,17 +13,8 @@ using FluentStorage.FTP.Utils;
 using FluentStorage.Model;
 using FluentStorage.Rules;
 using FluentStorage.Storage;
-
 using Polly;
 using Polly.Retry;
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FluentStorage.FTP.Storage;
 

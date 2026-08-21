@@ -1,4 +1,10 @@
-﻿using FluentStorage.Enums;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using FluentStorage.Enums;
 using FluentStorage.Exceptions;
 using FluentStorage.Minio.Utils;
 using FluentStorage.Model;
@@ -12,12 +18,6 @@ using Minio.DataModel.Args;
 using Minio.DataModel.ILM;
 using Minio.DataModel.Tags;
 using Minio.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FluentStorage.Minio.Storage;
 

@@ -1,9 +1,9 @@
 ﻿using System.Net;
 using FluentFTP;
-using FluentStorage.Storage;
 using FluentStorage.ConnectionStrings;
 using FluentStorage.FTP;
 using FluentStorage.FTP.Storage;
+using FluentStorage.Storage;
 
 namespace FluentStorage;
 

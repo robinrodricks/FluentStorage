@@ -1,9 +1,9 @@
 ﻿namespace FluentStorage.Utils.Extensions;
 
-using System.Collections;
-using System.Diagnostics;
-using System.Collections.Generic;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 /// <summary>
 /// <see cref="System.IEquatable{T}"/> extension methods

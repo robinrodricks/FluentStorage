@@ -1,9 +1,9 @@
 ﻿using Amazon.Runtime;
 using Amazon.S3;
-using FluentStorage.AWS.Storage;
-using FluentStorage.Storage;
-using FluentStorage.ConnectionStrings;
 using Amazon.S3.Transfer;
+using FluentStorage.AWS.Storage;
+using FluentStorage.ConnectionStrings;
+using FluentStorage.Storage;
 
 namespace FluentStorage;
 

@@ -1,6 +1,6 @@
-﻿using FluentStorage.Enums;
+﻿using System;
+using FluentStorage.Enums;
 using FluentStorage.Rules;
-using System;
 
 namespace FluentStorage.Model;
 

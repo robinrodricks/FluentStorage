@@ -11,11 +11,11 @@ using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.Storage.Blobs;
+using FluentStorage.Azure.Blobs.DataLake;
+using FluentStorage.Azure.Blobs.DataLake.Model;
+using FluentStorage.Model;
 using FluentStorage.Storage;
 using FluentStorage.Utils.Extensions;
-using FluentStorage.Azure.Blobs.DataLake.Model;
-using FluentStorage.Azure.Blobs.DataLake;
-using FluentStorage.Model;
 
 namespace FluentStorage.Azure.Blobs.Utils;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using FluentStorage.Model;
 using FluentStorage.Enums;
+using FluentStorage.Model;
 
 namespace FluentStorage.Rules;
 

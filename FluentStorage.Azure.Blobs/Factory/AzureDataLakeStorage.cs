@@ -2,11 +2,11 @@
 using Azure.Core;
 using Azure.Storage;
 using Azure.Storage.Blobs;
-using FluentStorage.ConnectionStrings;
 using FluentStorage.Azure;
-using FluentStorage.Azure.Blobs.DataLake;
 using FluentStorage.Azure.Blobs;
+using FluentStorage.Azure.Blobs.DataLake;
 using FluentStorage.Azure.Blobs.Utils;
+using FluentStorage.ConnectionStrings;
 
 namespace FluentStorage;
 

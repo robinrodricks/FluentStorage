@@ -1,7 +1,7 @@
-﻿using FluentStorage.Enums;
-using FluentStorage.Utils.Hashing;
-using System;
+﻿using System;
 using System.IO;
+using FluentStorage.Enums;
+using FluentStorage.Utils.Hashing;
 
 namespace FluentStorage.Model;
 

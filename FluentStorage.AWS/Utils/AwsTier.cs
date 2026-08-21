@@ -1,6 +1,6 @@
-﻿using Amazon.S3;
+﻿using System.Collections.Generic;
+using Amazon.S3;
 using FluentStorage.Enums;
-using System.Collections.Generic;
 
 namespace FluentStorage.AWS.Utils;
 

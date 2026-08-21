@@ -1,5 +1,5 @@
-﻿using FluentStorage.Utils.Files;
-using System;
+﻿using System;
+using FluentStorage.Utils.Files;
 
 namespace FluentStorage.Utils.Extensions;
 

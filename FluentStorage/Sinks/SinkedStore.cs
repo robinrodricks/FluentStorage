@@ -1,10 +1,10 @@
-﻿using FluentStorage.Model;
-using FluentStorage.Storage;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentStorage.Model;
+using FluentStorage.Storage;
 
 namespace FluentStorage.Sinks;
 
