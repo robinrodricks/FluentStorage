@@ -54,7 +54,7 @@ class S3DirectoryBrowser : IDisposable {
 
 		var folderContainer = new List<StoreObject>();
 
-		while (options.MaxResults == null || (container.Count < options.MaxResults)) {
+		while (options.MaxResults == null || (container.Count + folderContainer.Count < options.MaxResults)) {
 			ListObjectsV2Response response;
 
 			using (await _limiter.AcquireOneAsync().ConfigureAwait(false)) {
