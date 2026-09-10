@@ -123,7 +123,10 @@ internal class DiskStore : StoreBase {
 		return _fileSystem.Path.Combine(dir, name);
 	}
 
-	private string NormalizeFolderPath(string path, bool createIfNotExists) {
+	/// <summary>
+	/// Resolves a storage folder path to a native path without requiring it to exist.
+	/// </summary>
+	private string GetFullFolderPath(string path) {
 		if (path == null) return _directoryFullName;
 		string[] parts = StoragePath.Split(path);
 
@@ -132,6 +135,14 @@ internal class DiskStore : StoreBase {
 		foreach (string part in parts) {
 			fullPath = _fileSystem.Path.Combine(fullPath, part);
 		}
+
+		return fullPath;
+	}
+
+	private string NormalizeFolderPath(string path, bool createIfNotExists) {
+		if (path == null) return _directoryFullName;
+
+		string fullPath = GetFullFolderPath(path);
 
 		if (!_fileSystem.Directory.Exists(fullPath)) {
 			if (createIfNotExists) {
@@ -533,15 +544,25 @@ internal class DiskStore : StoreBase {
 	/// </summary>
 	public override async Task MoveDirectory(string sourceFolderPath, string destinationFolderPath, CancellationToken cancellationToken = default) {
 		if (sourceFolderPath == null) throw new ArgumentNullException(nameof(sourceFolderPath));
-		if (destinationFolderPath == null) throw new ArgumentNullException(nameof(sourceFolderPath));
+		if (destinationFolderPath == null) throw new ArgumentNullException(nameof(destinationFolderPath));
 
 		sourceFolderPath = StoragePath.Normalize(sourceFolderPath);
 		destinationFolderPath = StoragePath.Normalize(destinationFolderPath);
 
 		string sourcePath = NormalizeFolderPath(sourceFolderPath, false);
-		string destinationPath = NormalizeFolderPath(destinationFolderPath, false);
+
+		// the destination of a move does not exist yet, so it must not be resolved through NormalizeFolderPath
+		string destinationPath = GetFullFolderPath(destinationFolderPath);
 
 		if (_fileSystem.Directory.Exists(sourcePath)) {
+
+			// Directory.Move does not create the parent of the destination
+			string destinationParent = _fileSystem.Path.GetDirectoryName(destinationPath);
+
+			if (!string.IsNullOrEmpty(destinationParent) && !_fileSystem.Directory.Exists(destinationParent)) {
+				_fileSystem.Directory.CreateDirectory(destinationParent);
+			}
+
 			_fileSystem.Directory.Move(sourcePath, destinationPath);
 		}
 
