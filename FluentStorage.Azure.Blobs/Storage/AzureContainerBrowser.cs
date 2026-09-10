@@ -67,7 +67,7 @@ class AzureContainerBrowser : IDisposable {
 	}
 
 	private static string FormatFolderPrefix(string folderPath) {
-		folderPath = StoragePath.Normalize(folderPath).Substring(1);
+		folderPath = StoragePath.Normalize(folderPath);
 
 		if (StoragePath.IsRootPath(folderPath))
 			return null;

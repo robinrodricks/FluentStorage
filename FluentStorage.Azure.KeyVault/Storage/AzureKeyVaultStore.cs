@@ -201,7 +201,7 @@ public class AzureKeyVaultStore : StoreBase {
 
 
 	private static string NormaliseSecretName(string fullPath) {
-		fullPath = StoragePath.Normalize(fullPath).Substring(1);
+		fullPath = StoragePath.Normalize(fullPath);
 
 		if (!secretNameRegex.IsMatch(fullPath)) {
 			throw new NotSupportedException($"secret '{fullPath}' does not match expected pattern '^[0-9a-zA-Z-]+$'");

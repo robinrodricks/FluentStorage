@@ -41,6 +41,20 @@ public partial class IStoreTest {
 	}
 
 	[Fact]
+	public async Task ListObjects_FolderPath_ReturnsObjectsInThatFolder() {
+		string folder = RandomFolder();
+
+		await CreateText($"{folder}/b.txt");
+
+		var list = (await _storage.ListObjects(new StorageListOptions { FolderPath = folder, Recurse = true }))
+			.Where(f => f.Type == StorageObjectType.File).ToList();
+
+		Assert.Single(list);
+
+		Assert.Equal($"{folder}/b.txt", list[0].FullPath);
+	}
+
+	[Fact]
 	public async Task ListObjects_AfterDelete_DoesNotContainDeletedObject() {
 		string file = RandomFile();
 
