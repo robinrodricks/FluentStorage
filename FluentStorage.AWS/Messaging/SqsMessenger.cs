@@ -52,7 +52,7 @@ class SQSMessenger : IQueue {
 	public async Task<List<string>> ListChannels(CancellationToken cancellationToken = default) {
 		ListQueuesResponse queues = await _client.ListQueuesAsync(new ListQueuesRequest { }).ConfigureAwait(false);
 
-		return queues.QueueUrls.Select(u => u.Substring(u.LastIndexOf("/") + 1)).ToList();
+		return queues.QueueUrls?.Select(u => u.Substring(u.LastIndexOf("/") + 1)).ToList() ?? new List<string>();
 	}
 
 	public async Task DeleteChannels(IEnumerable<string> channelNames, CancellationToken cancellationToken = default) {
@@ -124,7 +124,7 @@ class SQSMessenger : IQueue {
 
 		ReceiveMessageResponse messages = await _client.ReceiveMessageAsync(request, cancellationToken).ConfigureAwait(false);
 
-		return messages.Messages.Select(Converter.ToQueueMessage).ToList();
+		return messages.Messages?.Select(Converter.ToQueueMessage).ToList() ?? new List<QueueMessage>();
 	}
 
 	public void Dispose() {

@@ -46,7 +46,7 @@ class SQSMessageReceiver : PollingMessageReceiver {
 
 		ReceiveMessageResponse messages = await _client.ReceiveMessageAsync(request, cancellationToken).ConfigureAwait(false);
 
-		return messages.Messages.Select(Converter.ToQueueMessage).ToList();
+		return messages.Messages?.Select(Converter.ToQueueMessage).ToList() ?? new List<QueueMessage>();
 	}
 
 	public override async Task<List<QueueMessage>> PeekMessages(int maxMessages, CancellationToken cancellationToken = default) {
@@ -59,7 +59,7 @@ class SQSMessageReceiver : PollingMessageReceiver {
 		};
 
 		ReceiveMessageResponse messages = await _client.ReceiveMessageAsync(request, cancellationToken).ConfigureAwait(false);
-		return messages.Messages.Select(Converter.ToQueueMessage).ToList();
+		return messages.Messages?.Select(Converter.ToQueueMessage).ToList() ?? new List<QueueMessage>();
 	}
 
 	public override Task DeadLetterMessage(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default) {

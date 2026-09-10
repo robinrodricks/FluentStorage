@@ -24,6 +24,11 @@ public partial class IStoreTest {
 	}
 
 	[Fact]
+	public async Task DirectoryExists_MissingDirectory_ReturnsFalse() {
+		Assert.False(await _storage.DirectoryExists(RandomFolder()));
+	}
+
+	[Fact]
 	public async Task ObjectsExists_ReturnsStatusForEveryObject() {
 		string f1 = RandomFile();
 		string f2 = RandomFile();
