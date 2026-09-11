@@ -702,7 +702,7 @@ public class S3Store : StoreBase, IS3Storage {
 					VersionIdMarker = versionMarker
 				}, cancellationToken).ConfigureAwait(false);
 
-				foreach (S3ObjectVersion version in response.Versions) {
+				foreach (S3ObjectVersion version in response.Versions ?? Enumerable.Empty<S3ObjectVersion>()) {
 
 					if (!string.Equals(version.Key, objectPath, StringComparison.Ordinal))
 						continue;
@@ -765,7 +765,7 @@ public class S3Store : StoreBase, IS3Storage {
 					VersionIdMarker = versionMarker
 				}, cancellationToken).ConfigureAwait(false);
 
-				foreach (S3ObjectVersion version in response.Versions) {
+				foreach (S3ObjectVersion version in response.Versions ?? Enumerable.Empty<S3ObjectVersion>()) {
 
 					if (!string.Equals(version.Key, objectPath, StringComparison.Ordinal))
 						continue;
@@ -1062,7 +1062,7 @@ public class S3Store : StoreBase, IS3Storage {
 			MaxKeys = 1
 		}, cancellationToken).ConfigureAwait(false);
 
-		return response.S3Objects.Count > 0;
+		return (response.S3Objects?.Count ?? 0) > 0;
 	}
 
 }

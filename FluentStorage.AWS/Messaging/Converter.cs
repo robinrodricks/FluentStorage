@@ -30,8 +30,10 @@ static class Converter {
 		var r = new QueueMessage(sqsMessage.Body);
 		r.Id = sqsMessage.MessageId;
 
-		foreach (KeyValuePair<string, MessageAttributeValue> attr in sqsMessage.MessageAttributes) {
-			r.Properties[attr.Key] = attr.Value.StringValue;
+		if (sqsMessage.MessageAttributes != null) {
+			foreach (KeyValuePair<string, MessageAttributeValue> attr in sqsMessage.MessageAttributes) {
+				r.Properties[attr.Key] = attr.Value.StringValue;
+			}
 		}
 		r.Properties[ReceiptHandlePropertyName] = sqsMessage.ReceiptHandle;
 
