@@ -2,6 +2,18 @@
 
 **Please read the [Migration Guide](https://github.com/robinrodricks/FluentStorage/wiki/Migration-Guide) to help you migrate from older versions to FluentStorage 8!**
 
+#### FluentStorage 8.0.21
+ - **FluentStorage**
+   - Fix: `MoveDirectory` on local disk provider no longer throws `ArgumentNullException`
+   - Fix: `MoveDirectory` on local disk provider will now throw `IOException` when the destination folder exists
+ - **FluentStorage.AWS**
+   - Fix: Blank collections returned by S3 and SQS API calls should not throw `NullReferenceException`
+   - Fix: `ListObjects`/`ListDirectory` correctly handle bucket paths and do not truncate the first path character (affects S3 and all S3-compatible providers)
+ - **FluentStorage.Azure.Blobs**
+   - Fix: `ListObjects`/`ListDirectory` correctly handle bucket paths and do not truncate the first path character
+ - **FluentStorage.Azure.KeyVault**
+   - Fix: `ListObjects`/`ListDirectory` correctly handle bucket paths and do not truncate the first path character
+
 #### FluentStorage 8.0.20
  - **FluentStorage**
    - Change: Use file-scoped namespaces, remove unused using directives and remove unnecessary `this` keyword usage
