@@ -41,7 +41,7 @@ static class AwsConverter {
 		if (blob == null)
 			return;
 
-		GetObjectMetadataResponse obj = await client.GetObjectMetadataAsync(bucketName, blob.FullPath.Substring(1), cancellationToken).ConfigureAwait(false);
+		GetObjectMetadataResponse obj = await client.GetObjectMetadataAsync(bucketName, blob.FullPath, cancellationToken).ConfigureAwait(false);
 
 		AddMetadata(blob, obj);
 	}
