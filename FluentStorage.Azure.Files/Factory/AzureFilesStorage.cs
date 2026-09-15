@@ -25,11 +25,24 @@ public static class AzureFilesStorage {
 	/// </summary>
 	public static IStore FromClient(
 		ShareServiceClient shareServiceClient) {
+		return FromClient(shareServiceClient, null);
+	}
+
+	/// <summary>
+	/// Creates Azure Files from an existing <see cref="ShareServiceClient"/> rooted at a single file share.
+	/// </summary>
+	/// <param name="shareServiceClient"></param>
+	/// <param name="shareName">Azure file share that acts as the FluentStorage root. Null means all shares in the storage account.</param>
+	/// <param name="directoryPath">Azure Files directory that acts as the FluentStorage root. Null means the root directory of each share.</param>
+	public static IStore FromClient(
+		ShareServiceClient shareServiceClient,
+		string shareName,
+		string directoryPath = null) {
 		if (shareServiceClient is null) {
 			throw new ArgumentNullException(nameof(shareServiceClient));
 		}
 
-		return new AzureFilesStore(shareServiceClient, shareServiceClient.AccountName);
+		return new AzureFilesStore(shareServiceClient, shareServiceClient.AccountName, shareName, directoryPath);
 	}
 
 	/// <summary>
@@ -96,7 +109,7 @@ public static class AzureFilesStorage {
 	}
 
 	/// <summary>
-	/// Create Azure Files with Azure AD 
+	/// Create Azure Files with Azure AD
 	/// </summary>
 	public static IStore FromAzureAd(
 		string accountName,

@@ -22,12 +22,16 @@ namespace FluentStorage.Azure.Files.Storage;
 /// </summary>
 public class AzureFilesStore : StoreBase {
 	private readonly ShareServiceClient _client;
+	private readonly string _shareName;
+	private readonly string _directoryPath;
 	private readonly ConcurrentDictionary<string, ShareClient> _shareNameToShareClient =
 		new ConcurrentDictionary<string, ShareClient>();
 
 
-	public AzureFilesStore(ShareServiceClient shareServiceClient, string accountName) {
+	public AzureFilesStore(ShareServiceClient shareServiceClient, string accountName, string shareName = null, string directoryPath = null) {
 		_client = shareServiceClient ?? throw new ArgumentNullException(nameof(shareServiceClient));
+		_shareName = shareName;
+		_directoryPath = StoragePath.Normalize(directoryPath);
 	}
 
 	public static AzureFilesStore CreateFromAccountNameAndKey(string accountName, string key) {
@@ -62,7 +66,7 @@ public class AzureFilesStore : StoreBase {
 
 	protected override async Task<List<StoreObject>> ListPath(
 		string path, StorageListOptions options, CancellationToken cancellationToken = default) {
-		if (StoragePath.IsRootPath(path)) {
+		if (StoragePath.IsRootPath(path) && _shareName == null) {
 			var shares = new List<StoreObject>();
 
 			await foreach (ShareItem share in _client.GetSharesAsync(ShareTraits.Metadata, cancellationToken: cancellationToken).ConfigureAwait(false)) {
@@ -300,18 +304,21 @@ public class AzureFilesStore : StoreBase {
 	}
 
 	private async Task<ShareFileClient> GetFileReferenceAsync(string fullPath, bool createParents, CancellationToken cancellationToken = default) {
-		string[] parts = StoragePath.Split(fullPath);
+		string[] parts = GetStorageParts(fullPath);
 		if (parts.Length == 0) {
 			return null;
 		}
 
-		ShareClient share = await GetShareReferenceAsync(parts[0], createParents, cancellationToken).ConfigureAwait(false);
+		string shareName = _shareName ?? parts[0];
+		int pathStart = _shareName == null ? 1 : 0;
+
+		ShareClient share = await GetShareReferenceAsync(shareName, createParents, cancellationToken).ConfigureAwait(false);
 		if (share == null) {
 			return null;
 		}
 
 		ShareDirectoryClient dir = share.GetRootDirectoryClient();
-		for (int i = 1; i < parts.Length - 1; i++) {
+		for (int i = pathStart; i < parts.Length - 1; i++) {
 			string sub = parts[i];
 			dir = dir.GetSubdirectoryClient(sub);
 
@@ -324,18 +331,21 @@ public class AzureFilesStore : StoreBase {
 	}
 
 	private async Task<ShareDirectoryClient> GetDirectoryReferenceAsync(string fullPath, bool createParents, CancellationToken cancellationToken = default) {
-		string[] parts = StoragePath.Split(fullPath);
-		if (parts.Length == 0) {
+		string[] parts = GetStorageParts(fullPath);
+		if (parts.Length == 0 && _shareName == null) {
 			return null;
 		}
 
-		ShareClient share = await GetShareReferenceAsync(parts[0], createParents, cancellationToken).ConfigureAwait(false);
+		string shareName = _shareName ?? parts[0];
+		int pathStart = _shareName == null ? 1 : 0;
+
+		ShareClient share = await GetShareReferenceAsync(shareName, createParents, cancellationToken).ConfigureAwait(false);
 		if (share == null) {
 			return null;
 		}
 
 		ShareDirectoryClient dir = share.GetRootDirectoryClient();
-		for (int i = 1; i < parts.Length; i++) {
+		for (int i = pathStart; i < parts.Length; i++) {
 			string sub = parts[i];
 			dir = dir.GetSubdirectoryClient(sub);
 
@@ -366,6 +376,22 @@ public class AzureFilesStore : StoreBase {
 		}
 
 		return share;
+	}
+
+	private string[] GetStorageParts(string fullPath) {
+		string normalized = StoragePath.Normalize(fullPath);
+
+		if (string.IsNullOrEmpty(_directoryPath))
+			return StoragePath.Split(normalized);
+
+		if (_shareName == null) {
+			string[] parts = StoragePath.Split(normalized);
+			return parts.Length == 0
+				? parts
+				: StoragePath.Split(StoragePath.Combine(parts[0], _directoryPath, StoragePath.Combine(parts.Skip(1))));
+		}
+
+		return StoragePath.Split(StoragePath.Combine(_directoryPath, normalized));
 	}
 
 	private static async Task<Stream> CopyToSeekableStreamAsync(Stream stream, CancellationToken cancellationToken = default) {

@@ -32,6 +32,7 @@ public class AzureBlobStore : StoreBase, IAzureBlobStore {
 	private readonly BlobServiceClient _client;
 	private readonly StorageSharedKeyCredential _sasSigningCredentials;
 	private readonly string _containerName;
+	private readonly string _blobPrefix;
 	private readonly ConcurrentDictionary<string, BlobContainerClient> _containerNameToContainerClient =
 		new ConcurrentDictionary<string, BlobContainerClient>();
 
@@ -39,19 +40,20 @@ public class AzureBlobStore : StoreBase, IAzureBlobStore {
 		BlobServiceClient blobServiceClient,
 		string accountName,
 		StorageSharedKeyCredential sasSigningCredentials = null,
-		string containerName = null) {
+		string containerName = null,
+		string blobPrefix = null) {
 		_client = blobServiceClient ?? throw new ArgumentNullException(nameof(blobServiceClient));
 		_sasSigningCredentials = sasSigningCredentials;
 		_containerName = containerName;
+		_blobPrefix = StoragePath.Normalize(blobPrefix);
 
 	}
-
 
 	/// <summary>
 	/// Returns the BlobServiceClient instance for this store.
 	/// </summary>
-	public override async Task<object> GetClient() {
-		return _client;
+	public override Task<object> GetClient() {
+		return Task.FromResult<object>(_client);
 	}
 
 	public override async Task<List<StoreObject>> ListObjects(StorageListOptions options = null, CancellationToken cancellationToken = default) {
@@ -279,7 +281,9 @@ public class AzureBlobStore : StoreBase, IAzureBlobStore {
 		try {
 			Response<BlobProperties> properties = await client.GetPropertiesAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 
-			return AzConvert.ToBlob(_containerName, path, properties);
+			StoreObject blob = AzConvert.ToBlob(_containerName, path, properties);
+			blob.SetFullPath(ToStorePath(blob.FullPath));
+			return blob;
 		}
 		catch (RequestFailedException ex) when (ex.ErrorCode == "BlobNotFound") {
 			return null;
@@ -535,9 +539,42 @@ public class AzureBlobStore : StoreBase, IAzureBlobStore {
 					.ConfigureAwait(false);
 
 			if (containerBlobs.Count > 0) {
+				foreach (StoreObject blob in containerBlobs) {
+					blob.SetFullPath(ToStorePath(blob.FullPath));
+				}
 				result.AddRange(containerBlobs);
 			}
 		}
+	}
+
+	private string ToStorePath(string path) {
+		if (string.IsNullOrEmpty(_blobPrefix)) {
+			return path;
+		}
+
+		string normalized = StoragePath.Normalize(path);
+		string containerName = _containerName;
+		if (containerName == null) {
+			string[] parts = StoragePath.Split(normalized);
+			if (parts.Length == 0) {
+				return normalized;
+			}
+
+			containerName = parts[0];
+		}
+
+		string prefix = StoragePath.Combine(containerName, _blobPrefix);
+
+		if (normalized == prefix) {
+			return _containerName == null ? containerName : string.Empty;
+		}
+
+		if (!normalized.StartsWith(prefix + StoragePath.PathSeparator, StringComparison.Ordinal)) {
+			return normalized;
+		}
+
+		string relativePath = normalized.Substring(prefix.Length + 1);
+		return _containerName == null ? StoragePath.Combine(containerName, relativePath) : relativePath;
 	}
 
 	protected virtual async Task DeleteObjects(string fullPath, CancellationToken cancellationToken = default) {
@@ -612,6 +649,10 @@ public class AzureBlobStore : StoreBase, IAzureBlobStore {
 		else {
 			containerName = _containerName;
 			relativePath = fullPath;
+		}
+
+		if (!string.IsNullOrEmpty(_blobPrefix)) {
+			relativePath = StoragePath.Combine(_blobPrefix, relativePath);
 		}
 
 		if (!_containerNameToContainerClient.TryGetValue(containerName, out BlobContainerClient container)) {

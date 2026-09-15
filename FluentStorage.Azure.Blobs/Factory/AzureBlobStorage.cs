@@ -24,22 +24,22 @@ public static class AzureBlobStorage {
 	/// <summary>
 	/// Creates Azure Blob Storage from an existing <see cref="BlobServiceClient"/>.
 	/// </summary>
-	public static IAzureBlobStore FromClient(
-		BlobServiceClient blobServiceClient) {
-		return FromClient(blobServiceClient, null);
-	}
-
-	/// <summary>
-	/// Creates Azure Blob Storage from an existing <see cref="BlobServiceClient"/>.
-	/// </summary>
+	/// <param name="blobServiceClient"></param>
+	/// <param name="containerName">Azure blob container that acts as the FluentStorage root.</param>
+	/// <param name="blobPrefix">Blob name prefix that acts as the FluentStorage root within each container. Null means the container root.</param>
 	public static IAzureBlobStore FromClient(
 		BlobServiceClient blobServiceClient,
-		string containerName) {
+		string containerName = null,
+		string blobPrefix = null) {
 		if (blobServiceClient is null) {
 			throw new ArgumentNullException(nameof(blobServiceClient));
 		}
 
-		return new AzureBlobStore(blobServiceClient, blobServiceClient.AccountName, containerName: containerName);
+		return new AzureBlobStore(
+			blobServiceClient,
+			blobServiceClient.AccountName,
+			containerName: containerName,
+			blobPrefix: blobPrefix);
 	}
 
 	/// <summary>
