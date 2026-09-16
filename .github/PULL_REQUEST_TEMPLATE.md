@@ -1,7 +1,11 @@
 ### Fixes
 
-Issue #
+Issue # (optional)
 
-### Description
+### Problem Statement
 
-add your description
+write the problem or issue you are trying to address
+
+### Solution
+
+write how your PR fixes the issue or details of the features it implements
