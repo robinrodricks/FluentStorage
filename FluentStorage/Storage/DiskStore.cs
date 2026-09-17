@@ -53,7 +53,7 @@ internal class DiskStore : StoreBase {
 
 	/// <summary>
 	/// Gets information and capabilities of the connected machine.
-	/// 
+	///
 	/// Returns a Dictionary with keys:
 	/// - Machine: `MachineName`, `UserName`, `ProcessorCount`.
 	/// - OS: `ServerOS`, `Platform`, `Architecture`.
@@ -390,10 +390,12 @@ internal class DiskStore : StoreBase {
 
 		if (_fileSystem.File.Exists(path)) {
 			_fileSystem.File.Delete(path);
+
+			string attrPath = GetAttrPath(path);
+
+			if(_fileSystem.File.Exists(attrPath))
+				_fileSystem.File.Delete(attrPath);
 		}
-		/*else if (_fileSystem.Directory.Exists(path)) {
-			_fileSystem.Directory.Delete(path, true);
-		}*/
 	}
 
 	/// <summary>
@@ -465,9 +467,13 @@ internal class DiskStore : StoreBase {
 			if (blob?.Metadata == null)
 				continue;
 
-			string attrPath = NormalizeFilePath(blob.FullPath) + AttributesFileExtension;
+			string attrPath = GetAttrPath(blobPath);
 			_fileSystem.File.WriteAllBytes(attrPath, blob.AttributesToByteArray());
 		}
+	}
+
+	private static string GetAttrPath(string path) {
+		return path + AttributesFileExtension;
 	}
 
 	private void AddMetadata(StoreObject blob) {
@@ -475,7 +481,7 @@ internal class DiskStore : StoreBase {
 
 		if (!_fileSystem.File.Exists(path)) return;
 
-		var fi = _fileSystem.FileInfo.New(path);
+		_fileSystem.FileInfo.New(path);
 
 		try {
 			string attrFilePath = path + AttributesFileExtension;
@@ -590,6 +596,14 @@ internal class DiskStore : StoreBase {
 			}
 
 			_fileSystem.File.Move(source, destination);
+
+			string sourceAttrPath = GetAttrPath(source);
+
+			if (_fileSystem.File.Exists(sourceAttrPath)) {
+				string destinationAttrPath = GetAttrPath(destination);
+				_fileSystem.File.Move(sourceAttrPath, destinationAttrPath);
+			}
+
 			return true;
 		}
 
