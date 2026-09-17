@@ -2,6 +2,15 @@
 
 **Please read the [Migration Guide](https://github.com/robinrodricks/FluentStorage/wiki/Migration-Guide) to help you migrate from older versions to FluentStorage 8!**
 
+#### FluentStorage 8.0.22
+ - **FluentStorage**
+   - Fix: `DiskStore` now deletes `.attr` files when the source file is deleted
+   - Fix: `DiskStore` now moves `.attr` files when the source file is moved
+ - **FluentStorage.Azure.Blobs**
+   - New: Support Azure scoped blob prefixes and file directories with upgraded `FromClient` API
+ - **FluentStorage.Azure.Files**
+   - New: Support Azure scoped blob prefixes and file directories with upgraded `FromClient` API
+
 #### FluentStorage 8.0.21
  - **FluentStorage**
    - Fix: `MoveDirectory` on local disk provider no longer throws `ArgumentNullException`
