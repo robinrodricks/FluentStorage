@@ -484,7 +484,7 @@ internal class DiskStore : StoreBase {
 		_fileSystem.FileInfo.New(path);
 
 		try {
-			string attrFilePath = path + AttributesFileExtension;
+			string attrFilePath = GetAttrPath(path);
 			if (_fileSystem.File.Exists(attrFilePath)) {
 				byte[] content = _fileSystem.File.ReadAllBytes(attrFilePath);
 				blob.AppendAttributesFromByteArray(content);
