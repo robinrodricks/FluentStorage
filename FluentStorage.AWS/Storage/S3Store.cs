@@ -104,7 +104,7 @@ public class S3Store : StoreBase, IS3Storage {
 		};
 
 		var store = new S3Store(accessKeyId, secretAccessKey, sessionToken, bucketName, config);
-		store.UploadSignedPayload = true;
+		store.UploadSignedPayload = false;
 		return store;
 	}
 	/// <summary>
