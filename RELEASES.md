@@ -2,6 +2,12 @@
 
 **Please read the [Migration Guide](https://github.com/robinrodricks/FluentStorage/wiki/Migration-Guide) to help you migrate from older versions to FluentStorage 8!**
 
+#### FluentStorage 8.0.23
+ - **FluentStorage.AWS**
+   - New: `S3Store.DisablePayloadSigning` and `S3Store.UsePutObject` are now public, and can be set through `AwsS3Storage.FromThirdPartyCredentials`
+   - Fix: `DisablePayloadSigning` is now honoured by the `TransferUtility` upload path, so Cloudflare R2 performs multipart uploads instead of a single PUT
+   - Fix: `CloudflareR2Storage` no longer sends the CRC32 checksums that R2 rejects with `The checksum type FULL_OBJECT is not supported for this operation.`
+
 #### FluentStorage 8.0.22
  - **FluentStorage**
    - Fix: `DiskStore` now deletes `.attr` files when the source file is deleted

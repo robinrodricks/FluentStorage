@@ -31,8 +31,20 @@ public class S3Store : StoreBase, IS3Storage {
 	private readonly AmazonS3Client _client;
 	private readonly TransferUtility _fileTransferUtility;
 	private bool _initialised = false;
-	private bool _usePutObject = false;
-	private bool _disablePayloadSigning = false;
+
+	/// <summary>
+	/// Uploads with a single `PutObjectAsync` call instead of `TransferUtility`, so no multipart upload is ever
+	/// started. Only needed for servers that reject multipart uploads outright; `DisablePayloadSigning` alone is
+	/// enough for Cloudflare R2.
+	/// </summary>
+	public bool UsePutObject { get; set; } = false;
+
+	/// <summary>
+	/// Sends uploads with an unsigned payload. The AWS SDK signs upload bodies with AWS chunked ("streaming")
+	/// signing by default, which several S3-compatible servers do not implement - Cloudflare R2 answers
+	/// `STREAMING-AWS4-HMAC-SHA256-PAYLOAD[-TRAILER] not implemented`. The SDK requires HTTPS when this is set.
+	/// </summary>
+	public bool DisablePayloadSigning { get; set; } = false;
 
 
 	/// <summary>
@@ -85,11 +97,15 @@ public class S3Store : StoreBase, IS3Storage {
 			ForcePathStyle = false,
 			// Ensures HTTPS (the endpoint itself is HTTPS, but this makes it explicit).
 			UseHttp = false,
+			// The SDK adds a CRC32 checksum to every upload and starts multipart uploads with
+			// ChecksumType=FULL_OBJECT, which R2 rejects with "The checksum type FULL_OBJECT is not
+			// supported for this operation." Send checksums only where the operation requires one.
+			RequestChecksumCalculation = RequestChecksumCalculation.WHEN_REQUIRED,
+			ResponseChecksumValidation = ResponseChecksumValidation.WHEN_REQUIRED,
 		};
 
 		var store = new S3Store(accessKeyId, secretAccessKey, sessionToken, bucketName, config);
-		store._usePutObject = true;
-		store._disablePayloadSigning = true;
+		store.DisablePayloadSigning = true;
 		return store;
 	}
 	/// <summary>
@@ -280,8 +296,7 @@ public class S3Store : StoreBase, IS3Storage {
 	/// <summary>
 	/// Uploads an object to S3 or S3-compatible storage, with the given Content-Type.
 	///
-	/// Uses `TransferUtility` API for AWS S3, MinIO, Wasabi, DigitalOcean Spaces.
-	/// Uses `PutObjectAsync` API for Cloudflare R2.
+	/// Uses `TransferUtility` API, unless `UsePutObject` asks for a single `PutObjectAsync` call.
 	/// `TransferUtility` performs either a single PUT or a multipart upload depending on the stream size.
 	///
 	/// If the supplied stream is not seekable or its length cannot be determined,
@@ -305,15 +320,15 @@ public class S3Store : StoreBase, IS3Storage {
 		}
 
 		// if PutObject API is required
-		if (_usePutObject) {
+		if (UsePutObject) {
 
-			// Use PutObjectAsync for Cloudflare R2.
+			// Single PUT, no multipart upload.
 			var request = new PutObjectRequest {
 				BucketName = _bucketName,
 				Key = fullPath,
 				InputStream = dataStream,
 				ContentType = contentType,
-				DisablePayloadSigning = _disablePayloadSigning // R2 does not support "Streaming Signature V4".
+				DisablePayloadSigning = DisablePayloadSigning // R2 does not support "Streaming Signature V4".
 			};
 
 			await _client.PutObjectAsync(request, cancellationToken).ConfigureAwait(false);
@@ -321,12 +336,13 @@ public class S3Store : StoreBase, IS3Storage {
 		}
 		else {
 
-			// Use TransferUtility for AWS S3, MinIO, Wasabi, DigitalOcean Spaces.
+			// Use TransferUtility for AWS S3, MinIO, Wasabi, DigitalOcean Spaces, Cloudflare R2.
 			var request = new TransferUtilityUploadRequest {
 				BucketName = _bucketName,
 				Key = fullPath,
 				InputStream = dataStream,
-				ContentType = contentType
+				ContentType = contentType,
+				DisablePayloadSigning = DisablePayloadSigning // Carried through to every UploadPart of a multipart upload.
 			};
 
 			await _fileTransferUtility.UploadAsync(request, cancellationToken).ConfigureAwait(false);
