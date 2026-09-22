@@ -37,14 +37,14 @@ public class S3Store : StoreBase, IS3Storage {
 	/// started. Only needed for servers that reject multipart uploads outright; `DisablePayloadSigning` alone is
 	/// enough for Cloudflare R2.
 	/// </summary>
-	public bool UsePutObject { get; set; } = false;
+	public bool? UsePutObject { get; set; }
 
 	/// <summary>
 	/// Sends uploads with an unsigned payload. The AWS SDK signs upload bodies with AWS chunked ("streaming")
 	/// signing by default, which several S3-compatible servers do not implement - Cloudflare R2 answers
 	/// `STREAMING-AWS4-HMAC-SHA256-PAYLOAD[-TRAILER] not implemented`. The SDK requires HTTPS when this is set.
 	/// </summary>
-	public bool DisablePayloadSigning { get; set; } = false;
+	public bool? DisablePayloadSigning { get; set; }
 
 
 	/// <summary>
@@ -320,7 +320,7 @@ public class S3Store : StoreBase, IS3Storage {
 		}
 
 		// if PutObject API is required
-		if (UsePutObject) {
+		if (UsePutObject is true) {
 
 			// Single PUT, no multipart upload.
 			var request = new PutObjectRequest {

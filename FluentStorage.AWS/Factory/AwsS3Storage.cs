@@ -74,8 +74,8 @@ public static class AwsS3Storage {
 		string bucketName,
 		AmazonS3Config clientConfig,
 		TransferUtilityConfig transferUtilityConfig = null,
-		bool disablePayloadSigning = false,
-		bool usePutObject = false) {
+		bool? disablePayloadSigning = null,
+		bool? usePutObject = null) {
 		return new S3Store(accessKeyId, secretAccessKey, sessionToken, bucketName, clientConfig, transferUtilityConfig) {
 			DisablePayloadSigning = disablePayloadSigning,
 			UsePutObject = usePutObject
