@@ -33,18 +33,17 @@ public class S3Store : StoreBase, IS3Storage {
 	private bool _initialised = false;
 
 	/// <summary>
-	/// Uploads with a single `PutObjectAsync` call instead of `TransferUtility`, so no multipart upload is ever
-	/// started. Only needed for servers that reject multipart uploads outright; `DisablePayloadSigning` alone is
-	/// enough for Cloudflare R2.
+	/// Uploads with a single `PutObjectAsync` API call instead of `TransferUtility`, so no multipart upload is ever
+	/// started. Only needed for servers that reject multipart uploads outright, like Cloudflare R2.
 	/// </summary>
-	public bool? UsePutObject { get; set; }
+	public bool UploadPutObject { get; set; } = false;
 
 	/// <summary>
-	/// Sends uploads with an unsigned payload. The AWS SDK signs upload bodies with AWS chunked ("streaming")
-	/// signing by default, which several S3-compatible servers do not implement - Cloudflare R2 answers
-	/// `STREAMING-AWS4-HMAC-SHA256-PAYLOAD[-TRAILER] not implemented`. The SDK requires HTTPS when this is set.
+	/// Uploads objects with an signed or unsigned payload.
+	/// Setting this to false will disable the SigV4 payload signing data integrity check on all uploads.
+	/// Useful for AWS-compatible servers that don't implement signed payloads.
 	/// </summary>
-	public bool? DisablePayloadSigning { get; set; }
+	public bool UploadSignedPayload { get; set; } = true;
 
 
 	/// <summary>
@@ -105,7 +104,7 @@ public class S3Store : StoreBase, IS3Storage {
 		};
 
 		var store = new S3Store(accessKeyId, secretAccessKey, sessionToken, bucketName, config);
-		store.DisablePayloadSigning = true;
+		store.UploadSignedPayload = true;
 		return store;
 	}
 	/// <summary>
@@ -320,7 +319,7 @@ public class S3Store : StoreBase, IS3Storage {
 		}
 
 		// if PutObject API is required
-		if (UsePutObject is true) {
+		if (UploadPutObject) {
 
 			// Single PUT, no multipart upload.
 			var request = new PutObjectRequest {
@@ -328,7 +327,7 @@ public class S3Store : StoreBase, IS3Storage {
 				Key = fullPath,
 				InputStream = dataStream,
 				ContentType = contentType,
-				DisablePayloadSigning = DisablePayloadSigning // R2 does not support "Streaming Signature V4".
+				DisablePayloadSigning = !UploadSignedPayload // R2 does not support "Streaming Signature V4".
 			};
 
 			await _client.PutObjectAsync(request, cancellationToken).ConfigureAwait(false);
@@ -342,7 +341,7 @@ public class S3Store : StoreBase, IS3Storage {
 				Key = fullPath,
 				InputStream = dataStream,
 				ContentType = contentType,
-				DisablePayloadSigning = DisablePayloadSigning // Carried through to every UploadPart of a multipart upload.
+				DisablePayloadSigning = !UploadSignedPayload // Carried through to every UploadPart of a multipart upload.
 			};
 
 			await _fileTransferUtility.UploadAsync(request, cancellationToken).ConfigureAwait(false);
