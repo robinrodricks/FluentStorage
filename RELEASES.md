@@ -4,9 +4,10 @@
 
 #### FluentStorage 8.0.23
  - **FluentStorage.AWS**
-   - New: `S3Store.DisablePayloadSigning` and `S3Store.UsePutObject` are now public, and can be set through `AwsS3Storage.FromThirdPartyCredentials`
-   - Fix: `DisablePayloadSigning` is now honoured by the `TransferUtility` upload path, so Cloudflare R2 performs multipart uploads instead of a single PUT
-   - Fix: `CloudflareR2Storage` no longer sends the CRC32 checksums that R2 rejects with `The checksum type FULL_OBJECT is not supported for this operation.`
+   - New: `DisablePayloadSigning` and `UsePutObject` are now public properties on `S3Store`
+   - New: `AwsS3Storage.FromThirdPartyCredentials` enhanced with additional properties
+   - Fix: Cloudflare R2 performs multipart uploads instead of a single PUT
+   - Fix: Cloudflare R2 no longer sends the CRC32 checksums that R2 rejects with `The checksum type FULL_OBJECT is not supported for this operation.`
 
 #### FluentStorage 8.0.22
  - **FluentStorage**
