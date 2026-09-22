@@ -61,6 +61,11 @@ public static class AwsS3Storage {
 	/// <param name="bucketName">Bucket name</param>
 	/// <param name="clientConfig">S3 client configuration</param>
 	/// <param name="transferUtilityConfig">S3 transfer utility configuration</param>
+	/// <param name="disablePayloadSigning">
+	/// Sends uploads with an unsigned payload. Required by servers that do not implement AWS chunked
+	/// ("streaming") payload signing, such as Cloudflare R2. Requires an HTTPS endpoint.
+	/// </param>
+	/// <param name="usePutObject">Uploads with a single PutObject call instead of TransferUtility.</param>
 	/// <returns>A reference to the created storage</returns>
 	public static IStore FromThirdPartyCredentials(
 		string accessKeyId,
@@ -68,8 +73,13 @@ public static class AwsS3Storage {
 		string sessionToken,
 		string bucketName,
 		AmazonS3Config clientConfig,
-		TransferUtilityConfig transferUtilityConfig = null) {
-		return new S3Store(accessKeyId, secretAccessKey, sessionToken, bucketName, clientConfig, transferUtilityConfig);
+		TransferUtilityConfig transferUtilityConfig = null,
+		bool? disablePayloadSigning = null,
+		bool? usePutObject = null) {
+		return new S3Store(accessKeyId, secretAccessKey, sessionToken, bucketName, clientConfig, transferUtilityConfig) {
+			DisablePayloadSigning = disablePayloadSigning,
+			UsePutObject = usePutObject
+		};
 	}
 
 #if !NET16
