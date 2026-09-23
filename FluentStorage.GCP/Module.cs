@@ -1,5 +1,7 @@
-﻿using FluentStorage.ConnectionStrings;
+using FluentStorage.ConnectionStrings;
 using FluentStorage.Queue;
+using FluentStorage.GCP.Storage;
+using Google.Apis.Auth.OAuth2;
 using FluentStorage.Storage;
 
 namespace FluentStorage.GCP;
@@ -15,7 +17,7 @@ class Module : IExternalModule, IConnectionFactory {
 			// When cred= is absent or empty, fall back to Application Default Credentials
 			// (Workload Identity on Cloud Run, gcloud auth application-default login locally)
 			if (string.IsNullOrEmpty(base64EncodedJson))
-				return GoogleCloudStorage.FromEnvironmentVariable(bucketName);
+				return new GoogleCloudStore(bucketName, GoogleCredential.GetApplicationDefault());
 
 			return GoogleCloudStorage.FromJson(bucketName, base64EncodedJson, true);
 		}
