@@ -3,6 +3,8 @@
 **Please read the [Migration Guide](https://github.com/robinrodricks/FluentStorage/wiki/Migration-Guide) to help you migrate from older versions to FluentStorage 8!**
 
 #### FluentStorage 8.0.23
+ - **FluentStorage.GCP**
+   - Fix: Use GCP application default credential (ADC) for connection strings that do not contain credentials
  - **FluentStorage.AWS**
    - New: `UploadPutObject` and `UploadSignedPayload` are now public properties on `S3Store`
    - New: Factory API `AwsS3Storage.FromThirdPartyCredentials` enhanced with additional properties
