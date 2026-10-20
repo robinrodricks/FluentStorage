@@ -31,6 +31,7 @@ public class S3Store : StoreBase, IS3Storage {
 	private readonly AmazonS3Client _client;
 	private readonly TransferUtility _fileTransferUtility;
 	private bool _initialised = false;
+	private int _disposed;
 
 	/// <summary>
 	/// Uploads with a single `PutObjectAsync` API call instead of `TransferUtility`, so no multipart upload is ever
@@ -226,6 +227,21 @@ public class S3Store : StoreBase, IS3Storage {
 		_client = new AmazonS3Client(awsCreds, clientConfig);
 
 		_fileTransferUtility = new TransferUtility(_client, transferUtilityConfig ?? new TransferUtilityConfig());
+	}
+
+	/// <summary>
+	/// Releases the transfer utility and S3 client owned by this store.
+	/// </summary>
+	public override void Dispose() {
+		if (Interlocked.Exchange(ref _disposed, 1) != 0)
+			return;
+
+		try {
+			_fileTransferUtility.Dispose();
+		}
+		finally {
+			_client.Dispose();
+		}
 	}
 
 	/// <summary>
