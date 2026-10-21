@@ -264,7 +264,7 @@ public class SftpStore : StoreBase {
 					// If using a RootDirectory, remove it from the object full path
 					if (RootDirectory != null) {
 						foreach (var b in dirListing) {
-							b.SetFullPath(b.FullPath.Substring(RootDirectory.Length + 1));
+							b.SetFullPath(b.FullPath.Substring(RootDirectory.Length));
 						}
 					}
 					results.AddRange(dirListing);
@@ -302,7 +302,7 @@ public class SftpStore : StoreBase {
 
 		if (RootDirectory != null) {
 			foreach (var b in results) {
-				b.SetFullPath(b.FullPath.Substring(RootDirectory.Length + 1));
+				b.SetFullPath(b.FullPath.Substring(RootDirectory.Length));
 			}
 		}
 
