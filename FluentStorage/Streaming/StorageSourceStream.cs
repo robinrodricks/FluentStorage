@@ -64,14 +64,19 @@ public class StorageSourceStream : Stream {
 	}
 
 	/// <summary>
-	/// Only allows seeks to beginning if no reads were performed
+	/// Seeks the origin when the origin can seek. Otherwise only allows seeks to beginning if no reads were
+	/// performed
 	/// </summary>
 	public override long Seek(long offset, SeekOrigin origin) {
+		// An SDK that retries a failed upload rewinds the stream to send the same bytes again. A seekable
+		// origin can do that, so let it rather than failing the retry
+		if (_origin.CanSeek) {
+			return _origin.Seek(offset, origin);
+		}
+
+		// FIX #132: Some SDKs call Seek(0, Begin) before first read. A seekable origin really rewinds, above;
+		// one that cannot seek is still at its start if nothing has been read
 		if (_noRead && offset == 0 && origin == SeekOrigin.Begin) {
-			// FIX #132: Some SDKs call Seek(0, Begin) before first read. Make sure we really rewind.
-			if (_origin.CanSeek) {
-				return _origin.Seek(0, SeekOrigin.Begin);
-			}
 			return 0;
 		}
 
