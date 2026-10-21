@@ -16,13 +16,22 @@ class MemoryStore : StoreBase {
 		public StoreObject blob;
 		public byte[] data;
 	}
+	// Lock object guarding _files and _directories. Never hold the lock while running caller code
+	// (streams, delegates, lazy enumerables), and never let a stored StoreObject out of it: callers get
+	// clones, as the disk and cloud stores return new objects on every call.
+	private readonly object _lock = new object();
 	private readonly Dictionary<string, Tag> _files = new Dictionary<string, Tag>();
 	private readonly HashSet<string> _directories = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "" };
 
 	public override async Task<List<StoreObject>> ListObjects(StorageListOptions options, CancellationToken cancellationToken = default) {
 		if (options == null) options = new StorageListOptions();
 
-		IEnumerable<KeyValuePair<string, Tag>> query = _files;
+		List<KeyValuePair<string, Tag>> files;
+		lock (_lock) {
+			files = _files.Select(p => new KeyValuePair<string, Tag>(p.Key, Snapshot(p.Value))).ToList();
+		}
+
+		IEnumerable<KeyValuePair<string, Tag>> query = files;
 
 		//limit by folder path
 		if (options.Recurse) {
@@ -64,30 +73,34 @@ class MemoryStore : StoreBase {
 		if (sourceStream is null)
 			throw new ArgumentNullException(nameof(sourceStream));
 
-		if (append) {
-			if (!await ObjectExists(fullPath, cancellationToken)) {
-				Write(fullPath, sourceStream);
-			}
-			else {
-				Tag tag = _files[fullPath];
-				byte[] data = tag.data.Concat(sourceStream.ToByteArray()).ToArray();
-				Write(fullPath, new MemoryStream(data));
-			}
+		// Read the caller's stream before taking the lock. As before, a MemoryStream is read from the
+		// start, except when appending to an existing object, which reads from its current position.
+		long appendFrom = 0;
+		if (sourceStream is MemoryStream ms) {
+			appendFrom = ms.Position;
+			ms.Position = 0;
 		}
-		else {
-			Write(fullPath, sourceStream);
-		}
+		byte[] data = sourceStream.ToByteArray();
 
+		lock (_lock) {
+			if (append && _files.TryGetValue(fullPath, out Tag tag))
+				data = tag.data.Concat(data.Skip((int)appendFrom)).ToArray();
+			Write(fullPath, data);
+		}
 	}
 
 	public override async Task<Stream> OpenRead(string fullPath, CancellationToken cancellationToken = default) {
 		if (fullPath == null) throw new ArgumentNullException(nameof(fullPath));
 		fullPath = StoragePath.Normalize(fullPath);
 
-		// return null if the object is not found
-		if (!_files.TryGetValue(fullPath, out Tag tag) || tag.data == null) return null;
+		Tag tag;
+		lock (_lock) {
+			// return null if the object is not found
+			if (!_files.TryGetValue(fullPath, out tag) || tag.data == null) return null;
+		}
 
-		return new NonCloseableStream(new MemoryStream(tag.data));
+		// read-only, so callers cannot change the stored bytes, which are shared and never copied
+		return new NonCloseableStream(new MemoryStream(tag.data, false));
 	}
 	public override async Task<Stream> OpenWrite(string fullPath, bool overwrite, CancellationToken cancellationToken = default) {
 		if (fullPath == null) throw new ArgumentNullException(nameof(fullPath));
@@ -111,9 +124,12 @@ class MemoryStore : StoreBase {
 
 		fullPath = StoragePath.Normalize(fullPath);
 
-		// return null if the object is not found
-		if (!_files.TryGetValue(fullPath, out Tag tag) || tag.data == null)
-			return null;
+		Tag tag;
+		lock (_lock) {
+			// return null if the object is not found
+			if (!_files.TryGetValue(fullPath, out tag) || tag.data == null)
+				return null;
+		}
 
 		var stream = new MemoryStream(tag.data, false);
 		stream.Position = offset;
@@ -145,16 +161,21 @@ class MemoryStore : StoreBase {
 	public override async Task DeleteObject(string fullPath, CancellationToken cancellationToken = default) {
 		if (fullPath == null) return;
 		StoreObject pb = fullPath;
-		if (_files.ContainsKey(pb)) {
-			_files.Remove(pb);
+		lock (_lock) {
+			if (_files.ContainsKey(pb)) {
+				_files.Remove(pb);
+			}
 		}
 	}
 
 	public override async Task<List<bool>> ObjectsExists(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
+		List<string> paths = fullPaths.ToList();
 		var result = new List<bool>();
 
-		foreach (string fullPath in fullPaths) {
-			result.Add(_files.ContainsKey(StoragePath.Normalize(fullPath)));
+		lock (_lock) {
+			foreach (string fullPath in paths) {
+				result.Add(_files.ContainsKey(StoragePath.Normalize(fullPath)));
+			}
 		}
 
 		return result;
@@ -164,16 +185,19 @@ class MemoryStore : StoreBase {
 		return (await GetObjectsInfo(new List<string> { path }, cancellationToken).ConfigureAwait(false)).FirstOrDefault();
 	}
 	public override async Task<List<StoreObject>> GetObjectsInfo(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
-		ArgValidator.AssertFullPaths(fullPaths);
+		List<string> paths = fullPaths?.ToList();
+		ArgValidator.AssertFullPaths(paths);
 
 		var result = new List<StoreObject>();
 
-		foreach (string fullPath in fullPaths) {
-			if (!_files.TryGetValue(StoragePath.Normalize(fullPath), out Tag tag)) {
-				result.Add(null);
-			}
-			else {
-				result.Add(tag.blob);
+		lock (_lock) {
+			foreach (string fullPath in paths) {
+				if (!_files.TryGetValue(StoragePath.Normalize(fullPath), out Tag tag)) {
+					result.Add(null);
+				}
+				else {
+					result.Add(Snapshot(tag).blob);
+				}
 			}
 		}
 
@@ -188,22 +212,26 @@ class MemoryStore : StoreBase {
 		if (blobs == null)
 			return;
 
-		foreach (StoreObject blob in blobs) {
-			if (_files.TryGetValue(blob, out Tag tag)) {
-				tag.blob.Metadata.Clear();
-				tag.blob.Metadata.AddRange(blob.Metadata);
+		List<StoreObject> blobList = blobs.ToList();
+
+		lock (_lock) {
+			foreach (StoreObject blob in blobList) {
+				if (_files.TryGetValue(blob, out Tag tag)) {
+					tag.blob.Metadata.Clear();
+					tag.blob.Metadata.AddRange(blob.Metadata);
+				}
 			}
 		}
 	}
 
-	private void Write(string fullPath, Stream sourceStream) {
-		if (fullPath == null) throw new ArgumentNullException(nameof(fullPath));
-		fullPath = StoragePath.Normalize(fullPath);
+	// A copy of a stored entry that callers may keep and change. The bytes are shared, as they are never
+	// changed in place: a write stores a new array.
+	private static Tag Snapshot(Tag tag) {
+		return new Tag { blob = (StoreObject)tag.blob.Clone(), data = tag.data };
+	}
 
-		if (sourceStream is MemoryStream ms)
-			ms.Position = 0;
-		byte[] data = sourceStream.ToByteArray();
-
+	// Caller must hold _lock.
+	private void Write(string fullPath, byte[] data) {
 		if (!_files.TryGetValue(fullPath, out Tag tag)) {
 			tag = new Tag {
 				data = data,
@@ -225,6 +253,7 @@ class MemoryStore : StoreBase {
 		AddVirtualFolderHierarchy(tag.blob);
 	}
 
+	// Caller must hold _lock.
 	private void AddVirtualFolderHierarchy(StoreObject fileBlob) {
 		string path = StoragePath.Normalize(fileBlob.FolderPath);
 
@@ -241,7 +270,9 @@ class MemoryStore : StoreBase {
 	public override async Task<bool> ObjectExists(string fullPath, CancellationToken cancellationToken = default) {
 		if (fullPath == null) throw new ArgumentNullException(nameof(fullPath));
 
-		return _files.ContainsKey(StoragePath.Normalize(fullPath));
+		lock (_lock) {
+			return _files.ContainsKey(StoragePath.Normalize(fullPath));
+		}
 	}
 
 
@@ -251,9 +282,11 @@ class MemoryStore : StoreBase {
 
 		fullPath = StoragePath.Normalize(fullPath);
 
-		return _files.TryGetValue(fullPath, out Tag tag) && tag.data != null
-			? tag.data.LongLength
-			: defaultValue;
+		lock (_lock) {
+			return _files.TryGetValue(fullPath, out Tag tag) && tag.data != null
+				? tag.data.LongLength
+				: defaultValue;
+		}
 	}
 
 	public override async Task CreateDirectory(string folderPath, bool force, CancellationToken cancellationToken = default) {
@@ -261,20 +294,24 @@ class MemoryStore : StoreBase {
 
 		folderPath = StoragePath.Normalize(folderPath);
 
-		while (true) {
-			_directories.Add(folderPath);
+		lock (_lock) {
+			while (true) {
+				_directories.Add(folderPath);
 
-			if (StoragePath.IsRootPath(folderPath))
-				break;
+				if (StoragePath.IsRootPath(folderPath))
+					break;
 
-			folderPath = StoragePath.GetParent(folderPath);
+				folderPath = StoragePath.GetParent(folderPath);
+			}
 		}
 	}
 
 	public override async Task<bool> DirectoryExists(string folderPath, CancellationToken cancellationToken = default) {
 		if (folderPath == null) throw new ArgumentNullException(nameof(folderPath));
 
-		return _directories.Contains(StoragePath.Normalize(folderPath));
+		lock (_lock) {
+			return _directories.Contains(StoragePath.Normalize(folderPath));
+		}
 	}
 
 	public override async Task DeleteDirectory(string folderPath, bool recursive, CancellationToken cancellationToken = default) {
@@ -282,29 +319,31 @@ class MemoryStore : StoreBase {
 
 		folderPath = StoragePath.Normalize(folderPath);
 
-		if (!_directories.Contains(folderPath))
-			return;
-
-		string prefix = folderPath.Length == 0 ? "" : folderPath + "/";
-
-		if (recursive) {
-
-			foreach (string file in _files.Keys.Where(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList())
-				_files.Remove(file);
-
-			foreach (string dir in _directories.Where(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList())
-				_directories.Remove(dir);
-		}
-		else {
-
-			if (_files.Keys.Any(x => StoragePath.GetParent(x) == folderPath))
+		lock (_lock) {
+			if (!_directories.Contains(folderPath))
 				return;
 
-			if (_directories.Any(x => StoragePath.GetParent(x) == folderPath))
-				return;
-		}
+			string prefix = folderPath.Length == 0 ? "" : folderPath + "/";
 
-		_directories.Remove(folderPath);
+			if (recursive) {
+
+				foreach (string file in _files.Keys.Where(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList())
+					_files.Remove(file);
+
+				foreach (string dir in _directories.Where(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList())
+					_directories.Remove(dir);
+			}
+			else {
+
+				if (_files.Keys.Any(x => StoragePath.GetParent(x) == folderPath))
+					return;
+
+				if (_directories.Any(x => StoragePath.GetParent(x) == folderPath))
+					return;
+			}
+
+			_directories.Remove(folderPath);
+		}
 	}
 
 	public override async Task MoveDirectory(string sourceFolderPath, string destinationFolderPath, CancellationToken cancellationToken = default) {
@@ -316,26 +355,28 @@ class MemoryStore : StoreBase {
 
 		string prefix = sourceFolderPath.Length == 0 ? "" : sourceFolderPath + "/";
 
-		foreach (string oldPath in _files.Keys.Where(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList()) {
+		lock (_lock) {
+			foreach (string oldPath in _files.Keys.Where(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList()) {
 
-			string relative = oldPath.Substring(prefix.Length);
-			string newPath = StoragePath.Combine(destinationFolderPath, relative);
+				string relative = oldPath.Substring(prefix.Length);
+				string newPath = StoragePath.Combine(destinationFolderPath, relative);
 
-			Tag tag = _files[oldPath];
-			tag.blob.SetFullPath(newPath);
+				Tag tag = _files[oldPath];
+				tag.blob.SetFullPath(newPath);
 
-			_files.Remove(oldPath);
-			_files[newPath] = tag;
+				_files.Remove(oldPath);
+				_files[newPath] = tag;
+			}
+
+			foreach (string dir in _directories.Where(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList()) {
+				_directories.Remove(dir);
+
+				string relative = dir.Substring(prefix.Length);
+				_directories.Add(StoragePath.Combine(destinationFolderPath, relative));
+			}
+
+			_directories.Add(destinationFolderPath);
 		}
-
-		foreach (string dir in _directories.Where(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList()) {
-			_directories.Remove(dir);
-
-			string relative = dir.Substring(prefix.Length);
-			_directories.Add(StoragePath.Combine(destinationFolderPath, relative));
-		}
-
-		_directories.Add(destinationFolderPath);
 	}
 
 	public override async Task<bool> MoveObject(string oldPath, string newPath, bool overwrite, CancellationToken cancellationToken = default) {
@@ -345,29 +386,31 @@ class MemoryStore : StoreBase {
 		oldPath = StoragePath.Normalize(oldPath);
 		newPath = StoragePath.Normalize(newPath);
 
-		// source must exist
-		if (!_files.TryGetValue(oldPath, out Tag tag) || tag.data == null)
-			return false;
+		lock (_lock) {
+			// source must exist
+			if (!_files.TryGetValue(oldPath, out Tag tag) || tag.data == null)
+				return false;
 
-		// destination exists and overwrite disabled
-		if (!overwrite && _files.ContainsKey(newPath))
-			return false;
+			// destination exists and overwrite disabled
+			if (!overwrite && _files.ContainsKey(newPath))
+				return false;
 
-		// remove destination if overwriting
-		if (overwrite && _files.ContainsKey(newPath))
-			_files.Remove(newPath);
+			// remove destination if overwriting
+			if (overwrite && _files.ContainsKey(newPath))
+				_files.Remove(newPath);
 
-		// move the object
-		tag.blob.SetFullPath(newPath);
-		tag.blob.DateModified = DateTime.UtcNow;
+			// move the object
+			tag.blob.SetFullPath(newPath);
+			tag.blob.DateModified = DateTime.UtcNow;
 
-		_files.Remove(oldPath);
-		_files[newPath] = tag;
+			_files.Remove(oldPath);
+			_files[newPath] = tag;
 
-		// ensure destination folder hierarchy exists
-		AddVirtualFolderHierarchy(tag.blob);
+			// ensure destination folder hierarchy exists
+			AddVirtualFolderHierarchy(tag.blob);
 
-		return true;
+			return true;
+		}
 	}
 
 }
