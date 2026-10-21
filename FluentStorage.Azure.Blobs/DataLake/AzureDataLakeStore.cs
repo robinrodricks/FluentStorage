@@ -59,7 +59,7 @@ public class AzureDataLakeStore : AzureBlobStore, IAzureDataLakeStore {
 	}
 
 
-	protected override Task DeleteObjects(string fullPath, CancellationToken cancellationToken = default) {
+	public override Task DeleteObject(string fullPath, CancellationToken cancellationToken = default) {
 		return _extended.DeleteAsync(fullPath, cancellationToken);
 	}
 

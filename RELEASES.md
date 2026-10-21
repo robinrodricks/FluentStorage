@@ -14,7 +14,7 @@
    - Fix: Correct disposal of AWS `TransferUtility` and AWS Client
  - **FluentStorage.SFTP**
    - Fix: File paths are no longer incorrectly cut at `GetObjectsInfo`, `GetObjectInfo`, `ListObjects`, `ListDirectory`
- - **FluentStorage.Azure.Blob**
+ - **FluentStorage.Azure.Blobs**
    - Fix: `DeleteObject` API was not supported and was crashing if called
 
 #### FluentStorage 8.0.23
