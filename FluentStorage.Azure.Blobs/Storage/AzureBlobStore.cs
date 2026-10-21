@@ -93,7 +93,7 @@ public class AzureBlobStore : StoreBase, IAzureBlobStore {
 	public override async Task DeleteObjects(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
 		ArgValidator.AssertFullPaths(fullPaths);
 
-		await Task.WhenAll(fullPaths.Select(fullPath => DeleteObjects(fullPath, cancellationToken))).ConfigureAwait(false);
+		await Task.WhenAll(fullPaths.Select(fullPath => DeleteObject(fullPath, cancellationToken))).ConfigureAwait(false);
 	}
 
 	public override async Task<List<bool>> ObjectsExists(IEnumerable<string> fullPaths, CancellationToken cancellationToken = default) {
@@ -577,7 +577,7 @@ public class AzureBlobStore : StoreBase, IAzureBlobStore {
 		return _containerName == null ? StoragePath.Combine(containerName, relativePath) : relativePath;
 	}
 
-	protected virtual async Task DeleteObjects(string fullPath, CancellationToken cancellationToken = default) {
+	public override async Task DeleteObject(string fullPath, CancellationToken cancellationToken = default) {
 		(BlobContainerClient container, string path) = await GetPartsAsync(fullPath, false).ConfigureAwait(false);
 
 		if (StoragePath.IsRootPath(path)) {
