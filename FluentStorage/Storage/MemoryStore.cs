@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentStorage.Enums;
 using FluentStorage.Model;
 using FluentStorage.Streaming;
 using FluentStorage.Utils.Extensions;
@@ -27,8 +28,10 @@ class MemoryStore : StoreBase {
 		if (options == null) options = new StorageListOptions();
 
 		List<KeyValuePair<string, Tag>> files;
+		List<string> directories;
 		lock (_lock) {
 			files = _files.Select(p => new KeyValuePair<string, Tag>(p.Key, Snapshot(p.Value))).ToList();
+			directories = _directories.ToList();
 		}
 
 		IEnumerable<KeyValuePair<string, Tag>> query = files;
@@ -43,7 +46,15 @@ class MemoryStore : StoreBase {
 		}
 		else {
 			var fPath = StoragePath.Normalize(options.FolderPath);
-			query = query.Where(p => p.Value.blob.FolderPath == fPath);
+
+			// immediate subfolders, which the disk and cloud stores also return (DiskStore and Azure Blob
+			// put them before the files); FilePrefix applies to them as it does on disk and S3
+			IEnumerable<KeyValuePair<string, Tag>> subfolders = directories
+				.Where(d => StoragePath.GetParent(d) == fPath)
+				.Select(d => new KeyValuePair<string, Tag>(d, new Tag { blob = new StoreObject(d, StorageObjectType.Folder) }))
+				.Where(p => options.FilePrefix == null || p.Value.blob.Name.StartsWith(options.FilePrefix));
+
+			query = subfolders.Concat(query.Where(p => p.Value.blob.FolderPath == fPath));
 		}
 
 		//prefix
