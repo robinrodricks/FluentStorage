@@ -261,12 +261,12 @@ class MemoryStore : StoreBase {
 		}
 		_files[fullPath] = tag;
 
-		AddVirtualFolderHierarchy(tag.blob);
+		AddVirtualFolderHierarchy(tag.blob.FolderPath);
 	}
 
 	// Caller must hold _lock.
-	private void AddVirtualFolderHierarchy(StoreObject fileBlob) {
-		string path = StoragePath.Normalize(fileBlob.FolderPath);
+	private void AddVirtualFolderHierarchy(string folderPath) {
+		string path = StoragePath.Normalize(folderPath);
 
 		while (true) {
 			_directories.Add(path);
@@ -367,7 +367,14 @@ class MemoryStore : StoreBase {
 		string prefix = sourceFolderPath.Length == 0 ? "" : sourceFolderPath + "/";
 
 		lock (_lock) {
-			foreach (string oldPath in _files.Keys.Where(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList()) {
+			List<string> filesToMove = _files.Keys.Where(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList();
+			List<string> foldersToMove = _directories.Where(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList();
+
+			// nothing to move: not even the destination is created
+			if (!_directories.Contains(sourceFolderPath) && filesToMove.Count == 0 && foldersToMove.Count == 0)
+				return;
+
+			foreach (string oldPath in filesToMove) {
 
 				string relative = oldPath.Substring(prefix.Length);
 				string newPath = StoragePath.Combine(destinationFolderPath, relative);
@@ -379,14 +386,19 @@ class MemoryStore : StoreBase {
 				_files[newPath] = tag;
 			}
 
-			foreach (string dir in _directories.Where(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList()) {
+			// remove every old folder record before adding the new ones, as a moved folder may land on
+			// the old path of the source or of another moved folder
+			if (!StoragePath.IsRootPath(sourceFolderPath))
+				_directories.Remove(sourceFolderPath);
+			foreach (string dir in foldersToMove)
 				_directories.Remove(dir);
 
+			foreach (string dir in foldersToMove) {
 				string relative = dir.Substring(prefix.Length);
 				_directories.Add(StoragePath.Combine(destinationFolderPath, relative));
 			}
 
-			_directories.Add(destinationFolderPath);
+			AddVirtualFolderHierarchy(destinationFolderPath);
 		}
 	}
 
@@ -418,7 +430,7 @@ class MemoryStore : StoreBase {
 			_files[newPath] = tag;
 
 			// ensure destination folder hierarchy exists
-			AddVirtualFolderHierarchy(tag.blob);
+			AddVirtualFolderHierarchy(tag.blob.FolderPath);
 
 			return true;
 		}
