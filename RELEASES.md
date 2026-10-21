@@ -2,6 +2,19 @@
 
 **Please read the [Migration Guide](https://github.com/robinrodricks/FluentStorage/wiki/Migration-Guide) to help you migrate from older versions to FluentStorage 8!**
 
+#### FluentStorage 8.0.24
+ - **FluentStorage**
+   - Fix: `FixedStream` Position setter does not rewind the underlying stream 
+   - Fix: `StorageSourceStream` seeks a seekable stream, so Azure uploads can be retried
+   - Fix: `MemoryStore` behaviour is now in parity with `FileStore` as far as possible
+   - Fix: `MemoryStore` is now thread-safe and returns copies of stored objects
+   - Fix: `MemoryStore` non-recursive listings now include immediate subfolders
+   - Fix: `MemoryStore` `MoveDirectory` now removes the source folder and creates the destination's parent folders
+ - **FluentStorage.AWS**
+   - Fix: Correct disposal of AWS `TransferUtility` and AWS Client
+ - **FluentStorage.SFTP**
+   - Fix: File paths are no longer incorrectly cut at `GetObjectsInfo`, `GetObjectInfo`, `ListObjects`, `ListDirectory`
+
 #### FluentStorage 8.0.23
  - **FluentStorage.GCP**
    - Fix: Use GCP application default credential (ADC) for connection strings that do not contain credentials
