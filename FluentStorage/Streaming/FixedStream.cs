@@ -67,11 +67,18 @@ public class FixedStream : Stream {
 	public override long Length => _length == null ? _parent.Length : _length.Value;
 
 	/// <summary>
-	/// Gets or sets current potision. This counter is maintained internally and parent's position is not used.
+	/// Gets or sets current position. This counter is maintained internally and parent's position is not read.
+	/// Setting it also moves the parent when the parent can seek, the same as <see cref="Seek"/> does.
 	/// </summary>
 	public override long Position {
 		get => _position;
 		set {
+			// OpenWrite implementations set Position = 0 before uploading what was written. Rewinding only
+			// this counter left the parent at its end, so the upload read nothing and stored an empty object
+			if (_parent.CanSeek) {
+				_parent.Position = value;
+			}
+
 			_position = value;
 		}
 	}
