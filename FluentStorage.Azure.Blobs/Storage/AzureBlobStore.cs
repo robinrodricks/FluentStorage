@@ -225,8 +225,15 @@ public class AzureBlobStore : StoreBase, IAzureBlobStore {
 					ContentType = contentType
 				}
 			};
+			// A stream that cannot seek is passed as it is. The SDK handles one itself, buffering each block
+			// so a retry can resend it; wrapped, it would claim it can seek, and the SDK would ask it for a
+			// length it cannot give
+			Stream uploadStream = dataStream.CanSeek
+				? new StorageSourceStream(dataStream)
+				: dataStream;
+
 			await client.UploadAsync(
-				new StorageSourceStream(dataStream),
+				uploadStream,
 				options: options,
 				cancellationToken: cancellationToken).ConfigureAwait(false);
 		}
