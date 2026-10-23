@@ -17,7 +17,6 @@ using FluentStorage.Enums;
 using FluentStorage.Exceptions;
 using FluentStorage.Model;
 using FluentStorage.Storage;
-using FluentStorage.Streaming;
 using FluentStorage.Utils.Validation;
 using MimeMapping;
 using HttpRange = Azure.HttpRange;
@@ -226,7 +225,7 @@ public class AzureBlobStore : StoreBase, IAzureBlobStore {
 				}
 			};
 			await client.UploadAsync(
-				new StorageSourceStream(dataStream),
+				dataStream,
 				options: options,
 				cancellationToken: cancellationToken).ConfigureAwait(false);
 		}
